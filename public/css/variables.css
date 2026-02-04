@@ -1,0 +1,17 @@
+/* public/css/variables.css */
+:root {
+    --cafe-oscuro: #4E342E;
+    --cafe-medio: #6D4C41;
+    --crema: #F5EFE6;
+    --ambar: #FFAB40;
+    --texto-p: #3E2723;
+    --texto-s: #795548;
+    --verde: #689F38;
+}
+
+body {
+    background-color: var(--crema) !important;
+    font-family: 'Poppins', Arial, sans-serif;
+    color: var(--texto-p);
+    margin: 0;
+}

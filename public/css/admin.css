@@ -1,0 +1,64 @@
+/* public/css/admin.css */
+
+/* Login Admin */
+.login-card {   
+    background: white; 
+    border-radius: 30px; 
+    padding: 50px; 
+    max-width: 450px; 
+    box-shadow: 0 20px 60px rgba(78,52,46,0.12); 
+}
+
+.btn-login { 
+    background-color: var(--cafe-oscuro); 
+    color: white !important; 
+    width: 100%; 
+    border-radius: 12px; 
+    font-weight: bold; 
+}
+
+/* Dashboard y Sidebar */
+.sidebar { 
+    width: 260px; 
+    height: 100vh; 
+    background-color: var(--cafe-oscuro); 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    padding: 30px 20px; 
+}
+
+.nav-link-admin { 
+    color: rgba(245,239,230,0.7); 
+    text-decoration: none; 
+    display: block; 
+    padding: 12px 15px; 
+    border-radius: 12px; 
+}
+
+.nav-link-admin.active, .nav-link-admin:hover { 
+    background-color: var(--ambar); 
+    color: var(--cafe-oscuro) !important; 
+    font-weight: bold; 
+}
+
+.metric-card { 
+    background: white; 
+    padding: 25px; 
+    border-radius: 20px; 
+    border: 1px solid rgba(109,76,65,0.1); 
+}
+
+.metric-value {
+    font-size: 2.5rem; 
+    font-weight: 800; 
+    color: var(--cafe-oscuro); 
+}
+
+.reserva-item-card { 
+    background: white; 
+    border-radius: 20px; 
+    padding: 25px; 
+    margin-bottom: 20px;
+    border: 1px solid rgba(109,76,65,0.1);
+}

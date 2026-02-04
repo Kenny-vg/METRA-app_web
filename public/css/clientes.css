@@ -1,0 +1,82 @@
+/* public/css/cliente.css */
+
+/* Menú Superior y Hero */
+.nav-link-custom { 
+    color: var(--cafe-oscuro) 
+    !important; font-weight: 600; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    text-decoration: none !important; 
+}
+
+.btn-nav-reserva { 
+    background-color: var(--ambar) 
+    !important; color: var(--cafe-oscuro) 
+    !important; border-radius: 50px !important;
+    padding: 8px 25px !important; 
+    text-decoration: none 
+    !important; font-weight: 800;
+}
+.hero-container { 
+    min-height: 90vh;
+    display: flex;
+    align-items: center; 
+}
+.hero-title {
+     font-size: 4.2rem; 
+     font-weight: 800; 
+     color: var(--cafe-oscuro); 
+}
+.btn-metra-main { 
+    background-color: var(--ambar); 
+    color: var(--cafe-oscuro) 
+    !important; padding: 18px 45px;
+    border-radius: 50px; 
+    font-weight: bold; 
+    text-decoration: none;
+}
+
+/* Página de Detalles y Reservas */
+.img-detalles { 
+    width: 100%; 
+    height: 400px; 
+    object-fit: cover; 
+    border-radius: 25px;
+}
+
+.info-card { 
+    background: white; 
+    border-radius: 20px; 
+    padding: 30px; 
+    border: 1px solid rgba(109,76,65,0.1); 
+    margin-bottom: 20px; 
+}
+
+.time-slot { 
+    display: inline-block; 
+    background-color: var(--cafe-oscuro); 
+    color: white; 
+    padding: 8px 15px; 
+    border-radius: 8px; 
+    margin: 5px; 
+    cursor: pointer; }
+
+
+.review-item { 
+    border-left: 4px solid var(--cafe-medio); 
+    padding-left: 15px; 
+    margin-bottom: 25px; 
+}
+
+.stars { 
+    color: var(--ambar);
+}
+
+.ticket-container { 
+    background: white; 
+    border-radius: 20px; 
+    padding: 40px; 
+    border: 2px dashed var(--cafe-medio); 
+    max-width: 500px; 
+    margin: 0 auto; 
+}
