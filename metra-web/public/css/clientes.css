@@ -1,0 +1,95 @@
+/* public/css/clientes.css */
+
+/* --- MENÚ SUPERIOR (Estilo Nike) --- */
+.nav-link-custom { 
+    color: var(--cafe-oscuro) !important; 
+    font-weight: 600; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    text-decoration: none !important; 
+    padding: 10px 15px;
+}
+
+.btn-nav-reserva { 
+    background-color: var(--ambar) !important; 
+    color: var(--cafe-oscuro) !important; 
+    border-radius: 50px !important; 
+    padding: 10px 25px !important; 
+    text-decoration: none !important; 
+    font-weight: 800;
+    box-shadow: 0 4px 15px rgba(255, 171, 64, 0.3);
+}
+
+/* --- BIENVENIDA (Imagen con adorno) --- */
+.image-wrapper {
+    position: relative;
+    padding: 40px;
+}
+
+.img-restaurante {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 500px;
+    height: 380px;
+    object-fit: cover;
+    border-radius: 30px;
+    box-shadow: 15px 15px 40px rgba(0,0,0,0.1);
+}
+
+.image-bg-decoration {
+    position: absolute;
+    top: 60px; /* Se desplaza hacia abajo */
+    right: 20px;
+    width: 480px;
+    height: 380px;
+    background-color: var(--cafe-medio); /* El div café de atrás */
+    border-radius: 30px;
+    z-index: 1;
+}
+
+/* --- PLATILLOS (Alineación perfecta) --- */
+.menu-thumb {
+    width: 100%;
+    height: 180px; /* Altura fija obligatoria */
+    object-fit: cover; /* Recorta la imagen para que rellene el espacio sin estirarse */
+    border-radius: 20px;
+    margin-bottom: 15px;
+}
+
+/* El adorno café debajo de la imagen de bienvenida */
+.image-wrapper {
+    position: relative;
+    padding-bottom: 40px; /* Espacio para el div de abajo */
+}
+
+.image-bg-decoration {
+    position: absolute;
+    bottom: 0; 
+    right: 0;
+    width: 90%;
+    height: 80%;
+    background-color: var(--cafe-medio);
+    border-radius: 30px;
+    z-index: 1;
+}
+/* --- TICKET Y CONTENEDOR DE RESERVA --- */
+.reserva-card {
+    background: white;
+    border-radius: 40px;
+    padding: 50px;
+    max-width: 1000px;
+    margin: -80px auto 60px; /* Sube para encimarse a la foto de cabecera */
+    box-shadow: 0 25px 60px rgba(78, 52, 46, 0.12);
+    position: relative;
+    z-index: 10;
+}
+
+.ticket-container {
+    max-width: 550px;
+    margin: 0 auto !important;
+    background: white;
+    padding: 45px;
+    border: 2px dashed var(--cafe-medio);
+    border-radius: 25px;
+}

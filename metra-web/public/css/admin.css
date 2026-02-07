@@ -1,0 +1,56 @@
+
+/* public/css/admin.css */
+
+/* --- LOGIN (Centrado total) --- */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--crema);
+}
+
+.login-card {
+    background: white;
+    border-radius: 35px;
+    padding: 60px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 30px 70px rgba(78, 52, 46, 0.15);
+    text-align: center;
+}
+
+/* --- SIDEBAR Y MAIN --- */
+.sidebar { 
+    width: 260px; 
+    height: 100vh; 
+    background-color: #4E342E !important;; 
+    position: fixed; 
+    top: 0; left: 0; 
+    padding: 40px 25px; 
+    z-index: 1000;
+}
+
+.main-admin-content {
+    margin-left: 260px !important; /* Empuja el contenido a la derecha del sidebar */
+    padding: 60px;
+    width: calc(100% - 260px); /* Ocupa el resto de la pantalla */
+    min-height: 100vh;
+}
+
+/* --- BOTONES DE PERFIL Y ACCIÓN --- */
+.btn-metra-main { 
+    background-color: var(--ambar) !important; 
+    color: var(--cafe-oscuro) !important; 
+    border-radius: 50px !important;
+    padding: 14px 35px !important;
+    font-weight: 800;
+    border: none !important;
+    transition: 0.3s;
+}
+
+.nav-link-admin.text-danger {
+    color: #ff6b6b !important;
+    font-weight: bold;
+    margin-top: 20px;
+}

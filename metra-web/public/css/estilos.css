@@ -1,0 +1,592 @@
+/* public/css/estilos.css */
+:root {
+    --cafe-oscuro: #4E342E;
+    --cafe-medio: #6D4C41;
+    --crema: #F5EFE6;
+    --ambar: #FFAB40;
+    --texto-p: #3E2723;
+    --texto-s: #795548;
+}
+
+body {
+    background-color: var(--crema) !important;
+    font-family: 'Poppins', Arial, sans-serif;
+    color: var(--texto-p);
+    margin: 0;
+}
+
+.hero-container {
+    min-height: 90vh; /* Para que ocupe casi toda la pantalla */
+    display: flex;
+    align-items: center; /* Esto centra el texto verticalmente respecto a la imagen */
+}
+
+.hero-title {
+    font-size: 4.2rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--cafe-oscuro);
+    margin-bottom: 20px;
+}
+
+/* EL BOTÓN con el nuevo color Ámbar */
+.btn-metra-main {
+    background-color: var(--ambar);
+    color: var(--cafe-oscuro) !important;
+    border: none;
+    padding: 18px 45px;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    text-decoration: none;
+    display: inline-block;
+    transition: 0.3s;
+    box-shadow: 0 10px 20px rgba(255, 171, 64, 0.3);
+}
+
+.btn-metra-main:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(255, 171, 64, 0.4);
+    filter: brightness(1.1);
+}
+
+/* Contenedor de imagen con fondo decorativo Café */
+.image-wrapper {
+    position: relative;
+    padding: 30px;
+}
+
+.image-bg-decoration {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: 90%;
+    height: 90%;
+    background-color: var(--cafe-medio);
+    border-radius: 30px;
+    z-index: 1;
+}
+
+.img-restaurante {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    border-radius: 30px;
+    box-shadow: 20px 20px 50px rgba(78, 52, 46, 0.2);
+}
+
+
+
+
+/* para detalles 
+/* public/css/estilos.css */
+:root {
+    --cafe-oscuro: #4E342E;
+    --cafe-medio: #6D4C41;
+    --crema: #F5EFE6;
+    --ambar: #FFAB40;
+    --texto-p: #3E2723;
+    --texto-s: #795548;
+    --verde: #689F38;
+}
+
+body { background-color: var(--crema) !important; font-family: 'Poppins', sans-serif; color: var(--texto-p); }
+
+/* Imagen más pequeña y elegante */
+.img-detalles {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 25px;
+    box-shadow: 0 10px 30px rgba(78, 52, 46, 0.1);
+}
+
+/* Tarjetas informativas */
+.info-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px solid rgba(109, 76, 65, 0.1);
+    margin-bottom: 20px;
+}
+
+.btn-ambar {
+    background-color: var(--ambar);
+    color: var(--cafe-oscuro) !important;
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    font-weight: 800;
+    width: 100%;
+    transition: 0.3s;
+}
+
+.btn-ambar:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255, 171, 64, 0.3); }
+
+/* Estilo para Reseñas */
+.review-item {
+    border-left: 4px solid var(--cafe-medio);
+    padding-left: 15px;
+    margin-bottom: 25px;
+}
+
+.stars { color: var(--ambar); font-size: 0.9rem; }
+
+/* public/css/estilos.css */
+
+/* Pastillas de horarios tipo OpenTable */
+.time-slot {
+    display: inline-block;
+    background-color: #4E342E;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 8px;
+    margin: 5px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.time-slot:hover {
+    background-color: #FFAB40;
+    color: #4E342E;
+}
+
+/* Fotos mini del menú */
+.menu-thumb {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 15px;
+    margin-bottom: 10px;
+}
+
+/* Footer discreto para acceso admin */
+.footer-admin {
+    padding: 20px 0;
+    margin-top: 50px;
+}
+
+.admin-link {
+    color: rgba(121, 85, 72, 0.3); /* Muy clarito, casi transparente */
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: 0.3s;
+}
+
+.admin-link:hover {
+    color: #4E342E; /* Solo se nota si pasas el mouse */
+}
+
+
+/* para reservaciones 
+/* public/css/estilos.css */
+
+/* Contenedor del formulario de reserva */
+.reserva-form-card {
+    background: white;
+    border-radius: 30px;
+    padding: 40px;
+    border: 1px solid var(--cafe-medio);
+    box-shadow: 0 15px 35px rgba(78, 52, 46, 0.1);
+}
+
+.step-title {
+    font-weight: 800;
+    color: var(--cafe-oscuro);
+    border-bottom: 2px solid var(--crema);
+    padding-bottom: 10px;
+    margin-bottom: 25px;
+}
+
+/* Inputs con estilo Coffee-Shop */
+.form-metra {
+    background-color: var(--crema);
+    border: 1px solid var(--cafe-medio);
+    border-radius: 12px;
+    padding: 12px;
+    color: var(--texto-p);
+}
+
+.form-metra:focus {
+    outline: none;
+    border-color: var(--ambar);
+    box-shadow: 0 0 0 3px rgba(255, 171, 64, 0.2);
+}
+
+/* Grid del Calendario simple */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    text-align: center;
+}
+
+.day-box {
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 0.9rem;
+}
+
+.day-box:hover { background-color: var(--ambar); }
+.day-active { background-color: var(--cafe-oscuro); color: white; }
+
+
+/* para reserva pag 3 
+/* public/css/estilos.css */
+:root {
+    --cafe-oscuro: #4E342E;
+    --cafe-medio: #6D4C41;
+    --crema: #F5EFE6;
+    --ambar: #FFAB40;
+}
+
+body {
+    background-color: var(--crema) !important;
+    font-family: 'Arial', sans-serif;
+}
+
+/* El contenedor blanco para que el formulario resalte */
+.reserva-card {
+    background: white;
+    border-radius: 30px;
+    padding: 50px;
+    box-shadow: 0 20px 50px rgba(78, 52, 46, 0.1);
+    border: 1px solid rgba(109, 76, 65, 0.1);
+    margin-top: -50px; /* Sube un poco para encimarse a la imagen */
+    position: relative;
+    z-index: 10;
+}
+
+.header-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 0 0 50px 50px;
+}
+
+.input-metra {
+    background-color: #fcfaf7;
+    border: 1px solid #dcd0c0;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.input-metra:focus {
+    border-color: var(--ambar);
+    box-shadow: 0 0 0 3px rgba(255, 171, 64, 0.2);
+}
+
+.section-title {
+    color: var(--cafe-oscuro);
+    font-weight: 800;
+    border-bottom: 2px solid var(--crema);
+    padding-bottom: 10px;
+}
+
+/* pagina 4 public 
+/* Estilo de Ticket de Confirmación */
+.ticket-container {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    border: 2px dashed var(--cafe-medio);
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto;
+    box-shadow: 0 15px 30px rgba(78, 52, 46, 0.1);
+}
+
+.ticket-header {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+.folio-text {
+    font-family: 'Courier New', Courier, monospace;
+    background: var(--crema);
+    padding: 5px 15px;
+    border-radius: 5px;
+    color: var(--cafe-oscuro);
+    font-weight: bold;
+}
+
+.ticket-data {
+    font-size: 0.95rem;
+    line-height: 2;
+}
+
+.check-icon {
+    width: 60px;
+    height: 60px;
+    background: #689F38;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 25px;
+}
+
+
+/* login admi 
+/* Estilos específicos para el Login */
+.login-container {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card {
+    background: white;
+    border-radius: 30px;
+    padding: 50px;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 20px 60px rgba(78, 52, 46, 0.12);
+    border: 1px solid rgba(109, 76, 65, 0.1);
+}
+
+.login-logo {
+    color: var(--cafe-oscuro);
+    font-weight: 800;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.btn-login {
+    background-color: var(--cafe-oscuro);
+    color: white !important;
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: bold;
+    border: none;
+    transition: 0.3s;
+    margin-top: 20px;
+}
+
+.btn-login:hover {
+    background-color: var(--cafe-medio);
+    transform: translateY(-2px);
+}
+
+
+/* dasboard 
+/* public/css/estilos.css */
+
+/* public/css/estilos.css */
+:root {
+    --cafe-oscuro: #4E342E;
+    --cafe-medio: #6D4C41;
+    --crema: #F5EFE6;
+    --ambar: #FFAB40;
+    --texto-p: #3E2723;
+    --texto-s: #795548;
+}
+
+body {
+    background-color: var(--crema) !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--texto-p);
+    margin: 0;
+}
+
+/* SIDEBAR (Menú Lateral) */
+.sidebar {
+    width: 260px;
+    height: 100vh;
+    background-color: var(--cafe-oscuro);
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 30px 20px;
+    z-index: 1000;
+}
+
+.nav-link-admin {
+    color: rgba(245, 239, 230, 0.7);
+    text-decoration: none;
+    display: block;
+    padding: 12px 15px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    transition: 0.3s;
+}
+
+.nav-link-admin:hover, .nav-link-admin.active {
+    background-color: var(--ambar);
+    color: var(--cafe-oscuro) !important;
+    font-weight: bold;
+}
+
+/* TARJETAS DE MÉTRICAS */
+.metric-card {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(78, 52, 46, 0.05);
+    border: 1px solid rgba(109, 76, 65, 0.1);
+}
+
+.metric-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--cafe-oscuro);
+    line-height: 1;
+    margin: 10px 0;
+}
+
+/* GRÁFICA E IMÁGENES */
+.chart-box-image {
+    width: 100%;
+    height: 320px;
+    object-fit: contain;
+    background: #fcfcfc;
+    border-radius: 15px;
+}
+
+.reservation-item {
+    padding: 15px;
+    border-bottom: 1px solid #f1ece4;
+}
+
+/* BOTONES GENERALES */
+.btn-metra-main {
+    background-color: var(--ambar);
+    color: var(--cafe-oscuro) !important;
+    border-radius: 50px;
+    padding: 12px 30px;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+}
+
+
+/***************gestion del negocio 
+/* Estilo para las pestañas de Gestión */
+.nav-pills .nav-link.active {
+    background-color: var(--cafe-oscuro) !important;
+    color: var(--ambar) !important;
+    font-weight: bold;
+}
+
+.nav-pills .nav-link {
+    color: var(--cafe-medio);
+}
+
+.table th {
+    border-top: none;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+/******** gesrion de reservas 
+/* Estilos para las tarjetas de reservación */
+.reserva-item-card {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(109, 76, 65, 0.1);
+    transition: 0.3s;
+}
+
+.reserva-item-card:hover {
+    box-shadow: 0 10px 25px rgba(78, 52, 46, 0.1);
+}
+
+.hora-box {
+    background-color: var(--crema);
+    color: var(--cafe-oscuro);
+    padding: 10px;
+    border-radius: 12px;
+    min-width: 80px;
+    text-align: center;
+    font-weight: 800;
+}
+
+/* Badges personalizados */
+.badge-status {
+    font-size: 0.75rem;
+    padding: 5px 12px;
+    border-radius: 50px;
+    font-weight: bold;
+}
+
+
+
+
+/* Estilos para el Menú Superior Minimalista */
+/* public/css/estilos.css */
+:root {
+    --cafe-oscuro: #4E342E;
+    --cafe-medio: #6D4C41;
+    --crema: #F5EFE6;
+    --ambar: #FFAB40;
+}
+
+body {
+    background-color: var(--crema) !important;
+}
+
+/* --- MENÚ SUPERIOR --- */
+.nav-link-custom {
+    color: var(--cafe-oscuro) !important;
+    font-weight: 600;
+    text-decoration: none !important;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 10px 15px;
+    transition: 0.3s;
+}
+
+.nav-link-custom:hover {
+    color: var(--cafe-medio) !important;
+    border-bottom: 2px solid var(--cafe-medio);
+}
+
+/* BOTÓN "TERMINAR RESERVA" EN EL MENÚ */
+.btn-nav-reserva {
+    background-color: var(--ambar) !important;
+    color: var(--cafe-oscuro) !important;
+    padding: 8px 25px !important;
+    border-radius: 50px !important;
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-decoration: none !important;
+    border: none !important;
+    box-shadow: 0 4px 10px rgba(255, 171, 64, 0.3);
+    transition: 0.3s;
+}
+
+.btn-nav-reserva:hover {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+}
+
+/* --- HERO SECTION --- */
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: var(--cafe-oscuro);
+}
+
+.btn-metra-main {
+    background-color: var(--ambar);
+    color: var(--cafe-oscuro) !important;
+    padding: 15px 35px;
+    border-radius: 50px;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    box-shadow: 0 8px 20px rgba(255, 171, 64, 0.3);
+}
