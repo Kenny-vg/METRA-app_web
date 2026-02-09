@@ -1,32 +1,12 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>METRA - Gestión de Negocio</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{{ asset('css/estilos.css?v=' . time()) }}">
-</head>
-<body class = "zona-admin" style="background-color: #F5EFE6;">
 
-    <aside class="sidebar">
-        <h2 class="fw-bold mb-5 text-center" style="color: #FFAB40;">METRA</h2>
-        <nav>
-            <a href="/admin/dashboard" class="nav-link-admin"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
-            <a href="/admin/gestion_negocio" class="nav-link-admin active"><i class="bi bi-shop me-2"></i> Gestión</a>
-            <a href="/admin/reservaciones" class="nav-link-admin"><i class="bi bi-calendar3 me-2"></i> Reservaciones</a>
-            <a href="/admin/perfil" class="nav-link-admin"><i class="bi bi-person-circle me-2"></i> Mi Perfil</a>
-            <hr style="border-color: rgba(255,255,255,0.1);">
-            <a href="/" class="nav-link-admin text-danger"><i class="bi bi-door-open me-2"></i> Salir</a>
-        </nav>
-    </aside>
+@extends('admin.menu')
+@section('title', 'Gestión del Negocio')
 
-    <main style="margin-left: 260px;" class="p-5">
-        <header class="mb-5">
-            <h2 class="fw-bold">Gestión del Negocio</h2>
-            <p class="text-muted">Administra tus recursos: Mesas y Personal</p>
-        </header>
-
+@section('content')
+    <header class="mb-5">
+        <h2 class="fw-bold">Gestión del Negocio</h2>
+        <p class="text-muted">Administra tu negocio</p>
+    </header>
         <ul class="nav nav-pills mb-4 gap-2" id="pills-tab" role="tablist">
             <li class="nav-item">
                 <button class="nav-link active rounded-pill px-4" id="mesas-tab" data-bs-toggle="pill" data-bs-target="#mesas">
@@ -41,6 +21,11 @@
             <li class="nav-item">
     <button class="nav-link rounded-pill px-4 border" id="reviews-tab" data-bs-toggle="pill" data-bs-target="#reviews">
         <i class="bi bi-star me-2"></i>Aprobar Reseñas
+    </button>
+</li>
+<li class="nav-item">
+    <button class="nav-link rounded-pill px-4 border" id="horarios-tab" data-bs-toggle="pill" data-bs-target="#horarios">
+        <i class="bi bi-clock me-2"></i>Horarios
     </button>
 </li>
         </ul>
@@ -103,7 +88,6 @@
                             <thead class="table-light">
                                 <tr class="small text-muted text-uppercase">
                                     <th>Nombre del Mesero</th>
-                                    <th>Turno</th>
                                     <th>Teléfono</th>
                                     <th class="text-end">Acciones</th>
                                 </tr>
@@ -114,7 +98,6 @@
                                         <img src="https://ui-avatars.com/api/?name=Juan+Perez&background=6D4C41&color=fff" class="rounded-circle me-3" width="35">
                                         <span class="fw-bold">Juan Pérez</span>
                                     </td>
-                                    <td>Matutino</td>
                                     <td>238 123 4455</td>
                                     <td class="text-end">
                                         <button class="btn btn-outline-secondary btn-sm rounded-circle"><i class="bi bi-pencil"></i></button>
@@ -126,6 +109,39 @@
                     </div>
                 </div>
             </div>
+
+            <div class="tab-pane fade" id="horarios">
+    <div class="bg-white p-4 rounded-4 shadow-sm border">
+        <div class="mb-4">
+            <h5 class="fw-bold text-dark">Configuración de Citas</h5>
+            <p class="text-muted small">Selecciona los horarios que estarán disponibles para reservación en tu página pública.</p>
+        </div>
+
+        <div class="row g-3">
+            @php 
+                $slots = ['08:30 AM', '09:00 AM', '11:30 AM', '01:00 PM', '04:30 PM', '07:00 PM', '08:30 PM'];
+            @endphp
+            
+            @foreach($slots as $hora)
+            <div class="col-md-3 col-6">
+                <div class="p-3 border rounded-4 d-flex justify-content-between align-items-center bg-light">
+                    <span class="fw-bold small">{{ $hora }}</span>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" checked>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        <div class="mt-4 pt-4 border-top text-end">
+            <button class="btn btn-warning rounded-pill px-5 fw-bold shadow-sm">
+                Actualizar Disponibilidad
+            </button>
+        </div>
+    </div>
+</div>
+
         </div>
         <div class="tab-pane fade" id="reviews">
     <div class="bg-white p-4 rounded-4 shadow-sm border">
@@ -161,8 +177,5 @@
         </div>
     </div>
 </div>
-    </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+ @include('partials.footer_admin')
+ @endsection

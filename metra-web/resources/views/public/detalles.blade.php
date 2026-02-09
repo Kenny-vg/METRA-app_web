@@ -4,16 +4,26 @@
     <meta charset="UTF-8">
     <title>METRA - Café Central</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ asset('css/estilos.css?v=' . time()) }}">
 </head>
-<body>
+<body class="zona-comensal">
 
-    <nav class="navbar py-4">
+   <nav class="navbar py-4">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a href="/" class="fw-bold fs-2 text-decoration-none" style="color: #4E342E;">METRA</a>
+        
+        <a href="{{ url('/') }}" class="btn-volver-chic">
+            <i class="bi bi-arrow-left-short"></i> Volver al inicio
+        </a>
+
         <div class="container">
-            <a href="/" class="fw-bold fs-2 text-decoration-none" style="color: #4E342E;">METRA</a>
+            <a href="/admin-login" class="admin-link">Iniciar Sesion</a>
         </div>
-    </nav>
-    <hr>
+    </div>
+</nav>
+<hr class="m-0" style="opacity: 0.1;">
+   
 
     <main class="container my-5">
     <div class="row g-5">
@@ -41,19 +51,19 @@
 
             <div class="info-card">
                 <h4 class="fw-bold mb-4">Platillos destacados</h4>
-                <div class="row g-3 text-center"> <div class="col-md-3 col-6"> <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=300" class="menu-thumb img-fluid rounded-3">
+                <div class="row g-3 text-center"> <div class="col-md-3 col-6"> <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=300" class="img-menu-item">
                         <p class="small fw-bold mt-2">Expreso Doble</p>
                     </div>
                     <div class="col-md-3 col-6">
-                        <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=300" class="menu-thumb img-fluid rounded-3">
+                        <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=300" class="img-menu-item">
                         <p class="small fw-bold mt-2">Chilaquiles</p>
                     </div>
                     <div class="col-md-3 col-6">
-                        <img src="https://images.unsplash.com/photo-1517433367423-c7e5b0f35086?w=300" class="menu-thumb img-fluid rounded-3">
+                        <img src="https://images.unsplash.com/photo-1517433367423-c7e5b0f35086?w=300" class="img-menu-item">
                         <p class="small fw-bold mt-2">Pan Artesanal</p>
                     </div>
                     <div class="col-md-3 col-6">
-                        <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=300" class="menu-thumb img-fluid rounded-3">
+                        <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=300" class="img-menu-item">
                         <p class="small fw-bold mt-2">Matcha Latte</p>
                     </div>
                 </div>
@@ -90,9 +100,15 @@
                 <p class="small mb-1"><strong>Ubicación:</strong> Calle 123 Col. Centro</p>
                 <p class="small mb-1"><strong>Precios:</strong> De $300 a $500 MXN</p>
                 <p class="small">Contamos con opciones de Pago</p>
+                <p class="text-muted small mb-2 text-uppercase fw-bold" style="letter-spacing: 1px;">Políticas</p>
+                  <ul class="list-unstyled small color-cafe-suave">
+                     <li><i class="bi bi-check2-circle me-2"></i> 15 min de tolerancia</li>
+                      <li><i class="bi bi-check2-circle me-2"></i> Enviamos sus datos al email</li>
+                  </ul>
             </div>
         </div>
     </div>
     </main>
+    @include('partials.footer')
 </body>
 </html>

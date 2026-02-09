@@ -1,33 +1,12 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>METRA - Perfil del Negocio</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{{ asset('css/estilos.css?v=' . time()) }}">
-</head>
-<body style="background-color: #F5EFE6;">
+@extends('admin.menu')
+@section('title', 'Perfil del negocio')
 
-    <aside class="sidebar">
-        <h2 class="fw-bold mb-5 text-center" style="color: #FFAB40;">METRA</h2>
-        <nav>
-            <a href="/admin/dashboard" class="nav-link-admin"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
-            <a href="/admin/gestion_negocio" class="nav-link-admin"><i class="bi bi-shop me-2"></i> Gestión</a>
-            <a href="/admin/reservaciones" class="nav-link-admin"><i class="bi bi-calendar3 me-2"></i> Reservaciones</a>
-            <a href="/admin/perfil" class="nav-link-admin active"><i class="bi bi-person-circle me-2"></i> Perfil</a>
-            <hr style="border-color: rgba(255,255,255,0.1);">
-            <a href="/" class="nav-link-admin text-danger fw-bold">
-                <i class="bi bi-box-arrow-left me-2"></i> Cerrar Sesión
-            </a>
-        </nav>
-    </aside>
+@section('content')
+    <header class="mb-5">
+        <h2 class="fw-bold">Perfil del negocio</h2>
+        <p class="text-muted">Revisa y administra las próximas visitas a Café Central</p>
+    </header>
 
-    <main style="margin-left: 260px;" class="p-5">
-        <header class="mb-5">
-            <h2 class="fw-bold">Perfil del Negocio</h2>
-            <p class="text-muted">Personaliza la información que tus clientes ven en METRA</p>
-        </header>
 
         <form style="max-width: 900px;">
             <div class="row">
@@ -97,7 +76,5 @@
                 </button>
             </div>
         </form>
-    </main>
-
-</body>
-</html>
+        @include('partials.footer_admin')
+ @endsection

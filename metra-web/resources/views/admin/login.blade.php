@@ -6,7 +6,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/estilos.css?v=' . time()) }}">
 </head>
-<body>
+<body class="zona-admin">
 
     <main class="login-container">
         <div class="login-card text-center">
@@ -30,6 +30,10 @@
                 <button type="submit" class="btn-login">
                     Acceder al Panel →
                 </button>
+                <a href="/login/google" class="btn btn-outline-dark w-100 rounded-pill py-2 shadow-sm">
+                    <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" class="me-2">
+                     Continuar con Google
+                </a>
             </form>
 
             <div class="mt-5">
@@ -37,6 +41,6 @@
             </div>
         </div>
     </main>
-
+ @include('partials.footer_admin')
 </body>
 </html>

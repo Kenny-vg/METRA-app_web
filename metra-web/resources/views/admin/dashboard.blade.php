@@ -1,48 +1,11 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>METRA - Panel de Control</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{{ asset('css/estilos.css?v=' . time()) }}">
-</head>
-<body class="zona-admin" style="background-color: #F5EFE6;">
+@extends('admin.menu')
+@section('title', 'Dashboard Administrador')
 
-    <aside class="sidebar">
-        <h2 class="fw-bold mb-5 text-center" style="color: #FFAB40;">METRA</h2>
-        <nav>
-            <a href="/admin/dashboard" class="nav-link-admin active">
-                <i class="bi bi-speedometer2 me-2"></i> Dashboard
-            </a>
-            <a href="/admin/gestion_negocio" class="nav-link-admin">
-                <i class="bi bi-shop me-2"></i> Gestión del Negocio
-            </a>
-            <a href="/admin/reservaciones" class="nav-link-admin">
-                <i class="bi bi-calendar3 me-2"></i> Reservaciones
-            </a>
-            <a href="/admin/perfil" class="nav-link-admin">
-                <i class="bi bi-bar-chart-line me-2"></i> Perfil
-            </a>
-            <hr style="border-color: rgba(255,255,255,0.1);">
-            <a href="/" class="nav-link-admin text-danger">
-                <i class="bi bi-box-arrow-left me-2"></i> Salir
-            </a>
-        </nav>
-    </aside>
-
-    <main style="margin-left: 250px;" class="p-5">
-        <header class="d-flex justify-content-between align-items-center mb-5">
-            <div>
-                <h2 class="fw-bold">Resumen de Operaciones</h2>
-                <p class="text-muted">Estado actual de Café Central al 30 de Enero</p>
-            </div>
-            <div class="d-flex align-items-center bg-white p-2 rounded-pill shadow-sm">
-                <span class="px-3 fw-bold small">Admin </span>
-                <img src="https://ui-avatars.com/api/?name=Cristina&background=4E342E&color=fff" class="rounded-circle" width="40">
-            </div>
-        </header>
-
+@section('content')
+    <header class="mb-5">
+        <h2 class="fw-bold">Resumen de Operaciones</h2>
+        <p class="text-muted">Estado actual de Café Central</p>
+    </header>
         <div class="row g-4 mb-5">
             <div class="col-md-3">
                 <div class="metric-card">
@@ -150,6 +113,5 @@
                 </div>
             </div>
         </div>
-    </main>
-</body>
-</html>
+         @include('partials.footer_admin')
+@endsection
