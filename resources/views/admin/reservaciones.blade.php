@@ -8,7 +8,7 @@
     </header>
 
     <div class="bg-white p-4 rounded-4 shadow-sm border mb-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-2">
             <h5 class="fw-bold m-0 text-dark"><i class="bi bi-grid-3x3-gap me-2"></i>Monitor de Ocupación</h5>
             <div class="d-flex gap-3">
                 <small><i class="bi bi-circle-fill text-warning me-1"></i> Por Confirmar</small>
@@ -27,7 +27,7 @@
             @endphp
 
             @foreach($horarios_maestro as $h)
-                <div class="col-md-4 col-lg-2"> <div class="card border-0 bg-light rounded-4 h-100 shadow-sm">
+                <div class="col-6 col-md-4 col-lg-2"> <div class="card border-0 bg-light rounded-4 h-100 shadow-sm">
                         <div class="card-header bg-transparent border-0 pt-3 text-center">
                             <span class="badge bg-dark rounded-pill px-3">{{ $h }}</span>
                         </div>

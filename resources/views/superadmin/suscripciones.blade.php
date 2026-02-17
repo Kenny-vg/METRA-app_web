@@ -9,9 +9,9 @@
     </header>
 
     <div class="bg-white p-4 rounded-4 shadow-sm border">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
             <h5 class="fw-bold m-0 text-dark"><i class="bi bi-credit-card-2-front me-2"></i>Control de Pagos y Planes</h5>
-            <div class="input-group w-25">
+            <div class="input-group" style="max-width: 300px;">
                 <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
                 <input type="text" class="form-control bg-light border-0 small" placeholder="Buscar negocio...">
             </div>

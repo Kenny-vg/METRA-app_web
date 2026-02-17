@@ -3,47 +3,48 @@
 @section('title', 'Ajustes del Sistema')
 
 @section('content')
-    <header class="mb-5 d-flex justify-content-between align-items-center">
+    <header class="mb-5">
         @if(session('success'))
             <div class="alert alert-success border-0 shadow-sm rounded-4 position-absolute top-0 start-50 translate-middle-x mt-4" style="z-index: 1050;">
                 <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
             </div>
         @endif
-        <div>
-            <h2 class="fw-bold">Configuración Global SaaS</h2>
-            <p class="text-muted">Administra parámetros críticos de la plataforma METRA.</p>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+            <div>
+                <h2 class="fw-bold">Configuración Global SaaS</h2>
+                <p class="text-muted mb-0">Administra parámetros críticos de la plataforma METRA.</p>
+            </div>
+            <button type="submit" form="settingsForm" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold w-100 w-md-auto">
+                <i class="bi bi-save2-fill me-2"></i>Guardar Cambios
+            </button>
         </div>
-        <!-- Botón Guardar Principal (Sticky) -->
-        <button type="submit" form="settingsForm" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold">
-            <i class="bi bi-save2-fill me-2"></i>Guardar Cambios
-        </button>
     </header>
 
     <form id="settingsForm" action="/superadmin/guardar-ajustes" method="POST">
         <div class="row g-4">
             
             <!-- Columna Izquierda: Configuración de Negocio -->
-            <div class="col-md-8">
+            <div class="col-12 col-md-8">
                 
                 <!-- Sección Precios -->
                 <div class="bg-white p-4 rounded-4 shadow-sm border mb-4">
                     <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-cash-coin me-2"></i>Precios de Suscripción (MXN)</h5>
                     <div class="row g-3">
-                        <div class="col-md-4">
+                        <div class="col-6 col-md-4">
                             <label class="form-label small fw-bold text-muted">Plan Básico</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-0">$</span>
                                 <input type="number" class="form-control bg-light border-0" value="299" placeholder="0.00">
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-6 col-md-4">
                             <label class="form-label small fw-bold text-muted">Plan Pro</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-0">$</span>
                                 <input type="number" class="form-control bg-light border-0" value="499" placeholder="0.00">
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-6 col-md-4">
                             <label class="form-label small fw-bold text-muted">Plan Premium</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-0">$</span>
@@ -103,7 +104,7 @@
             </div>
 
             <!-- Columna Derecha: Sistema -->
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 
                 <!-- Estado del Sistema -->
                 <div class="bg-white p-4 rounded-4 shadow-sm border mb-4">

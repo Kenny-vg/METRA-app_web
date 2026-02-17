@@ -2,33 +2,44 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>METRA - Café Central</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="zona-comensal">
 
-    <nav class="navbar py-4">
-    <div class="container d-flex justify-content-between align-items-center">
-        <a href="/" class="fw-bold fs-2 text-decoration-none" style="color: #4E342E;">METRA</a>
-        
-        <div class="d-flex align-items-center gap-3">
-            <a href="/admin-login" class="admin-link text-decoration-none fw-bold small text-uppercase" style="color: #6D4C41;">Iniciar Sesión</a>
+    <nav class="navbar navbar-expand-lg py-3 py-lg-4">
+        <div class="container">
+            <a href="/" class="navbar-brand fw-bold fs-2 text-decoration-none" style="color: #4E342E;">METRA</a>
             
-            <a href="{{ url('/') }}" class="btn-volver-chic">
-                <i class="bi bi-arrow-left-short"></i> Volver
-            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navDetalles" aria-controls="navDetalles" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="bi bi-list fs-1" style="color: #4E342E;"></i>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navDetalles">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-2 gap-lg-3 mt-3 mt-lg-0">
+                    <li class="nav-item">
+                        <a href="/admin-login" class="nav-link fw-bold small text-uppercase" style="color: #6D4C41;">Iniciar Sesión</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url('/') }}" class="btn-volver-chic d-block text-center">
+                            <i class="bi bi-arrow-left-short"></i> Volver
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
-<hr class="m-0" style="opacity: 0.1;">
+    </nav>
+    <hr class="m-0" style="opacity: 0.1;">
    
 
     <main class="container my-5">
-    <div class="row g-5">
+    <div class="row g-4 g-lg-5">
         
-        <div class="col-lg-8">
+        <div class="col-12 col-lg-8">
             <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=1200" 
                  class="img-detalles mb-4" alt="Café Central">
 
@@ -51,18 +62,20 @@
 
             <div class="info-card">
                 <h4 class="fw-bold mb-4">Platillos destacados</h4>
-                <div class="row g-3 text-center"> <div class="col-md-3 col-6"> <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=300" class="img-menu-item">
+                <div class="row g-3 text-center">
+                    <div class="col-6 col-md-3">
+                        <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=300" class="img-menu-item">
                         <p class="small fw-bold mt-2">Expreso Doble</p>
                     </div>
-                    <div class="col-md-3 col-6">
+                    <div class="col-6 col-md-3">
                         <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=300" class="img-menu-item">
                         <p class="small fw-bold mt-2">Chilaquiles</p>
                     </div>
-                    <div class="col-md-3 col-6">
+                    <div class="col-6 col-md-3">
                         <img src="https://images.unsplash.com/photo-1517433367423-c7e5b0f35086?w=300" class="img-menu-item">
                         <p class="small fw-bold mt-2">Pan Artesanal</p>
                     </div>
-                    <div class="col-md-3 col-6">
+                    <div class="col-6 col-md-3">
                         <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=300" class="img-menu-item">
                         <p class="small fw-bold mt-2">Matcha Latte</p>
                     </div>
@@ -86,10 +99,10 @@
                     <p class="mb-1 text-muted small fw-bold">Reseña del 25 de Enero, 2026</p>
                     <p class="text-muted small">"Excelente lugar para estudiar, el WiFi es rápido y el café delicioso."</p>
                 </div>
-                </div>
+            </div>
         </div>
 
-        <div class="col-lg-4">
+        <div class="col-12 col-lg-4">
             <div class="info-card shadow-sm border-0 sticky-top" style="top: 20px; z-index: 10;">
                 <h5 class="fw-bold mb-4">Haz una reservación</h5>
                 <button onclick="window.location.href='/reservar'" class="btn-ambar">
@@ -110,5 +123,6 @@
     </div>
     </main>
     @include('partials.footer')
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

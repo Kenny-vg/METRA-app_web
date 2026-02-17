@@ -16,9 +16,11 @@ body {
 }
 
 .hero-container {
-    min-height: 90vh; /* Para que ocupe casi toda la pantalla */
+    min-height: 90vh;
+    /* Para que ocupe casi toda la pantalla */
     display: flex;
-    align-items: center; /* Esto centra el texto verticalmente respecto a la imagen */
+    align-items: center;
+    /* Esto centra el texto verticalmente respecto a la imagen */
 }
 
 .hero-title {
@@ -28,6 +30,32 @@ body {
     color: var(--cafe-oscuro);
     margin-bottom: 20px;
 }
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-container {
+        min-height: auto;
+        padding: 50px 0;
+        flex-direction: column-reverse;
+        text-align: center;
+    }
+
+    .image-wrapper {
+        padding: 0;
+        margin-bottom: 30px;
+    }
+
+    .image-bg-decoration {
+        width: 100%;
+        top: 20px;
+        right: -10px;
+    }
+}
+
+
 
 /* EL BOTÓN con el nuevo color Ámbar */
 .btn-metra-main {
@@ -90,7 +118,11 @@ body {
     --verde: #689F38;
 }
 
-body { background-color: var(--crema) !important; font-family: 'Poppins', sans-serif; color: var(--texto-p); }
+body {
+    background-color: var(--crema) !important;
+    font-family: 'Poppins', sans-serif;
+    color: var(--texto-p);
+}
 
 /* Imagen más pequeña y elegante */
 .img-detalles {
@@ -107,7 +139,18 @@ body { background-color: var(--crema) !important; font-family: 'Poppins', sans-s
     border-radius: 20px;
     padding: 30px;
     border: 1px solid rgba(109, 76, 65, 0.1);
+    border: 1px solid rgba(109, 76, 65, 0.1);
     margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .img-detalles {
+        height: 250px;
+    }
+
+    .info-card {
+        padding: 20px;
+    }
 }
 
 .btn-ambar {
@@ -121,7 +164,10 @@ body { background-color: var(--crema) !important; font-family: 'Poppins', sans-s
     transition: 0.3s;
 }
 
-.btn-ambar:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255, 171, 64, 0.3); }
+.btn-ambar:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(255, 171, 64, 0.3);
+}
 
 /* Estilo para Reseñas */
 .review-item {
@@ -130,7 +176,10 @@ body { background-color: var(--crema) !important; font-family: 'Poppins', sans-s
     margin-bottom: 25px;
 }
 
-.stars { color: var(--ambar); font-size: 0.9rem; }
+.stars {
+    color: var(--ambar);
+    font-size: 0.9rem;
+}
 
 /* public/css/estilos.css */
 
@@ -169,14 +218,16 @@ body { background-color: var(--crema) !important; font-family: 'Poppins', sans-s
 }
 
 .admin-link {
-    color: rgba(121, 85, 72, 0.3); /* Muy clarito, casi transparente */
+    color: rgba(121, 85, 72, 0.3);
+    /* Muy clarito, casi transparente */
     text-decoration: none;
     font-size: 0.8rem;
     transition: 0.3s;
 }
 
 .admin-link:hover {
-    color: #4E342E; /* Solo se nota si pasas el mouse */
+    color: #4E342E;
+    /* Solo se nota si pasas el mouse */
 }
 
 
@@ -231,8 +282,14 @@ body { background-color: var(--crema) !important; font-family: 'Poppins', sans-s
     font-size: 0.9rem;
 }
 
-.day-box:hover { background-color: var(--ambar); }
-.day-active { background-color: var(--cafe-oscuro); color: white; }
+.day-box:hover {
+    background-color: var(--ambar);
+}
+
+.day-active {
+    background-color: var(--cafe-oscuro);
+    color: white;
+}
 
 
 /* para reserva pag 3 
@@ -256,7 +313,8 @@ body {
     padding: 50px;
     box-shadow: 0 20px 50px rgba(78, 52, 46, 0.1);
     border: 1px solid rgba(109, 76, 65, 0.1);
-    margin-top: -50px; /* Sube un poco para encimarse a la imagen */
+    margin-top: -50px;
+    /* Sube un poco para encimarse a la imagen */
     position: relative;
     z-index: 10;
 }
@@ -266,6 +324,18 @@ body {
     height: 300px;
     object-fit: cover;
     border-radius: 0 0 50px 50px;
+}
+
+@media (max-width: 768px) {
+    .reserva-card {
+        padding: 25px;
+        margin-top: -30px;
+        border-radius: 20px;
+    }
+
+    .header-image {
+        height: 200px;
+    }
 }
 
 .input-metra {
@@ -335,47 +405,48 @@ body {
 
 
 /* login admi 
-/* Estilos específicos para el Login */
-.login-container {
-    min-height: 80vh;
+/* LOGIN REDESIGN */
+.login-wrapper {
+    height: 100vh;
+    overflow: hidden;
+    background: white;
+}
+
+.login-image-side {
+    background-image: url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    position: relative;
+}
+
+.login-overlay {
+    background: linear-gradient(135deg, rgba(78, 52, 46, 0.9), rgba(109, 76, 65, 0.8));
+    height: 100%;
+    width: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
 }
 
-.login-card {
-    background: white;
-    border-radius: 30px;
-    padding: 50px;
+.login-card-refined {
     width: 100%;
-    max-width: 450px;
-    box-shadow: 0 20px 60px rgba(78, 52, 46, 0.12);
-    border: 1px solid rgba(109, 76, 65, 0.1);
+    max-width: 500px;
 }
 
-.login-logo {
+.text-cafe {
     color: var(--cafe-oscuro);
-    font-weight: 800;
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-    display: block;
 }
 
-.btn-login {
-    background-color: var(--cafe-oscuro);
-    color: white !important;
-    width: 100%;
-    padding: 14px;
-    border-radius: 12px;
-    font-weight: bold;
-    border: none;
-    transition: 0.3s;
-    margin-top: 20px;
-}
+@media (max-width: 992px) {
+    .login-wrapper {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+    }
 
-.btn-login:hover {
-    background-color: var(--cafe-medio);
-    transform: translateY(-2px);
+    .login-card-refined {
+        padding: 30px !important;
+    }
 }
 
 
@@ -408,7 +479,44 @@ body {
     top: 0;
     left: 0;
     padding: 30px 20px;
+    padding: 30px 20px;
     z-index: 1000;
+    transition: transform 0.3s ease-in-out;
+}
+
+@media (max-width: 768px) {
+    .sidebar-super {
+        transform: translateX(-100%);
+        width: 80%;
+        max-width: 300px;
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+        height: 100vh;
+        position: fixed;
+        background-color: #212529;
+        /* Dark bg for superadmin */
+    }
+
+    .sidebar-super.active {
+        transform: translateX(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        width: 80%;
+        max-width: 300px;
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    main {
+        margin-left: 0 !important;
+        padding: 20px !important;
+    }
 }
 
 .nav-link-admin {
@@ -421,7 +529,8 @@ body {
     transition: 0.3s;
 }
 
-.nav-link-admin:hover, .nav-link-admin.active {
+.nav-link-admin:hover,
+.nav-link-admin.active {
     background-color: var(--ambar);
     color: var(--cafe-oscuro) !important;
     font-weight: bold;
@@ -430,31 +539,35 @@ body {
 /* TARJETAS DE MÉTRICAS */
 .metric-card {
     background: white;
-    padding: 25px;
-    border-radius: 20px;
+    padding: 30px;
+    /* Más padding interno */
+    border-radius: 25px;
     box-shadow: 0 10px 25px rgba(78, 52, 46, 0.05);
     border: 1px solid rgba(109, 76, 65, 0.1);
+    height: 100%;
 }
 
 .metric-value {
-    font-size: 2.5rem;
+    font-size: 3rem;
+    /* Números más grandes */
     font-weight: 800;
     color: var(--cafe-oscuro);
     line-height: 1;
-    margin: 10px 0;
+    margin: 15px 0;
 }
 
 /* GRÁFICA E IMÁGENES */
 .chart-box-image {
     width: 100%;
-    height: 320px;
+    height: 350px;
     object-fit: contain;
     background: #fcfcfc;
-    border-radius: 15px;
+    border-radius: 20px;
 }
 
 .reservation-item {
-    padding: 15px;
+    padding: 20px;
+    /* Más espacio entre items */
     border-bottom: 1px solid #f1ece4;
 }
 
@@ -463,10 +576,12 @@ body {
     background-color: var(--ambar);
     color: var(--cafe-oscuro) !important;
     border-radius: 50px;
-    padding: 12px 30px;
+    padding: 15px 35px;
+    /* Botones más grandes */
     font-weight: bold;
     text-decoration: none;
     display: inline-block;
+    font-size: 1.1rem;
 }
 
 
@@ -476,16 +591,29 @@ body {
     background-color: var(--cafe-oscuro) !important;
     color: var(--ambar) !important;
     font-weight: bold;
+    padding: 15px 30px !important;
+    /* Tabs más grandes */
+    font-size: 1.1rem;
 }
 
 .nav-pills .nav-link {
     color: var(--cafe-medio);
+    padding: 15px 30px !important;
+    font-size: 1.1rem;
 }
 
 .table th {
     border-top: none;
-    font-size: 0.75rem;
+    font-size: 0.9rem;
+    /* Header tabla más grande */
     letter-spacing: 1px;
+    padding: 15px !important;
+}
+
+.table td {
+    padding: 15px !important;
+    /* Celdas con más aire */
+    font-size: 1.05rem;
 }
 
 /******** gesrion de reservas 
@@ -589,4 +717,303 @@ body {
     text-decoration: none;
     display: inline-block;
     box-shadow: 0 8px 20px rgba(255, 171, 64, 0.3);
+}
+
+
+/* ============================================
+   MOBILE-ONLY OVERRIDES (Admin/Superadmin)
+   Solo afecta pantallas <= 768px
+   ============================================ */
+@media (max-width: 768px) {
+
+    /* --- Layout Principal --- */
+    .zona-admin,
+    .zona-superadmin {
+        font-size: 1.05rem;
+    }
+
+    main {
+        margin-left: 0 !important;
+        padding: 15px !important;
+    }
+
+    /* --- Sidebar oculto en móvil --- */
+    .sidebar,
+    .sidebar-super {
+        transform: translateX(-100%);
+        width: 85%;
+        max-width: 320px;
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
+        z-index: 1050;
+    }
+
+    .sidebar.active,
+    .sidebar-super.active {
+        transform: translateX(0);
+    }
+
+    /* --- Metric Cards más grandes --- */
+    .metric-card {
+        padding: 20px;
+        border-radius: 18px;
+    }
+
+    .metric-value {
+        font-size: 2rem !important;
+        margin: 8px 0;
+    }
+
+    .metric-card small {
+        font-size: 0.75rem;
+    }
+
+    /* --- Encabezados de página --- */
+    header h2 {
+        font-size: 1.5rem;
+    }
+
+    header p {
+        font-size: 0.9rem;
+    }
+
+    /* --- Tarjetas y contenedores --- */
+    .bg-white.p-4 {
+        padding: 15px !important;
+        border-radius: 18px !important;
+    }
+
+    /* --- Tablas --- */
+    .table th {
+        font-size: 0.75rem;
+        padding: 10px 8px !important;
+    }
+
+    .table td {
+        font-size: 0.9rem;
+        padding: 10px 8px !important;
+    }
+
+    /* --- Chart image --- */
+    .chart-box-image {
+        height: 220px;
+        border-radius: 15px;
+    }
+
+    /* --- Nav Pills tabs (Gestión) --- */
+    .nav-pills {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-pills .nav-link {
+        white-space: nowrap;
+        padding: 10px 18px !important;
+        font-size: 0.9rem;
+    }
+
+    .nav-pills .nav-link.active {
+        padding: 10px 18px !important;
+        font-size: 0.9rem;
+    }
+
+    /* --- Botones más fáciles de tocar --- */
+    .btn {
+        padding: 10px 18px;
+        font-size: 0.95rem;
+    }
+
+    .btn-sm {
+        padding: 8px 14px;
+    }
+
+    /* --- Reservation mini cards --- */
+    .reserva-mini-card strong {
+        font-size: 0.8rem !important;
+        max-width: 90px !important;
+    }
+
+    /* --- Login container --- */
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+    }
+
+    .login-card-refined {
+        padding: 25px !important;
+        border-radius: 15px;
+    }
+
+    /* --- Reservation items (dashboard) --- */
+    .reservation-item {
+        padding: 12px;
+    }
+
+    .reservation-item .fw-bold {
+        font-size: 0.95rem;
+    }
+
+    /* --- Footer admin --- */
+    footer.mt-5 {
+        margin-top: 30px !important;
+    }
+
+    /* ==========================================
+       PUBLIC PAGES MOBILE OVERRIDES
+       ========================================== */
+
+    /* --- Base font para zona-comensal --- */
+    .zona-comensal {
+        font-size: 1rem;
+    }
+
+    /* --- Hero Section --- */
+    .hero-title {
+        font-size: 2.5rem !important;
+    }
+
+    .hero-title span {
+        font-size: 1.5rem !important;
+    }
+
+    .hero-container {
+        min-height: auto;
+        padding: 30px 0;
+    }
+
+    .hero-container .fs-5 {
+        font-size: 1.05rem !important;
+    }
+
+    /* --- Navbar links --- */
+    .nav-link-custom {
+        font-size: 1rem !important;
+        padding: 12px 0 !important;
+    }
+
+    .btn-nav-reserva {
+        padding: 12px 25px !important;
+        font-size: 0.95rem !important;
+        margin-top: 5px;
+    }
+
+    /* --- Info Cards (Detalles) --- */
+    .info-card {
+        padding: 20px;
+        border-radius: 15px;
+    }
+
+    .info-card h4,
+    .info-card h5 {
+        font-size: 1.15rem;
+    }
+
+    /* --- Time Slots --- */
+    .time-slot {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+        margin: 4px;
+    }
+
+    /* --- Img en detalles --- */
+    .img-detalles {
+        height: 200px !important;
+        border-radius: 18px;
+    }
+
+    .img-menu-item {
+        border-radius: 12px;
+    }
+
+    /* --- Review items --- */
+    .review-item {
+        padding-left: 12px;
+        margin-bottom: 18px;
+    }
+
+    /* --- Reservation Form --- */
+    .reserva-card {
+        padding: 20px !important;
+        border-radius: 18px !important;
+        margin-top: -25px;
+    }
+
+    .reserva-card h1 {
+        font-size: 1.5rem !important;
+    }
+
+    .header-image {
+        height: 180px !important;
+        border-radius: 0 0 30px 30px;
+    }
+
+    .input-metra {
+        padding: 14px !important;
+        font-size: 1rem;
+        border-radius: 12px;
+    }
+
+    .form-select.input-metra {
+        padding: 14px !important;
+        font-size: 1rem;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+    }
+
+    /* --- Ticket de Confirmación --- */
+    .ticket-container {
+        padding: 25px;
+        border-radius: 16px;
+    }
+
+    .ticket-container h2 {
+        font-size: 1.4rem;
+    }
+
+    .folio-text {
+        font-size: 1.1rem;
+    }
+
+    .check-icon {
+        width: 55px;
+        height: 55px;
+        font-size: 22px;
+    }
+
+    /* --- Login Cards (Client/Admin) --- */
+    .login-card {
+        padding: 25px !important;
+        border-radius: 18px;
+    }
+
+    .login-logo {
+        font-size: 1.8rem !important;
+    }
+
+    /* --- Botón principal grande en mobile --- */
+    .btn-metra-main {
+        padding: 16px 30px;
+        font-size: 1.05rem;
+    }
+
+    .btn-ambar {
+        padding: 16px;
+        font-size: 1.05rem;
+        border-radius: 14px;
+    }
+
+    /* --- Perfil reservas stacked --- */
+    .p-3.border.rounded-4.bg-light {
+        flex-direction: column !important;
+        gap: 10px;
+    }
+
+    .p-3.border.rounded-4.bg-light .text-end {
+        text-align: start !important;
+    }
 }

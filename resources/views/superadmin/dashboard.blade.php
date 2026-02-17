@@ -3,14 +3,16 @@
 @section('title', 'Panel Maestro')
 
 @section('content')
-    <header class="mb-5 d-flex justify-content-between align-items-center">
-        <div>
-            <h2 class="fw-bold">Panel de Control Maestro</h2>
-            <p class="text-muted">Bienvenido, V-TECH. Gestiona los restaurantes inscritos.</p>
+    <header class="mb-5">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+            <div>
+                <h2 class="fw-bold">Panel de Control Maestro</h2>
+                <p class="text-muted mb-0">Bienvenido, V-TECH. Gestiona los restaurantes inscritos.</p>
+            </div>
+            <button class="btn btn-primary rounded-pill px-4 shadow-sm w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#nuevoNegocio">
+                <i class="bi bi-plus-lg me-2"></i>Registrar Nuevo Café
+            </button>
         </div>
-        <button class="btn btn-primary rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#nuevoNegocio">
-            <i class="bi bi-plus-lg me-2"></i>Registrar Nuevo Café
-        </button>
     </header>
 
     <div class="row g-4">

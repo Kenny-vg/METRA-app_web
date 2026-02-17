@@ -3,7 +3,7 @@
 @section('content')
     <div class="container">
     <div class="row g-4">
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100">
                 <div class="mb-3">
                     <img src="https://ui-avatars.com/api/?name=Martia&background=FFAB40&color=4E342E" class="rounded-circle shadow-sm" width="80">
@@ -19,7 +19,7 @@
             </div>
         </div>
 
-        <div class="col-md-8">
+        <div class="col-12 col-md-8">
             <div class="card border-0 shadow-sm rounded-4 p-4">
                 <h5 class="fw-bold mb-4"><i class="bi bi-clock-history me-2 text-warning"></i>Mis Reservaciones</h5>
                 

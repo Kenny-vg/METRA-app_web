@@ -6,8 +6,8 @@
         <h2 class="fw-bold">Resumen de Operaciones</h2>
         <p class="text-muted">Estado actual de Café Central</p>
     </header>
-        <div class="row g-4 mb-5">
-            <div class="col-md-3">
+        <div class="row g-3 g-md-4 mb-5">
+            <div class="col-6 col-md-3">
                 <div class="metric-card">
                     <div class="d-flex justify-content-between">
                         <small class="text-muted fw-bold">RESERVAS HOY</small>
@@ -17,7 +17,7 @@
                     <small class="text-success fw-bold">+15% vs ayer</small>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
                 <div class="metric-card">
                     <div class="d-flex justify-content-between">
                         <small class="text-muted fw-bold">Horas Pico</small>
@@ -27,7 +27,7 @@
                     <small class="text-muted">A 8:00PM</small>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
                 <div class="metric-card">
                     <div class="d-flex justify-content-between">
                         <small class="text-muted fw-bold">MESAS OCUPADAS</small>
@@ -37,7 +37,7 @@
                     <small class="text-muted">De 25 totales</small>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-6 col-md-3">
                 <div class="metric-card" style="background-color: #4E342E; color: white;">
                     <div class="d-flex justify-content-between">
                         <small class="text-white-50 fw-bold">Próxima reserva:</small>
@@ -49,8 +49,8 @@
             </div>
         </div>
 
-        <div class="row g-4">
-            <div class="col-md-7">
+        <div class="row g-3 g-md-4">
+            <div class="col-12 col-md-7">
                 <div class="bg-white p-4 rounded-4 shadow-sm h-100">
                     <h6 class="fw-bold mb-4">Análisis de Ocupación Semanal</h6>
                     <img src="https://support.content.office.net/es-es/media/9d77e47a-6f77-4977-90c2-511a2f605f6b.png" 
@@ -61,7 +61,7 @@
                 </div>
             </div>
 
-            <div class="col-md-5">
+            <div class="col-12 col-md-5">
                 <div class="bg-white p-4 rounded-4 shadow-sm h-100">
                     <h6 class="fw-bold mb-4">Últimas Reservaciones</h6>
                     <div class="overflow-auto" style="max-height: 400px;">
