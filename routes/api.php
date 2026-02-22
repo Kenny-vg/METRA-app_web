@@ -25,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
+
 /*
 |------------------------------------------
 | RUTAS SUPERADMIN
@@ -35,9 +36,9 @@ Route::middleware([
     'role:superadmin'
 ])->prefix('superadmin')->group(function () {
 
-    /*Route::get('/cafeterias', [CafeteriaController::class, 'index']);
+    Route::get('/cafeterias', [CafeteriaController::class, 'index']);
     Route::post('/cafeterias', [CafeteriaController::class, 'store']);
-    Route::put('/cafeterias/{id}', [CafeteriaController::class, 'update']);
-    Route::delete('/cafeterias/{id}', [CafeteriaController::class, 'destroy']);*/
+    Route::put('/cafeterias/{cafeteria}', [CafeteriaController::class, 'update']);
+    Route::delete('/cafeterias/{cafeteria}', [CafeteriaController::class, 'destroy']);
 
 });
