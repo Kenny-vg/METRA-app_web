@@ -91,5 +91,43 @@ class AuthController extends Controller
             'Sesión cerrada'
         );
     }
-    
+
+    /*
+      Activar la cuenta del gerente
+    */
+
+    public function activarCuenta(Request $request)
+    {
+        $data = $request->validate([
+            'email'=>'required|email',
+            'token'=>'required',
+            'password'=>'required|min:6'
+        ]);
+
+        //buscar usuario por token
+        $user = User::where('email',$data['email'])
+            ->where('activation_token', $data['token'])
+            ->first();
+
+        //si no existe el token
+        if(!$user){
+            return ApiResponse::error(
+                'Token inválido o expirado',
+                400
+            );
+        }
+
+        //activar cuenta
+        $user->update([
+            'password'=>Hash::make($data['password']),
+            'estado'=>true,
+            'activation_token'=>null,
+            'must_change_password'=>false
+        ]);
+
+        return ApiResponse::success(
+            null,
+            'Cuenta activada correctamente'
+        );
+    }
 }

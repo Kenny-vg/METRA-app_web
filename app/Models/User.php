@@ -24,7 +24,10 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'cafe_id'
+        'cafe_id',
+        'estado',
+        'activation_token',
+        'must_change_password'
     ];
 
     /**

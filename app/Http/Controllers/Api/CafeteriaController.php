@@ -7,8 +7,11 @@ use App\Models\Cafeteria;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ActivacionCuentaMail;
 use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
+use Illuminate\Support\Str;
 
 class CafeteriaController extends Controller
 {
@@ -34,9 +37,7 @@ class CafeteriaController extends Controller
 
                 //datos del gerente
                 'gerente.name'=>'required|string|max:100',
-                'gerente.email'=>'required|email|unique:users,email',
-                'gerente.password'=>'required|string|min:6',
-                
+                'gerente.email'=>'required|email|unique:users,email'
             ]);
 
             //transacción db
@@ -46,29 +47,42 @@ class CafeteriaController extends Controller
                     'nombre' => $data['nombre']
                 ]);
 
+                //generar token seguro
+                $token = Str::random(60);
+
                 //crear gerente
                 $gerente = User::create([
                     'name'=> $data['gerente']['name'],
                     'email'=>$data['gerente']['email'],
-                    'password'=> Hash::make($data['gerente']['password']),
+                    'password'=>null,
 
                     //seguridad
                     'role'=>'gerente',
 
                     //vinculación automática
                     'cafe_id'=>$cafeteria->id,
-                    'estado'=>true
+                    'estado'=>false,
+                    'activation_token'=>$token,
+                    'must_change_password'=>true
                 ]);
+
+                //enviar correo de activación
+                Mail::to($gerente->email)->send(
+                    new ActivacionCuentaMail($token, $gerente->email)
+                );
 
                 return[
                     'cafeteria'=>$cafeteria,
-                    'gerente'=>$gerente
+                    'gerente'=>[
+                        'name'=>$gerente->name,
+                        'email'=>$gerente->email
+                    ]
                 ];
             });
 
             return ApiResponse::success(
                 $result,
-                'Cafetería y gerente creados correctamente'
+                'Cafetería creada. Se envió un correo de activación al gerente.'
             );
     }
 

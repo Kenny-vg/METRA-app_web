@@ -11,6 +11,12 @@ use App\Http\Controllers\Api\CafeteriaController;
 */
 Route::post('/login', [AuthController::class, 'login']);
 
+//Activar cuenta
+Route::post('/activar-cuenta',[
+    AuthController::class,
+    'activarCuenta'
+]);
+
 
 /*
 |------------------------------------------
