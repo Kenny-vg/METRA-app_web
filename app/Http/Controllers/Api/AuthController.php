@@ -130,4 +130,42 @@ class AuthController extends Controller
             'Cuenta activada correctamente'
         );
     }
+
+    /*-----------------
+       REGISTRO CLIENTE
+    -----------------*/
+
+    public function registerCliente(Request $request)
+    {
+        //validaciones básicas
+        $data = $request->validate([
+            'name'=>'required|string|max:100',
+            'email'=>'required|email|unique:users,email',
+            'password'=>'required|min:6'
+        ]);
+
+        //crear usuario cliente
+        $user = User::create([
+            'name'=>$data['name'],
+            'email'=>$data['email'],
+            'password'=>Hash::make($data['password']),
+
+            //seguridad
+            'role'=>'cliente',
+            'cafe_id'=>null,
+            'estado'=>true
+        ]);
+
+        return ApiResponse::success([
+            'usuario'=>[
+                'id'=>$user->id,
+                'name'=>$user->name,
+                'email'=>$user->email,
+                'role'=>$user->role
+            ]
+            ], 'Cuenta creada correctamente');
+
+    }
+
+
 }

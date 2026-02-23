@@ -17,6 +17,9 @@ Route::post('/activar-cuenta',[
     'activarCuenta'
 ]);
 
+//Registro cliente
+Route::post('/register-cliente', [AuthController::class, 'registerCliente']);
+
 
 /*
 |------------------------------------------
@@ -48,3 +51,18 @@ Route::middleware([
     Route::delete('/cafeterias/{cafeteria}', [CafeteriaController::class, 'destroy']);
 
 });
+
+
+/*
+|------------------------------------------
+| RUTAS GERENTE
+|------------------------------------------
+*/
+
+Route::middleware([ 
+    'auth:sanctum', 
+    'role:gerente'
+])->group(function(){
+    Route::put('/cafeterias/{cafeteria}', [CafeteriaController::class, 'update']);
+});
+    

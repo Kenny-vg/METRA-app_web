@@ -94,15 +94,26 @@ class CafeteriaController extends Controller
     {
         $data = $request->validate([
             'nombre' => 'sometimes|string|max:100',
+            'descripcion'=>'nullable|string|max:255',
+            'calle'=>'nullable|string|max:100',
+            'numero_exterior'=>'nullable|string|max:10',
+            'numero_interior'=>'nullable|string|max:10',
+            'colonia'=>'nullable|string|max:80',
+            'estado_republica'=>'nullable|string|max:80',
+            'municipio'=>'nullable|string|max:80',
+            'cp'=>'nullable|string|max:10',
+            'telefono'=>'nullable|string|max:20',
+            'estado'=>'sometimes|in:activa,suspendida,pendiente',
+            'foto_url'=>'nullable|string|max:255'
         ]);
 
         $cafeteria->update($data);
 
-        $cafeteria->refresh();
+        $cafeteria->refresh(); //Devuelve los datos actualizados
 
         return ApiResponse::success(
             $cafeteria,
-            'Cafetería actualizada'
+            'Cafetería actualizada correctamente'
         );
     }
 
