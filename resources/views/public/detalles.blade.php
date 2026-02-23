@@ -82,6 +82,59 @@
                 </div>
             </div>
 
+            <div class="info-card mt-5" style="border-left: 5px solid var(--ambar);">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold m-0"><i ></i>Combos Exclusivos</h4>
+                    <span class="badge rounded-pill bg-danger shadow-sm">¡Solo por tiempo limitado!</span>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <div class="p-3 border rounded-4 bg-white shadow-sm h-100 border-start border-4 border-warning">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="fw-bold mb-1">Desayuno Central</h6>
+                                <span class="fw-bold text-success">$149</span>
+                            </div>
+                            <p class="text-muted small mb-2">Chilaquiles rojos o verdes + Café del día + Pan artesanal.</p>
+                            <span class="badge bg-warning-subtle text-dark small" style="font-size: 0.7rem;">EL FAVORITO</span>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="p-3 border rounded-4 bg-white shadow-sm h-100 border-start border-4 border-info">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="fw-bold mb-1">Tarde de Matcha</h6>
+                                <span class="fw-bold text-success">$185</span>
+                            </div>
+                            <p class="text-muted small mb-2">2 Matcha Lattes (fríos o calientes) + Rebanada de Pastel de Elote.</p>
+                            <span class="badge bg-info-subtle text-dark small" style="font-size: 0.7rem;">IDEAL PARA COMPARTIR</span>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="p-3 border rounded-4 bg-white shadow-sm h-100 border-start border-4 border-success">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="fw-bold mb-1">Combo Estudiante</h6>
+                                <span class="fw-bold text-success">$95</span>
+                            </div>
+                            <p class="text-muted small mb-2">Expreso Doble o Americano + Galleta de Avena + WiFi Ilimitado.</p>
+                            <span class="badge bg-success-subtle text-dark small" style="font-size: 0.7rem;">FOCO TOTAL</span>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <div class="p-3 border rounded-4 bg-white shadow-sm h-100 border-start border-4 border-primary">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="fw-bold mb-1">Brunch Especial</h6>
+                                <span class="fw-bold text-success">$220</span>
+                            </div>
+                            <p class="text-muted small mb-2">Huevos Benedictinos + Jugo de Naranja + Capuchino Grande.</p>
+                            <span class="badge bg-primary-subtle text-dark small" style="font-size: 0.7rem;">PREMIUM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="info-card">
                 <h4 class="fw-bold mb-4">Lo que dicen los clientes</h4>
                 <div class="review-item">

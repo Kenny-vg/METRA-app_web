@@ -23,7 +23,7 @@
                     <li class="mb-2"><a href="/detalles" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Conócenos</a></li>
                     <li class="mb-2"><a href="/reservar" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Reservar Mesa</a></li>
                     <li class="mb-2"><a href="/login" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Acceso Clientes</a></li>
-                    <li class="mb-2"><a href="/admin-login" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Acceso Restaurantes</a></li>
+                    <li class="mb-2"><a href="/login" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Acceso Restaurantes</a></li>
                 </ul>
             </div>
 
@@ -56,7 +56,7 @@
                     &copy; 2026 V-TECH Software. Todos los derechos reservados.
                 </p>
                 <div class="mt-2">
-                    <a href="/superadmin/login" class="small text-decoration-none fw-bold" style="color: #6D4C41; background: #FFAB40; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem;">
+                    <a href="/login" class="small text-decoration-none fw-bold" style="color: #6D4C41; background: #FFAB40; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem;">
                         <i class="bi bi-lock-fill me-1"></i>SaaS Admin
                     </a>
                 </div>

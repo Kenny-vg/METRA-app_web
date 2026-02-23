@@ -47,7 +47,9 @@
             </form>
 
             <div class="mt-5">
-                <a href="/reservar" class="text-muted small text-decoration-none">¿No tienes cuenta? <span class="fw-bold text-dark">Regístrate</span></a>
+                 <a href="{{ route('register') }}" class="text-muted small text-decoration-none">
+                     ¿No tienes cuenta? <span class="fw-bold text-dark">Regístrate</span>
+                 </a>
             </div>
         </div>
     </main>

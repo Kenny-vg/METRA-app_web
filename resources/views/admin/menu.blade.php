@@ -33,8 +33,9 @@
             <a href="/admin/perfil" class="nav-link-admin {{ request()->is('admin/perfil') ? 'active' : '' }}">
                 <i class="bi bi-person-circle me-2"></i> Perfil
             </a>
-            <hr style="border-color: rgba(255,255,255,0.1);">
-            <a href="/" class="nav-link-admin text-danger"><i class="bi bi-door-open me-2"></i> Salir</a>
+            <a href="/logout" id="btnCerrarSesion" class="btn-logout">
+                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+            </a>
         </nav>
     </aside>
 
@@ -57,5 +58,18 @@
             }
         });
     </script>
+
+   <script>
+document.getElementById('btnCerrarSesion')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // 1. Borramos el rastro de la API
+    localStorage.removeItem('token');
+    localStorage.clear();
+    
+    // 2. Nos vamos a la ruta de Laravel para cerrar la sesión del servidor
+    window.location.href = '/logout';
+});
+</script>
 </body>
 </html>

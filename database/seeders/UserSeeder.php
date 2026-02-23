@@ -27,8 +27,8 @@ class UserSeeder extends Seeder
             'role' => 'superadmin',
             'estado' => true,
             'cafe_id' => null,
-            'activation_token' => null,
-            'must_change_password' => false
+           // 'activation_token' => null,
+           // 'must_change_password' => false
         ]);
 
         /*
@@ -43,9 +43,9 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123456'),
             'role' => 'gerente',
             'estado' => true,
-            'cafe_id' => 1,
-            'activation_token' => null,
-            'must_change_password' => false
+            'cafe_id' => null,
+          //  'activation_token' => null,
+            //'must_change_password' => false
         ]);
 
         /*
@@ -59,9 +59,21 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123456'),
             'role' => 'personal',
             'estado' => true,
-            'cafe_id' => 1,
-            'activation_token' => null,
-            'must_change_password' => false
+            'cafe_id' => null,
+           // 'activation_token' => null,
+           // 'must_change_password' => false
         ]);
-    } 
+
+
+        User::create([
+        'name' => 'Cliente Test',
+        'email' => 'cliente@metra.com',
+        'password' => Hash::make('123456'),
+        'role' => 'cliente',
+        'estado' => true,
+        'cafe_id' => null
+        ]);
+    }
+
+    
 }

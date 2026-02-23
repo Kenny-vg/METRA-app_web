@@ -97,6 +97,40 @@
                     </div>
                     <button type="button" class="btn btn-outline-dark btn-sm w-100 mt-2">+ Agregar platillo</button>
                 </div>
+                <div class="bg-white p-4 rounded-4 shadow-sm mb-4 border">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold m-0 text-dark"><i class="bi bi-stars me-2 text-warning"></i>Combos y Promociones</h5>
+                        <span class="badge bg-primary-subtle text-primary" style="font-size: 0.6rem;">PÚBLICO</span>
+                    </div>
+
+                    <div class="p-3 border rounded-3 bg-light mb-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <p class="mb-0 fw-bold small">Desayuno Central</p>
+                            <span class="fw-bold text-success small">$149.00</span>
+                        </div>
+                        <p class="text-muted mb-2" style="font-size: 0.75rem;">Chilaquiles + Café + Pan artesanal</p>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-sm btn-light border py-0 px-2" style="font-size: 0.7rem;"><i class="bi bi-pencil me-1"></i>Editar</button>
+                            <button type="button" class="btn btn-sm btn-light border py-0 px-2 text-danger" style="font-size: 0.7rem;"><i class="bi bi-trash"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="p-3 border rounded-3 bg-light mb-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <p class="mb-0 fw-bold small">Combo Estudiante</p>
+                            <span class="fw-bold text-success small">$95.00</span>
+                        </div>
+                        <p class="text-muted mb-2" style="font-size: 0.75rem;">Expreso Doble + Galleta de Avena</p>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-sm btn-light border py-0 px-2" style="font-size: 0.7rem;"><i class="bi bi-pencil me-1"></i>Editar</button>
+                            <button type="button" class="btn btn-sm btn-light border py-0 px-2 text-danger" style="font-size: 0.7rem;"><i class="bi bi-trash"></i></button>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-outline-warning btn-sm w-100 mt-2 fw-bold" style="color: #4E342E; border-color: #FFAB40;">
+                        <i class="bi bi-plus-circle me-2"></i>Crear Nueva Promoción
+                    </button>
+                </div>
 
                 <div class="bg-white p-4 rounded-4 shadow-sm border">
                     <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-image me-2"></i>Imagen Principal</h5>

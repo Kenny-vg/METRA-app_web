@@ -88,6 +88,62 @@
                                 <textarea class="form-control input-metra" rows="3" placeholder="Comentarios adicionales (alergias, notas...)"></textarea>
                             </div>
                         </div>
+                        
+                        <div class="row mb-5">
+                            <div class="col-12">
+                                <h5 class="section-title mb-4">4. ¿Deseas añadir un Combo Especial? (Opcional)</h5>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6 col-xl-3">
+                                        <input type="radio" name="combo_seleccionado" id="combo1" value="desayuno" class="btn-check">
+                                        <label class="card h-100 border-2 combo-card p-3 w-100" for="combo1" style="cursor: pointer;">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <span class="badge bg-warning text-dark">Desayuno</span>
+                                                <span class="fw-bold text-success">$149</span>
+                                            </div>
+                                            <h6 class="fw-bold mb-1">Central</h6>
+                                            <p class="x-small text-muted mb-0" style="font-size: 0.7rem;">Chilaquiles + Café + Pan</p>
+                                        </label>
+                                    </div>
+
+                                    <div class="col-12 col-md-6 col-xl-3">
+                                        <input type="radio" name="combo_seleccionado" id="combo2" value="matcha" class="btn-check">
+                                        <label class="card h-100 border-2 combo-card p-3 w-100" for="combo2" style="cursor: pointer;">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <span class="badge bg-info text-dark">Matcha</span>
+                                                <span class="fw-bold text-success">$185</span>
+                                            </div>
+                                            <h6 class="fw-bold mb-1">Tarde Relax</h6>
+                                            <p class="x-small text-muted mb-0" style="font-size: 0.7rem;">2 Matchas + Pastel Elote</p>
+                                        </label>
+                                    </div>
+
+                                    <div class="col-12 col-md-6 col-xl-3">
+                                        <input type="radio" name="combo_seleccionado" id="combo3" value="estudiante" class="btn-check">
+                                        <label class="card h-100 border-2 combo-card p-3 w-100" for="combo3" style="cursor: pointer;">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <span class="badge bg-success text-white">Estudio</span>
+                                                <span class="fw-bold text-success">$95</span>
+                                            </div>
+                                            <h6 class="fw-bold mb-1">Estudiante</h6>
+                                            <p class="x-small text-muted mb-0" style="font-size: 0.7rem;">Doble Expreso + Galleta</p>
+                                        </label>
+                                    </div>
+
+                                    <div class="col-12 col-md-6 col-xl-3">
+                                        <input type="radio" name="combo_seleccionado" id="combo4" value="ninguno" class="btn-check" checked>
+                                        <label class="card h-100 border-2 combo-card p-3 w-100" for="combo4" style="cursor: pointer;">
+                                            <div class="text-center py-2">
+                                                <h6 class="fw-bold mb-1 text-muted">Sin Combo</h6>
+                                                <p class="x-small text-muted mb-0" style="font-size: 0.7rem;">Solo la mesa</p>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="text-center">
                             <button type="submit" class="btn-metra-main px-5 py-3 border-0" style="background-color: #FFAB40; border-radius: 50px; font-weight: bold; color: #4E342E;">
