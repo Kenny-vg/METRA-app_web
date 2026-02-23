@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens; //Permite crear tokens para API
+use App\Models\Cafeteria;
 
 class User extends Authenticatable
 {
@@ -53,4 +54,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function cafeteria()
+    {
+        return $this->belongsTo(Cafeteria::class, 'cafe_id');
+    }
+    
 }

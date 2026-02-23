@@ -87,17 +87,20 @@ class CafeteriaController extends Controller
     }
 
 
-    /**
+    /*
      * Actualizar cafetería
-     */
-    public function update(Request $request, Cafeteria $cafeteria)
+     
+    public function update(Request $request)
     {
+
+        $cafeteria=$request->user()->cafeteria;
+
         $data = $request->validate([
             'nombre' => 'sometimes|string|max:100',
             'descripcion'=>'nullable|string|max:255',
             'calle'=>'nullable|string|max:100',
-            'numero_exterior'=>'nullable|string|max:10',
-            'numero_interior'=>'nullable|string|max:10',
+            'num_exterior'=>'nullable|string|max:10',
+            'num_interior'=>'nullable|string|max:10',
             'colonia'=>'nullable|string|max:80',
             'estado_republica'=>'nullable|string|max:80',
             'municipio'=>'nullable|string|max:80',
@@ -115,7 +118,7 @@ class CafeteriaController extends Controller
             $cafeteria,
             'Cafetería actualizada correctamente'
         );
-    }
+    } */
 
     /**
      * Eliminar

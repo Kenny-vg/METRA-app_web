@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CafeteriaController;
+use App\Http\Controllers\Api\Gerente\CafeteriaPerfilController;
+
 
 /*
 |------------------------------------------
@@ -47,7 +49,6 @@ Route::middleware([
 
     Route::get('/cafeterias', [CafeteriaController::class, 'index']);
     Route::post('/cafeterias', [CafeteriaController::class, 'store']);
-    Route::put('/cafeterias/{cafeteria}', [CafeteriaController::class, 'update']);
     Route::delete('/cafeterias/{cafeteria}', [CafeteriaController::class, 'destroy']);
 
 });
@@ -62,7 +63,8 @@ Route::middleware([
 Route::middleware([ 
     'auth:sanctum', 
     'role:gerente'
-])->group(function(){
-    Route::put('/cafeterias/{cafeteria}', [CafeteriaController::class, 'update']);
+])->prefix('gerente')->group(function(){
+    Route::get('/mi-cafeteria',[CafeteriaPerfilController::class,'show']);
+    Route::put('/mi-cafeteria', [CafeteriaPerfilController::class, 'update']);
 });
     
