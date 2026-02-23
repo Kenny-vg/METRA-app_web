@@ -7,6 +7,26 @@
         <p class="text-muted">Revisa y administra las próximas visitas a Café Central</p>
     </header>
 
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+    <div class="btn-group bg-light p-1 rounded-pill border" role="group">
+        <input type="radio" class="btn-check" name="vistas" id="vistaDia" checked>
+        <label class="btn btn-outline-dark border-0 rounded-pill px-4 btn-sm fw-bold" for="vistaDia">Día</label>
+
+        <input type="radio" class="btn-check" name="vistas" id="vistaSemana">
+        <label class="btn btn-outline-dark border-0 rounded-pill px-4 btn-sm fw-bold" for="vistaSemana">Semana</label>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+        <button class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm"><i class="bi bi-chevron-left"></i></button>
+        <div class="bg-white px-4 py-2 rounded-pill border shadow-sm">
+            <span class="fw-bold small text-dark"><i class="bi bi-calendar-event me-2"></i>Hoy, 22 de Febrero</span>
+        </div>
+        <button class="btn btn-outline-secondary btn-sm rounded-circle shadow-sm"><i class="bi bi-chevron-right"></i></button>
+    </div>
+</div>
+
+
     <div class="bg-white p-4 rounded-4 shadow-sm border mb-5">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-2">
             <h5 class="fw-bold m-0 text-dark"><i class="bi bi-grid-3x3-gap me-2"></i>Monitor de Ocupación</h5>
