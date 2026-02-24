@@ -68,6 +68,5 @@ document.getElementById('btnCerrarSesion')?.addEventListener('click', function(e
     window.location.href = '/logout';
 });
 </script>
-</script>
 </body>
 </html>
