@@ -30,6 +30,11 @@ Route::get('/confirmacion', function () {
     return view('public.confirmacion');
 });
 
+// Landing de registro de negocios (pública, sin login)
+Route::get('/registro-negocio', function () {
+    return view('public.registro-negocio');
+});
+
 /*
 |--------------------------------------------------------------------------
 | RUTAS DE AUTENTICACIÓN
@@ -51,6 +56,11 @@ Route::post('/login', [LoginController::class, 'login']);
 // Registro
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
+
+// Google Auth
+use App\Http\Controllers\Auth\GoogleController;
+Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('login.google');
+Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
 /*
 |--------------------------------------------------------------------------

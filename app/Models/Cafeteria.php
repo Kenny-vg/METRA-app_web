@@ -6,9 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cafeteria extends Model
 {
-    //
     protected $table = 'cafeterias';
-    protected $fillable =[
+    protected $fillable = [
         'nombre',
         'descripcion',
         'calle',
@@ -20,6 +19,25 @@ class Cafeteria extends Model
         'cp',
         'telefono',
         'estado',
-        'foto_url'
+        'foto_url',
+        'user_id',
+        'comprobante_url',
     ];
+
+    // Gerente/dueño que registró la cafetería
+    public function gerente()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    // Suscripción activa o pendiente
+    public function suscripciones()
+    {
+        return $this->hasMany(Suscripcion::class, 'cafe_id');
+    }
+
+    public function suscripcionActual()
+    {
+        return $this->hasOne(Suscripcion::class, 'cafe_id')->latest();
+    }
 }

@@ -62,3 +62,70 @@
     margin-bottom: 20px;
     border: 1px solid rgba(109,76,65,0.1);
 }
+/* --- NEW PREMIUM ADMIN BUTTONS --- */
+
+.btn-admin-primary {
+    background: var(--black-primary);
+    color: var(--white-pure);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-admin-primary:hover {
+    background: var(--gray-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-admin-secondary {
+    background: var(--white-pure);
+    color: var(--black-primary);
+    border: 1px solid var(--border-light);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-admin-secondary:hover {
+    background: var(--off-white);
+    border-color: rgba(28, 25, 23, 0.2);
+}
+
+.btn-admin-action {
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    background: var(--off-white);
+    color: var(--text-muted);
+}
+
+.btn-admin-action:hover {
+    background: var(--border-light);
+    color: var(--black-primary);
+    transform: translateY(-1px);
+}
+
+.btn-admin-action.icon-edit:hover {
+    color: var(--accent-gold);
+    background: rgba(197, 160, 89, 0.1);
+}
+
+.btn-admin-action.icon-delete:hover {
+    color: #dc3545;
+    background: rgba(220, 53, 69, 0.1);
+}

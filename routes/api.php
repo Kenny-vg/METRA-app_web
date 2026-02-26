@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CafeteriaController;
+use App\Http\Controllers\Api\RegistroNegocioController;
 use App\Http\Controllers\Api\Gerente\CafeteriaPerfilController;
 use App\Http\Controllers\Api\Superadmin\PlanController;
 use App\Http\Controllers\Api\Superadmin\SuscripcionController;
@@ -14,14 +15,18 @@ use App\Http\Controllers\Api\Superadmin\SuscripcionController;
 */
 Route::post('/login', [AuthController::class, 'login']);
 
-//Activar cuenta
-Route::post('/activar-cuenta',[
-    AuthController::class,
-    'activarCuenta'
-]);
+// Activar cuenta
+Route::post('/activar-cuenta', [AuthController::class, 'activarCuenta']);
 
-//Registro cliente
+// Registro cliente
 Route::post('/register-cliente', [AuthController::class, 'registerCliente']);
+
+// Planes públicos (landing de registro de negocios)
+Route::get('/planes-publicos', [RegistroNegocioController::class, 'planesPublicos']);
+
+// Auto-registro de negocio por el propio gerente/dueño
+Route::post('/registro-negocio', [RegistroNegocioController::class, 'store']);
+Route::post('/registro-negocio/{cafeteria}/comprobante', [RegistroNegocioController::class, 'subirComprobante']);
 
 
 /*
@@ -30,12 +35,9 @@ Route::post('/register-cliente', [AuthController::class, 'registerCliente']);
 |------------------------------------------
 */
 Route::middleware('auth:sanctum')->group(function () {
-
     Route::get('/mi-perfil', [AuthController::class, 'miPerfil']);
     Route::post('/logout', [AuthController::class, 'logout']);
-
 });
-
 
 
 /*
@@ -48,21 +50,24 @@ Route::middleware([
     'role:superadmin'
 ])->prefix('superadmin')->group(function () {
 
-    //CREAR, ELIMINAR, LISTAR CAFETERIAS
+    // CAFETERÍAS — listar, crear, eliminar
     Route::get('/cafeterias', [CafeteriaController::class, 'index']);
     Route::post('/cafeterias', [CafeteriaController::class, 'store']);
     Route::delete('/cafeterias/{cafeteria}', [CafeteriaController::class, 'destroy']);
 
-    //CREAR, ELIMINAR, LISTAR PLANES
-    Route::get('/planes',[PlanController::class,'index']);
-    Route::post('/planes',[PlanController::class,'store']);
-    Route::put('/planes/{plan}',[PlanController::class,'update']);
-    Route::delete('/planes/{plan}',[PlanController::class,'destroy']);
+    // CAFETERÍAS — revisión de registros auto-gestionados
+    Route::patch('/cafeterias/{cafeteria}/estado', [CafeteriaController::class, 'cambiarEstado']);
+    Route::get('/cafeterias/{cafeteria}/comprobante', [CafeteriaController::class, 'verComprobante']);
 
+    // PLANES
+    Route::get('/planes', [PlanController::class, 'index']);
+    Route::post('/planes', [PlanController::class, 'store']);
+    Route::put('/planes/{plan}', [PlanController::class, 'update']);
+    Route::delete('/planes/{plan}', [PlanController::class, 'destroy']);
 
-    //CREAR, ELIMINAR, LISTAR SUSCRIPCIONES
-    Route::get('/suscripciones',[SuscripcionController::class,'index']);
-    Route::post('/suscripciones',[SuscripcionController::class,'store']);
+    // SUSCRIPCIONES
+    Route::get('/suscripciones', [SuscripcionController::class, 'index']);
+    Route::post('/suscripciones', [SuscripcionController::class, 'store']);
 });
 
 
@@ -71,12 +76,10 @@ Route::middleware([
 | RUTAS GERENTE
 |------------------------------------------
 */
-
-Route::middleware([ 
-    'auth:sanctum', 
+Route::middleware([
+    'auth:sanctum',
     'role:gerente'
-])->prefix('gerente')->group(function(){
-    Route::get('/mi-cafeteria',[CafeteriaPerfilController::class,'show']);
+])->prefix('gerente')->group(function () {
+    Route::get('/mi-cafeteria', [CafeteriaPerfilController::class, 'show']);
     Route::put('/mi-cafeteria', [CafeteriaPerfilController::class, 'update']);
 });
-    

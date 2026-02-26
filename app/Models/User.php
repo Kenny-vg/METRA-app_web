@@ -28,7 +28,9 @@ class User extends Authenticatable
         'cafe_id',
         'estado',
         'activation_token',
-        'must_change_password'
+        'must_change_password',
+        'google_id',
+        'avatar'
     ];
 
     /**

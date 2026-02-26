@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Cafeteria;
 use App\Models\User;
+use App\Mail\ActivacionCuentaMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\ActivacionCuentaMail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Str;
@@ -16,13 +17,20 @@ use Illuminate\Support\Str;
 class CafeteriaController extends Controller
 {
     /**
-     *  Listar cafeterias (superadmin)
+     * Listar cafeterías con gerente y suscripción (superadmin)
      */
-    public function index()
+    public function index(Request $request)
     {
+        $query = Cafeteria::with(['gerente', 'suscripcionActual.plan']);
+
+        // Filtrar por estado si se pasa como parámetro
+        if ($request->has('estado')) {
+            $query->where('estado', $request->estado);
+        }
+
         return ApiResponse::success(
-            Cafeteria::all(),
-            'Listado de cafeterias'
+            $query->get(),
+            'Listado de cafeterías'
         );
     }
 
@@ -31,113 +39,127 @@ class CafeteriaController extends Controller
      */
     public function store(Request $request)
     {
-        //validación de datos
         $data = $request->validate([
-                'nombre'=>'required|string|max:100',
+            'nombre'       => 'required|string|max:100',
+            'gerente.name' => 'required|string|max:100',
+            'gerente.email'=> 'required|email|unique:users,email',
+        ]);
 
-                //datos del gerente
-                'gerente.name'=>'required|string|max:100',
-                'gerente.email'=>'required|email|unique:users,email'
+        $result = DB::transaction(function () use ($data) {
+            $cafeteria = Cafeteria::create([
+                'nombre' => $data['nombre'],
+                'estado' => 'activa',
             ]);
 
-            //transacción db
-            $result = DB::transaction(function() use($data){
-                //crear cafeteria
-                $cafeteria = Cafeteria::create([
-                    'nombre' => $data['nombre']
+            $token = Str::random(60);
+
+            $gerente = User::create([
+                'name'                => $data['gerente']['name'],
+                'email'               => $data['gerente']['email'],
+                'password'            => null,
+                'role'                => 'gerente',
+                'cafe_id'             => $cafeteria->id,
+                'estado'              => false,
+                'activation_token'    => $token,
+                'must_change_password'=> true,
+            ]);
+
+            $cafeteria->update(['user_id' => $gerente->id]);
+
+            Mail::to($gerente->email)->send(
+                new ActivacionCuentaMail($token, $gerente->email)
+            );
+
+            return [
+                'cafeteria' => $cafeteria,
+                'gerente'   => [
+                    'name'  => $gerente->name,
+                    'email' => $gerente->email,
+                ],
+            ];
+        });
+
+        return ApiResponse::success(
+            $result,
+            'Cafetería creada. Se envió un correo de activación al gerente.'
+        );
+    }
+
+    /**
+     * Cambiar el estado de una cafetería (superadmin).
+     * Usado para aprobar/rechazar registros en revisión.
+     */
+    public function cambiarEstado(Request $request, Cafeteria $cafeteria)
+    {
+        $data = $request->validate([
+            'estado' => 'required|in:activa,suspendida,pendiente,en_revision',
+        ]);
+
+        $cafeteria->update(['estado' => $data['estado']]);
+
+        // Si se aprueba: activar al gerente y enviarle el correo de activación
+        if ($data['estado'] === 'activa' && $cafeteria->gerente) {
+            $gerente = $cafeteria->gerente;
+
+            if (!$gerente->estado) {
+                // Generar nuevo token de activación si no tiene
+                $token = $gerente->activation_token ?? Str::random(60);
+
+                $gerente->update([
+                    'activation_token' => $token,
                 ]);
 
-                //generar token seguro
-                $token = Str::random(60);
-
-                //crear gerente
-                $gerente = User::create([
-                    'name'=> $data['gerente']['name'],
-                    'email'=>$data['gerente']['email'],
-                    'password'=>null,
-
-                    //seguridad
-                    'role'=>'gerente',
-
-                    //vinculación automática
-                    'cafe_id'=>$cafeteria->id,
-                    'estado'=>false,
-                    'activation_token'=>$token,
-                    'must_change_password'=>true
-                ]);
-
-                //enviar correo de activación
                 Mail::to($gerente->email)->send(
                     new ActivacionCuentaMail($token, $gerente->email)
                 );
+            }
 
-                return[
-                    'cafeteria'=>$cafeteria,
-                    'gerente'=>[
-                        'name'=>$gerente->name,
-                        'email'=>$gerente->email
-                    ]
-                ];
-            });
+            // Actualizar suscripción a pagado
+            optional($cafeteria->suscripcionActual)->update([
+                'estado_pago'      => 'pagado',
+                'fecha_validacion' => now(),
+            ]);
+        }
 
-            return ApiResponse::success(
-                $result,
-                'Cafetería creada. Se envió un correo de activación al gerente.'
-            );
-    }
+        // Si se rechaza/suspende: desactivar gerente
+        if (in_array($data['estado'], ['suspendida']) && $cafeteria->gerente) {
+            $cafeteria->gerente->update(['estado' => false]);
+        }
 
-
-    /*
-     * Actualizar cafetería
-     
-    public function update(Request $request)
-    {
-
-        $cafeteria=$request->user()->cafeteria;
-
-        $data = $request->validate([
-            'nombre' => 'sometimes|string|max:100',
-            'descripcion'=>'nullable|string|max:255',
-            'calle'=>'nullable|string|max:100',
-            'num_exterior'=>'nullable|string|max:10',
-            'num_interior'=>'nullable|string|max:10',
-            'colonia'=>'nullable|string|max:80',
-            'estado_republica'=>'nullable|string|max:80',
-            'municipio'=>'nullable|string|max:80',
-            'cp'=>'nullable|string|max:10',
-            'telefono'=>'nullable|string|max:20',
-            'estado'=>'sometimes|in:activa,suspendida,pendiente',
-            'foto_url'=>'nullable|string|max:255'
-        ]);
-
-        $cafeteria->update($data);
-
-        $cafeteria->refresh(); //Devuelve los datos actualizados
+        $cafeteria->load(['gerente', 'suscripcionActual.plan']);
 
         return ApiResponse::success(
             $cafeteria,
-            'Cafetería actualizada correctamente'
-        );
-    } */
-
-    /**
-     * Eliminar
-     */
-    public function destroy(Cafeteria $cafeteria)
-    {
-        // elimina SOLO la cafetería recibida
-        if (!$cafeteria->exists) {
-        return ApiResponse::error(
-            'Cafetería no encontrada',
-            404
+            'Estado de cafetería actualizado correctamente'
         );
     }
 
+    /**
+     * Ver URL del comprobante de pago (superadmin).
+     */
+    public function verComprobante(Cafeteria $cafeteria)
+    {
+        if (!$cafeteria->comprobante_url) {
+            return ApiResponse::error('Esta cafetería no tiene comprobante subido', 404);
+        }
+
+        return ApiResponse::success([
+            'comprobante_url' => Storage::url($cafeteria->comprobante_url),
+            'cafeteria'       => $cafeteria->nombre,
+        ], 'Comprobante encontrado');
+    }
+
+    /**
+     * Eliminar cafetería
+     */
+    public function destroy(Cafeteria $cafeteria)
+    {
+        if (!$cafeteria->exists) {
+            return ApiResponse::error('Cafetería no encontrada', 404);
+        }
+
         $cafeteria->delete();
 
-        return ApiResponse::success(
-            null,
-            'Cafetería eliminada'
-        );
+        return ApiResponse::success(null, 'Cafetería eliminada');
     }
 }

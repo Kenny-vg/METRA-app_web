@@ -6,62 +6,92 @@
     <title>METRA - LOGIN</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/variables.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/estilos.css') }}?v={{ time() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="zona-comensal">
 
-    <main class="login-container">
-        <div class="login-card text-center" style="border-top: 5px solid var(--ambar);">
-            
-            <span class="login-logo">METRA</span>
-            <h5 class="fw-bold mb-4" style="color: #6D4C41;">Bienvenido de nuevo</h5>
-            
-            <p class="text-muted small mb-5">Ingresa </p>
-@if ($errors->any())
-    <div class="alert alert-danger small p-2">
-        <ul class="mb-0">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-        <form id="loginForm" action="{{ route('login') }}" method="POST">
-    @csrf <div class="text-start mb-4">
-        <label class="form-label small fw-bold" style="color: #4E342E;">Correo Electrónico</label>
-        <input type="email" name="email" class="form-control input-metra" placeholder="tu@correo.com" required>
-    </div>
-
-    <div class="text-start mb-4">
-        <label class="form-label small fw-bold" style="color: #4E342E;">Contraseña</label>
-        <input type="password" name="password" class="form-control input-metra" placeholder="••••••••" required>
-    </div>
-
-    <button type="submit" class="btn-metra-main w-100 rounded-3">
-        Iniciar Sesión
-    </button>
-    
-    <div class="my-4 d-flex align-items-center">
-        <hr class="flex-grow-1 opacity-25">
-        <span class="mx-3 small text-muted">o continúa con</span>
-        <hr class="flex-grow-1 opacity-25">
-    </div>
-
-    <a href="#" class="btn btn-outline-dark w-100 rounded-pill py-2 shadow-sm">
-        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" class="me-2">
-         Google
-    </a>
-</form>
-
-            <div class="mt-5">
-                 <a href="{{ route('register') }}" class="text-muted small text-decoration-none">
-                     ¿No tienes cuenta? <span class="fw-bold text-dark">Regístrate</span>
-                 </a>
+    <div class="row g-0 vh-100">
+        <!-- Lado Izquierdo: Imagen Conceptual High-End -->
+        <div class="col-lg-6 d-none d-lg-block">
+            <div class="h-100 w-100" style="background-image: url('https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?auto=format&fit=crop&q=80&w=1400'); background-size: cover; background-position: center; position: relative;">
+                <!-- Overlay opcional sutil -->
+                <div style="position: absolute; inset: 0; background: linear-gradient(to right, rgba(0,0,0,0.2), transparent);"></div>
+                <div style="position: absolute; bottom: 40px; left: 40px; color: white; z-index: 2;">
+                    <h2 class="fw-bold fs-1" style="font-family: 'Inter', sans-serif; letter-spacing: -1px; text-shadow: 0 4px 20px rgba(0,0,0,0.3);">Exclusividad y<br>Servicio Impecable.</h2>
+                    <p class="fs-5" style="opacity: 0.9;">Gestione su perfil en METRA.</p>
+                </div>
             </div>
         </div>
-    </main>
- @include('partials.footer')
+
+        <!-- Lado Derecho: Formulario Limpio -->
+        <div class="col-12 col-lg-6 d-flex align-items-center justify-content-center" style="background-color: var(--white-pure);">
+            <div class="w-100 px-4 px-md-5" style="max-width: 480px;">
+                
+                <div class="text-center mb-5">
+                    <a href="/" class="text-decoration-none d-inline-block mb-4">
+                        <span class="fw-bold fs-2" style="color: var(--black-primary); letter-spacing: -1px;">
+                            <i class="bi bi-hexagon-fill me-2" style="color: var(--accent-gold); font-size: 1.5rem;"></i>METRA
+                        </span>
+                    </a>
+                    <h4 class="fw-bold mb-2" style="color: var(--black-primary); font-family: 'Inter', sans-serif;">Acceso al Portal</h4>
+                    <p style="color: var(--text-muted);">Ingrese sus credenciales para continuar.</p>
+                </div>
+
+                @if ($errors->any())
+                    <div class="alert small p-3 mb-4 rounded-3" style="background: #FFF0F0; border: 1px solid #FFD6D6; color: #D32F2F;">
+                        <ul class="mb-0 ps-3">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form id="loginForm" action="{{ route('login') }}" method="POST">
+                    @csrf 
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold" style="color: var(--text-main); letter-spacing: 0.5px;">DIRECCIÓN DE CORREO</label>
+                        <input type="email" name="email" class="form-control input-metra" placeholder="nombre@correo.com" required 
+                               style="padding: 14px 16px; border: 1px solid var(--border-light); border-radius: 8px; background-color: var(--off-white); font-size: 0.95rem; box-shadow: none;">
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label small fw-bold m-0" style="color: var(--text-main); letter-spacing: 0.5px;">CONTRASEÑA</label>
+                            <a href="#" class="small text-decoration-none fw-bold" style="color: var(--text-muted);">¿Olvidó su contraseña?</a>
+                        </div>
+                        <input type="password" name="password" class="form-control input-metra" placeholder="••••••••" required 
+                               style="padding: 14px 16px; border: 1px solid var(--border-light); border-radius: 8px; background-color: var(--off-white); font-size: 0.95rem; box-shadow: none;">
+                    </div>
+
+                    <button type="submit" class="btn-metra-main w-100 py-3 mt-2" style="border-radius: 8px; font-size: 1.05rem; letter-spacing: 0.5px;">
+                        Iniciar Sesión
+                    </button>
+                    
+                    <div class="my-4 d-flex align-items-center">
+                        <hr class="flex-grow-1" style="border-color: var(--border-light); opacity: 1;">
+                        <span class="mx-3 small text-uppercase fw-bold" style="color: var(--text-muted); font-size: 0.7rem; letter-spacing: 1px;">Confirmar Identidad</span>
+                        <hr class="flex-grow-1" style="border-color: var(--border-light); opacity: 1;">
+                    </div>
+
+                    <a href="{{ route('login.google') }}" class="btn w-100 py-3 d-flex align-items-center justify-content-center" 
+                       style="border: 1px solid var(--border-light); border-radius: 8px; background: var(--white-pure); color: var(--text-main); font-weight: 600; font-size: 0.95rem; transition: background 0.2s;">
+                        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" class="me-3">
+                         Continuar con Google
+                    </a>
+                </form>
+
+                <div class="mt-5 text-center">
+                    <p class="text-muted small">
+                        ¿Requiere una nueva cuenta? <a href="{{ route('register') }}" class="fw-bold text-decoration-none" style="color: var(--black-primary); border-bottom: 1px solid var(--black-primary);">Regístrese aquí</a>
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 
     <script>
@@ -70,14 +100,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (loginForm) {
         loginForm.addEventListener('submit', async function(e) {
-            // Detenemos el envío para intentar hablar con la API primero
             e.preventDefault(); 
 
-            // 1. Limpieza segura: si el navegador lo bloquea, no pasa nada, seguimos
             try {
                 localStorage.clear();
             } catch (err) {
-                console.warn("Storage bloqueado por el navegador");
+                console.warn("Storage bloqueado");
             }
 
             const email = loginForm.querySelector('input[name="email"]').value;
@@ -98,18 +126,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     const result = await response.json();
                     try {
                         localStorage.setItem('token', result.token);
-                    } catch (storageErr) {
-                        // Si no nos deja guardar el token, no importa, mandamos el form para la sesión
-                    }
-                    // IMPORTANTE: Enviamos el formulario "de verdad" para que Laravel cree la sesión
+                    } catch (storageErr) {}
                     loginForm.submit(); 
                 } else {
                     const errorData = await response.json();
-                    alert('Error: ' + (errorData.message || 'Credenciales incorrectas'));
+                    alert('Acceso denegado: ' + (errorData.message || 'Credenciales inválidas.'));
                 }
             } catch (error) {
-                console.error('Error de API, intentando login tradicional...', error);
-                // Si la API falla o el navegador bloquea el fetch, enviamos el form normal
+                console.error('Fallo la API, derivando a form estandar...', error);
                 loginForm.submit();
             }
         });
