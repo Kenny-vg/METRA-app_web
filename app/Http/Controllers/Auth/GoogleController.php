@@ -44,7 +44,7 @@ class GoogleController extends Controller
                     'avatar' => $googleUser->avatar,
                     'password' => bcrypt(Str::random(16)), 
                     'role' => 'cliente', // Default role for new users
-                    'estado' => 'activo'
+                    'estado' => true
                 ]);
             }
 
