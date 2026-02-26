@@ -33,10 +33,10 @@
                     </li>
                     <li class="nav-item d-flex align-items-center bg-white px-3 py-2 rounded-pill" style="border: 1px solid var(--border-light); cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.02)">
                         <div class="me-3 text-end d-none d-sm-block">
-                            <p class="m-0 fw-bold small" style="color: var(--black-primary); line-height: 1;">Maria</p>
-                            <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">Miembro Black</span>
+                            <p class="m-0 fw-bold small" style="color: var(--black-primary); line-height: 1;">{{ Auth::user()->name }}</p>
+                            <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">Cliente</span>
                         </div>
-                        <img src="https://ui-avatars.com/api/?name=Maria&background=0A0A0A&color=FFFFFF" class="rounded-circle" width="36" style="border: 2px solid var(--white-pure); box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                        <img src="{{ Auth::user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=0A0A0A&color=FFFFFF' }}" class="rounded-circle" width="36" style="border: 2px solid var(--white-pure); box-shadow: 0 2px 5px rgba(0,0,0,0.1);" referrerpolicy="no-referrer">
                     </li>
                 </ul>
             </div>

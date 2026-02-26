@@ -8,10 +8,10 @@
         <div class="col-12 col-md-4 col-xl-3">
             <div class="card border-0 rounded-4 p-4 text-center h-100" style="background: var(--white-pure); box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
                 <div class="mb-4">
-                    <img src="https://ui-avatars.com/api/?name=Maria+Juanita&background=0A0A0A&color=FFFFFF" class="rounded-circle" width="100" style="border: 4px solid var(--off-white); box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+                    <img src="{{ Auth::user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=0A0A0A&color=FFFFFF' }}" class="rounded-circle" width="100" style="border: 4px solid var(--off-white); box-shadow: 0 4px 15px rgba(0,0,0,0.08);" referrerpolicy="no-referrer">
                 </div>
-                <h4 class="fw-bold mb-1" style="color: var(--black-primary); letter-spacing: -0.5px;">Maria Juanita</h4>
-                <p class="small mb-4" style="color: var(--text-muted); font-weight: 500;">lllllll@gmail.com</p>
+                <h4 class="fw-bold mb-1" style="color: var(--black-primary); letter-spacing: -0.5px;">{{ Auth::user()->name }}</h4>
+                <p class="small mb-4" style="color: var(--text-muted); font-weight: 500;">{{ Auth::user()->email }}</p>
                 
                 <hr style="border-color: var(--border-light); opacity: 1;" class="w-75 mx-auto mb-4">
 
