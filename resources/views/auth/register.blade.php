@@ -51,7 +51,7 @@
                     <hr class="flex-grow-1 opacity-25">
                 </div>
 
-                <a href="#" class="btn btn-outline-dark w-100 rounded-pill py-2 shadow-sm">
+                <a href="{{ route('login.google') }}" class="btn btn-outline-dark w-100 rounded-pill py-2 shadow-sm">
                     <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" class="me-2">
                      Google
                 </a>

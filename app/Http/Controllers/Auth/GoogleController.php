@@ -60,7 +60,8 @@ class GoogleController extends Controller
             }
 
         } catch (Exception $e) {
-            return redirect('/login')->withErrors(['error' => 'No se pudo iniciar sesión con Google.']);
+            \Log::error('Google Login Error: ' . $e->getMessage());
+            return redirect('/login')->withErrors(['error' => 'No se pudo iniciar sesión con Google: ' . $e->getMessage()]);
         }
     }
 }
