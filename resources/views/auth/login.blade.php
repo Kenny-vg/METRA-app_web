@@ -76,11 +76,17 @@
                         <hr class="flex-grow-1" style="border-color: var(--border-light); opacity: 1;">
                     </div>
 
-                    <a href="{{ route('login.google') }}" class="btn w-100 py-3 d-flex align-items-center justify-content-center" 
-                       style="border: 1px solid var(--border-light); border-radius: 8px; background: var(--white-pure); color: var(--text-main); font-weight: 600; font-size: 0.95rem; transition: background 0.2s;">
-                        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" class="me-3">
-                         Continuar con Google
-                    </a>
+                    <div class="position-relative w-100" style="height: 52px; overflow: hidden; border-radius: 8px;">
+                        <!-- Botón Personalizado Visible -->
+                        <button type="button" id="customGoogleBtn" class="btn w-100 h-100 d-flex align-items-center justify-content-center" 
+                           style="border: 1px solid var(--border-light); background: var(--white-pure); color: var(--text-main); font-weight: 600; font-size: 0.95rem; pointer-events: none;">
+                            <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" class="me-3">
+                             Continuar con Google
+                        </button>
+                        
+                        <!-- Botón Oficial Invisible Encima -->
+                        <div id="btnGoogleContainer" class="position-absolute top-0 start-0 w-100 h-100" style="opacity: 0.001; z-index: 10;"></div>
+                    </div>
                 </form>
 
                 <div class="mt-5 text-center">
@@ -94,19 +100,75 @@
     </div>
 
 
-    <script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+function decodeJwtResponse(token) {
+    let base64Url = token.split('.')[1];
+    let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+}
+
+window.handleCredentialResponse = async function(response) {
+    const data = decodeJwtResponse(response.credential);
+    try {
+        const res = await fetch('/api/auth/google', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                email: data.email,
+                name: data.name,
+                google_id: data.sub,
+                avatar: data.picture
+            })
+        });
+
+        if (res.ok) {
+            const result = await res.json();
+            try {
+                localStorage.setItem('token', result.data.token);
+                const role = result.data.usuario.role;
+                if(role === 'superadmin') window.location.href = '/superadmin/dashboard';
+                else if(role === 'gerente') window.location.href = '/admin/dashboard';
+                else window.location.href = '/public/perfil';
+            } catch(e) {}
+        } else {
+            console.error('Error Google Login backend');
+            alert('Fallo al iniciar sesión con Google.');
+        }
+    } catch (error) {
+        console.error('API Error', error);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    const initGoogle = setInterval(() => {
+        if (typeof google !== 'undefined' && google.accounts) {
+            clearInterval(initGoogle);
+            google.accounts.id.initialize({
+                client_id: "{{ env('GOOGLE_CLIENT_ID') }}",
+                callback: handleCredentialResponse
+            });
+            // Hacemos render del boton oficial pero transparente sobre el nuestro
+            google.accounts.id.renderButton(
+                document.getElementById("btnGoogleContainer"),
+                { theme: "outline", size: "large", type: "standard", shape: "rectangular", text: "signin_with", logo_alignment: "left", width: document.getElementById('customGoogleBtn').offsetWidth }
+            );
+        }
+    }, 100);
+
     const loginForm = document.getElementById('loginForm');
 
     if (loginForm) {
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault(); 
 
-            try {
-                localStorage.clear();
-            } catch (err) {
-                console.warn("Storage bloqueado");
-            }
+            try { localStorage.clear(); } catch (err) {}
 
             const email = loginForm.querySelector('input[name="email"]').value;
             const password = loginForm.querySelector('input[name="password"]').value;
@@ -116,8 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({ email, password })
                 });
@@ -125,16 +186,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (response.ok) {
                     const result = await response.json();
                     try {
-                        localStorage.setItem('token', result.token);
-                    } catch (storageErr) {}
-                    loginForm.submit(); 
+                        localStorage.setItem('token', result.data.token);
+                        const role = result.data.usuario.role;
+                        if(role === 'superadmin') window.location.href = '/superadmin/dashboard';
+                        else if(role === 'gerente') window.location.href = '/admin/dashboard';
+                        else window.location.href = '/public/perfil';
+                    } catch (err) {}
                 } else {
                     const errorData = await response.json();
                     alert('Acceso denegado: ' + (errorData.message || 'Credenciales inválidas.'));
                 }
             } catch (error) {
-                console.error('Fallo la API, derivando a form estandar...', error);
-                loginForm.submit();
+                console.error('Fallo la API', error);
+                alert('Fallo de conexión al servidor.');
             }
         });
     }

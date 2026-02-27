@@ -56,12 +56,10 @@ class CafeteriaController extends Controller
             $gerente = User::create([
                 'name'                => $data['gerente']['name'],
                 'email'               => $data['gerente']['email'],
-                'password'            => null,
+                'password'            => Hash::make($data['gerente']['password']),
                 'role'                => 'gerente',
                 'cafe_id'             => $cafeteria->id,
                 'estado'              => false,
-                'activation_token'    => $token,
-                'must_change_password'=> true,
             ]);
 
             $cafeteria->update(['user_id' => $gerente->id]);
@@ -101,9 +99,13 @@ class CafeteriaController extends Controller
         if ($data['estado'] === 'activa' && $cafeteria->gerente) {
             $gerente = $cafeteria->gerente;
 
-            if (!$gerente->estado) {
+            $gerente->update([
+                'estado'=> true
+            ]);
+
+            if (!$gerente->activation_token) {
                 // Generar nuevo token de activación si no tiene
-                $token = $gerente->activation_token ?? Str::random(60);
+                $token = Str::random(60);
 
                 $gerente->update([
                     'activation_token' => $token,

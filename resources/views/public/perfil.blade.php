@@ -8,10 +8,10 @@
         <div class="col-12 col-md-4 col-xl-3">
             <div class="card border-0 rounded-4 p-4 text-center h-100" style="background: var(--white-pure); box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
                 <div class="mb-4">
-                    <img src="{{ Auth::user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=0A0A0A&color=FFFFFF' }}" class="rounded-circle" width="100" style="border: 4px solid var(--off-white); box-shadow: 0 4px 15px rgba(0,0,0,0.08);" referrerpolicy="no-referrer">
+                    <img id="profileAvatar" src="https://ui-avatars.com/api/?name=User&background=0A0A0A&color=FFFFFF" class="rounded-circle" width="100" style="border: 4px solid var(--off-white); box-shadow: 0 4px 15px rgba(0,0,0,0.08);" referrerpolicy="no-referrer">
                 </div>
-                <h4 class="fw-bold mb-1" style="color: var(--black-primary); letter-spacing: -0.5px;">{{ Auth::user()->name }}</h4>
-                <p class="small mb-4" style="color: var(--text-muted); font-weight: 500;">{{ Auth::user()->email }}</p>
+                <h4 id="profileName" class="fw-bold mb-1" style="color: var(--black-primary); letter-spacing: -0.5px;">Cargando...</h4>
+                <p id="profileEmail" class="small mb-4" style="color: var(--text-muted); font-weight: 500;">Cargando...</p>
                 
                 <hr style="border-color: var(--border-light); opacity: 1;" class="w-75 mx-auto mb-4">
 
@@ -75,11 +75,67 @@
 </div>
 
 <script>
-document.getElementById('btnCerrarSesionCliente')?.addEventListener('click', function(e) {
+document.addEventListener('DOMContentLoaded', async function() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/login';
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/mi-perfil', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const user = data.data.usuario;
+
+            document.getElementById('profileName').textContent = user.name;
+            document.getElementById('profileEmail').textContent = user.email;
+
+            if (user.avatar) {
+                document.getElementById('profileAvatar').src = user.avatar;
+            } else {
+                document.getElementById('profileAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=0A0A0A&color=FFFFFF`;
+            }
+        } else {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        }
+    } catch (error) {
+        console.error('Error cargando perfil:', error);
+    }
+});
+
+document.getElementById('btnCerrarSesionCliente')?.addEventListener('click', async function(e) {
     e.preventDefault();
+    const token = localStorage.getItem('token');
+    
+    if (token) {
+        try {
+            await fetch('/api/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+        } catch (e) {
+            console.error('Error API Logout', e);
+        }
+    }
+
     localStorage.removeItem('token');
+    localStorage.removeItem('role');
     localStorage.clear();
-    window.location.href = '/logout';
+    window.location.href = '/login';
 });
 </script>
 @endsection

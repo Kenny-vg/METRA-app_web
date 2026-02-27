@@ -1,7 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\Auth\LoginController;
+use App\Http\Controllers\Api\Auth\RegisterController;
+use App\Http\Controllers\Api\Auth\GoogleController;
+use App\Http\Controllers\Api\Auth\ProfileController;
 use App\Http\Controllers\Api\CafeteriaController;
 use App\Http\Controllers\Api\RegistroNegocioController;
 use App\Http\Controllers\Api\Gerente\CafeteriaPerfilController;
@@ -13,15 +16,18 @@ use App\Http\Controllers\Api\Superadmin\SuscripcionController;
 | RUTAS PÚBLICAS
 |------------------------------------------
 */
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [LoginController::class, 'login']);
 
 // Activar cuenta
-Route::post('/activar-cuenta', [AuthController::class, 'activarCuenta']);
+Route::post('/activar-cuenta', [RegisterController::class, 'activarCuenta']);
 
 // Registro cliente
-Route::post('/register-cliente', [AuthController::class, 'registerCliente']);
+Route::post('/register-cliente', [RegisterController::class, 'registerCliente']);
 
-// Planes públicos (landing de registro de negocios)
+//Login con Google
+Route::post('/login-google', [GoogleController::class, 'loginGoogle']);
+
+// Planes públicos 
 Route::get('/planes-publicos', [RegistroNegocioController::class, 'planesPublicos']);
 
 // Auto-registro de negocio por el propio gerente/dueño
@@ -35,8 +41,8 @@ Route::post('/registro-negocio/{cafeteria}/comprobante', [RegistroNegocioControl
 |------------------------------------------
 */
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/mi-perfil', [AuthController::class, 'miPerfil']);
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/mi-perfil', [ProfileController::class, 'miPerfil']);
+    Route::post('/logout', [LoginController::class, 'logout']);
 });
 
 

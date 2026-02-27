@@ -20,7 +20,9 @@ return new class extends Migration
         $table->string('ap_materno')->nullable();
 
         $table->string('email')->unique();
-        $table->string('password')->nullable();
+        $table->string('password');
+        $table->string('google_id')->nullable();
+        $table->string('avatar')->nullable();
 
         // Roles del sistema
         $table->enum('role', [

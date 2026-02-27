@@ -11,49 +11,33 @@ use App\Models\Cafeteria;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasApiTokens;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
-    //campos que se pueden insertar o actualizar masivamente
+    //campos que se pueden insertar o actualizar
     protected $fillable = [
         'name',
+        'ap_paterno',
+        'ap_materno',
         'email',
         'password',
         'role',
         'cafe_id',
         'estado',
-        'activation_token',
-        'must_change_password',
         'google_id',
         'avatar'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     //campos que no se devuelven en respuestas JSON
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'estado'=> 'boolean',
         ];
     }
 
