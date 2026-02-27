@@ -25,7 +25,7 @@ Route::post('/activar-cuenta', [RegisterController::class, 'activarCuenta']);
 Route::post('/register-cliente', [RegisterController::class, 'registerCliente']);
 
 //Login con Google
-Route::post('/login-google', [GoogleController::class, 'loginGoogle']);
+Route::post('/auth/google', [GoogleController::class, 'loginGoogle']);
 
 // Planes públicos 
 Route::get('/planes-publicos', [RegistroNegocioController::class, 'planesPublicos']);

@@ -11,6 +11,8 @@ use App\Helpers\ApiResponse;
 class LoginController extends Controller
 {
     //
+    public function login(Request $request)
+    {
     $request->validate([
         'email'=>'required|email',
         'password'=>'required'
@@ -23,7 +25,7 @@ class LoginController extends Controller
     }
 
     if(!$user ->estado){
-        return ApiResponse::error('Usuario inactivo, 403');
+        return ApiResponse::error('Usuario inactivo', 403);
     }
 
     $token = $user->createToken('metra_token')->plainTextToken;
@@ -38,14 +40,15 @@ class LoginController extends Controller
             'cafe_id'=>$user->cafe_id
         ]
     ], 'Login correcto');
-}
-
-public function logout(Request $request)
-{
-    $token = $request->user()->currentAccessToken();
-
-    if($token){
-        $token->delete();
     }
-    return ApiResponse::success(null, 'Sesión cerrada');
+
+    public function logout(Request $request)
+    {
+        $token = $request->user()->currentAccessToken();
+
+        if($token){
+            $token->delete();
+        }
+        return ApiResponse::success(null, 'Sesión cerrada');
+    }
 }

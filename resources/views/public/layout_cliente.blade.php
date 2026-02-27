@@ -33,10 +33,10 @@
                     </li>
                     <li class="nav-item d-flex align-items-center bg-white px-3 py-2 rounded-pill" style="border: 1px solid var(--border-light); cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.02)">
                         <div class="me-3 text-end d-none d-sm-block">
-                            <p class="m-0 fw-bold small" style="color: var(--black-primary); line-height: 1;">{{ Auth::user()->name }}</p>
+                            <p id="clientName" class="m-0 fw-bold small" style="color: var(--black-primary); line-height: 1;">Cargando...</p>
                             <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">Cliente</span>
                         </div>
-                        <img src="{{ Auth::user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=0A0A0A&color=FFFFFF' }}" class="rounded-circle" width="36" style="border: 2px solid var(--white-pure); box-shadow: 0 2px 5px rgba(0,0,0,0.1);" referrerpolicy="no-referrer">
+                        <img id="clientAvatar" src="https://ui-avatars.com/api/?name=User&background=0A0A0A&color=FFFFFF" class="rounded-circle" width="36" style="border: 2px solid var(--white-pure); box-shadow: 0 2px 5px rgba(0,0,0,0.1);" referrerpolicy="no-referrer">
                     </li>
                 </ul>
             </div>
@@ -48,5 +48,36 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const response = await fetch('/api/mi-perfil', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    const user = data.data.usuario;
+                    
+                    const layoutName = document.getElementById('clientName');
+                    const layoutAvatar = document.getElementById('clientAvatar');
+                    
+                    if (layoutName) layoutName.textContent = user.name;
+                    if (layoutAvatar) {
+                        layoutAvatar.src = user.avatar ? user.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=0A0A0A&color=FFFFFF`;
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching global profile data:', error);
+            }
+        }
+    });
+    </script>
 </body>
 </html>
