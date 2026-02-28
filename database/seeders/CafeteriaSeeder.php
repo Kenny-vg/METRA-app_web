@@ -14,8 +14,7 @@ class CafeteriaSeeder extends Seeder
     public function run(): void
     {
         
-        Cafeteria::create([
-            'id' => 1,
+        Cafeteria::firstOrCreate([
             'nombre' => 'Cafe Demo METRA',
             'estado' => true
         ]);

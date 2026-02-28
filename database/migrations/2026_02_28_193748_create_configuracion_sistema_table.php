@@ -34,6 +34,16 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('configuracion_sistema');
+        Schema::table('configuracion_sistema', function (Blueprint $table) {
+            $table->dropColumn([
+                'banco',
+                'clabe',
+                'beneficiario',
+                'instrucciones_pago',
+                'email_soporte',
+                'telefono_soporte',
+                'whatsapp_soporte'
+            ]);
+        });
     }
 };

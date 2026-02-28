@@ -38,10 +38,13 @@ class CafeteriaController extends Controller
      */
     public function store(Request $request)
     {
+
+        //validación
         $data = $request->validate([
             'nombre'       => 'required|string|max:100',
             'gerente.name' => 'required|string|max:100',
             'gerente.email'=> 'required|email|unique:users,email',
+            'comprobante' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
         $result = DB::transaction(function () use ($data) {
@@ -57,6 +60,7 @@ class CafeteriaController extends Controller
                 'role'                => 'gerente',
                 'cafe_id'             => $cafeteria->id,
                 'estado'              => false,
+                
             ]);
 
             $cafeteria->update(['user_id' => $gerente->id]);
