@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\RegistroNegocioController;
 use App\Http\Controllers\Api\Gerente\CafeteriaPerfilController;
 use App\Http\Controllers\Api\Superadmin\PlanController;
 use App\Http\Controllers\Api\Superadmin\SuscripcionController;
+use App\Http\Controllers\Api\Superadmin\DashboardController;
+use App\Http\Controllers\Api\Superadmin\SolicitudesController;
 
 /*
 |------------------------------------------
@@ -74,6 +76,18 @@ Route::middleware([
     // SUSCRIPCIONES
     Route::get('/suscripciones', [SuscripcionController::class, 'index']);
     Route::post('/suscripciones', [SuscripcionController::class, 'store']);
+
+    //DASHBOARD
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+
+    //SOLICITUDES
+    Route::get('/solicitudes', [SolicitudesController::class, 'index']);
+
+    //APROBACION
+    Route::patch('/solicitudes/{cafeteria}/aprobar', 
+        [AprobacionController::class, 'aprobar']);
+    Route::patch('/solicitudes/{cafeteria}/rechazar', 
+        [AprobacionController::class, 'rechazar']);
 });
 
 

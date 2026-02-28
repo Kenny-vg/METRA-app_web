@@ -30,7 +30,8 @@ return new class extends Migration
             $table->enum('estado', [
                 'activa',
                 'suspendida',
-                'pendiente'
+                'pendiente',
+                'en_revision'
             ])->default('pendiente');
 
             $table->string('foto_url')->nullable();

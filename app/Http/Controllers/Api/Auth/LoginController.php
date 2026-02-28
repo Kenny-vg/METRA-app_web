@@ -27,6 +27,15 @@ class LoginController extends Controller
     if(!$user ->estado){
         return ApiResponse::error('Usuario inactivo', 403);
     }
+    //bloquear acceso si la cafeteria no tiene suscripción activa
+    if(in_array($user->role,['gerente','personal'])){
+        $cafeteria=$user->cafeteria;
+        if(!$cafeteria||!$cafeteria->suscripcionActual){
+            return ApiResponse::error(
+                'La suscripción de tu cafeteria ha vencido', 
+                403);
+        }
+    }
 
     $token = $user->createToken('metra_token')->plainTextToken;
 

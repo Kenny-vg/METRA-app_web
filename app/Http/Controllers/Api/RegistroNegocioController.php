@@ -72,16 +72,14 @@ class RegistroNegocioController extends Controller
             ]);
 
             // 2. Crear el gerente/dueño (inactivo hasta que se apruebe)
-            $token = Str::random(60);
+            
             $gerente = User::create([
                 'name'                => $data['gerente']['name'],
                 'email'               => $data['gerente']['email'],
-                'password'            => null,
+                'password'            => Hash::make(Str::random(40)),
                 'role'                => 'gerente',
                 'cafe_id'             => $cafeteria->id,
-                'estado'              => false,
-                'activation_token'    => $token,
-                'must_change_password'=> true,
+                'estado'              => false
             ]);
 
             // 3. Vincular cafetería con el gerente
@@ -125,6 +123,13 @@ class RegistroNegocioController extends Controller
      */
     public function subirComprobante(Request $request, Cafeteria $cafeteria)
     {
+        
+        if ($cafeteria->estado !== 'en_revision') {
+            return ApiResponse::error(
+                'No se puede subir el comprobante de pago',
+                400
+            );
+        }
         $request->validate([
             'comprobante' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);

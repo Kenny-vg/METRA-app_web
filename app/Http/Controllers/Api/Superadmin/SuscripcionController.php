@@ -66,7 +66,7 @@ class SuscripcionController extends Controller
             'plan_id'=>$data['plan_id'],
             'fecha_inicio'=>$fecha_inicio,
             'fecha_fin'=>$fecha_fin,
-            'estado'=>true,
+            'estado_pago'=>'pagado',
             'monto'=>$plan->precio,
         ]);
 

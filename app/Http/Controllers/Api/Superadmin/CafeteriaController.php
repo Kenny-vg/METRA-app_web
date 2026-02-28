@@ -5,10 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Cafeteria;
 use App\Models\User;
-use App\Mail\ActivacionCuentaMail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
@@ -51,12 +49,10 @@ class CafeteriaController extends Controller
                 'estado' => 'activa',
             ]);
 
-            $token = Str::random(60);
-
             $gerente = User::create([
                 'name'                => $data['gerente']['name'],
                 'email'               => $data['gerente']['email'],
-                'password'            => Hash::make($data['gerente']['password']),
+                'password'            => Hash::make(Str::random(40)),
                 'role'                => 'gerente',
                 'cafe_id'             => $cafeteria->id,
                 'estado'              => false,
@@ -64,9 +60,6 @@ class CafeteriaController extends Controller
 
             $cafeteria->update(['user_id' => $gerente->id]);
 
-            Mail::to($gerente->email)->send(
-                new ActivacionCuentaMail($token, $gerente->email)
-            );
 
             return [
                 'cafeteria' => $cafeteria,
@@ -79,7 +72,7 @@ class CafeteriaController extends Controller
 
         return ApiResponse::success(
             $result,
-            'Cafetería creada. Se envió un correo de activación al gerente.'
+            'Cafetería creada correctamente.'
         );
     }
 
@@ -95,37 +88,26 @@ class CafeteriaController extends Controller
 
         $cafeteria->update(['estado' => $data['estado']]);
 
-        // Si se aprueba: activar al gerente y enviarle el correo de activación
+        // aprobado
         if ($data['estado'] === 'activa' && $cafeteria->gerente) {
-            $gerente = $cafeteria->gerente;
-
-            $gerente->update([
+            
+            //activar gerente
+            $cafeteria->gerente->update([
                 'estado'=> true
             ]);
 
-            if (!$gerente->activation_token) {
-                // Generar nuevo token de activación si no tiene
-                $token = Str::random(60);
-
-                $gerente->update([
-                    'activation_token' => $token,
-                ]);
-
-                Mail::to($gerente->email)->send(
-                    new ActivacionCuentaMail($token, $gerente->email)
-                );
-            }
-
-            // Actualizar suscripción a pagado
+            //actualizar suscripcion a pagado
             optional($cafeteria->suscripcionActual)->update([
                 'estado_pago'      => 'pagado',
                 'fecha_validacion' => now(),
             ]);
-        }
-
+        } 
+            
         // Si se rechaza/suspende: desactivar gerente
-        if (in_array($data['estado'], ['suspendida']) && $cafeteria->gerente) {
-            $cafeteria->gerente->update(['estado' => false]);
+        if ($data['estado'] === 'suspendida' && $cafeteria->gerente) {
+            $cafeteria->gerente->update([
+                'estado' => false
+            ]);
         }
 
         $cafeteria->load(['gerente', 'suscripcionActual.plan']);

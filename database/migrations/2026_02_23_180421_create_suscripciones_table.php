@@ -29,6 +29,9 @@ return new class extends Migration
 
             $table->decimal('monto',10,2);
 
+            $table->foreignId('user_id')->nullable()->constrained('users');
+            $table->dateTime('fecha_validacion')->nullable();
+
             $table->timestamps();
         });
     }
