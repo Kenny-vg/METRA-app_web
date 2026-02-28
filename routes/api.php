@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Superadmin\DashboardController;
 use App\Http\Controllers\Api\Superadmin\SolicitudesController;
 use App\Http\Controllers\Api\Superadmin\AprobacionController;
 use App\Http\Controllers\Api\Superadmin\CafeteriaController;
+use App\Http\Controllers\Api\Superadmin\ConfiguracionController;
 /*
 |------------------------------------------
 | RUTAS PÚBLICAS
@@ -31,6 +32,9 @@ Route::post('/auth/google', [GoogleController::class, 'loginGoogle']);
 
 // Planes públicos 
 Route::get('/planes-publicos', [RegistroNegocioController::class, 'planesPublicos']);
+
+// Información de pago
+Route::get('/configuracion-pago', [ConfiguracionController::class, 'showPublic']);
 
 // Auto-registro de negocio por el propio gerente/dueño
 Route::post('/registro-negocio', [RegistroNegocioController::class, 'store']);
@@ -89,6 +93,9 @@ Route::middleware([
         [AprobacionController::class, 'aprobar']);
     Route::patch('/solicitudes/{cafeteria}/rechazar', 
         [AprobacionController::class, 'rechazar']);
+
+    // CONFIGURACIÓN PAGO
+    Route::put('/configuracion-pago', [ConfiguracionController::class, 'update']);    
 });
 
 

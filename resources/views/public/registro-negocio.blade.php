@@ -242,9 +242,25 @@
         <!-- PASO 3 -->
         <div class="wizard-step" id="step-3">
             <h4 class="fw-bold mb-1" style="color: var(--black-primary);">Validación de Pago</h4>
-            <p class="text-muted mb-4">
-                Transfiere tu cuota inicial a <strong id="dynamic-clabe" style="color: var(--accent-gold);">CLABE: 0123 4567 8901 2345 67</strong> y adjunta el soporte visual.
-            </p>
+            
+            <div class="mb-4 p-4 rounded-4 bg-white border border-secondary border-opacity-25 shadow-sm" id="pago-s-info" style="display:none;">
+                <h6 class="fw-bold text-dark border-bottom pb-2 mb-3"><i class="bi bi-bank me-2 text-primary"></i>Datos de Transferencia</h6>
+                <div class="row g-2 small text-muted mb-4">
+                    <div class="col-12 col-md-6"><strong class="text-dark">Banco:</strong> <span id="dyn-banco"></span></div>
+                    <div class="col-12 col-md-6"><strong class="text-dark">Beneficiario:</strong> <span id="dyn-beneficiario"></span></div>
+                    <div class="col-12"><strong class="text-dark">CLABE:</strong> <span id="dyn-clabe" style="color: var(--accent-gold); font-weight:bold; letter-spacing:1px;"></span></div>
+                    <div class="col-12 mt-2 p-3 bg-light rounded-3" id="dyn-inst-box" style="display:none;">
+                        <i class="bi bi-info-circle me-1 text-primary"></i> <span id="dyn-instrucciones"></span>
+                    </div>
+                </div>
+                
+                <h6 class="fw-bold text-dark border-bottom pb-2 mb-3"><i class="bi bi-headset me-2 text-primary"></i>Contacto Soporte</h6>
+                <div class="d-flex flex-wrap gap-4 small fw-semibold">
+                    <span id="dyn-email-box" style="display:none;"><i class="bi bi-envelope-fill me-1 text-danger"></i> <span id="dyn-email" class="text-dark"></span></span>
+                    <span id="dyn-tel-box" style="display:none;"><i class="bi bi-telephone-fill me-1 text-primary"></i> <span id="dyn-telefono" class="text-dark"></span></span>
+                    <span id="dyn-wts-box" style="display:none;"><i class="bi bi-whatsapp me-1 text-success"></i> <span id="dyn-whatsapp" class="text-dark"></span></span>
+                </div>
+            </div>
             
             <div class="upload-area" id="upload-area" onclick="document.getElementById('comprobante-input').click()">
                 <i class="bi bi-cloud-arrow-up"></i>
@@ -484,15 +500,43 @@
     ua.addEventListener('dragleave', () => ua.classList.remove('dragover'));
     ua.addEventListener('drop', e => { e.preventDefault(); ua.classList.remove('dragover'); document.getElementById('comprobante-input').files = e.dataTransfer.files; previewFile(document.getElementById('comprobante-input')); });
 
-    // Preparado para consumo de endpoint futuro de cuenta CLABE
+    // Consumo de endpoint de configuración
     async function cargarConfiguracionPago() {
-        // const res = await fetch(`${API_BASE}/configuracion-pago`);
-        // const json = await res.json();
-        // document.getElementById('dynamic-clabe').textContent = `CLABE: ${json.data.clabe}`;
+        try {
+            const res = await fetch(`${API_BASE}/configuracion-pago`);
+            const json = await res.json();
+            if(res.ok && json.data) {
+                const config = json.data;
+                document.getElementById('pago-s-info').style.display = 'block';
+                
+                document.getElementById('dyn-banco').textContent = config.banco || 'No provisto';
+                document.getElementById('dyn-beneficiario').textContent = config.beneficiario || 'No provisto';
+                document.getElementById('dyn-clabe').textContent = config.clabe || 'No provista';
+                
+                if (config.instrucciones_pago) {
+                    document.getElementById('dyn-inst-box').style.display = 'block';
+                    document.getElementById('dyn-instrucciones').textContent = config.instrucciones_pago;
+                }
+                if (config.email_soporte) {
+                    document.getElementById('dyn-email-box').style.display = 'block';
+                    document.getElementById('dyn-email').textContent = config.email_soporte;
+                }
+                if (config.telefono_soporte) {
+                    document.getElementById('dyn-tel-box').style.display = 'block';
+                    document.getElementById('dyn-telefono').textContent = config.telefono_soporte;
+                }
+                if (config.whatsapp_soporte) {
+                    document.getElementById('dyn-wts-box').style.display = 'block';
+                    document.getElementById('dyn-whatsapp').textContent = config.whatsapp_soporte;
+                }
+            }
+        } catch(e) {
+            console.error('Error al cargar config pago', e);
+        }
     }
 
     cargarPlanes();
-    // cargarConfiguracionPago();
+    cargarConfiguracionPago();
 </script>
 </body>
 </html>

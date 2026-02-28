@@ -13,6 +13,18 @@ return new class extends Migration
     {
         Schema::create('configuracion_sistema', function (Blueprint $table) {
             $table->id();
+
+            // PAGOS
+            $table->string('banco')->nullable();
+            $table->string('clabe')->nullable();
+            $table->string('beneficiario')->nullable();
+            $table->text('instrucciones_pago')->nullable();
+            
+            // SOPORTE
+            $table->string('email_soporte')->nullable();
+            $table->string('telefono_soporte')->nullable();
+            $table->string('whatsapp_soporte')->nullable();
+
             $table->timestamps();
         });
     }

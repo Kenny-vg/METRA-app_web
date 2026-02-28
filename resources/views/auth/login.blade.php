@@ -27,7 +27,12 @@
         </div>
 
         <!-- Lado Derecho: Formulario Limpio -->
-        <div class="col-12 col-lg-6 d-flex align-items-center justify-content-center" style="background-color: var(--white-pure);">
+        <div class="col-12 col-lg-6 position-relative d-flex align-items-center justify-content-center" style="background-color: var(--white-pure);">
+            <!-- Botón Volver -->
+            <a href="/" class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-4 fw-bold" style="border-radius: 50px; padding: 8px 20px;">
+                <i class="bi bi-arrow-left me-2"></i>Volver al Inicio
+            </a>
+            
             <div class="w-100 px-4 px-md-5" style="max-width: 480px;">
                 
                 <div class="text-center mb-5">
