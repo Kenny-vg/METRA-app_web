@@ -22,12 +22,12 @@ class PlanController extends Controller
     public function store(Request $request, Plan $plan)
     {
         $data=$request->validate([
-           'nombre_plan'=>'required|unique:planes',
-           'precio'=>'required|numeric',
-           'max_reservas_mes'=>'required|integer',
-           'max_usuarios_admin'=>'required|integer',
-           'duracion_dias'=>'required|integer',
-           'descripcion'=>'nullable|string',
+            'nombre_plan'=>'required|unique:planes',
+            'precio'=>'required|numeric|min:0',
+            'max_reservas_mes'=>'required|integer|min:1',
+            'max_usuarios_admin'=>'required|integer|min:1',
+            'duracion_dias'=>'required|integer|min:1',
+            'descripcion'=>'nullable|string|max:255',
         ]);
 
         $data['estado']=true;
@@ -61,12 +61,14 @@ class PlanController extends Controller
     //Eliminar plan
     public function destroy (Plan $plan)
     {
-        $plan->delete();
-        return ApiResponse::success(
-            null,
-            'Plan eliminado correctamente'
-        );
-    }
+        $plan->update([
+        'estado' => false
+    ]);
 
+    return ApiResponse::success(
+        $plan,
+        'Plan desactivado correctamente'
+    );
+    }
 
 }

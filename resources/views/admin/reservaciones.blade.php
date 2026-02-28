@@ -76,11 +76,8 @@
                                         
                                         <div class="d-flex justify-content-between align-items-center mt-2">
                                             <span style="font-size: 0.7rem; opacity: 0.8;"><i class="bi bi-people-fill me-1"></i>{{ $res['pax'] }}</span>
-                                            <span class="badge" 
-                                                  style="background: {{ $res['status'] == 'curso' ? 'rgba(255,255,255,0.1)' : 'var(--off-white)' }}; 
-                                                         color: {{ $res['status'] == 'curso' ? 'var(--white-pure)' : 'var(--text-muted)' }}; 
-                                                         font-size: 0.6rem; border: 1px solid {{ $res['status'] == 'curso' ? 'transparent' : 'var(--border-light)' }};
-                                                         font-weight: 600;">
+                                            <span class="badge badge-status badge-status-{{ $res['status'] == 'curso' ? 'active' : 'pending' }}" 
+                                                  style="font-size: 0.6rem;">
                                                 {{ $res['mesa'] }}
                                             </span>
                                         </div>

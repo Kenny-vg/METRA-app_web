@@ -23,22 +23,22 @@
             <form id="registerForm">
                 <div class="text-start mb-3">
                     <label class="form-label small fw-bold" style="color: var(--black-primary);">Nombre Completo</label>
-                    <input type="text" name="name" class="form-control input-metra" placeholder="Ej. Cristina Juárez" required>
+                    <input type="text" name="name" class="form-control input-metra" placeholder="Ej. Cristina Juárez" maxlength="100" required>
                 </div>
 
                 <div class="text-start mb-3">
                     <label class="form-label small fw-bold" style="color: var(--black-primary);">Correo Electrónico</label>
-                    <input type="email" name="email" class="form-control input-metra" placeholder="tu@correo.com" required>
+                    <input type="email" name="email" class="form-control input-metra" placeholder="tu@correo.com" maxlength="255" required>
                 </div>
 
                 <div class="text-start mb-3">
                     <label class="form-label small fw-bold" style="color: var(--black-primary);">Contraseña</label>
-                    <input type="password" name="password" class="form-control input-metra" placeholder="••••••••" required>
+                    <input type="password" name="password" class="form-control input-metra" placeholder="••••••••" minlength="8" required>
                 </div>
 
                 <div class="text-start mb-4">
                     <label class="form-label small fw-bold" style="color: var(--black-primary);">Confirmar Contraseña</label>
-                    <input type="password" name="password_confirmation" class="form-control input-metra" placeholder="••••••••" required>
+                    <input type="password" name="password_confirmation" class="form-control input-metra" placeholder="••••••••" minlength="8" required>
                 </div>
 
                 <button type="submit" class="btn-metra-main w-100 rounded-3">

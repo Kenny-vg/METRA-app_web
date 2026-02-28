@@ -50,6 +50,7 @@ class RegistroNegocioController extends Controller
 
             'gerente.name'     => 'required|string|max:100',
             'gerente.email'    => 'required|email|unique:users,email',
+            'gerente.password' => 'required|string|min:8|confirmed',
 
             'plan_id'          => 'required|exists:planes,id',
         ]);
@@ -77,7 +78,7 @@ class RegistroNegocioController extends Controller
             $gerente = User::create([
                 'name'                => $data['gerente']['name'],
                 'email'               => $data['gerente']['email'],
-                'password'            => Hash::make(Str::random(40)),
+                'password'            => $data['gerente']['password'],
                 'role'                => 'gerente',
                 'cafe_id'             => $cafeteria->id,
                 'estado'              => false
@@ -125,9 +126,9 @@ class RegistroNegocioController extends Controller
     public function subirComprobante(Request $request, Cafeteria $cafeteria)
     {
         
-        if ($cafeteria->estado !== 'en_revision') {
+        if (!in_array($cafeteria->estado, ['en_revision', 'activa', 'suspendida'])) {
             return ApiResponse::error(
-                'No se puede subir el comprobante de pago',
+                'No se puede subir el comprobante de pago en el estado actual',
                 400
             );
         }
@@ -138,6 +139,7 @@ class RegistroNegocioController extends Controller
         // Guardar archivo
         $path = $request->file('comprobante')->store('comprobantes', 'public');
 
+        // Actualizar el comprobante en la cafetería
         $cafeteria->update([
             'comprobante_url' => $path,
         ]);

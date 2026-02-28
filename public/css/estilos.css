@@ -964,3 +964,131 @@ body.zona-superadmin {
     text-transform: uppercase;
     font-weight: 800;
 }
+
+/* =========================================
+   ESTILOS GERENTE (Manager Panel UX UI Polish)
+========================================= */
+
+/* Premium Cards Estandarizados */
+.premium-card {
+    background: var(--white-pure);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(109, 76, 65, 0.1);
+    transition: all 0.3s ease;
+}
+
+.premium-card:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* Base de botones administrador */
+.btn-admin-primary {
+    background-color: var(--black-primary);
+    color: var(--white-pure);
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-admin-primary:hover {
+    background-color: var(--cafe-oscuro);
+    color: var(--white-pure);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-admin-secondary {
+    background-color: var(--white-pure);
+    color: var(--black-primary);
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    border: 1px solid var(--border-light);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-admin-secondary:hover {
+    background-color: var(--off-white);
+    color: var(--black-primary);
+    border-color: var(--black-primary);
+}
+
+/* Estado de Badges Semánticos */
+.badge-status {
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.badge-status-active {
+    background-color: #E8F5E9;
+    color: #2E7D32;
+    border: 1px solid #C8E6C9;
+}
+
+.badge-status-pending {
+    background-color: #FFF3E0;
+    color: #E65100;
+    border: 1px solid #FFE0B2;
+}
+
+.badge-status-suspended {
+    background-color: #FFEBEE;
+    color: #C62828;
+    border: 1px solid #FFCDD2;
+}
+
+.badge-status-info {
+    background-color: #E3F2FD;
+    color: #1565C0;
+    border: 1px solid #BBDEFB;
+}
+
+/* Tablas Estandarizadas (Metra) */
+.table-metra {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table-metra thead th {
+    border-bottom: 2px solid var(--off-white);
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 15px 10px;
+}
+
+.table-metra tbody tr {
+    transition: background 0.2s;
+    cursor: pointer;
+}
+
+.table-metra tbody tr:hover {
+    background: var(--off-white);
+}
+
+.table-metra tbody td {
+    padding: 15px 10px;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-main);
+    vertical-align: middle;
+}

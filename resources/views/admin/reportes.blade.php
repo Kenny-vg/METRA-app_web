@@ -27,39 +27,38 @@
     <!-- KPI Cards de Reportes -->
     <div class="row g-4 mb-5">
         <div class="col-12 col-sm-6 col-lg-3">
-            <div class="card border-0 p-4 h-100" style="background: var(--white-pure); border-radius: 12px; border: 1px solid rgba(0,0,0,0.03) !important;">
+            <div class="card border-0 p-4 h-100 premium-card">
                 <p class="small fw-bold text-uppercase mb-1" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.7rem;">Tráfico Total</p>
                 <h3 class="fw-bold m-0" style="color: var(--black-primary); font-size: 2rem; letter-spacing: -1px;">1,432</h3>
-                <span class="badge mt-2 align-self-start" style="background: #E8F5E9; color: #2E7D32; border: 1px solid #C8E6C9; padding: 4px 8px;">+12% <i class="bi bi-arrow-up"></i></span>
+                <span class="badge badge-status badge-status-active mt-2 align-self-start">+12% <i class="bi bi-arrow-up"></i></span>
             </div>
         </div>
         <div class="col-12 col-sm-6 col-lg-3">
-             <div class="card border-0 p-4 h-100" style="background: var(--white-pure); border-radius: 12px; border: 1px solid rgba(0,0,0,0.03) !important;">
+             <div class="card border-0 p-4 h-100 premium-card">
                 <p class="small fw-bold text-uppercase mb-1" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.7rem;">Reservas Cumplidas</p>
                 <h3 class="fw-bold m-0" style="color: var(--black-primary); font-size: 2rem; letter-spacing: -1px;">89%</h3>
                 <span class="badge mt-2 align-self-start" style="background: var(--off-white); color: var(--text-main); border: 1px dashed var(--border-light); padding: 4px 8px;">Constante</span>
             </div>
         </div>
         <div class="col-12 col-sm-6 col-lg-3">
-             <div class="card border-0 p-4 h-100" style="background: var(--white-pure); border-radius: 12px; border: 1px solid rgba(0,0,0,0.03) !important;">
+             <div class="card border-0 p-4 h-100 premium-card">
                 <p class="small fw-bold text-uppercase mb-1" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.7rem;">No Presentados (No-Show)</p>
                 <h3 class="fw-bold m-0" style="color: var(--black-primary); font-size: 2rem; letter-spacing: -1px;">11%</h3>
-                <span class="badge mt-2 align-self-start" style="background: #FFEBEE; color: #C62828; border: 1px solid #FFCDD2; padding: 4px 8px;">-2% <i class="bi bi-arrow-down"></i></span>
+                <span class="badge badge-status badge-status-suspended mt-2 align-self-start">-2% <i class="bi bi-arrow-down"></i></span>
             </div>
         </div>
         <div class="col-12 col-sm-6 col-lg-3">
              <div class="card border-0 p-4 h-100" style="background: var(--black-primary); border-radius: 12px;">
                 <p class="small fw-bold text-uppercase mb-1" style="color: rgba(255,255,255,0.6); letter-spacing: 1px; font-size: 0.7rem;">Ingreso Promedio / Reserva</p>
                 <h3 class="fw-bold m-0" style="color: var(--accent-gold); font-size: 2rem; letter-spacing: -1px;">$840<span class="fs-5 fw-normal" style="color: rgba(255,255,255,0.6);"> MXN</span></h3>
-                <span class="badge mt-2 align-self-start" style="background: rgba(255,255,255,0.1); color: var(--white-pure); padding: 4px 8px; font-weight: 500;">Proyectado</span>
+                <span class="badge badge-status badge-status-pending mt-2 align-self-start">Proyectado</span>
             </div>
         </div>
     </div>
 
-    <!-- Gráficas Placeholder -->
-    <div class="row g-4">
+    <div class="row g-4 mb-5">
         <div class="col-12 col-xl-8">
-            <div class="card border-0 p-4 p-md-5 h-100 rounded-4" style="background: var(--white-pure); box-shadow: 0 4px 20px rgba(0,0,0,0.02);">
+            <div class="card border-0 p-4 p-md-5 h-100 premium-card">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h5 class="fw-bold m-0" style="color: var(--black-primary);"><i class="bi bi-bar-chart-line me-2"></i>Fluctuación de Afluencia</h5>
                 </div>
@@ -74,7 +73,7 @@
         </div>
 
         <div class="col-12 col-xl-4">
-             <div class="card border-0 p-4 p-md-5 h-100 rounded-4" style="background: var(--white-pure); box-shadow: 0 4px 20px rgba(0,0,0,0.02);">
+             <div class="card border-0 p-4 p-md-5 h-100 premium-card">
                 <div class="mb-4">
                     <h5 class="fw-bold m-0" style="color: var(--black-primary);"><i class="bi bi-pie-chart me-2"></i>Segmentación</h5>
                 </div>

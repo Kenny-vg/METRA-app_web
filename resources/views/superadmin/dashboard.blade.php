@@ -114,16 +114,16 @@
                 <div class="alert alert-danger d-none rounded-3" id="modal-alert"></div>
                 <div class="mb-3">
                     <label class="form-label small fw-bold">Nombre del Negocio</label>
-                    <input type="text" class="form-control bg-light border-0 py-2" id="m-nombre" placeholder="Ej. Café Central">
+                    <input type="text" class="form-control bg-light border-0 py-2" id="m-nombre" placeholder="Ej. Café Central" maxlength="100" required>
                 </div>
                 <div class="row mb-3">
                     <div class="col">
                         <label class="form-label small fw-bold">Nombre del Gerente</label>
-                        <input type="text" class="form-control bg-light border-0 py-2" id="m-gerente-name" placeholder="Nombre completo">
+                        <input type="text" class="form-control bg-light border-0 py-2" id="m-gerente-name" placeholder="Nombre completo" maxlength="100" required>
                     </div>
                     <div class="col">
                         <label class="form-label small fw-bold">Correo del Gerente</label>
-                        <input type="email" class="form-control bg-light border-0 py-2" id="m-gerente-email" placeholder="gerente@cafe.com">
+                        <input type="email" class="form-control bg-light border-0 py-2" id="m-gerente-email" placeholder="gerente@cafe.com" maxlength="255" required>
                     </div>
                 </div>
                 <div class="mb-4">
@@ -451,8 +451,9 @@ async function cargarPlanesModal() {
         const json = await res.json();
         if (res.ok) {
             const select = document.getElementById('m-plan');
+            const planesActivos = json.data.filter(p => p.estado === true || p.estado === 1);
             select.innerHTML = '<option value="">Selecciona un plan...</option>' + 
-                json.data.map(p => `<option value="${p.id}">${p.nombre_plan} ($${p.precio})</option>`).join('');
+                planesActivos.map(p => `<option value="${p.id}">${p.nombre_plan} ($${p.precio})</option>`).join('');
         }
     } catch (e) {
         console.error('Error cargando planes modal', e);

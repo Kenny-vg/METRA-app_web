@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="zona-admin" style="background-color: var(--off-white); font-family: 'Inter', sans-serif;">
@@ -36,7 +39,7 @@
                 <i class="bi bi-speedometer2 me-3"></i>Métricas
             </a>
             <a href="/admin/gestion_negocio" class="nav-link-admin {{ request()->is('admin/gestion_negocio') ? 'active' : '' }}">
-                <i class="bi bi-shop me-3"></i>Gestión de Menú
+                <i class="bi bi-shop me-3"></i>Gestión del Negocio
             </a>
             <a href="/admin/reservaciones" class="nav-link-admin {{ request()->is('admin/reservaciones') ? 'active' : '' }}">
                 <i class="bi bi-calendar3 me-3"></i>Reservaciones
@@ -49,7 +52,7 @@
             </a>
             
             <div class="mt-auto pt-5">
-                <a href="/logout" id="btnCerrarSesion" class="btn-logout d-flex align-items-center justify-content-center w-100" style="padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); transition: 0.2s;">
+                <a href="/logout" id="btnCerrarSesion" class="btn btn-outline-danger d-flex align-items-center justify-content-center w-100" style="padding: 12px; border-radius: 8px; font-weight: 500; transition: all 0.2s;">
                     <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
                 </a>
             </div>

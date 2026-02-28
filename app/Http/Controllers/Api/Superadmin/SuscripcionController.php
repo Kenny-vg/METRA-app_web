@@ -30,54 +30,60 @@ class SuscripcionController extends Controller
      * CREAR SUSCRIPCION.
      */
     public function store(Request $request)
-    {
-        $data = $request->validate([
-            'cafe_id'=>'required|exists:cafeterias,id',
-            'plan_id'=>'required|exists:planes,id',
-        ]);
+{
+    $data = $request->validate([
+        'cafe_id'=>'required|exists:cafeterias,id',
+        'plan_id'=>'required|exists:planes,id',
+    ]);
 
-        $plan = Plan::findOrFail($data['plan_id']);
+    $plan = Plan::findOrFail($data['plan_id']);
 
-        //no permitir planes inactivos
-        if(!$plan->estado){
-            return ApiResponse::error(
-                'El plan seleccionado no esta activo',
-                400
-            );
-        } 
-
-        // evitar doble suscripción activa
-        $existente = Suscripcion::where('cafe_id',$data['cafe_id'])
-            ->where('fecha_fin','>',now())
-            ->first();
-
-        if($existente){
-            return ApiResponse::error(
-                'La cafetería ya tiene una suscripción activa',
-                400
-            );
-        }
-                
-        $fecha_inicio=Carbon::now();
-        $fecha_fin=(clone $fecha_inicio)->addDays($plan->duracion_dias);
-
-        $suscripcion = Suscripcion::create([
-            'cafe_id'=>$data['cafe_id'],
-            'plan_id'=>$data['plan_id'],
-            'fecha_inicio'=>$fecha_inicio,
-            'fecha_fin'=>$fecha_fin,
-            'estado_pago'=>'pagado',
-            'monto'=>$plan->precio,
-        ]);
-
-        $suscripcion->load(['cafeteria', 'plan']);
-
-        return ApiResponse::success(
-            $suscripcion,
-            'Suscripcion creada correctamente'
+    if(!$plan->estado){
+        return ApiResponse::error(
+            'El plan seleccionado ya no está activo',
+            400
         );
     }
 
+    $activa = Suscripcion::where('cafe_id', $data['cafe_id'])
+        ->where('fecha_fin','>',now())
+        ->latest('fecha_fin')
+        ->first();
+
+    $futura = Suscripcion::where('cafe_id',$data['cafe_id'])
+        ->where('fecha_inicio','>',now())
+        ->exists();
+
+    if($futura){
+        return ApiResponse::error(
+            'Ya existe una renovación pendiente',
+            400
+        );
+    }
+
+    $fecha_inicio = $activa
+        ? Carbon::parse($activa->fecha_fin)
+        : now();
+
+    $fecha_fin = (clone $fecha_inicio)
+        ->addDays($plan->duracion_dias);
+
+    $suscripcion = Suscripcion::create([
+        'cafe_id'=>$data['cafe_id'],
+        'plan_id'=>$data['plan_id'],
+        'fecha_inicio'=>$fecha_inicio,
+        'fecha_fin'=>$fecha_fin,
+        'estado_pago'=>'pendiente',
+        'monto'=>$plan->precio,
+    ]);
+
+    $suscripcion->load(['cafeteria','plan']);
+
+    return ApiResponse::success(
+        $suscripcion,
+        'Suscripción creada correctamente'
+    );
+}
 
     /**
      * Display the specified resource.

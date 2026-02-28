@@ -50,11 +50,11 @@
                         El sistema ideal para tu negocio
                     </span>
                     <h1 class="hero-title" style="font-family: 'Inter', sans-serif;">
-                        METRA <br>
+                        {{ \App\Models\Cafeteria::first()?->nombre ?? 'METRA' }} <br>
                         <span style="color: var(--accent-gold);">Olvídate de las esperas.</span>
                     </h1>
                     <p class="fs-5 mb-5" style="color: var(--text-muted); max-width: 520px; font-weight: 400; line-height: 1.6;">
-                        Reserva tu mesa en segundos y disfruta de tu experiencia gastronómica desde el primer momento. Fácil y rápido.
+                        {{ \App\Models\Cafeteria::first()?->descripcion ?? 'Reserva tu mesa en segundos y disfruta de tu experiencia gastronómica desde el primer momento. Fácil y rápido.' }}
                     </p>
                     <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
                         <a href="/detalles" class="btn-metra-main" style="padding: 16px 36px; font-size: 1.05rem;">

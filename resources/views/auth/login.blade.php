@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="zona-comensal">
@@ -51,21 +52,28 @@
 
                 <form id="loginForm" action="{{ route('login') }}" method="POST">
                     @csrf 
-                    <div class="mb-4">
-                        <label class="form-label small fw-bold" style="color: var(--text-main); letter-spacing: 0.5px;">DIRECCIÓN DE CORREO</label>
-                        <input type="email" name="email" class="form-control input-metra" placeholder="nombre@correo.com" required 
-                               style="padding: 14px 16px; border: 1px solid var(--border-light); border-radius: 8px; background-color: var(--off-white); font-size: 0.95rem; box-shadow: none;">
+                    <div class="text-start mb-3">
+                        <label class="form-label small fw-bold" style="color: var(--black-primary);">Correo Electrónico</label>
+                        <input type="email" name="email" class="form-control input-metra" placeholder="nombre@correo.com" maxlength="255" required 
+                            value="{{ old('email') }}" autofocus>
+                        @error('email')
+                            <span class="text-danger small mt-1 d-block">{{ $message }}</span>
+                        @enderror
                     </div>
 
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <label class="form-label small fw-bold m-0" style="color: var(--text-main); letter-spacing: 0.5px;">CONTRASEÑA</label>
-                            <a href="#" class="small text-decoration-none fw-bold" style="color: var(--text-muted);">¿Olvidó su contraseña?</a>
+                    <div class="text-start mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label small fw-bold mb-0" style="color: var(--black-primary);">Contraseña</label>
+                            @if (Route::has('password.request'))
+                                <a href="{{ route('password.request') }}" class="small text-muted text-decoration-none">¿Olvidó su contraseña?</a>
+                            @endif
                         </div>
-                        <input type="password" name="password" class="form-control input-metra" placeholder="••••••••" required 
-                               style="padding: 14px 16px; border: 1px solid var(--border-light); border-radius: 8px; background-color: var(--off-white); font-size: 0.95rem; box-shadow: none;">
+                        <input type="password" name="password" class="form-control input-metra" placeholder="••••••••" minlength="8" required 
+                            autocomplete="current-password">
+                        @error('password')
+                            <span class="text-danger small mt-1 d-block">{{ $message }}</span>
+                        @enderror
                     </div>
-
                     <button type="submit" class="btn-metra-main w-100 py-3 mt-2" style="border-radius: 8px; font-size: 1.05rem; letter-spacing: 0.5px;">
                         Iniciar Sesión
                     </button>
@@ -139,7 +147,13 @@ window.handleCredentialResponse = async function(response) {
             } catch(e) {}
         } else {
             console.error('Error Google Login backend');
-            alert('Fallo al iniciar sesión con Google.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de Autenticación',
+                text: 'Fallo al iniciar sesión con Google.',
+                confirmButtonColor: 'var(--black-primary)',
+                confirmButtonText: 'Aceptar'
+            });
         }
     } catch (error) {
         console.error('API Error', error);
@@ -194,11 +208,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     } catch (err) {}
                 } else {
                     const errorData = await response.json();
-                    alert('Acceso denegado: ' + (errorData.message || 'Credenciales inválidas.'));
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Acceso Denegado',
+                        text: errorData.message || 'Credenciales inválidas.',
+                        confirmButtonColor: 'var(--black-primary)',
+                        confirmButtonText: 'Aceptar'
+                    });
                 }
             } catch (error) {
                 console.error('Fallo la API', error);
-                alert('Fallo de conexión al servidor.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de Conexión',
+                    text: 'Fallo de conexión al servidor.',
+                    confirmButtonColor: 'var(--black-primary)',
+                    confirmButtonText: 'Entendido'
+                });
             }
         });
     }

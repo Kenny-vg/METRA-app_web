@@ -23,12 +23,10 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Super Admin',
             'email' => 'superadmin@metra.com',
-            'password' => Hash::make('123456'),
+            'password' => Hash::make('12345678'),
             'role' => 'superadmin',
             'estado' => true,
             'cafe_id' => null,
-           // 'activation_token' => null,
-           // 'must_change_password' => false
         ]);
 
         /*
@@ -40,12 +38,10 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Gerente Test',
             'email' => 'gerente@metra.com',
-            'password' => Hash::make('123456'),
+            'password' => Hash::make('12345678'),
             'role' => 'gerente',
             'estado' => true,
-            'cafe_id' => null,
-          //  'activation_token' => null,
-            //'must_change_password' => false
+            'cafe_id' => 1,
         ]);
 
         /*
@@ -56,19 +52,17 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Staff Test',
             'email' => 'staff@metra.com',
-            'password' => Hash::make('123456'),
+            'password' => Hash::make('12345678'),
             'role' => 'personal',
             'estado' => true,
-            'cafe_id' => null,
-           // 'activation_token' => null,
-           // 'must_change_password' => false
+            'cafe_id' => 1,
         ]);
 
 
         User::create([
         'name' => 'Cliente Test',
         'email' => 'cliente@metra.com',
-        'password' => Hash::make('123456'),
+        'password' => Hash::make('12345678'),
         'role' => 'cliente',
         'estado' => true,
         'cafe_id' => null

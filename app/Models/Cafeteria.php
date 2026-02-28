@@ -37,10 +37,9 @@ class Cafeteria extends Model
     }
 
     public function suscripcionActual()
-    {
-        return $this->hasOne(Suscripcion::class, 'cafe_id')
+{
+    return $this->hasOne(Suscripcion::class, 'cafe_id')
         ->where('fecha_fin', '>', now())
-        ->latestOfMany('fecha_fin');
-
-    }
+        ->latest('fecha_fin');
+}
 }

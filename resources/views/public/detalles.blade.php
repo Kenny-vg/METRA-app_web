@@ -45,10 +45,10 @@
                  class="img-detalles mb-4" alt="Interior Exclusivo">
 
             <div class="d-flex justify-content-between align-items-center mb-2">
-                 <h1 class="fw-bold display-5 m-0" style="letter-spacing: -1px;">Café Central</h1>
+                 <h1 class="fw-bold display-5 m-0" style="letter-spacing: -1px;">{{ \App\Models\Cafeteria::first()?->nombre ?? 'Café Central' }}</h1>
                  <span class="badge" style="background: var(--off-white); color: var(--text-main); border: 1px solid var(--border-light); padding: 8px 16px;">Cafetería Destacada</span>
             </div>
-            <p class="fs-5 mb-5" style="color: var(--text-muted);">El mejor ambiente • Tehuacán Centro</p>
+            <p class="fs-5 mb-5" style="color: var(--text-muted);">{{ \App\Models\Cafeteria::first()?->descripcion ?? 'El mejor ambiente • Tehuacán Centro' }}</p>
 
             <div class="info-card">
                 <h5 class="fw-bold mb-4" style="color: var(--black-primary);">Disponibilidad de Mesas</h5>
@@ -172,7 +172,7 @@
                     <i class="bi bi-geo-alt fs-5 me-3" style="color: var(--black-primary);"></i>
                     <div>
                         <p class="mb-0 fw-bold fs-6">Ubicación</p>
-                        <p class="small m-0" style="color: var(--text-muted);">Calle 123 Col. Centro</p>
+                        <p class="small m-0" style="color: var(--text-muted);">{{ \App\Models\Cafeteria::first()?->calle ?? 'Calle 123' }} {{ \App\Models\Cafeteria::first()?->num_exterior ?? '' }}, {{ \App\Models\Cafeteria::first()?->colonia ?? 'Centro' }}</p>
                     </div>
                 </div>
                 

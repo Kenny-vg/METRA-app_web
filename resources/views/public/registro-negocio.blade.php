@@ -161,34 +161,38 @@
             <p class="text-muted mb-4">Información principal de tu cafetería</p>
             <div class="mb-3">
                 <label class="form-label fw-semibold">Nombre del negocio *</label>
-                <input type="text" class="form-metra w-100" id="nombre" placeholder="Ej. Café Central">
+                <input type="text" class="form-metra w-100" id="nombre" placeholder="Ej. Café Central" maxlength="100" required>
             </div>
             <div class="mb-3">
                 <label class="form-label fw-semibold">Descripción</label>
-                <textarea class="form-metra w-100" id="descripcion" rows="2" placeholder="Un concepto elegante, especialidad en origen..."></textarea>
+                <textarea class="form-metra w-100" id="descripcion" rows="2" placeholder="Un concepto elegante, especialidad en origen..." maxlength="255"></textarea>
             </div>
             <div class="row g-3 mb-3">
-                <div class="col-md-8">
+                <div class="col-md-6">
                     <label class="form-label fw-semibold">Calle</label>
-                    <input type="text" class="form-metra w-100" id="calle" placeholder="Av. Principal">
+                    <input type="text" class="form-metra w-100" id="calle" placeholder="Av. Principal" maxlength="100">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-semibold">Núm.</label>
-                    <input type="text" class="form-metra w-100" id="num_exterior" placeholder="123">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Núm. Ext.</label>
+                    <input type="text" class="form-metra w-100" id="num_exterior" placeholder="123" maxlength="10">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Núm. Int. (Opc)</label>
+                    <input type="text" class="form-metra w-100" id="num_interior" placeholder="Int 4" maxlength="10">
                 </div>
             </div>
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">Colonia</label>
-                    <input type="text" class="form-metra w-100" id="colonia" placeholder="Centro">
+                    <input type="text" class="form-metra w-100" id="colonia" placeholder="Centro" maxlength="80">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">Ciudad</label>
-                    <input type="text" class="form-metra w-100" id="ciudad" placeholder="Tehuacán">
+                    <input type="text" class="form-metra w-100" id="ciudad" placeholder="Tehuacán" maxlength="80">
                 </div>
                 <div class="col-md-4">
                     <label class="form-label fw-semibold">Teléfono</label>
-                    <input type="text" class="form-metra w-100" id="telefono" placeholder="238 100 0000">
+                    <input type="tel" class="form-metra w-100" id="telefono" placeholder="238 100 0000" maxlength="20" inputmode="numeric" pattern="[0-9\s\-\+]+">
                 </div>
             </div>
             <div class="d-flex justify-content-end mt-2">
@@ -204,11 +208,22 @@
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Nombre completo *</label>
-                    <input type="text" class="form-metra w-100" id="gerente_name" placeholder="Juan García">
+                    <input type="text" class="form-metra w-100" id="gerente_name" placeholder="Juan García" maxlength="100" required>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Correo corporativo *</label>
-                    <input type="email" class="form-metra w-100" id="gerente_email" placeholder="admin@cafe.com">
+                    <input type="email" class="form-metra w-100" id="gerente_email" placeholder="admin@cafe.com" maxlength="255" required>
+                </div>
+            </div>
+            
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Contraseña *</label>
+                    <input type="password" class="form-metra w-100" id="gerente_password" placeholder="Mínimo 8 caracteres" minlength="8" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Confirmar contraseña *</label>
+                    <input type="password" class="form-metra w-100" id="gerente_password_confirmation" placeholder="Repite tu contraseña" minlength="8" required>
                 </div>
             </div>
             
@@ -228,7 +243,7 @@
         <div class="wizard-step" id="step-3">
             <h4 class="fw-bold mb-1" style="color: var(--black-primary);">Validación de Pago</h4>
             <p class="text-muted mb-4">
-                Transfiere tu cuota inicial a <strong style="color: var(--accent-gold);">CLABE: 0123 4567 8901 2345 67</strong> y adjunta el soporte visual.
+                Transfiere tu cuota inicial a <strong id="dynamic-clabe" style="color: var(--accent-gold);">CLABE: 0123 4567 8901 2345 67</strong> y adjunta el soporte visual.
             </p>
             
             <div class="upload-area" id="upload-area" onclick="document.getElementById('comprobante-input').click()">
@@ -273,7 +288,7 @@
 </footer>
 
 <script>
-    const API_BASE = '/METRA-app_web/api';
+    const API_BASE = '/api';
     let selectedPlanId = null;
     let registeredCafeteriaId = null;
 
@@ -365,7 +380,12 @@
     async function registrarNegocio() {
         const name  = document.getElementById('gerente_name').value.trim();
         const email = document.getElementById('gerente_email').value.trim();
+        const password = document.getElementById('gerente_password').value;
+        const password_confirmation = document.getElementById('gerente_password_confirmation').value;
+
         if (!name || !email) { showAlert('Completa tu nombre y correo corporativo.'); return; }
+        if (password.length < 8) { showAlert('La contraseña debe tener al menos 8 caracteres.'); return; }
+        if (password !== password_confirmation) { showAlert('Las contraseñas no coinciden.'); return; }
         if (!selectedPlanId) { showAlert('Selecciona una propuesta de suscripción.'); return; }
 
         const btnTxt = document.getElementById('btn-text');
@@ -377,10 +397,11 @@
             descripcion: document.getElementById('descripcion').value.trim() || null,
             calle: document.getElementById('calle').value.trim() || null,
             num_exterior: document.getElementById('num_exterior').value.trim() || null,
+            num_interior: document.getElementById('num_interior').value.trim() || null,
             colonia: document.getElementById('colonia').value.trim() || null,
             ciudad: document.getElementById('ciudad').value.trim() || null,
             telefono: document.getElementById('telefono').value.trim() || null,
-            gerente: { name, email },
+            gerente: { name, email, password, password_confirmation },
             plan_id: selectedPlanId,
         };
 
@@ -406,7 +427,7 @@
         const f = input.files[0];
         if (f.type.startsWith('image/')) {
             const rd = new FileReader();
-            rd.onload = e => p.innerHTML = `<img src="${e.target.result}"><div class="small text-muted mt-2 fw-semibold">${f.name}</div>`;
+            rd.onload = e => p.innerHTML = `<img src="${e.target.result}" style="max-width: 100%; max-height: 250px; object-fit: contain; border-radius: 8px; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"><div class="small text-muted mt-2 fw-semibold">${f.name}</div>`;
             rd.readAsDataURL(f);
         } else {
             p.innerHTML = `<div class="p-3 bg-light rounded-3 text-start border"><i class="bi bi-file-pdf text-danger fs-3 me-2"></i><b>${f.name}</b> adjunto listo.</div>`;
@@ -417,17 +438,33 @@
         const input = document.getElementById('comprobante-input');
         if (!input.files.length) { showAlert('Por favor selecciona el soporte de pago visual.'); return; }
         
+        const file = input.files[0];
+        // 5 MB en Bytes
+        if (file.size > 5 * 1024 * 1024) { 
+            showAlert('El archivo excede el límite de 5MB. Por favor selecciona uno más ligero.'); 
+            input.value = ''; // Limpiar el input
+            document.getElementById('file-preview').innerHTML = '';
+            return; 
+        }
+
         const btnTxt = document.getElementById('btn-subir-text');
         const btnLd = document.getElementById('btn-subir-loading');
         btnTxt.classList.add('d-none'); btnLd.classList.remove('d-none');
 
-        const fd = new FormData(); fd.append('comprobante', input.files[0]);
+        const fd = new FormData(); 
+        fd.append('comprobante', file);
+        if (selectedPlanId) {
+            fd.append('plan_id', selectedPlanId); // <- Se envía siempre junto como solicitaste
+        }
 
         try {
             const res = await fetch(`${API_BASE}/registro-negocio/${registeredCafeteriaId}/comprobante`, {
                 method: 'POST', headers: { 'Accept': 'application/json' }, body: fd
             });
-            if (!res.ok) throw new Error('Ocurrió un error en la transferencia del archivo.');
+            if (!res.ok) {
+                const json = await res.json();
+                throw new Error(json.message || 'Ocurrió un error en la transferencia del archivo.');
+            }
             
             // Go to success
             document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
@@ -447,7 +484,15 @@
     ua.addEventListener('dragleave', () => ua.classList.remove('dragover'));
     ua.addEventListener('drop', e => { e.preventDefault(); ua.classList.remove('dragover'); document.getElementById('comprobante-input').files = e.dataTransfer.files; previewFile(document.getElementById('comprobante-input')); });
 
+    // Preparado para consumo de endpoint futuro de cuenta CLABE
+    async function cargarConfiguracionPago() {
+        // const res = await fetch(`${API_BASE}/configuracion-pago`);
+        // const json = await res.json();
+        // document.getElementById('dynamic-clabe').textContent = `CLABE: ${json.data.clabe}`;
+    }
+
     cargarPlanes();
+    // cargarConfiguracionPago();
 </script>
 </body>
 </html>

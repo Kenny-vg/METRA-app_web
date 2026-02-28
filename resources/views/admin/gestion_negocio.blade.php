@@ -46,21 +46,21 @@
                     </button>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-borderless align-middle mt-2">
+                    <table class="table-metra mt-2">
                         <thead>
-                            <tr class="small text-uppercase" style="border-bottom: 2px solid var(--off-white); color: var(--text-muted); letter-spacing: 1px;">
-                                <th class="pb-3 hw-bold">Nombre de la Zona</th>
-                                <th class="pb-3 fw-bold">Capacidad / Mesas</th>
-                                <th class="pb-3 fw-bold text-end">Acciones</th>
+                            <tr>
+                                <th>Nombre de la Zona</th>
+                                <th>Capacidad / Mesas</th>
+                                <th class="text-end">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr style="border-bottom: 1px solid var(--off-white);">
-                                <td class="py-4 fw-bold" style="color: var(--black-primary);">Terraza Principal</td>
-                                <td class="py-4"><span class="badge" style="background: var(--off-white); color: var(--text-muted); border: 1px dashed var(--border-light); padding: 6px 12px;">5 Mesas</span></td>
-                                <td class="py-4 text-end">
-                                    <button class="btn-admin-action icon-edit me-1"><i class="bi bi-pencil"></i></button>
-                                    <button class="btn-admin-action icon-delete"><i class="bi bi-trash"></i></button>
+                            <tr>
+                                <td class="fw-bold" style="color: var(--black-primary);">Terraza Principal</td>
+                                <td><span class="badge" style="background: var(--off-white); color: var(--text-muted); border: 1px dashed var(--border-light); padding: 6px 12px;">5 Mesas</span></td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-dark rounded-circle me-1" title="Editar"><i class="bi bi-pencil"></i></button>
+                                    <button class="btn btn-sm btn-outline-danger rounded-circle" title="Eliminar"><i class="bi bi-trash"></i></button>
                                 </td>
                             </tr>
                         </tbody>
@@ -79,28 +79,28 @@
                     </button>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-borderless align-middle mt-2">
+                    <table class="table-metra mt-2">
                         <thead>
-                            <tr class="small text-uppercase" style="border-bottom: 2px solid var(--off-white); color: var(--text-muted); letter-spacing: 1px;">
-                                <th class="pb-3 fw-bold">ID / # Mesa</th>
-                                <th class="pb-3 fw-bold">Ubicación</th>
-                                <th class="pb-3 fw-bold">Capacidad</th>
-                                <th class="pb-3 fw-bold">Estado Operativo</th>
-                                <th class="pb-3 fw-bold text-end">Acciones</th>
+                            <tr>
+                                <th>ID / # Mesa</th>
+                                <th>Ubicación</th>
+                                <th>Capacidad</th>
+                                <th>Estado Operativo</th>
+                                <th class="text-end">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr style="border-bottom: 1px solid var(--off-white);">
-                                <td class="py-4 fw-bold" style="color: var(--black-primary);">
-                                    <div class="d-inline-flex align-items-center justify-content-center bg-black text-white rounded-circle me-2" style="width: 25px; height: 25px; font-size: 0.75rem;">01</div>
+                            <tr>
+                                <td class="fw-bold" style="color: var(--black-primary);">
+                                    <div class="d-inline-flex align-items-center justify-content-center text-white rounded-circle me-2 shadow-sm" style="background: var(--black-primary); width: 25px; height: 25px; font-size: 0.75rem;">01</div>
                                     Mesa Principal
                                 </td>
-                                <td class="py-4"><span class="badge" style="background: var(--off-white); border: 1px solid var(--border-light); color: var(--text-main);">Interior</span></td>
-                                <td class="py-4 text-muted">4 Inv.</td>
-                                <td class="py-4"><span class="badge" style="background: #E8F5E9; color: #2E7D32; border: 1px solid #C8E6C9; padding: 5px 10px;">En Línea</span></td>
-                                <td class="py-4 text-end">
-                                    <button class="btn-admin-action icon-edit me-1"><i class="bi bi-pencil"></i></button>
-                                    <button class="btn-admin-action icon-delete"><i class="bi bi-trash"></i></button>
+                                <td><span class="badge" style="background: var(--off-white); border: 1px solid var(--border-light); color: var(--text-main);">Interior</span></td>
+                                <td class="text-muted">4 Inv.</td>
+                                <td><span class="badge badge-status badge-status-active">En Línea</span></td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-dark rounded-circle me-1" title="Editar"><i class="bi bi-pencil"></i></button>
+                                    <button class="btn btn-sm btn-outline-danger rounded-circle" title="Eliminar"><i class="bi bi-trash"></i></button>
                                 </td>
                             </tr>
                         </tbody>
@@ -119,27 +119,27 @@
                     </button>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-borderless align-middle mt-2">
+                    <table class="table-metra mt-2">
                         <thead>
-                            <tr class="small text-uppercase" style="border-bottom: 2px solid var(--off-white); color: var(--text-muted); letter-spacing: 1px;">
-                                <th class="pb-3 fw-bold">Identidad</th>
-                                <th class="pb-3 fw-bold">Contacto Interno</th>
-                                <th class="pb-3 fw-bold text-end">Acciones</th>
+                            <tr>
+                                <th>Identidad</th>
+                                <th>Contacto Interno</th>
+                                <th class="text-end">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr style="border-bottom: 1px solid var(--off-white);">
-                                <td class="py-4 d-flex align-items-center">
+                            <tr>
+                                <td class="d-flex align-items-center">
                                     <img src="https://ui-avatars.com/api/?name=Juan+Perez&background=0A0A0A&color=fff" class="rounded-circle me-3" width="40" style="border: 2px solid var(--off-white);">
                                     <div>
                                         <span class="fw-bold d-block" style="color: var(--black-primary);">Juan Pérez</span>
                                         <span class="small" style="color: var(--text-muted); font-size: 0.75rem;">Staff Service</span>
                                     </div>
                                 </td>
-                                <td class="py-4 fw-medium text-muted">238 123 4455</td>
-                                <td class="py-4 text-end">
-                                    <button class="btn-admin-action icon-edit me-1"><i class="bi bi-pencil"></i></button>
-                                    <button class="btn-admin-action icon-delete"><i class="bi bi-trash"></i></button>
+                                <td class="fw-medium text-muted">238 123 4455</td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-outline-dark rounded-circle me-1" title="Editar"><i class="bi bi-pencil"></i></button>
+                                    <button class="btn btn-sm btn-outline-danger rounded-circle" title="Eliminar"><i class="bi bi-trash"></i></button>
                                 </td>
                             </tr>
                         </tbody>
@@ -156,26 +156,26 @@
                     <span class="badge rounded-pill px-3 py-2" style="background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.1); color: var(--black-primary);">3 Sin revisar</span>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-borderless align-middle mt-2">
+                    <table class="table-metra mt-2">
                         <thead>
-                            <tr class="small text-uppercase" style="border-bottom: 2px solid var(--off-white); color: var(--text-muted); letter-spacing: 1px;">
-                                <th class="pb-3 fw-bold">Recepción</th>
-                                <th class="pb-3 fw-bold" style="min-width: 300px;">Testimonio</th>
-                                <th class="pb-3 fw-bold">Score</th>
-                                <th class="pb-3 fw-bold text-end">Control</th>
+                            <tr>
+                                <th>Recepción</th>
+                                <th style="min-width: 300px;">Testimonio</th>
+                                <th>Score</th>
+                                <th class="text-end">Control</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr style="border-bottom: 1px solid var(--border-light);">
-                                <td class="py-4 small fw-medium" style="color: var(--text-muted);">30 Ene, 2026</td>
-                                <td class="py-4" style="max-width: 300px;">
+                            <tr>
+                                <td class="small fw-medium" style="color: var(--text-muted);">30 Ene, 2026</td>
+                                <td style="max-width: 300px;">
                                     <i class="bi bi-quote d-block mb-1" style="color: var(--border-light); font-size: 1.2rem;"></i>
                                     <span class="d-block" style="color: var(--text-main); font-style: italic;">"Experiencia inigualable, el ambiente minimalista fascina."</span>
                                 </td>
-                                <td class="py-4"><span style="color: var(--black-primary); font-size: 1.1rem; letter-spacing: 2px;">★★★★<span style="color: var(--border-light);">★</span></span></td>
-                                <td class="py-4 text-end">
-                                    <button class="btn-admin-primary me-2">Visualizar</button>
-                                    <button class="btn-admin-secondary">Ignorar</button>
+                                <td><span style="color: var(--black-primary); font-size: 1.1rem; letter-spacing: 2px;">★★★★<span style="color: var(--border-light);">★</span></span></td>
+                                <td class="text-end">
+                                    <button class="btn btn-sm btn-dark rounded-pill px-3 me-2 fw-bold shadow-sm">Visualizar</button>
+                                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3">Ignorar</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -205,10 +205,10 @@
                     @endforeach
                 </div>
                 <div class="mt-5 pt-4 border-top d-flex flex-wrap flex-md-nowrap gap-3 justify-content-between" style="border-color: var(--border-light) !important;">
-                    <button class="btn-admin-secondary" data-bs-toggle="modal" data-bs-target="#modalHorario">
+                    <button class="btn-admin-secondary px-4 py-2 w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#modalHorario">
                         <i class="bi bi-plus-lg me-2"></i>Añadir Slot
                     </button>
-                    <button class="btn-admin-primary w-100 w-md-auto">Restablecer Configuración</button>
+                    <button class="btn-admin-primary px-4 py-2 w-100 w-md-auto">Restablecer Configuración</button>
                 </div>
             </div>
         </div>
@@ -226,9 +226,9 @@
                     <p class="small text-muted mb-4">La zonificación ayuda a distribuir mejor a sus clientes.</p>
                     <div class="mb-4">
                         <label class="form-label small fw-bold" style="color: var(--text-main); letter-spacing: 0.5px;">DENOMINACIÓN</label>
-                        <input type="text" class="form-control form-metra" placeholder="Ej. Balcón Este">
+                        <input type="text" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="Ej. Balcón Este">
                     </div>
-                    <button class="btn-metra-main w-100 py-3" style="border-radius: 8px;">Agregar Zona</button>
+                    <button class="btn-admin-primary w-100 py-3 mt-3">Agregar Zona</button>
                 </div>
             </div>
         </div>
@@ -240,11 +240,11 @@
                 <div class="modal-header border-0 pb-0"><h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Adicionar Mesa</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body pt-4">
                     <div class="row g-3 mb-4">
-                        <div class="col-6"><input type="text" class="form-control form-metra" placeholder="ID/Num"></div>
-                        <div class="col-6"><select class="form-select form-metra"><option>Asignación...</option><option>Terraza Principal</option></select></div>
-                        <div class="col-12"><input type="number" class="form-control form-metra" placeholder="Aforo máximo (Pax)"></div>
+                        <div class="col-6"><input type="text" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="ID/Num"></div>
+                        <div class="col-6"><select class="form-select border-0 shadow-sm rounded-3" style="background: var(--off-white);"><option>Asignación...</option><option>Terraza Principal</option></select></div>
+                        <div class="col-12"><input type="number" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="Aforo máximo (Pax)"></div>
                     </div>
-                    <button class="btn-metra-main w-100 py-3" style="border-radius: 8px;">Salvar Elemento</button>
+                    <button class="btn-admin-primary w-100 py-3 mt-3">Salvar Elemento</button>
                 </div>
             </div>
         </div>
@@ -255,9 +255,9 @@
             <div class="modal-content rounded-4 border-0 p-2" style="box-shadow: 0 20px 50px rgba(0,0,0,0.1);">
                 <div class="modal-header border-0 pb-0"><h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Integrar Colaborador</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body pt-4">
-                    <input type="text" class="form-control form-metra mb-3" placeholder="Nombre completo del colaborador">
-                    <input type="tel" class="form-control form-metra mb-4" placeholder="Teléfono de contacto">
-                    <button class="btn-metra-main w-100 py-3" style="border-radius: 8px;">Agregar al equipo</button>
+                    <input type="text" class="form-control border-0 shadow-sm rounded-3 mb-3" style="background: var(--off-white);" placeholder="Nombre completo del colaborador">
+                    <input type="tel" class="form-control border-0 shadow-sm rounded-3 mb-4" style="background: var(--off-white);" placeholder="Teléfono de contacto">
+                    <button class="btn-admin-primary w-100 py-3 mt-3">Agregar al equipo</button>
                 </div>
             </div>
         </div>
@@ -268,8 +268,8 @@
             <div class="modal-content rounded-4 border-0 p-2" style="box-shadow: 0 20px 50px rgba(0,0,0,0.1);">
                 <div class="modal-header border-0 pb-0"><h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Agregar horario</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body pt-4">
-                    <input type="time" class="form-control form-metra mb-4">
-                    <button class="btn-metra-main w-100 py-3" style="border-radius: 8px;">Agregar horario</button>
+                    <input type="time" class="form-control border-0 shadow-sm rounded-3 mb-4" style="background: var(--off-white);">
+                    <button class="btn-admin-primary w-100 py-3 mt-3">Agregar horario</button>
                 </div>
             </div>
         </div>
