@@ -22,7 +22,7 @@ class SuscripcionActivaSeeder extends Seeder
     $plan = Plan::first();
 
     if (!$plan) {
-        $plan = Plan::create([
+        $plan = Plan::updateOrCreate([
             'nombre_plan' => 'Plan Demo',
             'precio' => 299,
             'duracion_dias' => 30,
@@ -34,7 +34,7 @@ class SuscripcionActivaSeeder extends Seeder
 
     Suscripcion::where('cafe_id', $cafeteria->id)->delete();
 
-    Suscripcion::create([
+    Suscripcion::updateOrCreate([
         'cafe_id' => $cafeteria->id,
         'plan_id' => $plan->id,
         'fecha_inicio' => Carbon::now(),

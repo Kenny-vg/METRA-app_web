@@ -77,7 +77,7 @@ Route::middleware([
     Route::delete('/cafeterias/{cafeteria}', [CafeteriaController::class, 'destroy']);
 
     // CAFETERÍAS — revisión de registros auto-gestionados
-    Route::patch('/cafeterias/{cafeteria}/estado', [CafeteriaController::class, 'cambiarEstado']);
+    //Route::patch('/cafeterias/{cafeteria}/estado', [CafeteriaController::class, 'cambiarEstado']);
     Route::get('/cafeterias/{cafeteria}/comprobante', [CafeteriaController::class, 'verComprobante']);
 
     // PLANES

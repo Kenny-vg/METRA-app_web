@@ -12,6 +12,7 @@ class AprobacionController extends Controller
     //
     public function aprobar(Cafeteria $cafeteria)
     {
+        $cafeteria = Cafeteria::findOrFail($cafeteria->id);
         $cafeteria->update([
             'estado'=>'activa'
         ]);

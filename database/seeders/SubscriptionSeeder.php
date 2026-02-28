@@ -14,7 +14,7 @@ class SubscriptionSeeder extends Seeder
     public function run(): void
     {
         //
-        Suscripcion::create([
+        Suscripcion::updateOrCreate([
             'cafe_id' => 1,
             'plan_id' => 1,
             'fecha_inicio' => now(),

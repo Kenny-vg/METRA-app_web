@@ -14,7 +14,7 @@ class PlanSeeder extends Seeder
     public function run(): void
     {
         //
-        Plan::firstOrCreate([
+        Plan::updateOrCreate([
             'nombre_plan' => 'Plan Demo',
             'precio' => 799,
             'max_reservas_mes' => 100,

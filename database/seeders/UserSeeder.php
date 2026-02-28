@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
         |--------------------------------------------------------------------------
         | No pertenece a ninguna cafetería
         */
-        User::create([
+        User::updateOrCreate([
             'name' => 'Super Admin',
             'email' => 'superadmin@metra.com',
             'password' => Hash::make('12345678'),
@@ -35,7 +35,7 @@ class UserSeeder extends Seeder
         |--------------------------------------------------------------------------
         | Pertenece a cafetería 1
         */
-        User::create([
+        User::updateOrCreate([
             'name' => 'Gerente Test',
             'email' => 'gerente@metra.com',
             'password' => Hash::make('12345678'),
@@ -49,7 +49,7 @@ class UserSeeder extends Seeder
         | PERSONAL DE PRUEBA
         |--------------------------------------------------------------------------
         */
-        User::create([
+        User::updateOrCreate([
             'name' => 'Staff Test',
             'email' => 'staff@metra.com',
             'password' => Hash::make('12345678'),
@@ -59,7 +59,7 @@ class UserSeeder extends Seeder
         ]);
 
 
-        User::create([
+        User::updateOrCreate([
         'name' => 'Cliente Test',
         'email' => 'cliente@metra.com',
         'password' => Hash::make('12345678'),
