@@ -6,17 +6,17 @@
 
 <style>
     /* Superadmin specific overrides if any, otherwise rely on estilos.css */
-    .stat-card { border-radius: 16px; padding: 24px; border: 1px solid rgba(0,0,0,0.06); }
+    .stat-card { border-radius: 16px; padding: 24px; border: 1px solid rgba(0,0,0,0.06); transition: transform 0.2s, box-shadow 0.2s; }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important; }
     .stat-card h2 { font-size: 2.2rem; font-weight: 800; margin: 0; letter-spacing: -1px; }
     .comprobante-img { max-width: 100%; border-radius: 12px; max-height: 300px; object-fit: contain; }
-    #overlay-loading { display:none; position:fixed; top:0;left:0;width:100%;height:100%;
-        background:rgba(10,10,10,0.5); z-index:9999; align-items:center; justify-content:center; }
+    #overlay-loading { display:none; position:fixed; top:0;left:0;width:100%;height:100%; z-index:9999; align-items:center; justify-content:center; }
 </style>
 
 <!-- Loading overlay -->
-<div id="overlay-loading" class="d-flex">
-    <div class="text-center text-white">
-        <div class="spinner-border text-light mb-3" style="width:3rem;height:3rem;"></div>
+<div id="overlay-loading" style="display:none !important;">
+    <div class="text-center">
+        <div class="spinner-border mb-3" style="width:3rem;height:3rem;"></div>
         <p class="fw-bold">Procesando...</p>
     </div>
 </div>
@@ -38,27 +38,27 @@
 <!-- STATS -->
 <div class="row g-4 mb-5" id="stats-row">
     <div class="col-6 col-md-3">
-        <div class="stat-card bg-white shadow-sm">
-            <p class="text-muted small mb-1">Total cafeterías</p>
-            <h2 id="stat-total">—</h2>
+        <div class="stat-card bg-white shadow-sm border-0 border-start border-4" style="border-color: var(--black-primary) !important;">
+            <p class="text-muted small mb-2 fw-bold text-uppercase" style="letter-spacing: 0.5px;">Total cafeterías</p>
+            <h2 id="stat-total" class="text-dark">—</h2>
         </div>
     </div>
     <div class="col-6 col-md-3">
-        <div class="stat-card shadow-sm" style="background:#d1fae5;">
-            <p class="text-muted small mb-1" style="color:#065f46!important;">Activas</p>
-            <h2 id="stat-activas" style="color:#065f46;">—</h2>
+        <div class="stat-card bg-white shadow-sm border-0 border-start border-4 border-success">
+            <p class="small mb-2 fw-bold text-uppercase text-success" style="letter-spacing: 0.5px;">Activas</p>
+            <h2 id="stat-activas" class="text-dark">—</h2>
         </div>
     </div>
     <div class="col-6 col-md-3">
-        <div class="stat-card shadow-sm" style="background:#fef3c7;">
-            <p class="small mb-1 fw-semibold" style="color:#92400e;">Pendientes</p>
-            <h2 id="stat-pendientes" style="color:#92400e;">—</h2>
+        <div class="stat-card bg-white shadow-sm border-0 border-start border-4 border-warning">
+            <p class="small mb-2 fw-bold text-uppercase text-warning" style="letter-spacing: 0.5px;">Pendientes</p>
+            <h2 id="stat-pendientes" class="text-dark">—</h2>
         </div>
     </div>
     <div class="col-6 col-md-3">
-        <div class="stat-card shadow-sm" style="background:#fef3c7;">
-            <p class="small mb-1 fw-semibold" style="color:#92400e;">Pendientes</p>
-            <h2 id="stat-pendientes" style="color:#92400e;">—</h2>
+        <div class="stat-card bg-white shadow-sm border-0 border-start border-4 border-danger">
+            <p class="small mb-2 fw-bold text-uppercase text-danger" style="letter-spacing: 0.5px;">En Revisión</p>
+            <h2 id="stat-revision" class="text-dark">—</h2>
         </div>
     </div>
 </div>
@@ -126,6 +126,12 @@
                         <input type="email" class="form-control bg-light border-0 py-2" id="m-gerente-email" placeholder="gerente@cafe.com">
                     </div>
                 </div>
+                <div class="mb-4">
+                    <label class="form-label small fw-bold">Plan de Suscripción Asignado</label>
+                    <select class="form-select bg-light border-0 py-2" id="m-plan">
+                        <option value="">Cargando planes...</option>
+                    </select>
+                </div>
                 <button type="button" class="btn-metra-main w-100 py-2 fw-bold" onclick="crearNegocioManual()">
                     Crear Cuenta de Negocio
                 </button>
@@ -150,8 +156,12 @@
 </div>
 
 <script>
-const API = '/METRA-app_web/api';
-let authToken = localStorage.getItem('metra_token') || sessionStorage.getItem('metra_token') || '';
+const API = '/api';
+let authToken = localStorage.getItem('token') || '';
+
+if (!authToken) {
+    window.location.href = '/login';
+}
 
 function authHeaders() {
     return {
@@ -166,14 +176,25 @@ function authHeaders() {
 // ────────────────────────────────────────────
 async function cargarDashboard() {
     try {
-        const res  = await fetch(`${API}/superadmin/cafeterias`, { headers: authHeaders() });
-        const json = await res.json();
-        const todos = json.data || [];
+        const [resCafes, resSols] = await Promise.all([
+            fetch(`${API}/superadmin/cafeterias`, { headers: authHeaders() }),
+            fetch(`${API}/superadmin/solicitudes`, { headers: authHeaders() })
+        ]);
+
+        if (!resCafes.ok || !resSols.ok) {
+             throw new Error("El servidor respondió con un error");
+        }
+
+        const jsonCafes = await resCafes.json();
+        const jsonSols  = await resSols.json();
+        
+        const todos = jsonCafes.data || [];
+        const enRevision = jsonSols.data || [];
 
         // Stats
         const activas    = todos.filter(c => c.estado === 'activa').length;
-        const revision   = todos.filter(c => c.estado === 'en_revision').length;
         const pendientes = todos.filter(c => c.estado === 'pendiente').length;
+        const revision   = enRevision.length;
 
         document.getElementById('stat-total').textContent    = todos.length;
         document.getElementById('stat-activas').textContent  = activas;
@@ -182,33 +203,40 @@ async function cargarDashboard() {
 
         if (revision > 0) {
             document.getElementById('badge-revision-count').textContent = `${revision} nuevas`;
+        } else {
+            document.getElementById('badge-revision-count').textContent = '';
         }
 
         // Tabla revisión
-        const enRevision = todos.filter(c => c.estado === 'en_revision');
         renderTablaRevision(enRevision);
 
         // Tabla todos
         renderTablaTodos(todos);
 
     } catch (e) {
+        console.error('API Error:', e);
         document.getElementById('tabla-revision').innerHTML =
-            '<div class="text-danger text-center py-3">Error al cargar datos. Verifica tu sesión.</div>';
+            '<div class="text-danger text-center py-3">Error al cargar datos. El servidor está fallando.</div>';
+        
+        document.getElementById('tabla-todos').innerHTML = 
+            '<tr><td colspan="5" class="text-danger text-center py-4">Error al cargar datos del servidor.</td></tr>';
+    } finally {
+        document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
     }
 }
 
 function badgeEstado(estado) {
     const map = {
-        'activa':     'badge-activa',
-        'pendiente':  'badge-pendiente',
-        'en_revision':'badge-revision',
-        'suspendida': 'badge-suspendida',
+        'activa':     'badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2',
+        'pendiente':  'badge rounded-pill bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2',
+        'en_revision':'badge rounded-pill bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2',
+        'suspendida': 'badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2',
     };
     const labels = {
-        'activa':'Activa','pendiente':'Pendiente',
-        'en_revision':'En Revisión','suspendida':'Suspendida',
+        'activa':'● Activa','pendiente':'● Pendiente',
+        'en_revision':'● En Revisión','suspendida':'● Suspendida',
     };
-    return `<span class="badge-estado ${map[estado] || ''}">${labels[estado] || estado}</span>`;
+    return `<span class="${map[estado] || 'badge bg-light text-dark'}">${labels[estado] || estado}</span>`;
 }
 
 function renderTablaRevision(cafeterias) {
@@ -243,10 +271,10 @@ function renderTablaRevision(cafeterias) {
                     <td>${plan}</td>
                     <td>${comp}</td>
                     <td class="text-end">
-                        <button class="btn btn-sm btn-success rounded-pill px-3 me-1" onclick="cambiarEstado(${c.id}, 'activa')">
+                        <button class="btn btn-sm btn-success rounded-pill px-3 me-1" onclick="accionSolicitud(${c.id}, 'aprobar')">
                             <i class="bi bi-check2 me-1"></i>Aprobar
                         </button>
-                        <button class="btn btn-sm btn-danger rounded-pill px-3" onclick="cambiarEstado(${c.id}, 'suspendida')">
+                        <button class="btn btn-sm btn-danger rounded-pill px-3" onclick="accionSolicitud(${c.id}, 'rechazar')">
                             <i class="bi bi-x me-1"></i>Rechazar
                         </button>
                     </td>
@@ -285,13 +313,36 @@ function renderTablaTodos(cafeterias) {
 }
 
 // ────────────────────────────────────────────
+// Acciones Solicitudes (Aprobar / Rechazar)
+// ────────────────────────────────────────────
+async function accionSolicitud(cafeteriaId, accion) {
+    const texto = accion === 'aprobar' ? 'APROBAR' : 'RECHAZAR';
+    if (!confirm(`¿Deseas ${texto} esta solicitud?`)) return;
+
+    document.getElementById('overlay-loading').style.setProperty('display', 'flex', 'important');
+    try {
+        const res = await fetch(`${API}/superadmin/solicitudes/${cafeteriaId}/${accion}`, {
+            method: 'PATCH',
+            headers: authHeaders()
+        });
+        const json = await res.json();
+        if (!res.ok) { alert(json.message || `Error al ${accion} la solicitud.`); return; }
+        await cargarDashboard();
+    } catch (e) {
+        alert('Error de conexión.');
+    } finally {
+        document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
+    }
+}
+
+// ────────────────────────────────────────────
 // Cambiar estado
 // ────────────────────────────────────────────
 async function cambiarEstado(cafeteriaId, nuevoEstado) {
     const accion = nuevoEstado === 'activa' ? 'APROBAR' : 'RECHAZAR';
     if (!confirm(`¿Deseas ${accion} esta cafetería?`)) return;
 
-    document.getElementById('overlay-loading').style.display = 'flex';
+    document.getElementById('overlay-loading').style.setProperty('display', 'flex', 'important');
     try {
         const res  = await fetch(`${API}/superadmin/cafeterias/${cafeteriaId}/estado`, {
             method: 'PATCH',
@@ -304,7 +355,7 @@ async function cambiarEstado(cafeteriaId, nuevoEstado) {
     } catch (e) {
         alert('Error de conexión.');
     } finally {
-        document.getElementById('overlay-loading').style.display = 'none';
+        document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
     }
 }
 
@@ -344,14 +395,17 @@ async function crearNegocioManual() {
     const nombre = document.getElementById('m-nombre').value.trim();
     const name   = document.getElementById('m-gerente-name').value.trim();
     const email  = document.getElementById('m-gerente-email').value.trim();
+    const plan_id = document.getElementById('m-plan').value;
     const alert  = document.getElementById('modal-alert');
 
-    if (!nombre || !name || !email) {
-        alert.textContent = 'Todos los campos son requeridos.';
+    if (!nombre || !name || !email || !plan_id) {
+        alert.textContent = 'Todos los campos son requeridos, incluyendo el plan.';
         alert.classList.remove('d-none');
         return;
     }
     alert.classList.add('d-none');
+    
+    document.getElementById('overlay-loading').style.setProperty('display', 'flex', 'important');
 
     try {
         const res  = await fetch(`${API}/superadmin/cafeterias`, {
@@ -364,8 +418,20 @@ async function crearNegocioManual() {
             const msgs = json.errors ? Object.values(json.errors).flat().join(' | ') : json.message;
             alert.textContent = msgs;
             alert.classList.remove('d-none');
+            document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
             return;
         }
+
+        const cafeId = json.data.cafeteria.id;
+        const resPlan = await fetch(`${API}/superadmin/suscripciones`, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify({ cafe_id: cafeId, plan_id: plan_id })
+        });
+        if (!resPlan.ok) {
+            console.error('No se pudo asignar el plan automáticamente');
+        }
+
         bootstrap.Modal.getInstance(document.getElementById('nuevoNegocio')).hide();
         document.getElementById('m-nombre').value = '';
         document.getElementById('m-gerente-name').value = '';
@@ -374,11 +440,28 @@ async function crearNegocioManual() {
     } catch (e) {
         alert.textContent = 'Error de conexión.';
         alert.classList.remove('d-none');
+    } finally {
+        document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
+    }
+}
+
+async function cargarPlanesModal() {
+    try {
+        const res = await fetch(`${API}/superadmin/planes`, { headers: authHeaders() });
+        const json = await res.json();
+        if (res.ok) {
+            const select = document.getElementById('m-plan');
+            select.innerHTML = '<option value="">Selecciona un plan...</option>' + 
+                json.data.map(p => `<option value="${p.id}">${p.nombre_plan} ($${p.precio})</option>`).join('');
+        }
+    } catch (e) {
+        console.error('Error cargando planes modal', e);
     }
 }
 
 // Init
 cargarDashboard();
+cargarPlanesModal();
 </script>
 
 @endsection

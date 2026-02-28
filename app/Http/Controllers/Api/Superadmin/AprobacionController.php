@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Superadmin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
+use App\Models\Cafeteria;
 
 class AprobacionController extends Controller
 {
@@ -17,7 +18,7 @@ class AprobacionController extends Controller
 
         //activar gerente
         optional($cafeteria->gerente)->update([
-            'estado'=>'true'
+            'estado'=>1 //true
         ]);
 
         //marcar pago
@@ -35,7 +36,7 @@ class AprobacionController extends Controller
     public function rechazar(Cafeteria $cafeteria)
     {
         $cafeteria->update([
-            'estado'=>false
+            'estado'=>0 //false
         ]);
 
         return ApiResponse::success(

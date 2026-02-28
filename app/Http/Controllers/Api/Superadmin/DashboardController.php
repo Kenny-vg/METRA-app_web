@@ -15,7 +15,7 @@ class DashboardController extends Controller
     {
         return ApiResponse::success([
             'cafeterias_total'=>Cafeteria::count(),
-            'en_revision'=>Cafeteria::where('estado','en_revision')->count()
+            'en_revision'=>Cafeteria::where('estado','en_revision')->count(),
             'activas'=>Cafeteria::where('estado','activa')->count(),
             'suspendidas'=>Cafeteria::where('estado','suspendida')->count(),
 

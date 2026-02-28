@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Superadmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cafeteria;
@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Str;
+
 
 class CafeteriaController extends Controller
 {
@@ -93,7 +94,7 @@ class CafeteriaController extends Controller
             
             //activar gerente
             $cafeteria->gerente->update([
-                'estado'=> true
+                'estado'=> 1 //true
             ]);
 
             //actualizar suscripcion a pagado
@@ -106,7 +107,12 @@ class CafeteriaController extends Controller
         // Si se rechaza/suspende: desactivar gerente
         if ($data['estado'] === 'suspendida' && $cafeteria->gerente) {
             $cafeteria->gerente->update([
-                'estado' => false
+                'estado' => 0 //false
+            ]);
+
+            // cancelar suscripción
+            optional($cafeteria->suscripcionActual)->update([
+                'estado_pago' => 'cancelado'
             ]);
         }
 
@@ -131,6 +137,20 @@ class CafeteriaController extends Controller
             'comprobante_url' => Storage::url($cafeteria->comprobante_url),
             'cafeteria'       => $cafeteria->nombre,
         ], 'Comprobante encontrado');
+    }
+
+
+    public function show(Cafeteria $cafeteria)
+    {
+        $cafeteria->load([
+            'gerente',
+            'suscripcionActual.plan'
+        ]);
+
+        return ApiResponse::success(
+            $cafeteria,
+            'Detalle de cafetería'
+        );
     }
 
     /**

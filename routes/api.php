@@ -5,14 +5,14 @@ use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\GoogleController;
 use App\Http\Controllers\Api\Auth\ProfileController;
-use App\Http\Controllers\Api\CafeteriaController;
 use App\Http\Controllers\Api\RegistroNegocioController;
 use App\Http\Controllers\Api\Gerente\CafeteriaPerfilController;
 use App\Http\Controllers\Api\Superadmin\PlanController;
 use App\Http\Controllers\Api\Superadmin\SuscripcionController;
 use App\Http\Controllers\Api\Superadmin\DashboardController;
 use App\Http\Controllers\Api\Superadmin\SolicitudesController;
-
+use App\Http\Controllers\Api\Superadmin\AprobacionController;
+use App\Http\Controllers\Api\Superadmin\CafeteriaController;
 /*
 |------------------------------------------
 | RUTAS PÚBLICAS
@@ -61,6 +61,7 @@ Route::middleware([
     // CAFETERÍAS — listar, crear, eliminar
     Route::get('/cafeterias', [CafeteriaController::class, 'index']);
     Route::post('/cafeterias', [CafeteriaController::class, 'store']);
+    Route::get('/cafeterias/{cafeteria}', [CafeteriaController::class, 'show']);
     Route::delete('/cafeterias/{cafeteria}', [CafeteriaController::class, 'destroy']);
 
     // CAFETERÍAS — revisión de registros auto-gestionados

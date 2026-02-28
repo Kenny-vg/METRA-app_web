@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\Superadmin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Cafeteria;
+use App\Helpers\ApiResponse;
 
 class SolicitudesController extends Controller
 {

@@ -10,18 +10,19 @@
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="zona-superadmin">
-    <div class="d-md-none p-3 text-white d-flex justify-content-between align-items-center bg-dark">
-        <h4 class="fw-bold m-0">METRA <small style="font-size: 0.6rem;" class="text-muted">SaaS</small></h4>
-        <button class="btn btn-outline-secondary" onclick="document.querySelector('.sidebar-super').classList.toggle('active')">
+<body class="zona-superadmin bg-light">
+    <!-- Header móvil elegante -->
+    <div class="d-md-none p-3 text-dark d-flex justify-content-between align-items-center bg-white border-bottom shadow-sm" style="position: sticky; top: 0; z-index: 1020;">
+        <h4 class="fw-bold m-0" style="color: var(--black-primary);">METRA <small style="font-size: 0.6rem; color: var(--accent-gold) !important;" class="text-muted">SaaS</small></h4>
+        <button class="btn btn-light border-0" onclick="document.querySelector('.sidebar-super').classList.toggle('active')">
             <i class="bi bi-list fs-4"></i>
         </button>
     </div>
 
     <aside class="sidebar-super">
         <div class="p-4 text-white d-none d-md-block">
-            <h2 class="fw-bold m-0">METRA</h2>
-            <span class="badge bg-primary" style="font-size: 0.6rem;">SaaS Master</span>
+            <h2 class="fw-bold m-0" style="color: var(--white-pure);">METRA</h2>
+            <span class="badge rounded-pill" style="font-size: 0.65rem; background-color: var(--accent-gold); color: var(--black-primary); font-weight: 700;">SaaS Master</span>
         </div>
         <nav class="mt-4">
             <a href="/superadmin/dashboard" class="nav-link-super {{ request()->is('superadmin/dashboard') ? 'active' : '' }}">
