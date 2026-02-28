@@ -43,7 +43,7 @@
                     <button onclick="document.getElementById('registro').scrollIntoView({ behavior: 'smooth' });" class="btn-metra-main">
                         <i class="bi bi-rocket-takeoff me-2"></i> Comenzar registro
                     </button>
-                    <a href="#planes" class="btn btn-outline-dark rounded-pill px-4" style="padding: 16px; font-weight: 600; border-width: 2px; color: var(--black-primary); border-color: var(--black-primary);">
+                    <a href="#planes" class="btn rounded-pill px-4 fw-600" style="padding: 16px; font-weight: 600; border: 2px solid var(--accent-gold); color: var(--accent-gold); background: transparent;">
                         Ver Planes
                     </a>
                 </div>

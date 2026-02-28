@@ -36,6 +36,14 @@ Route::get('/planes-publicos', [RegistroNegocioController::class, 'planesPublico
 // Información de pago
 Route::get('/configuracion-pago', [ConfiguracionController::class, 'showPublic']);
 
+// Cafeterías activas (uso público: landing page)
+Route::get('/cafeterias-publicas', function () {
+    $cafeterias = \App\Models\Cafeteria::where('estado', true)
+        ->select('id', 'nombre', 'descripcion', 'calle', 'num_exterior', 'colonia')
+        ->get();
+    return response()->json(['data' => $cafeterias]);
+});
+
 // Auto-registro de negocio por el propio gerente/dueño
 Route::post('/registro-negocio', [RegistroNegocioController::class, 'store']);
 Route::post('/registro-negocio/{cafeteria}/comprobante', [RegistroNegocioController::class, 'subirComprobante']);

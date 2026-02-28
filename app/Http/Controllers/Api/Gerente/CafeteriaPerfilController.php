@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Gerente;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
+use Illuminate\Support\Facades\Storage;
 
 class CafeteriaPerfilController extends Controller
 {
@@ -48,18 +49,28 @@ class CafeteriaPerfilController extends Controller
             'municipio'=>'nullable|string|max:80',
             'cp'=>'nullable|string|max:10',
             'telefono'=>'nullable|string|max:20',
-            'estado'=>'sometimes|in:activa,suspendida,pendiente',
-            'foto_url'=>'nullable|string|max:255'
+            'foto'=>'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
-        $cafeteria->update($data);
+        if($request->hasFile('foto')){
+            // borrar foto anterior
+            if($cafeteria->foto_url){
+                Storage::disk('public')->delete($cafeteria->foto_url);
+            }
 
-        $cafeteria->refresh(); //Devuelve los datos actualizados
+            $path = $request->file('foto')
+                ->store('cafeterias','public');
 
-        return ApiResponse::success(
-            $cafeteria,
-            'Cafetería actualizada correctamente'
-        );
-    }
+            $data['foto_url'] = $path;
+        }
+                $cafeteria->update($data);
+
+                $cafeteria->refresh(); //Devuelve los datos actualizados
+
+                return ApiResponse::success(
+                    $cafeteria,
+                    'Cafetería actualizada correctamente'
+                );
+            }
 
 }

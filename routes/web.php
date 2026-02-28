@@ -91,6 +91,10 @@ Route::get('/admin/perfil', function () {
     return view('admin.perfil');
 });
 
+Route::get('/admin/marketing', function () {
+    return view('admin.marketing');
+});
+
 
 
 // --- ZONA SUPERADMIN ---

@@ -44,7 +44,10 @@
             <a href="/admin/reservaciones" class="nav-link-admin {{ request()->is('admin/reservaciones') ? 'active' : '' }}">
                 <i class="bi bi-calendar3 me-3"></i>Reservaciones
             </a>
-            
+            <a href="/admin/marketing" class="nav-link-admin {{ request()->is('admin/marketing') ? 'active' : '' }}">
+                <i class="bi bi-megaphone me-3"></i>Promociones
+            </a>
+
             <span class="small fw-bold text-uppercase mt-4 mb-2 ms-3" style="color: var(--text-muted); font-size: 0.7rem; letter-spacing: 1px;">Configuración</span>
             
             <a href="/admin/perfil" class="nav-link-admin {{ request()->is('admin/perfil') ? 'active' : '' }}">

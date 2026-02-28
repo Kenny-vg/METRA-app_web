@@ -301,10 +301,15 @@ function renderTablaTodos(cafeterias) {
             <td>${badgeEstado(c.estado)}</td>
             <td class="text-end">
                 ${c.estado === 'en_revision'
-                    ? `<button class="btn btn-sm btn-success rounded-pill px-3 me-1" onclick="cambiarEstado(${c.id},'activa')">Aprobar</button>
-                       <button class="btn btn-sm btn-danger rounded-pill px-3" onclick="cambiarEstado(${c.id},'suspendida')">Rechazar</button>`
-                    : `<button class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="cambiarEstado(${c.id},'${c.estado === 'activa' ? 'suspendida' : 'activa'}')">
-                        ${c.estado === 'activa' ? 'Suspender' : 'Activar'}
+                    ? `<button class="btn btn-sm btn-success rounded-pill px-3 me-1" onclick="accionSolicitud(${c.id},'aprobar')">
+                           <i class="bi bi-check2 me-1"></i>Aprobar
+                       </button>
+                       <button class="btn btn-sm btn-danger rounded-pill px-3" onclick="accionSolicitud(${c.id},'rechazar')">
+                           <i class="bi bi-x me-1"></i>Rechazar
+                       </button>`
+                    : `<button class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                              onclick="accionSolicitud(${c.id},'${c.estado === 'activa' ? 'rechazar' : 'aprobar'}')">
+                           ${c.estado === 'activa' ? 'Suspender' : 'Activar'}
                        </button>`
                 }
             </td>
@@ -335,29 +340,7 @@ async function accionSolicitud(cafeteriaId, accion) {
     }
 }
 
-// ────────────────────────────────────────────
-// Cambiar estado
-// ────────────────────────────────────────────
-async function cambiarEstado(cafeteriaId, nuevoEstado) {
-    const accion = nuevoEstado === 'activa' ? 'APROBAR' : 'RECHAZAR';
-    if (!confirm(`¿Deseas ${accion} esta cafetería?`)) return;
 
-    document.getElementById('overlay-loading').style.setProperty('display', 'flex', 'important');
-    try {
-        const res  = await fetch(`${API}/superadmin/cafeterias/${cafeteriaId}/estado`, {
-            method: 'PATCH',
-            headers: authHeaders(),
-            body: JSON.stringify({ estado: nuevoEstado }),
-        });
-        const json = await res.json();
-        if (!res.ok) { alert(json.message || 'Error al cambiar estado.'); return; }
-        await cargarDashboard();
-    } catch (e) {
-        alert('Error de conexión.');
-    } finally {
-        document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
-    }
-}
 
 // ────────────────────────────────────────────
 // Ver comprobante

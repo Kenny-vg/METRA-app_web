@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Str;
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ActivacionCafeteriaMail;
 
 class CafeteriaController extends Controller
 {
@@ -44,7 +45,6 @@ class CafeteriaController extends Controller
             'nombre'       => 'required|string|max:100',
             'gerente.name' => 'required|string|max:100',
             'gerente.email'=> 'required|email|unique:users,email',
-            'comprobante' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
         $result = DB::transaction(function () use ($data) {
@@ -81,10 +81,10 @@ class CafeteriaController extends Controller
         );
     }
 
-    /**
+    /*
      * Cambiar el estado de una cafetería (superadmin).
      * Usado para aprobar/rechazar registros en revisión.
-     */
+     
     public function cambiarEstado(Request $request, Cafeteria $cafeteria)
     {
         $data = $request->validate([
@@ -100,6 +100,12 @@ class CafeteriaController extends Controller
             $cafeteria->gerente->update([
                 'estado'=> 1 //true
             ]);
+            try {
+                Mail::to($cafeteria->gerente->email)
+                    ->send(new ActivacionCafeteriaMail($cafeteria));
+            } catch (\Exception $e) {
+                \Log::error($e->getMessage());
+            }
 
             //actualizar suscripcion a pagado
             optional($cafeteria->suscripcionActual)->update([
@@ -127,6 +133,7 @@ class CafeteriaController extends Controller
             'Estado de cafetería actualizado correctamente'
         );
     }
+    */
 
     /**
      * Ver URL del comprobante de pago (superadmin).

@@ -90,14 +90,18 @@
             <div class="col-12 col-xl-5">
                 <!-- Portafolio Visual -->
                 <div class="card border-0 p-4 p-md-5 rounded-4 mb-4 premium-card">
-                    <h5 class="fw-bold mb-4 text-dark" style="letter-spacing: -0.5px;"><i class="bi bi-image me-2" style="color: var(--accent-gold);"></i>Cover Principal Público</h5>
-                    <div style="position: relative; border-radius: 12px; overflow: hidden; margin-bottom: 20px;">
-                        <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800" class="img-fluid w-100" style="object-fit: cover; height: 200px;">
-                        <div style="position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.4) 0%, transparent 100%);"></div>
+                    <h5 class="fw-bold mb-4 text-dark" style="letter-spacing: -0.5px;"><i class="bi bi-image me-2" style="color: var(--accent-gold);"></i>Imagen Principal del Negocio</h5>
+                    <div style="position: relative; border-radius: 12px; overflow: hidden; margin-bottom: 16px; background: var(--off-white); min-height: 200px; cursor: pointer;" onclick="document.getElementById('inputFoto').click()">
+                        <img id="previewFoto"
+                             src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800"
+                             class="img-fluid w-100" style="object-fit: cover; height: 200px; transition: opacity 0.2s;">
+                        <div style="position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.35) 0%, transparent 60%); pointer-events: none;"></div>
+                        <div style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.55); color: #fff; font-size: 0.78rem; font-weight: 600; padding: 5px 14px; border-radius: 50px; white-space: nowrap; pointer-events: none;">
+                            <i class="bi bi-pencil me-1"></i>Cambiar imagen
+                        </div>
                     </div>
-                    <button type="button" class="btn-admin-secondary w-100 py-2">
-                        <i class="bi bi-cloud-arrow-up me-2"></i>Actualizar Media
-                    </button>
+                    <input type="file" id="inputFoto" name="foto" accept="image/jpg,image/jpeg,image/png" class="d-none">
+                    <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i>JPG o PNG · Máx. 2 MB. Esta imagen aparece en la página pública de tu cafetería.</p>
                 </div>
 
                 <!-- Highlights Menú -->
@@ -127,32 +131,7 @@
                     </button>
                 </div>
 
-                <!-- Paquetes Cautivos -->
-                <div class="card border-0 p-4 p-md-5 rounded-4" style="background: var(--black-primary); box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative; overflow: hidden;">
-                    <!-- Decoración SaaS Dark -->
-                    <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: var(--accent-gold); border-radius: 50%; opacity: 0.1; filter: blur(30px);"></div>
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-4 position-relative z-1">
-                        <h5 class="fw-bold m-0" style="color: var(--white-pure); letter-spacing: -0.5px;">Acciones de Marketing</h5>
-                        <span class="badge" style="background: rgba(255,255,255,0.1); color: var(--accent-gold); border: 1px solid rgba(212, 175, 55, 0.3); font-size: 0.6rem;">ACTIVO EN PLATAFORMA</span>
-                    </div>
 
-                    <div class="p-3 rounded-3 mb-3 position-relative z-1" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <p class="mb-0 fw-bold small text-white">Brunch Central</p>
-                            <span class="fw-bold small" style="color: var(--accent-gold);">$149.00</span>
-                        </div>
-                        <p class="mb-3" style="color: rgba(255,255,255,0.6); font-size: 0.75rem;">Chilaquiles + Café Reserva + Pan de masa madre</p>
-                        <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-sm py-0 px-3 fw-bold" style="background: var(--white-pure); color: var(--black-primary); font-size: 0.7rem; border-radius: 4px;">Ajustar</button>
-                            <button type="button" class="btn btn-sm py-0 px-3" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); font-size: 0.7rem; border-radius: 4px;">Pausar</button>
-                        </div>
-                    </div>
-
-                    <button type="button" class="btn-admin-primary w-100 py-3 mt-2 fw-bold">
-                        <i class="bi bi-megaphone-fill me-2"></i>Lanzar Campaña
-                    </button>
-                </div>
             </div> 
         </div>
 
@@ -200,11 +179,28 @@
                 if (cafe.ciudad) document.querySelector('input[name="ciudad"]').value = cafe.ciudad;
                 if (cafe.estado_republica) document.querySelector('input[name="estado_republica"]').value = cafe.estado_republica;
                 if (cafe.telefono) document.querySelector('input[name="telefono"]').value = cafe.telefono;
+                if (cafe.foto_url) {
+                    document.getElementById('previewFoto').src = '/storage/' + cafe.foto_url;
+                }
                 
             } catch (e) {
                 console.error('Error cargando perfil:', e);
             }
         }
+
+        // Live preview al seleccionar foto
+        document.getElementById('inputFoto').addEventListener('change', function() {
+            const file = this.files[0];
+            if (!file) return;
+            if (file.size > 2 * 1024 * 1024) {
+                Swal.fire('Archivo muy grande', 'La imagen no debe superar 2 MB.', 'warning');
+                this.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = e => { document.getElementById('previewFoto').src = e.target.result; };
+            reader.readAsDataURL(file);
+        });
 
         document.getElementById('formPerfil').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -214,24 +210,31 @@
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
             submitBtn.disabled = true;
 
-            const data = {
-                nombre: document.querySelector('input[name="nombre_franquicia"]').value,
-                descripcion: document.querySelector('textarea[name="descripcion"]').value,
-                calle: document.querySelector('input[name="calle"]').value,
-                num_exterior: document.querySelector('input[name="num_exterior"]').value,
-                num_interior: document.querySelector('input[name="num_interior"]').value,
-                colonia: document.querySelector('input[name="colonia"]').value,
-                cp: document.querySelector('input[name="cp"]').value,
-                ciudad: document.querySelector('input[name="ciudad"]').value,
-                estado_republica: document.querySelector('input[name="estado_republica"]').value,
-                telefono: document.querySelector('input[name="telefono"]').value
-            };
+            // Usamos FormData para soportar multipart (foto)
+            const formData = new FormData();
+            formData.append('_method', 'PUT');
+            formData.append('nombre',          document.querySelector('input[name="nombre_franquicia"]').value);
+            formData.append('descripcion',     document.querySelector('textarea[name="descripcion"]').value);
+            formData.append('calle',           document.querySelector('input[name="calle"]').value);
+            formData.append('num_exterior',    document.querySelector('input[name="num_exterior"]').value);
+            formData.append('num_interior',    document.querySelector('input[name="num_interior"]').value);
+            formData.append('colonia',         document.querySelector('input[name="colonia"]').value);
+            formData.append('cp',              document.querySelector('input[name="cp"]').value);
+            formData.append('ciudad',          document.querySelector('input[name="ciudad"]').value);
+            formData.append('estado_republica',document.querySelector('input[name="estado_republica"]').value);
+            formData.append('telefono',        document.querySelector('input[name="telefono"]').value);
 
+            const fotoInput = document.getElementById('inputFoto');
+            if (fotoInput.files.length > 0) {
+                formData.append('foto', fotoInput.files[0]);
+            }
+
+            // *** Authorization header only — NO Content-Type (el browser lo pone automático con boundary) ***
             try {
                 const res = await fetch(`${API}/gerente/mi-cafeteria`, {
-                    method: 'PUT',
-                    headers: authHeaders(),
-                    body: JSON.stringify(data)
+                    method: 'POST',   // Laravel necesita POST + _method=PUT para FormData
+                    headers: { 'Authorization': `Bearer ${authToken}`, 'Accept': 'application/json' },
+                    body: formData
                 });
                 
                 const json = await res.json();
@@ -239,12 +242,20 @@
                 if(!res.ok) {
                     throw new Error(json.message || 'Error al actualizar');
                 }
-                
+
+                // Actualizar preview con la foto guardada (si la API devuelve foto_url)
+                const cafe = json.data || json;
+                if (cafe.foto_url) {
+                    document.getElementById('previewFoto').src = '/storage/' + cafe.foto_url;
+                    fotoInput.value = ''; // resetear input
+                }
+
                 Swal.fire({
-                    title: '¡Éxito!',
-                    text: 'Perfil de cafetería actualizado correctamente.',
+                    title: '¡Guardado!',
+                    text: 'Perfil actualizado correctamente.',
                     icon: 'success',
-                    confirmButtonColor: '#212529'
+                    timer: 2200,
+                    showConfirmButton: false
                 });
                 
             } catch (e) {
