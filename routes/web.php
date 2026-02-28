@@ -102,6 +102,10 @@ Route::get('/superadmin/suscripciones', function () {
     return view('superadmin.suscripciones');
 });
 
+Route::get('/superadmin/planes', function () {
+    return view('superadmin.planes');
+});
+
 Route::get('/superadmin/ajustes', function () {
     return view('superadmin.ajustes');
 });

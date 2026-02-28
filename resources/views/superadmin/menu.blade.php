@@ -31,6 +31,9 @@
             <a href="/superadmin/suscripciones" class="nav-link-super {{ request()->is('superadmin/suscripciones') ? 'active' : '' }}">
                 <i class="bi bi-wallet2 me-2"></i> Suscripciones
             </a>
+            <a href="/superadmin/planes" class="nav-link-super {{ request()->is('superadmin/planes') ? 'active' : '' }}">
+                <i class="bi bi-stack me-2"></i> Planes de Suscripción
+            </a>
             <a href="/superadmin/ajustes" class="nav-link-super {{ request()->is('superadmin/ajustes') ? 'active' : '' }}">
                 <i class="bi bi-gear me-2"></i> Ajustes Sistema
             </a>
