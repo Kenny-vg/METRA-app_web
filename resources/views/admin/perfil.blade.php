@@ -169,7 +169,7 @@
                 if (cafe.estado_republica) document.querySelector('input[name="estado_republica"]').value = cafe.estado_republica;
                 if (cafe.telefono) document.querySelector('input[name="telefono"]').value = cafe.telefono;
                 if (cafe.foto_url) {
-                    document.getElementById('previewFoto').src = '/storage/' + cafe.foto_url + '?v=' + new Date().getTime();
+                    document.getElementById('previewFoto').src = cafe.foto_url + '?v=' + new Date().getTime();
                     document.getElementById('previewFoto').classList.remove('d-none');
                     document.getElementById('placeholder-foto').classList.add('d-none');
                     document.getElementById('overlay-foto').classList.remove('d-none');
@@ -251,7 +251,7 @@
                 // Actualizar preview con la foto guardada (si la API devuelve foto_url)
                 const cafe = json.data || json;
                 if (cafe.foto_url) {
-                    document.getElementById('previewFoto').src = '/storage/' + cafe.foto_url + '?v=' + new Date().getTime();
+                    document.getElementById('previewFoto').src = cafe.foto_url + '?v=' + new Date().getTime();
                     fotoInput.value = ''; // resetear input
                 }
 

@@ -374,7 +374,7 @@
                              onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 40px rgba(0,0,0,0.12)'"
                              onmouseout="this.style.transform='';this.style.boxShadow=''">
                             ${cafe.foto_url
-                                ? `<img src="${STORAGE_URL}/${cafe.foto_url}?v=${new Date().getTime()}" alt="${cafe.nombre}" style="width:100%; height:180px; object-fit:cover;">`
+                                ? `<img src="${cafe.foto_url}?v=${new Date().getTime()}" alt="${cafe.nombre}" style="width:100%; height:180px; object-fit:cover;">`
                                 : `<div style="height: 180px; background: linear-gradient(135deg, var(--black-primary), #2d3748); display: flex; align-items: center; justify-content: center;"><i class="bi bi-cup-hot-fill" style="font-size: 3.5rem; color: var(--accent-gold); opacity: 0.8;"></i></div>`
                             }
                             <div class="card-body p-4">

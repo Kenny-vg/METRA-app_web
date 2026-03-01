@@ -203,7 +203,7 @@ async function verDetalle(cafeteriaId) {
                             <span class="text-muted">Plan Actual</span>
                             <span class="fw-bold" style="color: var(--accent-gold);">${plan}</span>
                         </div>
-                        ${c.comprobante_url ? `<a href="/storage/${c.comprobante_url.replace('public/', '')}" target="_blank" class="btn btn-outline-secondary w-100 rounded-pill"><i class="bi bi-file-earmark-text me-2"></i>Ver Comprobante de Pago</a>` : '<p class="text-muted small text-center m-0">Sin comprobante subido</p>'}
+                        ${c.comprobante_url ? `<button onclick="verComprobante(${c.id})" class="btn btn-outline-secondary w-100 rounded-pill"><i class="bi bi-file-earmark-text me-2"></i>Ver Comprobante de Pago</button>` : '<p class="text-muted small text-center m-0">Sin comprobante subido</p>'}
                     </div>
                 </div>
             </div>
@@ -211,6 +211,51 @@ async function verDetalle(cafeteriaId) {
 
     } catch (e) {
         body.innerHTML = '<p class="text-danger">No pudimos conectar con el servidor. Verifica tu internet.</p>';
+    }
+}
+
+async function verComprobante(cafeteriaId) {
+    const modal = new bootstrap.Modal(document.getElementById('modalComprobante'));
+    const body = document.getElementById('detalle-body');
+    
+    // We reuse the modal for the receipt as well, or we can use another one. 
+    // Given the current structure, let's keep it simple.
+    
+    body.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Cargando comprobante...</p></div>';
+    
+    try {
+        const url = `${API}/superadmin/cafeterias/${cafeteriaId}/comprobante`;
+        const response = await fetch(url, { headers: authHeaders() });
+        
+        if (!response.ok) throw new Error('Error al cargar el comprobante');
+        
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const contentType = response.headers.get('content-type');
+        
+        if (contentType && contentType.includes('pdf')) {
+            body.innerHTML = `
+                <div class="text-center p-4">
+                    <i class="bi bi-file-earmark-pdf fs-1 text-danger mb-3 d-block"></i>
+                    <a href="${blobUrl}" target="_blank" class="btn btn-dark px-4 rounded-pill">
+                        <i class="bi bi-box-arrow-up-right me-2"></i>Abrir PDF
+                    </a>
+                </div>
+            `;
+        } else {
+            body.innerHTML = `
+                <div class="text-center">
+                    <img src="${blobUrl}" class="img-fluid rounded-3 shadow-sm mb-3" style="max-height: 400px;" alt="Comprobante">
+                    <div>
+                        <a href="${blobUrl}" download="comprobante" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                            <i class="bi bi-download me-1"></i>Descargar
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+    } catch (e) {
+        body.innerHTML = '<p class="text-danger text-center">No pudimos cargar el comprobante.</p>';
     }
 }
 

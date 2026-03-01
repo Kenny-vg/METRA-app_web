@@ -272,7 +272,7 @@
                 let timestamp = new Date().getTime(); // simple cache buster
                 
                 if (cafe.foto_url) {
-                    finalImgUrl = `${STORAGE_URL}/${cafe.foto_url}?v=${timestamp}`;
+                    finalImgUrl = `${cafe.foto_url}?v=${timestamp}`;
                     document.getElementById('foto-secundaria-container').innerHTML = `
                         <img src="${finalImgUrl}" alt="El espacio" class="img-fluid rounded-4 shadow-sm w-100" style="height: 280px; object-fit: cover;">
                     `;

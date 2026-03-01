@@ -393,22 +393,42 @@ async function verComprobante(cafeteriaId) {
     modal.show();
 
     try {
-        const res  = await fetch(`${API}/superadmin/cafeterias/${cafeteriaId}/comprobante`, { headers: authHeaders() });
-        const json = await res.json();
-        if (!res.ok || !json.data?.comprobante_url) {
-            document.getElementById('modal-comprobante-body').innerHTML =
-                '<p class="text-danger">Algo salió mal. Intenta de nuevo.</p>';
-            return;
+        const url = `${API}/superadmin/cafeterias/${cafeteriaId}/comprobante`;
+        
+        // Since the backend now handles the authorized view and returns the file,
+        // we can fetch with auth headers to check if it exists, then use the URL with a blob or just an iframe/image
+        // However, for simplicity and since we are using Bearer tokens, we might need a blob approach
+        // or just rely on the backend returning the secure Cloudinary URL in a JSON if we update it.
+        // BUT the requirement says: "consumir endpoint de backend para ver comprobante."
+        
+        const response = await fetch(url, { headers: authHeaders() });
+        if (!response.ok) {
+            throw new Error('Error al cargar el comprobante');
         }
-        const url = json.data.comprobante_url;
-        const isPdf = url.toLowerCase().includes('.pdf');
-        document.getElementById('modal-comprobante-body').innerHTML = isPdf
-            ? `<a href="${url}" target="_blank" class="btn btn-metra-main px-4" style="padding: 10px 20px;">
-                <i class="bi bi-file-earmark-pdf me-2"></i>Abrir PDF
-               </a>`
-            : `<img src="${url}" class="comprobante-img" alt="Comprobante">`;
+        
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const contentType = response.headers.get('content-type');
+        
+        if (contentType && contentType.includes('pdf')) {
+            document.getElementById('modal-comprobante-body').innerHTML = `
+                <a href="${blobUrl}" target="_blank" class="btn btn-metra-main px-4" style="padding: 10px 20px;">
+                    <i class="bi bi-file-earmark-pdf me-2"></i>Abrir PDF
+                </a>
+                <p class="mt-3 small text-muted text-center">El navegador abrirá el PDF en una pestaña nueva.</p>
+            `;
+        } else {
+            document.getElementById('modal-comprobante-body').innerHTML = `
+                <img src="${blobUrl}" class="comprobante-img" alt="Comprobante" style="max-width: 100%; max-height: 500px;">
+                <div class="mt-3">
+                    <a href="${blobUrl}" download="comprobante" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                        <i class="bi bi-download me-1"></i>Descargar
+                    </a>
+                </div>
+            `;
+        }
     } catch (e) {
-        document.getElementById('modal-comprobante-body').innerHTML = '<p class="text-danger">No pudimos conectar con el servidor. Verifica tu internet.</p>';
+        document.getElementById('modal-comprobante-body').innerHTML = '<p class="text-danger">No pudimos cargar el comprobante. Intenta de nuevo.</p>';
     }
 }
 
