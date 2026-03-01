@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class RegistroNegocioController extends Controller
 {
@@ -88,7 +89,7 @@ class RegistroNegocioController extends Controller
             $gerente = User::create([
                 'name'                => $data['gerente']['name'],
                 'email'               => $data['gerente']['email'],
-                'password'            => $data['gerente']['password'],
+                'password'            => Hash::make($data['gerente']['password']),
                 'role'                => 'gerente',
                 'cafe_id'             => $cafeteria->id,
                 'estado'              => false
@@ -147,15 +148,22 @@ class RegistroNegocioController extends Controller
         ]);
 
         // Guardar archivo
-        $path = $request->file('comprobante')->store('comprobantes');
+        $uploaded = Cloudinary::upload(
+            $request->file('comprobante')->getRealPath(),
+            [
+                'folder' => 'comprobantes'
+            ]
+        );
+
+        $path = $uploaded->getSecurePath();
 
         // Actualizar el comprobante en la cafetería
         $cafeteria->update([
-            ['comprobante_url' =>$path]
+            'comprobante_url' =>$path
         ]);
 
         return ApiResponse::success(
-            ['comprobante_url' => Storage::url($path)],
+            ['comprobante_url' => $path],
             'Comprobante subido correctamente. El equipo revisará tu solicitud.'
         );
     }

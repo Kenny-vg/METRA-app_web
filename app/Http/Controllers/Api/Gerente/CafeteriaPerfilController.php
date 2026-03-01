@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class CafeteriaPerfilController extends Controller
 {
@@ -58,8 +59,14 @@ class CafeteriaPerfilController extends Controller
                 Storage::disk('public')->delete($cafeteria->foto_url);
             }
 
-            $path = $request->file('foto')
-                ->store('cafeterias','public');
+            $uploaded = Cloudinary::upload(
+                $request->file('foto')->getRealPath(),
+                [
+                    'folder' => 'cafeterias'
+                ]
+            );
+
+            $path = $uploaded->getSecurePath();
 
             $data['foto_url'] = $path;
         }
