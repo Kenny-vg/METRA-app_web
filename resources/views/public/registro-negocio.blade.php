@@ -386,10 +386,31 @@
     }
 
     /* WIZARD LOGIC */
-    function goToStep(step) {
-        if (step === 2 && !document.getElementById('nombre').value.trim()) {
-            showAlert('Por favor, indica el nombre de la cafetería.'); return;
+    function validarPaso1() {
+        const nombre = document.getElementById('nombre').value.trim();
+        const telefono = document.getElementById('telefono').value.trim();
+        const cp = document.getElementById('cp').value.trim();
+
+        if (!nombre || nombre.length < 3) {
+            showAlert('El nombre del negocio debe tener al menos 3 caracteres.');
+            return false;
         }
+        if (telefono && telefono.length < 10) {
+            showAlert('El número de teléfono debe tener al menos 10 dígitos.');
+            return false;
+        }
+        if (cp && cp.length < 5) {
+            showAlert('El código postal debe tener al menos 5 dígitos.');
+            return false;
+        }
+        return true;
+    }
+
+    function goToStep(step) {
+        if (step === 2 && !validarPaso1()) {
+            return;
+        }
+        
         hideAlert();
         document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
         document.getElementById(`step-${step}`).classList.add('active');
@@ -439,7 +460,28 @@
                 body: JSON.stringify(payload)
             });
             const json = await res.json();
-            if (!res.ok) throw new Error(json.errors ? Object.values(json.errors).flat().join(' | ') : (json.message || 'Error'));
+            
+            if (!res.ok) {
+                let errorMsg = json.message || 'Error en el registro';
+                if (json.errors) {
+                    errorMsg = `<ul class="text-start mb-0" style="color: #D32F2F;">`;
+                    Object.values(json.errors).forEach(errArray => {
+                        errArray.forEach(err => {
+                            errorMsg += `<li>${err}</li>`;
+                        });
+                    });
+                    errorMsg += `</ul>`;
+                    
+                    Swal.fire({
+                        title: 'Datos inválidos',
+                        html: errorMsg,
+                        icon: 'error',
+                        confirmButtonColor: '#382C26'
+                    });
+                    return;
+                }
+                throw new Error(errorMsg);
+            }
             
             registeredCafeteriaId = json.data.cafeteria_id;
             hideAlert();

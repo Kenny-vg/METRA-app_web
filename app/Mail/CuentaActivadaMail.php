@@ -19,9 +19,7 @@ class CuentaActivadaMail extends Mailable
     public function __construct()
     {
         //
-        return new Content(
-            view: 'emails.cuenta-activada'
-        );
+        
     }
 
     /**
@@ -30,7 +28,7 @@ class CuentaActivadaMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Cuenta Activada Mail',
+            subject: 'Cuenta Activada',
         );
     }
 
@@ -40,7 +38,7 @@ class CuentaActivadaMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'emails.cuenta-activada'
         );
     }
 

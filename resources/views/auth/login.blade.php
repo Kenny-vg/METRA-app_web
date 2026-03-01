@@ -252,13 +252,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     } catch (err) {}
                 } else {
                     const errorData = await response.json();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Acceso Denegado',
-                        text: errorData.message || 'Credenciales inválidas.',
-                        confirmButtonColor: '#382C26',
-                        confirmButtonText: 'Aceptar'
-                    });
+                    let errorMsg = errorData.message || 'Credenciales inválidas.';
+                    if (errorData.errors) {
+                        errorMsg = `<ul class="text-start mb-0" style="color: #D32F2F;">`;
+                        Object.values(errorData.errors).forEach(errArray => {
+                            errArray.forEach(err => {
+                                errorMsg += `<li>${err}</li>`;
+                            });
+                        });
+                        errorMsg += `</ul>`;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Acceso Denegado',
+                            html: errorMsg,
+                            confirmButtonColor: '#382C26',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Acceso Denegado',
+                            text: errorMsg,
+                            confirmButtonColor: '#382C26',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    }
                 }
             } catch (error) {
                 console.error('Fallo la API', error);

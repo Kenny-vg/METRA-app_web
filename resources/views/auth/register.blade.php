@@ -127,10 +127,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     const errorData = await response.json();
                     let errorMsg = errorData.message || 'Datos inválidos.';
                     if (errorData.errors) {
-                        const firstError = Object.values(errorData.errors)[0][0];
-                        if (firstError) errorMsg = firstError;
+                        errorMsg = `<ul class="text-start mb-0" style="color: #D32F2F;">`;
+                        Object.values(errorData.errors).forEach(errArray => {
+                            errArray.forEach(err => {
+                                errorMsg += `<li>${err}</li>`;
+                            });
+                        });
+                        errorMsg += `</ul>`;
+                        Swal.fire({
+                            title: 'Error en el registro',
+                            html: errorMsg,
+                            icon: 'error',
+                            confirmButtonColor: '#382C26'
+                        });
+                    } else {
+                        Swal.fire('Error en el registro', errorMsg, 'error');
                     }
-                    Swal.fire('Error en el registro', errorMsg, 'error');
                     btnSubmit.disabled = false;
                 }
             } catch (error) {

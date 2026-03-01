@@ -35,7 +35,10 @@ class AprobacionController extends Controller
         }
 
         return ApiResponse::success(
-            $cafeteria->load(['gerente','suscripcionActual.plan']),
+            $cafeteria->fresh()->load([
+                'gerente',
+                'suscripciones.plan'
+            ]),
             'Cafetería aprobada correctamente'
         );
     }
