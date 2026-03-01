@@ -111,7 +111,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4 pt-0">
-                <div class="alert alert-danger d-none rounded-3" id="modal-alert"></div>
+                <!-- Alert removed manually to use SweetAlert instead -->
                 <div class="mb-3">
                     <label class="form-label small fw-bold">Nombre del Negocio</label>
                     <input type="text" class="form-control bg-light border-0 py-2" id="m-nombre" placeholder="Ej. Café Central" maxlength="100" required>
@@ -180,6 +180,12 @@ async function cargarDashboard() {
             fetch(`${API}/superadmin/cafeterias`, { headers: authHeaders() }),
             fetch(`${API}/superadmin/solicitudes`, { headers: authHeaders() })
         ]);
+
+        if (resCafes.status === 401 || resSols.status === 401) {
+             localStorage.removeItem('token');
+             window.location.href = '/login';
+             return;
+        }
 
         if (!resCafes.ok || !resSols.ok) {
              throw new Error("El servidor respondió con un error");
@@ -271,10 +277,10 @@ function renderTablaRevision(cafeterias) {
                     <td>${plan}</td>
                     <td>${comp}</td>
                     <td class="text-end">
-                        <button class="btn btn-sm btn-success rounded-pill px-3 me-1" onclick="accionSolicitud(${c.id}, 'aprobar')">
+                        <button type="button" class="btn btn-sm btn-success rounded-pill px-3 me-1" onclick="accionSolicitud(${c.id}, 'aprobar')">
                             <i class="bi bi-check2 me-1"></i>Aprobar
                         </button>
-                        <button class="btn btn-sm btn-danger rounded-pill px-3" onclick="accionSolicitud(${c.id}, 'rechazar')">
+                        <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" onclick="accionSolicitud(${c.id}, 'rechazar')">
                             <i class="bi bi-x me-1"></i>Rechazar
                         </button>
                     </td>
@@ -301,14 +307,14 @@ function renderTablaTodos(cafeterias) {
             <td>${badgeEstado(c.estado)}</td>
             <td class="text-end">
                 ${c.estado === 'en_revision'
-                    ? `<button class="btn btn-sm btn-success rounded-pill px-3 me-1" onclick="accionSolicitud(${c.id},'aprobar')">
+                    ? `<button type="button" class="btn btn-sm btn-success rounded-pill px-3 me-1" onclick="accionSolicitud(${c.id},'aprobar')">
                            <i class="bi bi-check2 me-1"></i>Aprobar
                        </button>
-                       <button class="btn btn-sm btn-danger rounded-pill px-3" onclick="accionSolicitud(${c.id},'rechazar')">
+                       <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" onclick="accionSolicitud(${c.id},'rechazar')">
                            <i class="bi bi-x me-1"></i>Rechazar
                        </button>`
-                    : `<button class="btn btn-sm btn-outline-secondary rounded-pill px-3"
-                              onclick="accionSolicitud(${c.id},'${c.estado === 'activa' ? 'rechazar' : 'aprobar'}')">
+                    : `<button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                              onclick="accionSolicitud(${c.id},'${c.estado === 'activa' ? 'suspender' : 'aprobar'}')">
                            ${c.estado === 'activa' ? 'Suspender' : 'Activar'}
                        </button>`
                 }
@@ -320,24 +326,54 @@ function renderTablaTodos(cafeterias) {
 // ────────────────────────────────────────────
 // Acciones Solicitudes (Aprobar / Rechazar)
 // ────────────────────────────────────────────
-async function accionSolicitud(cafeteriaId, accion) {
-    const texto = accion === 'aprobar' ? 'APROBAR' : 'RECHAZAR';
-    if (!confirm(`¿Deseas ${texto} esta solicitud?`)) return;
+// ────────────────────────────────────────────
+// Acciones Solicitudes (Aprobar / Rechazar)
+// ────────────────────────────────────────────
+function accionSolicitud(cafeteriaId, accion) {
+    const isActivar = accion === 'aprobar';
+    const isSuspender = accion === 'suspender';
+    
+    let finalTexto = 'Rechazar';
+    if (isActivar) finalTexto = 'Aprobar';
+    if (isSuspender) finalTexto = 'Suspender';
 
-    document.getElementById('overlay-loading').style.setProperty('display', 'flex', 'important');
-    try {
-        const res = await fetch(`${API}/superadmin/solicitudes/${cafeteriaId}/${accion}`, {
-            method: 'PATCH',
-            headers: authHeaders()
-        });
-        const json = await res.json();
-        if (!res.ok) { alert(json.message || `Error al ${accion} la solicitud.`); return; }
-        await cargarDashboard();
-    } catch (e) {
-        alert('Error de conexión.');
-    } finally {
-        document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
-    }
+    const colorBtn = isActivar ? '#198754' : '#dc3545'; // success or danger
+    const endpointAccion = isSuspender ? 'rechazar' : accion; // backend rechazar suspends
+
+    Swal.fire({
+        title: `¿Deseas ${finalTexto.toLowerCase()} este negocio?`,
+        text: 'Esta acción notificará al usuario seleccionado.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: colorBtn,
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: `Sí, ${finalTexto.toLowerCase()}`,
+        cancelButtonText: 'Cancelar'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            document.getElementById('overlay-loading').style.setProperty('display', 'flex', 'important');
+            try {
+                const res = await fetch(`${API}/superadmin/solicitudes/${cafeteriaId}/${endpointAccion}`, {
+                    method: 'PATCH',
+                    headers: authHeaders()
+                });
+                const json = await res.json();
+                
+                if (!res.ok) { 
+                    Swal.fire('Error', json.message || `Ocurrió un error al ${finalTexto.toLowerCase()} la solicitud.`, 'error');
+                    return; 
+                }
+                
+                await cargarDashboard();
+                Swal.fire('¡Listo!', `La solicitud fue ${finalTexto === 'Aprobar' ? 'aprobada' : (finalTexto === 'Suspender' ? 'suspendida' : 'rechazada')} con éxito.`, 'success');
+                
+            } catch (e) {
+                Swal.fire('Error de conexión', 'Revisa tu conexión a internet o intenta más tarde.', 'error');
+            } finally {
+                document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
+            }
+        }
+    });
 }
 
 
@@ -379,14 +415,11 @@ async function crearNegocioManual() {
     const name   = document.getElementById('m-gerente-name').value.trim();
     const email  = document.getElementById('m-gerente-email').value.trim();
     const plan_id = document.getElementById('m-plan').value;
-    const alert  = document.getElementById('modal-alert');
 
     if (!nombre || !name || !email || !plan_id) {
-        alert.textContent = 'Todos los campos son requeridos, incluyendo el plan.';
-        alert.classList.remove('d-none');
+        Swal.fire({ title: 'Atención', text: 'Todos los campos son requeridos, incluyendo el plan.', icon: 'warning', confirmButtonColor: '#382C26' });
         return;
     }
-    alert.classList.add('d-none');
     
     document.getElementById('overlay-loading').style.setProperty('display', 'flex', 'important');
 
@@ -399,8 +432,7 @@ async function crearNegocioManual() {
         const json = await res.json();
         if (!res.ok) {
             const msgs = json.errors ? Object.values(json.errors).flat().join(' | ') : json.message;
-            alert.textContent = msgs;
-            alert.classList.remove('d-none');
+            Swal.fire({ title: 'Error', text: msgs, icon: 'error', confirmButtonColor: '#382C26' });
             document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
             return;
         }
@@ -420,9 +452,9 @@ async function crearNegocioManual() {
         document.getElementById('m-gerente-name').value = '';
         document.getElementById('m-gerente-email').value = '';
         await cargarDashboard();
+        Swal.fire({ title: '¡Éxito!', text: 'El negocio ha sido registrado.', icon: 'success', confirmButtonColor: '#382C26' });
     } catch (e) {
-        alert.textContent = 'Error de conexión.';
-        alert.classList.remove('d-none');
+        Swal.fire({ title: 'Error', text: 'Error de conexión.', icon: 'error', confirmButtonColor: '#382C26' });
     } finally {
         document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
     }

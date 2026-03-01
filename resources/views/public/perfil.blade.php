@@ -16,11 +16,11 @@
                 <hr style="border-color: var(--border-light); opacity: 1;" class="w-75 mx-auto mb-4">
 
                 <div class="d-grid gap-3 mt-2">
-                    <a href="/reservar" class="btn-metra-main rounded-pill fw-bold py-3" style="font-size: 0.95rem;">
+                    <a href="{{ url('/reservar') }}" class="btn-metra-main rounded-pill fw-bold py-3" style="font-size: 0.95rem;">
                         <i class="bi bi-calendar-plus me-2"></i>Nueva Reservación
                     </a>
                     
-                    <a href="/logout" id="btnCerrarSesionCliente" class="btn rounded-pill fw-bold py-3" style="background: var(--off-white); border: 1px solid var(--border-light); color: var(--text-main); font-size: 0.9rem; transition: background 0.3s;">
+                    <a href="{{ url('/logout') }}" id="btnCerrarSesionCliente" class="btn rounded-pill fw-bold py-3" style="background: var(--off-white); border: 1px solid var(--border-light); color: var(--text-main); font-size: 0.9rem; transition: background 0.3s;">
                         <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
                     </a>
                 </div>
@@ -77,13 +77,15 @@
 <script>
 document.addEventListener('DOMContentLoaded', async function() {
     const token = localStorage.getItem('token');
+    const BASE_URL = "{{ url('/') }}";
     if (!token) {
-        window.location.href = '/login';
+        window.location.href = `${BASE_URL}/login`;
         return;
     }
 
     try {
-        const response = await fetch('/api/mi-perfil', {
+        const API_URL = "{{ url('/api') }}";
+        const response = await fetch(`${API_URL}/mi-perfil`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -106,7 +108,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
         } else {
             localStorage.removeItem('token');
-            window.location.href = '/login';
+            window.location.href = `${BASE_URL}/login`;
         }
     } catch (error) {
         console.error('Error cargando perfil:', error);
@@ -119,7 +121,8 @@ document.getElementById('btnCerrarSesionCliente')?.addEventListener('click', asy
     
     if (token) {
         try {
-            await fetch('/api/logout', {
+            const API_URL = "{{ url('/api') }}";
+            await fetch(`${API_URL}/logout`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -135,7 +138,8 @@ document.getElementById('btnCerrarSesionCliente')?.addEventListener('click', asy
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     localStorage.clear();
-    window.location.href = '/login';
+    const BASE_URL = "{{ url('/') }}";
+    window.location.href = `${BASE_URL}/login`;
 });
 </script>
 @endsection

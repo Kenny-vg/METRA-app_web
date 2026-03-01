@@ -20,7 +20,7 @@
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-light-custom sticky-top py-3">
     <div class="container">
-        <a class="navbar-brand fw-bold fs-3" href="/" style="color: var(--black-primary);">
+        <a class="navbar-brand fw-bold fs-3" href="{{ url('/') }}" style="color: var(--black-primary);">
             <i class="bi bi-cup-hot-fill me-2" style="color: var(--accent-gold);"></i>METRA
         </a>
         <div class="ms-auto text-end">
@@ -143,8 +143,7 @@
 
 <div class="container mb-5" style="position: relative; z-index: 20;">
     <div class="wizard-card" id="wizard-form">
-        <!-- Alert -->
-        <div class="alert alert-danger rounded-3" style="display:none; background: #FFF5F5; border-color: #FFDEDC; color: #B3261E;" id="alert-box" role="alert"></div>
+        <!-- Alert removed manually to use SweetAlert instead -->
 
         <!-- Step Indicator -->
         <div class="step-indicator">
@@ -182,17 +181,27 @@
                 </div>
             </div>
             <div class="row g-3 mb-4">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label fw-semibold">Colonia</label>
                     <input type="text" class="form-metra w-100" id="colonia" placeholder="Centro" maxlength="80">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label fw-semibold">Ciudad</label>
                     <input type="text" class="form-metra w-100" id="ciudad" placeholder="Tehuacán" maxlength="80">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Estado</label>
+                    <input type="text" class="form-metra w-100" id="estado_republica" placeholder="Puebla" maxlength="80">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">C.P.</label>
+                    <input type="text" class="form-metra w-100" id="cp" placeholder="75700" maxlength="10">
+                </div>
+            </div>
+            <div class="row g-3 mb-4">
+                <div class="col-md-12">
                     <label class="form-label fw-semibold">Teléfono</label>
-                    <input type="tel" class="form-metra w-100" id="telefono" placeholder="238 100 0000" maxlength="20" inputmode="numeric" pattern="[0-9\s\-\+]+">
+                    <input type="tel" class="form-metra w-100" id="telefono" placeholder="238 100 0000" maxlength="20" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 </div>
             </div>
             <div class="d-flex justify-content-end mt-2">
@@ -288,8 +297,8 @@
                     Hemos recibido la documentación de tu cafetería correctamente. Nuestro equipo administrativo validará el formato y en breve recibirás tus credenciales de acceso oficial.
                 </p>
                 <div class="d-flex gap-3 justify-content-center mt-5">
-                    <a href="/" class="btn-prev text-decoration-none">Volver al inicio</a>
-                    <a href="/login" class="btn-metra-main" style="padding: 14px 35px;">Portal Administrativo</a>
+                    <a href="{{ url('/') }}" class="btn-prev text-decoration-none">Volver al inicio</a>
+                    <a href="{{ url('/login') }}" class="btn-metra-main" style="padding: 14px 35px;">Portal Administrativo</a>
                 </div>
             </div>
         </div>
@@ -303,8 +312,9 @@
     </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    const API_BASE = '/api';
+    const API_BASE = "{{ url('/api') }}";
     let selectedPlanId = null;
     let registeredCafeteriaId = null;
 
@@ -416,6 +426,8 @@
             num_interior: document.getElementById('num_interior').value.trim() || null,
             colonia: document.getElementById('colonia').value.trim() || null,
             ciudad: document.getElementById('ciudad').value.trim() || null,
+            estado_republica: document.getElementById('estado_republica').value.trim() || null,
+            cp: document.getElementById('cp').value.trim() || null,
             telefono: document.getElementById('telefono').value.trim() || null,
             gerente: { name, email, password, password_confirmation },
             plan_id: selectedPlanId,
@@ -439,15 +451,50 @@
     /* COMPROBANTE */
     function previewFile(input) {
         const p = document.getElementById('file-preview');
-        if (!input.files.length) return p.innerHTML = '';
+        const uploadArea = document.getElementById('upload-area');
+        if (!input.files.length) {
+            p.innerHTML = '';
+            uploadArea.style.display = 'block';
+            return;
+        }
+        
+        uploadArea.style.display = 'none'; // ocultar area original para mejorar UX
         const f = input.files[0];
+        
+        let htmlPreview = '';
         if (f.type.startsWith('image/')) {
             const rd = new FileReader();
-            rd.onload = e => p.innerHTML = `<img src="${e.target.result}" style="max-width: 100%; max-height: 250px; object-fit: contain; border-radius: 8px; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"><div class="small text-muted mt-2 fw-semibold">${f.name}</div>`;
+            rd.onload = e => {
+                p.innerHTML = `
+                    <img src="${e.target.result}" style="max-width: 100%; max-height: 250px; object-fit: contain; border-radius: 8px; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    <div class="small text-muted mt-3 fw-semibold">${f.name}</div>
+                    <div class="mt-3">
+                        <button class="btn btn-sm btn-outline-danger me-2 shadow-sm rounded-pill px-3" onclick="rmFile()"><i class="bi bi-trash"></i> Eliminar</button>
+                        <button class="btn btn-sm btn-outline-primary shadow-sm rounded-pill px-3" onclick="document.getElementById('comprobante-input').click()"><i class="bi bi-arrow-repeat"></i> Reemplazar</button>
+                    </div>
+                `;
+            };
             rd.readAsDataURL(f);
         } else {
-            p.innerHTML = `<div class="p-3 bg-light rounded-3 text-start border"><i class="bi bi-file-pdf text-danger fs-3 me-2"></i><b>${f.name}</b> adjunto listo.</div>`;
+            p.innerHTML = `
+                <div class="p-3 bg-light rounded-3 text-start border d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi bi-file-pdf text-danger fs-3 me-2"></i><b>${f.name}</b> adjunto listo.
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-outline-danger me-2" onclick="rmFile()"><i class="bi bi-trash"></i></button>
+                        <button class="btn btn-sm btn-outline-primary" onclick="document.getElementById('comprobante-input').click()"><i class="bi bi-arrow-repeat"></i></button>
+                    </div>
+                </div>
+            `;
         }
+    }
+
+    window.rmFile = function() {
+        const input = document.getElementById('comprobante-input');
+        input.value = '';
+        document.getElementById('file-preview').innerHTML = '';
+        document.getElementById('upload-area').style.display = 'block';
     }
 
     async function subirComprobante() {
@@ -491,8 +538,16 @@
         finally { btnTxt.classList.remove('d-none'); btnLd.classList.add('d-none'); }
     }
 
-    function showAlert(msg) { const b = document.getElementById('alert-box'); b.textContent = msg; b.style.display = 'block'; }
-    function hideAlert() { document.getElementById('alert-box').style.display = 'none'; }
+    function showAlert(msg) { 
+        Swal.fire({
+            title: 'Atención',
+            text: msg,
+            icon: 'warning',
+            confirmButtonColor: '#382C26',
+            confirmButtonText: 'Entendido'
+        });
+    }
+    function hideAlert() { /* Left empty as UI alerts are no longer used */ }
 
     // Drag N Drop
     const ua = document.getElementById('upload-area');

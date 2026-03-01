@@ -46,13 +46,18 @@
                 </div>
 
                 @if ($errors->any())
-                    <div class="alert small p-3 mb-4 rounded-3" style="background: #FFF0F0; border: 1px solid #FFD6D6; color: #D32F2F;">
-                        <ul class="mb-0 ps-3">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Atención',
+                                    html: '<ul class="text-start mb-0" style="color: #D32F2F;">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>',
+                                    confirmButtonColor: '#382C26'
+                                });
+                            }
+                        });
+                    </script>
                 @endif
 
                 <form id="loginForm" action="{{ route('login') }}" method="POST">
@@ -126,8 +131,9 @@ function decodeJwtResponse(token) {
 
 window.handleCredentialResponse = async function(response) {
     const data = decodeJwtResponse(response.credential);
+    const API_URL = "{{ url('/api') }}";
     try {
-        const res = await fetch('/api/auth/google', {
+        const res = await fetch(`${API_URL}/auth/google`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -148,6 +154,7 @@ window.handleCredentialResponse = async function(response) {
                 const role = result.data.usuario.role;
                 if(role === 'superadmin') window.location.href = '/superadmin/dashboard';
                 else if(role === 'gerente') window.location.href = '/admin/dashboard';
+                else if(role === 'personal') window.location.href = '/staff-app';
                 else window.location.href = '/public/perfil';
             } catch(e) {}
         } else {
@@ -156,7 +163,7 @@ window.handleCredentialResponse = async function(response) {
                 icon: 'error',
                 title: 'Error de Autenticación',
                 text: 'Fallo al iniciar sesión con Google.',
-                confirmButtonColor: 'var(--black-primary)',
+                confirmButtonColor: '#382C26',
                 confirmButtonText: 'Aceptar'
             });
         }
@@ -193,7 +200,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const password = loginForm.querySelector('input[name="password"]').value;
 
             try {
-                const response = await fetch('/api/login', {
+                const API_URL = "{{ url('/api') }}";
+                const response = await fetch(`${API_URL}/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -209,6 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         const role = result.data.usuario.role;
                         if(role === 'superadmin') window.location.href = '/superadmin/dashboard';
                         else if(role === 'gerente') window.location.href = '/admin/dashboard';
+                        else if(role === 'personal') window.location.href = '/staff-app';
                         else window.location.href = '/public/perfil';
                     } catch (err) {}
                 } else {
@@ -217,7 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         icon: 'error',
                         title: 'Acceso Denegado',
                         text: errorData.message || 'Credenciales inválidas.',
-                        confirmButtonColor: 'var(--black-primary)',
+                        confirmButtonColor: '#382C26',
                         confirmButtonText: 'Aceptar'
                     });
                 }
@@ -227,7 +236,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     icon: 'error',
                     title: 'Error de Conexión',
                     text: 'Fallo de conexión al servidor.',
-                    confirmButtonColor: 'var(--black-primary)',
+                    confirmButtonColor: '#382C26',
                     confirmButtonText: 'Entendido'
                 });
             }

@@ -14,9 +14,17 @@ class RegisterController extends Controller
     public function registerCliente(Request $request)
     {
         $data = $request->validate([
-            'name'=>'required|string|max100',
+            'name'=>'required|string|max:100',
             'email'=>'required|email|unique:users,email',
             'password'=>'required|min:6'
+        ], [
+            'name.required' => 'El nombre es obligatorio.',
+            'name.max' => 'El nombre no debe exceder los 100 caracteres.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'El correo electrónico no tiene un formato válido.',
+            'email.unique' => 'El correo electrónico ya se encuentra registrado.',
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
         ]);
 
         $user = User::create([

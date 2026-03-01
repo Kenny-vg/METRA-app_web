@@ -142,12 +142,12 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 rounded-4 shadow">
                 <div class="modal-header border-0 p-4">
-                    <h5 class="fw-bold m-0"><i class="bi bi-arrow-repeat me-2"></i>Renovar Suscripción</h5>
+                    <h5 class="fw-bold m-0" id="titulo-modal-renovar"><i class="bi bi-arrow-repeat me-2"></i>Renovar Suscripción</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4 pt-0">
                     <form id="formRenovar">
-                        <div class="mb-3">
+                        <div class="mb-3" id="caja-r-plan">
                             <label class="form-label small fw-bold">Selecciona tu nuevo plan</label>
                             <select id="r-plan" class="form-select border-0 shadow-sm rounded-3" style="background: var(--off-white);" required>
                                 <option value="">Cargando planes...</option>
@@ -157,8 +157,8 @@
                             <label class="form-label small fw-bold">Comprobante de Pago (PDF, JPG, PNG)</label>
                             <input type="file" id="r-comprobante" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" accept=".pdf,.jpg,.jpeg,.png" required>
                         </div>
-                        <div id="r-alert" class="alert alert-danger d-none small"></div>
-                        <button type="submit" class="btn-admin-primary w-100 py-2">Enviar Renovación</button>
+                        <!-- Alert removed manually to use SweetAlert instead -->
+                        <button type="submit" id="btn-submit-renovar" class="btn-admin-primary w-100 py-2">Enviar Renovación</button>
                     </form>
                 </div>
             </div>
@@ -246,8 +246,8 @@
                             ${cafe.estado === 'en_revision' ? 
                                 `<div class="mb-2"><span class="badge bg-warning text-dark px-3 py-2 rounded-pill"><i class="bi bi-hourglass-split me-1"></i>En revisión por administrador</span></div>` : ''
                             }
-                            <button class="btn-admin-secondary px-4 py-2" onclick="abrirModalRenovar()">
-                                <i class="bi bi-arrow-repeat me-2"></i>Renovar Suscripción
+                            <button class="btn-admin-secondary px-4 py-2" onclick="abrirModalRenovar('${cafe.estado}')">
+                                <i class="bi bi-arrow-repeat me-2"></i>${cafe.estado === 'en_revision' ? 'Actualizar Comprobante' : 'Renovar Suscripción'}
                             </button>
                         </div>
                     </div>
@@ -255,21 +255,39 @@
             `;
         }
 
-        async function abrirModalRenovar() {
+        async function abrirModalRenovar(estado = '') {
             const modal = new bootstrap.Modal(document.getElementById('modalRenovar'));
+            const isRevision = estado === 'en_revision';
+            
+            document.getElementById('titulo-modal-renovar').innerHTML = isRevision 
+                ? '<i class="bi bi-receipt me-2"></i>Actualizar Comprobante' 
+                : '<i class="bi bi-arrow-repeat me-2"></i>Renovar Suscripción';
+                
+            const selectPlan = document.getElementById('r-plan');
+            const cajaPlan = document.getElementById('caja-r-plan');
+            if (isRevision) {
+                cajaPlan.classList.add('d-none');
+                selectPlan.removeAttribute('required');
+            } else {
+                cajaPlan.classList.remove('d-none');
+                selectPlan.setAttribute('required', 'true');
+            }
+            
+            document.getElementById('btn-submit-renovar').innerHTML = isRevision ? 'Subir Nuevo Comprobante' : 'Enviar Renovación';
+
             modal.show();
             
-            try {
-                const res = await fetch(`${API}/planes-publicos`, { headers: authHeaders() });
-                const json = await res.json();
-                if (res.ok) {
-                    const select = document.getElementById('r-plan');
-                    // Planes públicos ya vienen filtrados del backend por activos
-                    select.innerHTML = '<option value="">Selecciona un plan...</option>' + 
-                        json.data.map(p => `<option value="${p.id}">${p.nombre_plan} ($${p.precio})</option>`).join('');
+            if (!isRevision) {
+                try {
+                    const res = await fetch(`${API}/planes-publicos`, { headers: authHeaders() });
+                    const json = await res.json();
+                    if (res.ok) {
+                        selectPlan.innerHTML = '<option value="">Selecciona un plan...</option>' + 
+                            json.data.map(p => `<option value="${p.id}">${p.nombre_plan} ($${p.precio})</option>`).join('');
+                    }
+                } catch (e) {
+                    console.error('Error cargando planes modal', e);
                 }
-            } catch (e) {
-                console.error('Error cargando planes modal', e);
             }
         }
 
@@ -281,18 +299,17 @@
             const fileInput = document.getElementById('r-comprobante').files[0];
             const alertBox = document.getElementById('r-alert');
 
-            if (!planVal || !fileInput) {
-                alertBox.textContent = 'Llena todos los campos';
-                alertBox.classList.remove('d-none');
+            // if requires plan text check dynamically
+            const selectReq = document.getElementById('r-plan').hasAttribute('required');
+            if ((selectReq && !planVal) || !fileInput) {
+                Swal.fire({ title: 'Atención', text: 'Llena todos los campos', icon: 'warning', confirmButtonColor: '#382C26' });
                 return;
             }
             if (fileInput.size > 5 * 1024 * 1024) {
-                alertBox.textContent = 'El comprobante no debe superar los 5MB.';
-                alertBox.classList.remove('d-none');
+                Swal.fire({ title: 'Atención', text: 'El comprobante no debe superar los 5MB.', icon: 'warning', confirmButtonColor: '#382C26' });
                 return;
             }
 
-            alertBox.classList.add('d-none');
             const submitBtn = e.target.querySelector('button');
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
             submitBtn.disabled = true;
@@ -331,10 +348,9 @@
                 });
 
             } catch(e) {
-                alertBox.textContent = e.message;
-                alertBox.classList.remove('d-none');
+                Swal.fire({ title: 'Error', text: e.message, icon: 'error', confirmButtonColor: '#382C26' });
             } finally {
-                submitBtn.innerHTML = 'Enviar Renovación';
+                submitBtn.innerHTML = document.getElementById('btn-submit-renovar').textContent === 'Subir Nuevo Comprobante' ? 'Subir Nuevo Comprobante' : 'Enviar Renovación';
                 submitBtn.disabled = false;
             }
 

@@ -19,11 +19,11 @@
             <div class="col-md-3 mb-4 mb-md-0">
                 <h5 class="fw-bold mb-3" style="color: var(--accent-gold);">Explorar</h5>
                 <ul class="list-unstyled">
-                    <li class="mb-2"><a href="/" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Inicio</a></li>
-                    <li class="mb-2"><a href="/detalles" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Conócenos</a></li>
-                    <li class="mb-2"><a href="/reservar" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Reservar Mesa</a></li>
-                    <li class="mb-2"><a href="/login" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Acceso Clientes</a></li>
-                    <li class="mb-2"><a href="/login" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Acceso Restaurantes</a></li>
+                    <li class="mb-2"><a href="{{ url('/') }}" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Inicio</a></li>
+                    <li class="mb-2"><a href="{{ url('/#como-funciona') }}" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Conócenos</a></li>
+                    <li class="mb-2"><a href="{{ url('/reservar') }}" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Reservar Mesa</a></li>
+                    <li class="mb-2"><a href="{{ url('/login') }}" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Acceso Clientes</a></li>
+                    <li class="mb-2"><a href="{{ url('/login') }}" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Acceso Restaurantes</a></li>
                 </ul>
             </div>
 
@@ -36,8 +36,16 @@
                         <span class="opacity-75">Calle Independencia 123, Centro<br>Tehuacán, Puebla</span>
                     </li>
                     <li class="mb-3 d-flex align-items-center">
+                        <i class="bi bi-telephone-fill me-2" style="color: var(--accent-gold);"></i>
+                        <span class="opacity-75">+52 238 100 0000</span>
+                    </li>
+                    <li class="mb-3 d-flex align-items-center">
+                        <i class="bi bi-whatsapp me-2" style="color: var(--success);"></i>
+                        <span class="opacity-75">+52 238 100 0000</span>
+                    </li>
+                    <li class="mb-3 d-flex align-items-center">
                         <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gold);"></i>
-                        <span class="opacity-75">contacto@metra-app.com</span>
+                        <span class="opacity-75">soporte@metra-app.com</span>
                     </li>
                 </ul>
                 <div class="d-flex gap-3 mt-4">
@@ -56,7 +64,7 @@
                     &copy; 2026 V-TECH Software. Todos los derechos reservados.
                 </p>
                 <div class="mt-2">
-                    <a href="/login" class="small text-decoration-none fw-bold" style="color: var(--black-primary); background: var(--accent-gold); padding: 2px 8px; border-radius: 4px; font-size: 0.65rem;">
+                    <a href="{{ url('/login') }}" class="small text-decoration-none fw-bold" style="color: var(--black-primary); background: var(--accent-gold); padding: 2px 8px; border-radius: 4px; font-size: 0.65rem;">
                         <i class="bi bi-lock-fill me-1"></i>SaaS Admin
                     </a>
                 </div>

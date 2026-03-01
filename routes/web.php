@@ -11,12 +11,12 @@ Route::get('/', function () {
     return view('public.bienvenida');
 });
 
-Route::get('/detalles', function () {
-    return view('public.detalles');
+Route::get('/detalles/{id}', function ($id) {
+    return view('public.detalles', ['id' => $id]);
 });
 
-Route::get('/reservar', function () {
-    return view('public.reservar');
+Route::get('/reservar/{id}', function ($id) {
+    return view('public.reservar', ['id' => $id]);
 });
 
 Route::get('/confirmacion', function () {
@@ -67,6 +67,10 @@ Route::get('/home', function () {
 // --- ZONA CLIENTE ---
 Route::get('/public/perfil', function () {
     return view('public.perfil');
+});
+
+Route::get('/staff-app', function () {
+    return view('public.staff-app');
 });
 
 

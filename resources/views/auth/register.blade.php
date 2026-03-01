@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="zona-comensal">
@@ -33,12 +34,18 @@
 
                 <div class="text-start mb-3">
                     <label class="form-label small fw-bold" style="color: var(--black-primary);">Contraseña</label>
-                    <input type="password" name="password" class="form-control input-metra" placeholder="••••••••" minlength="8" required>
+                    <div class="position-relative">
+                        <input type="password" name="password" class="form-control input-metra pe-5" placeholder="••••••••" minlength="8" required>
+                        <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 text-muted toggle-password" style="cursor: pointer;"></i>
+                    </div>
                 </div>
 
                 <div class="text-start mb-4">
                     <label class="form-label small fw-bold" style="color: var(--black-primary);">Confirmar Contraseña</label>
-                    <input type="password" name="password_confirmation" class="form-control input-metra" placeholder="••••••••" minlength="8" required>
+                    <div class="position-relative">
+                        <input type="password" name="password_confirmation" class="form-control input-metra pe-5" placeholder="••••••••" minlength="8" required>
+                        <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 text-muted toggle-password" style="cursor: pointer;"></i>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn-metra-main w-100 rounded-3">
@@ -83,7 +90,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     const userInfo = await userInfoRes.json();
                     
-                    const res = await fetch('/api/auth/google', {
+                    const API_URL = "{{ url('/api') }}";
+                    const res = await fetch(`${API_URL}/auth/google`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -124,6 +132,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    const togglePasswords = document.querySelectorAll('.toggle-password');
+    togglePasswords.forEach(icon => {
+        icon.addEventListener('click', function() {
+            const input = this.previousElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                this.classList.remove('bi-eye-slash');
+                this.classList.add('bi-eye');
+            } else {
+                input.type = 'password';
+                this.classList.remove('bi-eye');
+                this.classList.add('bi-eye-slash');
+            }
+        });
+    });
+
     const registerForm = document.getElementById('registerForm');
 
     if (registerForm) {
@@ -139,13 +163,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const password_confirmation = registerForm.querySelector('input[name="password_confirmation"]').value;
 
             if (password !== password_confirmation) {
-                alert('Las contraseñas no coinciden.');
+                Swal.fire('Atención', 'Las contraseñas no coinciden.', 'warning');
                 btnSubmit.disabled = false;
                 return;
             }
 
             try {
-                const response = await fetch('/api/register-cliente', {
+                const API_URL = "{{ url('/api') }}";
+                const response = await fetch(`${API_URL}/register-cliente`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -155,8 +180,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 if (response.ok) {
-                    alert('Cuenta creada exitosamente. Ahora puedes iniciar sesión.');
-                    window.location.href = '/login';
+                    Swal.fire({
+                        title: '¡Cuenta creada!',
+                        text: 'Ahora puedes iniciar sesión para continuar.',
+                        icon: 'success',
+                        confirmButtonText: 'Ir al Login',
+                        confirmButtonColor: 'var(--black-primary)'
+                    }).then(() => {
+                        registerForm.reset();
+                        window.location.href = '/login';
+                    });
                 } else {
                     const errorData = await response.json();
                     let errorMsg = errorData.message || 'Datos inválidos.';
@@ -164,12 +197,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         const firstError = Object.values(errorData.errors)[0][0];
                         if (firstError) errorMsg = firstError;
                     }
-                    alert('Error en registro: ' + errorMsg);
+                    Swal.fire('Error en el registro', errorMsg, 'error');
                     btnSubmit.disabled = false;
                 }
             } catch (error) {
                 console.error('Fallo la API', error);
-                alert('Fallo de conexión al servidor.');
+                Swal.fire('Error', 'Fallo de conexión al servidor.', 'error');
                 btnSubmit.disabled = false;
             }
         });

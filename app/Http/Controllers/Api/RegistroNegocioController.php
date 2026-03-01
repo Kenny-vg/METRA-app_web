@@ -53,6 +53,16 @@ class RegistroNegocioController extends Controller
             'gerente.password' => 'required|string|min:8|confirmed',
 
             'plan_id'          => 'required|exists:planes,id',
+        ], [
+            'nombre.required' => 'El nombre del negocio es obligatorio.',
+            'gerente.name.required' => 'El nombre del gerente es obligatorio.',
+            'gerente.email.required' => 'El correo corporativo es obligatorio.',
+            'gerente.email.email' => 'El correo corporativo no tiene un formato válido.',
+            'gerente.email.unique' => 'El correo ya se encuentra registrado en el sistema. Inicia sesión o usa otro.',
+            'gerente.password.required' => 'La contraseña es obligatoria.',
+            'gerente.password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+            'gerente.password.confirmed' => 'La confirmación de la contraseña no coincide.',
+            'plan_id.required' => 'Debe seleccionar un plan de suscripción válido.',
         ]);
 
         $plan = Plan::findOrFail($data['plan_id']);

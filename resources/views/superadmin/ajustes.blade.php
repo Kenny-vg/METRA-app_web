@@ -15,9 +15,13 @@
     </style>
     <header class="mb-5">
         @if(session('success'))
-            <div class="alert alert-success border-0 shadow-sm rounded-4 position-absolute top-0 start-50 translate-middle-x mt-4" style="z-index: 1050;">
-                <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-            </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({ icon: 'success', title: '¡Éxito!', text: '{{ session("success") }}', confirmButtonColor: '#382C26' });
+                    }
+                });
+            </script>
         @endif
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
             <div>

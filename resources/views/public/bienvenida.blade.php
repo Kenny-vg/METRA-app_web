@@ -14,7 +14,7 @@
 
     <nav class="navbar navbar-expand-lg py-3 py-lg-4" style="background: rgba(248, 249, 250, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-light); position: sticky; top: 0; z-index: 1000;">
         <div class="container">
-            <a class="navbar-brand fw-bold fs-3" href="/" style="color: var(--black-primary); letter-spacing: -0.5px;">
+            <a class="navbar-brand fw-bold fs-3" href="{{ url('/') }}" style="color: var(--black-primary); letter-spacing: -0.5px;">
                 <i class="bi bi-hexagon-fill me-2" style="color: var(--accent-gold); font-size: 1.2rem;"></i>METRA
             </a>
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navBienvenida">
@@ -236,7 +236,7 @@
                 </div>
             </div>
             <div class="text-center">
-                <a href="/registro-negocio" class="btn-metra-main" style="padding: 18px 50px; font-size: 1.1rem; border-radius: 50px; box-shadow: 0 10px 30px rgba(212,175,55,0.3);">
+                <a href="{{ url('/registro-negocio') }}" class="btn-metra-main" style="padding: 18px 50px; font-size: 1.1rem; border-radius: 50px; box-shadow: 0 10px 30px rgba(212,175,55,0.3);">
                     <i class="bi bi-rocket-takeoff me-2"></i>Registrar mi Negocio
                 </a>
                 <p style="color: rgba(255,255,255,0.35); font-size: 0.85rem; margin-top: 14px; margin-bottom: 0;">
@@ -353,7 +353,10 @@
     <script>
     async function cargarCafeterias() {
         try {
-            const res = await fetch('/api/cafeterias-publicas');
+            const API_URL = "{{ url('/api') }}";
+            const BASE_URL = "{{ url('/') }}";
+            const STORAGE_URL = "{{ url('/storage') }}";
+            const res = await fetch(`${API_URL}/cafeterias-publicas`);
             const json = await res.json();
             const cafeterias = Array.isArray(json) ? json : (json.data || []);
             const container = document.getElementById('cafeterias-container');
@@ -365,12 +368,12 @@
 
             container.innerHTML = cafeterias.map(cafe => `
                 <div class="col-12 col-sm-6 col-lg-4">
-                    <a href="/detalles" class="text-decoration-none d-block h-100">
+                    <a href="${BASE_URL}/detalles/${cafe.id}" class="text-decoration-none d-block h-100">
                         <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden" style="transition: transform 0.2s ease, box-shadow 0.2s ease;"
                              onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 40px rgba(0,0,0,0.12)'"
                              onmouseout="this.style.transform='';this.style.boxShadow=''">
                             ${cafe.foto_url
-                                ? `<img src="/storage/${cafe.foto_url}?v=${Date.now()}" alt="${cafe.nombre}" style="width:100%; height:180px; object-fit:cover;">`
+                                ? `<img src="${STORAGE_URL}/${cafe.foto_url}?v=${new Date().getTime()}" alt="${cafe.nombre}" style="width:100%; height:180px; object-fit:cover;">`
                                 : `<div style="height: 180px; background: linear-gradient(135deg, var(--black-primary), #2d3748); display: flex; align-items: center; justify-content: center;"><i class="bi bi-cup-hot-fill" style="font-size: 3.5rem; color: var(--accent-gold); opacity: 0.8;"></i></div>`
                             }
                             <div class="card-body p-4">

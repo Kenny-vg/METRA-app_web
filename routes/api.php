@@ -38,10 +38,25 @@ Route::get('/configuracion-pago', [ConfiguracionController::class, 'showPublic']
 
 // Cafeterías activas (uso público: landing page)
 Route::get('/cafeterias-publicas', function () {
-    $cafeterias = \App\Models\Cafeteria::where('estado', true)
-        ->select('id', 'nombre', 'descripcion', 'calle', 'num_exterior', 'colonia')
+    $cafeterias = \App\Models\Cafeteria::where('estado', 'activa')
+        ->select(
+            'id',
+            'nombre',
+            'descripcion',
+            'calle',
+            'num_exterior',
+            'colonia',
+            'foto_url'
+        )
         ->get();
+
     return response()->json(['data' => $cafeterias]);
+});
+
+Route::get('/cafeterias-publicas/{id}', function ($id) {
+    $cafeteria = \App\Models\Cafeteria::findOrFail($id);
+
+    return response()->json(['data' => $cafeteria]);
 });
 
 // Auto-registro de negocio por el propio gerente/dueño
@@ -77,7 +92,6 @@ Route::middleware([
     Route::delete('/cafeterias/{cafeteria}', [CafeteriaController::class, 'destroy']);
 
     // CAFETERÍAS — revisión de registros auto-gestionados
-    //Route::patch('/cafeterias/{cafeteria}/estado', [CafeteriaController::class, 'cambiarEstado']);
     Route::get('/cafeterias/{cafeteria}/comprobante', [CafeteriaController::class, 'verComprobante']);
 
     // PLANES

@@ -13,7 +13,7 @@
 <body style="background-color: var(--off-white); font-family: 'Inter', sans-serif;">
     <nav class="navbar navbar-expand-lg sticky-top py-3" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-light);">
         <div class="container">
-            <a class="navbar-brand fw-bold fs-4" href="/" style="color: var(--black-primary); letter-spacing: -0.5px;">
+            <a class="navbar-brand fw-bold fs-4" href="{{ url('/') }}" style="color: var(--black-primary); letter-spacing: -0.5px;">
                 <i class="bi bi-hexagon-fill me-2" style="color: var(--accent-gold); font-size: 1.2rem;"></i>METRA
             </a>
             
@@ -53,7 +53,8 @@
         const token = localStorage.getItem('token');
         if (token) {
             try {
-                const response = await fetch('/api/mi-perfil', {
+                const API_URL = "{{ url('/api') }}";
+                const response = await fetch(`${API_URL}/mi-perfil`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
