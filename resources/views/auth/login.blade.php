@@ -78,8 +78,11 @@
                                 <a href="{{ route('password.request') }}" class="small text-muted text-decoration-none">¿Olvidó su contraseña?</a>
                             @endif
                         </div>
-                        <input type="password" name="password" class="form-control input-metra" placeholder="••••••••" minlength="8" maxlength="32" required 
-                            autocomplete="current-password" oninput="this.value = this.value.trim()">
+                        <div class="position-relative">
+                            <input type="password" name="password" class="form-control input-metra pe-5" placeholder="••••••••" minlength="8" maxlength="32" required 
+                                autocomplete="current-password" oninput="this.value = this.value.trim()">
+                            <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 text-muted toggle-password" style="cursor: pointer; z-index: 10;"></i>
+                        </div>
                         @error('password')
                             <span class="text-danger small mt-1 d-block">{{ $message }}</span>
                         @enderror
@@ -184,6 +187,22 @@ window.handleCredentialResponse = async function(response) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    const togglePasswords = document.querySelectorAll('.toggle-password');
+    togglePasswords.forEach(icon => {
+        icon.addEventListener('click', function() {
+            const input = this.previousElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                this.classList.remove('bi-eye-slash');
+                this.classList.add('bi-eye');
+            } else {
+                input.type = 'password';
+                this.classList.remove('bi-eye');
+                this.classList.add('bi-eye-slash');
+            }
+        });
+    });
+
     const initGoogle = setInterval(() => {
         if (typeof google !== 'undefined' && google.accounts) {
             clearInterval(initGoogle);
