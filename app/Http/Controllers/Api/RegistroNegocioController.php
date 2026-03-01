@@ -111,9 +111,6 @@ class RegistroNegocioController extends Controller
                 'monto'       => $plan->precio,
             ]);
 
-            // 5. Enviar correo de activación (cuando el superadmin apruebe)
-            // Por ahora guardamos el token y enviamos el correo al aprobarse
-            // Mail::to($gerente->email)->send(new ActivacionCuentaMail($token, $gerente->email));
 
             return [
                 'cafeteria_id' => $cafeteria->id,
