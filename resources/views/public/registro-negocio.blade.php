@@ -168,40 +168,40 @@
             </div>
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                    <label class="form-label fw-semibold">Calle</label>
-                    <input type="text" class="form-metra w-100" id="calle" placeholder="Av. Principal" maxlength="100">
+                    <label class="form-label fw-semibold">Calle *</label>
+                    <input type="text" class="form-metra w-100" id="calle" placeholder="Av. Principal" maxlength="100" required>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label fw-semibold">Núm. Ext.</label>
-                    <input type="text" class="form-metra w-100" id="num_exterior" placeholder="123" maxlength="10">
+                    <label class="form-label fw-semibold">Núm. Ext. *</label>
+                    <input type="text" class="form-metra w-100" id="num_exterior" placeholder="123" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-semibold">Núm. Int. (Opc)</label>
-                    <input type="text" class="form-metra w-100" id="num_interior" placeholder="Int 4" maxlength="10">
+                    <input type="text" class="form-metra w-100" id="num_interior" placeholder="Int 4" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 </div>
             </div>
             <div class="row g-3 mb-4">
                 <div class="col-md-3">
-                    <label class="form-label fw-semibold">Colonia</label>
-                    <input type="text" class="form-metra w-100" id="colonia" placeholder="Centro" maxlength="80">
+                    <label class="form-label fw-semibold">Colonia *</label>
+                    <input type="text" class="form-metra w-100" id="colonia" placeholder="Centro" maxlength="80" required>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label fw-semibold">Ciudad</label>
-                    <input type="text" class="form-metra w-100" id="ciudad" placeholder="Tehuacán" maxlength="80">
+                    <label class="form-label fw-semibold">Ciudad *</label>
+                    <input type="text" class="form-metra w-100" id="ciudad" placeholder="Tehuacán" maxlength="80" required>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label fw-semibold">Estado</label>
-                    <input type="text" class="form-metra w-100" id="estado_republica" placeholder="Puebla" maxlength="80">
+                    <label class="form-label fw-semibold">Estado *</label>
+                    <input type="text" class="form-metra w-100" id="estado_republica" placeholder="Puebla" maxlength="80" required>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label fw-semibold">C.P.</label>
-                    <input type="text" class="form-metra w-100" id="cp" placeholder="75700" maxlength="10">
+                    <label class="form-label fw-semibold">C.P. *</label>
+                    <input type="text" class="form-metra w-100" id="cp" placeholder="75700" maxlength="5" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
                 </div>
             </div>
             <div class="row g-3 mb-4">
                 <div class="col-md-12">
-                    <label class="form-label fw-semibold">Teléfono</label>
-                    <input type="tel" class="form-metra w-100" id="telefono" placeholder="238 100 0000" maxlength="20" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    <label class="form-label fw-semibold">Teléfono *</label>
+                    <input type="tel" class="form-metra w-100" id="telefono" placeholder="238 100 0000" maxlength="10" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
                 </div>
             </div>
             <div class="d-flex justify-content-end mt-2">
@@ -228,11 +228,17 @@
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Contraseña *</label>
-                    <input type="password" class="form-metra w-100" id="gerente_password" placeholder="Mínimo 8 caracteres" minlength="8" required>
+                    <div class="position-relative">
+                        <input type="password" class="form-metra w-100 pe-5" id="gerente_password" placeholder="Mínimo 8 caracteres" minlength="8" required>
+                        <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 text-muted toggle-password" style="cursor: pointer; z-index: 10;"></i>
+                    </div>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Confirmar contraseña *</label>
-                    <input type="password" class="form-metra w-100" id="gerente_password_confirmation" placeholder="Repite tu contraseña" minlength="8" required>
+                    <div class="position-relative">
+                        <input type="password" class="form-metra w-100 pe-5" id="gerente_password_confirmation" placeholder="Repite tu contraseña" minlength="8" required>
+                        <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 text-muted toggle-password" style="cursor: pointer; z-index: 10;"></i>
+                    </div>
                 </div>
             </div>
             
@@ -385,22 +391,28 @@
         setTimeout(() => goToStep(2), 500);
     }
 
-    /* WIZARD LOGIC */
     function validarPaso1() {
         const nombre = document.getElementById('nombre').value.trim();
-        const telefono = document.getElementById('telefono').value.trim();
+        const calle = document.getElementById('calle').value.trim();
+        const num_exterior = document.getElementById('num_exterior').value.trim();
+        const colonia = document.getElementById('colonia').value.trim();
+        const ciudad = document.getElementById('ciudad').value.trim();
+        const estado = document.getElementById('estado_republica').value.trim();
         const cp = document.getElementById('cp').value.trim();
+        const telefono = document.getElementById('telefono').value.trim();
 
-        if (!nombre || nombre.length < 3) {
-            showAlert('El nombre del negocio debe tener al menos 3 caracteres.');
+        if (!nombre || nombre.length < 3 || !calle || !num_exterior || !colonia || !ciudad || !estado || !cp || !telefono) {
+            showAlert('Completa todos los datos obligatorios.');
             return false;
         }
-        if (telefono && telefono.length < 10) {
-            showAlert('El número de teléfono debe tener al menos 10 dígitos.');
+        
+        if (telefono.length !== 10) {
+            showAlert('Revisa los campos marcados. El teléfono debe tener 10 dígitos.');
             return false;
         }
-        if (cp && cp.length < 5) {
-            showAlert('El código postal debe tener al menos 5 dígitos.');
+        
+        if (cp.length !== 5) {
+            showAlert('Revisa los campos marcados. El código postal debe ser de 5 dígitos.');
             return false;
         }
         return true;
@@ -423,17 +435,20 @@
         }
     }
 
-    /* SUBMIT */
     async function registrarNegocio() {
         const name  = document.getElementById('gerente_name').value.trim();
         const email = document.getElementById('gerente_email').value.trim();
         const password = document.getElementById('gerente_password').value;
         const password_confirmation = document.getElementById('gerente_password_confirmation').value;
 
-        if (!name || !email) { showAlert('Completa tu nombre y correo corporativo.'); return; }
-        if (password.length < 8) { showAlert('La contraseña debe tener al menos 8 caracteres.'); return; }
+        if (!name || !email || !password || !password_confirmation) { showAlert('Completa todos los datos obligatorios.'); return; }
+        
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email)) { showAlert('El correo no es válido.'); return; }
+        
+        if (password.length < 8) { showAlert('Revisa los campos marcados. La contraseña debe tener al menos 8 caracteres.'); return; }
         if (password !== password_confirmation) { showAlert('Las contraseñas no coinciden.'); return; }
-        if (!selectedPlanId) { showAlert('Selecciona una propuesta de suscripción.'); return; }
+        if (!selectedPlanId) { showAlert('Completa todos los datos obligatorios (Debes elegir un plan).'); return; }
 
         const btnTxt = document.getElementById('btn-text');
         const btnLd = document.getElementById('btn-loading');
@@ -462,25 +477,18 @@
             const json = await res.json();
             
             if (!res.ok) {
-                let errorMsg = json.message || 'Error en el registro';
-                if (json.errors) {
-                    errorMsg = `<ul class="text-start mb-0" style="color: #D32F2F;">`;
-                    Object.values(json.errors).forEach(errArray => {
-                        errArray.forEach(err => {
-                            errorMsg += `<li>${err}</li>`;
-                        });
-                    });
-                    errorMsg += `</ul>`;
-                    
-                    Swal.fire({
-                        title: 'Datos inválidos',
-                        html: errorMsg,
-                        icon: 'error',
-                        confirmButtonColor: '#382C26'
-                    });
-                    return;
+                let errorMsg = 'Algo salió mal. Intenta de nuevo.';
+                if (res.status === 422 || json.errors || res.status === 400) {
+                    errorMsg = 'Revisa los campos marcados. Podría haber un error en el correo (quizá ya registrado) o datos inválidos.';
                 }
-                throw new Error(errorMsg);
+                
+                Swal.fire({
+                    title: 'Atención',
+                    text: errorMsg,
+                    icon: 'warning',
+                    confirmButtonColor: '#382C26'
+                });
+                return;
             }
             
             registeredCafeteriaId = json.data.cafeteria_id;
@@ -594,8 +602,24 @@
     // Drag N Drop
     const ua = document.getElementById('upload-area');
     ua.addEventListener('dragover', e => { e.preventDefault(); ua.classList.add('dragover'); });
-    ua.addEventListener('dragleave', () => ua.classList.remove('dragover'));
+    ua.addEventListener('dragleave', () => ua.classList.remove('dragover'); });
     ua.addEventListener('drop', e => { e.preventDefault(); ua.classList.remove('dragover'); document.getElementById('comprobante-input').files = e.dataTransfer.files; previewFile(document.getElementById('comprobante-input')); });
+
+    // Contraseñas Toggle Ojo
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('toggle-password')) {
+            const input = e.target.previousElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                e.target.classList.remove('bi-eye-slash');
+                e.target.classList.add('bi-eye');
+            } else {
+                input.type = 'password';
+                e.target.classList.remove('bi-eye');
+                e.target.classList.add('bi-eye-slash');
+            }
+        }
+    });
 
     // Consumo de endpoint de configuración
     async function cargarConfiguracionPago() {

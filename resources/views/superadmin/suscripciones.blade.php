@@ -86,7 +86,7 @@ async function cargarSuscripciones() {
         renderTabla(json.data || []);
     } catch (e) {
         document.getElementById('tabla-suscripciones').innerHTML = 
-            '<tr><td colspan="6" class="text-danger text-center py-4">Error al cargar datos del servidor.</td></tr>';
+            '<tr><td colspan="6" class="text-danger text-center py-4">Ocurrió un problema al procesar la solicitud. Intenta nuevamente.</td></tr>';
     }
 }
 
@@ -140,20 +140,27 @@ async function cambiarEstado(cafeteriaId, nuevoEstado) {
         if (result.isConfirmed) {
             document.getElementById('overlay-loading').style.setProperty('display', 'flex', 'important');
             try {
-                const res  = await fetch(`${API}/superadmin/cafeterias/${cafeteriaId}/estado`, {
+                const endpointAccion = nuevoEstado === 'suspendida' ? 'rechazar' : 'aprobar';
+                const res  = await fetch(`${API}/superadmin/solicitudes/${cafeteriaId}/${endpointAccion}`, {
                     method: 'PATCH',
-                    headers: authHeaders(),
-                    body: JSON.stringify({ estado: nuevoEstado }),
+                    headers: authHeaders()
                 });
-                const json = await res.json();
+                
                 if (!res.ok) { 
-                    Swal.fire('Error', json.message || 'Error al cambiar estado.', 'error'); 
-                    return; 
+                    if(res.status >= 500) {
+                        throw new Error('Ocurrió un problema al procesar la solicitud. Intenta nuevamente.');
+                    }
+                    throw new Error('Algo salió mal. Intenta de nuevo.');
                 }
+                
                 await cargarSuscripciones();
                 Swal.fire('¡Éxito!', `Cafetería ${accion.toLowerCase()} correctamente.`, 'success');
             } catch (e) {
-                Swal.fire('Error', 'Error de conexión.', 'error');
+                if(e.message === 'Ocurrió un problema al procesar la solicitud. Intenta nuevamente.' || e.message === 'Algo salió mal. Intenta de nuevo.') {
+                    Swal.fire('Atención', e.message, 'warning');
+                } else {
+                    Swal.fire('Error de conexión', 'No pudimos conectar con el servidor. Verifica tu internet.', 'error');
+                }
             } finally {
                 document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
             }
@@ -171,7 +178,7 @@ async function verDetalle(cafeteriaId) {
         const res = await fetch(`${API}/superadmin/cafeterias/${cafeteriaId}`, { headers: authHeaders() });
         const json = await res.json();
         if (!res.ok) {
-            body.innerHTML = '<p class="text-danger">Error al cargar detalle.</p>';
+            body.innerHTML = '<p class="text-danger">Algo salió mal. Intenta de nuevo.</p>';
             return;
         }
 
@@ -203,7 +210,7 @@ async function verDetalle(cafeteriaId) {
         `;
 
     } catch (e) {
-        body.innerHTML = '<p class="text-danger">Error de conexión.</p>';
+        body.innerHTML = '<p class="text-danger">No pudimos conectar con el servidor. Verifica tu internet.</p>';
     }
 }
 

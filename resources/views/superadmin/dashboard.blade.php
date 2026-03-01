@@ -222,10 +222,10 @@ async function cargarDashboard() {
     } catch (e) {
         console.error('API Error:', e);
         document.getElementById('tabla-revision').innerHTML =
-            '<div class="text-danger text-center py-3">Error al cargar datos. El servidor está fallando.</div>';
+            '<div class="text-danger text-center py-3">Ocurrió un problema al procesar la solicitud. Intenta nuevamente.</div>';
         
         document.getElementById('tabla-todos').innerHTML = 
-            '<tr><td colspan="5" class="text-danger text-center py-4">Error al cargar datos del servidor.</td></tr>';
+            '<tr><td colspan="5" class="text-danger text-center py-4">Ocurrió un problema al procesar la solicitud. Intenta nuevamente.</td></tr>';
     } finally {
         document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
     }
@@ -357,18 +357,23 @@ function accionSolicitud(cafeteriaId, accion) {
                     method: 'PATCH',
                     headers: authHeaders()
                 });
-                const json = await res.json();
                 
                 if (!res.ok) { 
-                    Swal.fire('Error', json.message || `Ocurrió un error al ${finalTexto.toLowerCase()} la solicitud.`, 'error');
-                    return; 
+                    if(res.status >= 500) {
+                        throw new Error('Ocurrió un problema al procesar la solicitud. Intenta nuevamente.');
+                    }
+                    throw new Error('Algo salió mal. Intenta de nuevo.');
                 }
                 
                 await cargarDashboard();
                 Swal.fire('¡Listo!', `La solicitud fue ${finalTexto === 'Aprobar' ? 'aprobada' : (finalTexto === 'Suspender' ? 'suspendida' : 'rechazada')} con éxito.`, 'success');
                 
             } catch (e) {
-                Swal.fire('Error de conexión', 'Revisa tu conexión a internet o intenta más tarde.', 'error');
+                if(e.message === 'Ocurrió un problema al procesar la solicitud. Intenta nuevamente.' || e.message === 'Algo salió mal. Intenta de nuevo.') {
+                    Swal.fire('Atención', e.message, 'warning');
+                } else {
+                    Swal.fire('Error de conexión', 'No pudimos conectar con el servidor. Verifica tu internet.', 'error');
+                }
             } finally {
                 document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
             }
@@ -392,7 +397,7 @@ async function verComprobante(cafeteriaId) {
         const json = await res.json();
         if (!res.ok || !json.data?.comprobante_url) {
             document.getElementById('modal-comprobante-body').innerHTML =
-                '<p class="text-danger">No se pudo cargar el comprobante.</p>';
+                '<p class="text-danger">Algo salió mal. Intenta de nuevo.</p>';
             return;
         }
         const url = json.data.comprobante_url;
@@ -403,7 +408,7 @@ async function verComprobante(cafeteriaId) {
                </a>`
             : `<img src="${url}" class="comprobante-img" alt="Comprobante">`;
     } catch (e) {
-        document.getElementById('modal-comprobante-body').innerHTML = '<p class="text-danger">Error de conexión.</p>';
+        document.getElementById('modal-comprobante-body').innerHTML = '<p class="text-danger">No pudimos conectar con el servidor. Verifica tu internet.</p>';
     }
 }
 
@@ -429,23 +434,19 @@ async function crearNegocioManual() {
             headers: authHeaders(),
             body: JSON.stringify({ nombre, gerente: { name, email } }),
         });
-        const json = await res.json();
+        
         if (!res.ok) {
-            const msgs = json.errors ? Object.values(json.errors).flat().join(' | ') : json.message;
-            Swal.fire({ title: 'Error', text: msgs, icon: 'error', confirmButtonColor: '#382C26' });
-            document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
-            return;
+            if(res.status >= 500) throw new Error('Ocurrió un problema al procesar la solicitud. Intenta nuevamente.');
+            throw new Error('Algo salió mal. Intenta de nuevo.');
         }
 
+        const json = await res.json();
         const cafeId = json.data.cafeteria.id;
         const resPlan = await fetch(`${API}/superadmin/suscripciones`, {
             method: 'POST',
             headers: authHeaders(),
             body: JSON.stringify({ cafe_id: cafeId, plan_id: plan_id })
         });
-        if (!resPlan.ok) {
-            console.error('No se pudo asignar el plan automáticamente');
-        }
 
         bootstrap.Modal.getInstance(document.getElementById('nuevoNegocio')).hide();
         document.getElementById('m-nombre').value = '';
@@ -454,7 +455,11 @@ async function crearNegocioManual() {
         await cargarDashboard();
         Swal.fire({ title: '¡Éxito!', text: 'El negocio ha sido registrado.', icon: 'success', confirmButtonColor: '#382C26' });
     } catch (e) {
-        Swal.fire({ title: 'Error', text: 'Error de conexión.', icon: 'error', confirmButtonColor: '#382C26' });
+        if(e.message === 'Ocurrió un problema al procesar la solicitud. Intenta nuevamente.' || e.message === 'Algo salió mal. Intenta de nuevo.') {
+            Swal.fire('Atención', e.message, 'warning');
+        } else {
+            Swal.fire('Error de conexión', 'No pudimos conectar con el servidor. Verifica tu internet.', 'error');
+        }
     } finally {
         document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
     }
