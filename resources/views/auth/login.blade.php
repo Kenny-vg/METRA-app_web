@@ -159,13 +159,24 @@ window.handleCredentialResponse = async function(response) {
             } catch(e) {}
         } else {
             console.error('Error Google Login backend');
-            Swal.fire({
-                icon: 'error',
-                title: 'Error de Autenticación',
-                text: 'Fallo al iniciar sesión con Google.',
-                confirmButtonColor: '#382C26',
-                confirmButtonText: 'Aceptar'
-            });
+            if (res.status === 422) {
+                const json = await res.json();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atención',
+                    text: json.message || 'Primero debes crear tu cuenta usando el formulario de registro.',
+                    confirmButtonColor: '#382C26',
+                    confirmButtonText: 'Entendido'
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de Autenticación',
+                    text: 'Fallo al iniciar sesión con Google.',
+                    confirmButtonColor: '#382C26',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
         }
     } catch (error) {
         console.error('API Error', error);

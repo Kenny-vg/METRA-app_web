@@ -127,23 +127,38 @@ function renderTabla(suscripciones) {
 
 async function cambiarEstado(cafeteriaId, nuevoEstado) {
     const accion = nuevoEstado === 'suspendida' ? 'SUSPENDER' : 'REACTIVAR';
-    if (!confirm(`¿Deseas ${accion} esta cafetería?`)) return;
-
-    document.getElementById('overlay-loading').style.setProperty('display', 'flex', 'important');
-    try {
-        const res  = await fetch(`${API}/superadmin/cafeterias/${cafeteriaId}/estado`, {
-            method: 'PATCH',
-            headers: authHeaders(),
-            body: JSON.stringify({ estado: nuevoEstado }),
-        });
-        const json = await res.json();
-        if (!res.ok) { alert(json.message || 'Error al cambiar estado.'); return; }
-        await cargarSuscripciones();
-    } catch (e) {
-        alert('Error de conexión.');
-    } finally {
-        document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
-    }
+    
+    Swal.fire({
+        title: `¿Deseas ${accion} esta cafetería?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#382C26',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: `Sí, ${accion.toLowerCase()}`,
+        cancelButtonText: 'Cancelar'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            document.getElementById('overlay-loading').style.setProperty('display', 'flex', 'important');
+            try {
+                const res  = await fetch(`${API}/superadmin/cafeterias/${cafeteriaId}/estado`, {
+                    method: 'PATCH',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ estado: nuevoEstado }),
+                });
+                const json = await res.json();
+                if (!res.ok) { 
+                    Swal.fire('Error', json.message || 'Error al cambiar estado.', 'error'); 
+                    return; 
+                }
+                await cargarSuscripciones();
+                Swal.fire('¡Éxito!', `Cafetería ${accion.toLowerCase()} correctamente.`, 'success');
+            } catch (e) {
+                Swal.fire('Error', 'Error de conexión.', 'error');
+            } finally {
+                document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
+            }
+        }
+    });
 }
 
 async function verDetalle(cafeteriaId) {

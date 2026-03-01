@@ -51,17 +51,6 @@
                 <button type="submit" class="btn-metra-main w-100 rounded-3">
                     Crear mi cuenta
                 </button>
-                
-                <div class="my-4 d-flex align-items-center">
-                    <hr class="flex-grow-1 opacity-25">
-                    <span class="mx-3 small text-muted">o regístrate con</span>
-                    <hr class="flex-grow-1 opacity-25">
-                </div>
-
-                <button type="button" id="customGoogleBtn" class="btn btn-outline-dark w-100 rounded-pill py-2 shadow-sm">
-                    <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" class="me-2">
-                     Google
-                </button>
             </form>
 
             <div class="mt-5">
@@ -74,63 +63,7 @@
 
     @include('partials.footer')
 
-<script src="https://accounts.google.com/gsi/client" async></script>
 <script>
-let tokenClient;
-
-document.addEventListener('DOMContentLoaded', function() {
-    tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: "{{ env('GOOGLE_CLIENT_ID') }}",
-        scope: 'email profile',
-        callback: async (tokenResponse) => {
-            if (tokenResponse && tokenResponse.access_token) {
-                try {
-                    const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                        headers: { 'Authorization': 'Bearer ' + tokenResponse.access_token }
-                    });
-                    const userInfo = await userInfoRes.json();
-                    
-                    const API_URL = "{{ url('/api') }}";
-                    const res = await fetch(`${API_URL}/auth/google`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            email: userInfo.email,
-                            name: userInfo.name,
-                            google_id: userInfo.sub,
-                            avatar: userInfo.picture
-                        })
-                    });
-
-                    if (res.ok) {
-                        const result = await res.json();
-                        try {
-                            localStorage.setItem('token', result.data.token);
-                            const role = result.data.usuario.role;
-                            if(role === 'superadmin') window.location.href = '/superadmin/dashboard';
-                            else if(role === 'gerente') window.location.href = '/admin/dashboard';
-                            else window.location.href = '/public/perfil';
-                        } catch(e) {}
-                    } else {
-                        alert('Fallo al iniciar sesión con Google.');
-                    }
-                } catch (error) {
-                    console.error('API Error', error);
-                    alert('Error comunicando con Google o el servidor.');
-                }
-            }
-        }
-    });
-
-    const customGoogleBtn = document.getElementById('customGoogleBtn');
-    if (customGoogleBtn) {
-        customGoogleBtn.addEventListener('click', () => {
-            tokenClient.requestAccessToken();
-        });
-    }
 
     const togglePasswords = document.querySelectorAll('.toggle-password');
     togglePasswords.forEach(icon => {

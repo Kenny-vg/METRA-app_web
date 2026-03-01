@@ -23,19 +23,17 @@ class GoogleController extends Controller
 
         $user = User::where('email',$data['email'])->first();
 
+        if (!$user) {
+            return ApiResponse::error(
+                'Primero debes registrarte con email y contraseña',
+                422
+            );
+        }
+        
         if($user){
             $user->update([
                 'google_id'=>$data['google_id'],
                 'avatar'=>$data['avatar']
-            ]);
-        } else {
-            $user = User::create([
-                'name'=>$data['name'],
-                'email'=>$data['email'],
-                'password'=>Hash::make(Str::random(40)),
-                'google_id'=>$data['google_id'],
-                'role'=>'cliente',
-                'estado'=>true
             ]);
         }
         
