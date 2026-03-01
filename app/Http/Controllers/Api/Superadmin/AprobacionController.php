@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use App\Models\Cafeteria;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CuentaActivadaMail;
 
 class AprobacionController extends Controller
 {
@@ -26,6 +28,11 @@ class AprobacionController extends Controller
             'estado_pago'=>'pagado',
             'fecha_validacion'=>now(),
         ]);
+
+        if ($cafeteria->gerente) {
+            Mail::to($cafeteria->gerente->email)
+                ->send(new CuentaActivadaMail());
+        }
 
         return ApiResponse::success(
             $cafeteria->load(['gerente','suscripcionActual.plan']),

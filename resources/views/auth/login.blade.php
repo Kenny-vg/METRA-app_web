@@ -64,8 +64,8 @@
                     @csrf 
                     <div class="text-start mb-3">
                         <label class="form-label small fw-bold" style="color: var(--black-primary);">Correo Electrónico</label>
-                        <input type="email" name="email" class="form-control input-metra" placeholder="nombre@correo.com" maxlength="255" required 
-                            value="{{ old('email') }}" autofocus>
+                        <input type="email" name="email" class="form-control input-metra" placeholder="nombre@correo.com" maxlength="100" required 
+                            value="{{ old('email') }}" autofocus oninput="this.value = this.value.trim()">
                         @error('email')
                             <span class="text-danger small mt-1 d-block">{{ $message }}</span>
                         @enderror
@@ -78,8 +78,8 @@
                                 <a href="{{ route('password.request') }}" class="small text-muted text-decoration-none">¿Olvidó su contraseña?</a>
                             @endif
                         </div>
-                        <input type="password" name="password" class="form-control input-metra" placeholder="••••••••" minlength="8" required 
-                            autocomplete="current-password">
+                        <input type="password" name="password" class="form-control input-metra" placeholder="••••••••" minlength="8" maxlength="32" required 
+                            autocomplete="current-password" oninput="this.value = this.value.trim()">
                         @error('password')
                             <span class="text-danger small mt-1 d-block">{{ $message }}</span>
                         @enderror

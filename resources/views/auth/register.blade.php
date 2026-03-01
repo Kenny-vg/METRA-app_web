@@ -24,27 +24,27 @@
             <form id="registerForm">
                 <div class="text-start mb-3">
                     <label class="form-label small fw-bold" style="color: var(--black-primary);">Nombre Completo</label>
-                    <input type="text" name="name" class="form-control input-metra" placeholder="Ej. Cristina Juárez" maxlength="100" required>
+                    <input type="text" name="name" class="form-control input-metra" placeholder="Ej. Cristina Juárez" maxlength="50" required oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')">
                 </div>
 
                 <div class="text-start mb-3">
                     <label class="form-label small fw-bold" style="color: var(--black-primary);">Correo Electrónico</label>
-                    <input type="email" name="email" class="form-control input-metra" placeholder="tu@correo.com" maxlength="255" required>
+                    <input type="email" name="email" class="form-control input-metra" placeholder="tu@correo.com" maxlength="100" required oninput="this.value = this.value.trim()">
                 </div>
 
                 <div class="text-start mb-3">
                     <label class="form-label small fw-bold" style="color: var(--black-primary);">Contraseña</label>
                     <div class="position-relative">
-                        <input type="password" name="password" class="form-control input-metra pe-5" placeholder="••••••••" minlength="8" required>
-                        <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 text-muted toggle-password" style="cursor: pointer;"></i>
+                        <input type="password" name="password" class="form-control input-metra pe-5" placeholder="••••••••" minlength="8" maxlength="32" required oninput="this.value = this.value.trim()">
+                        <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 text-muted toggle-password" style="cursor: pointer; z-index: 10;"></i>
                     </div>
                 </div>
 
                 <div class="text-start mb-4">
                     <label class="form-label small fw-bold" style="color: var(--black-primary);">Confirmar Contraseña</label>
                     <div class="position-relative">
-                        <input type="password" name="password_confirmation" class="form-control input-metra pe-5" placeholder="••••••••" minlength="8" required>
-                        <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 text-muted toggle-password" style="cursor: pointer;"></i>
+                        <input type="password" name="password_confirmation" class="form-control input-metra pe-5" placeholder="••••••••" minlength="8" maxlength="32" required oninput="this.value = this.value.trim()">
+                        <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 text-muted toggle-password" style="cursor: pointer; z-index: 10;"></i>
                     </div>
                 </div>
 
@@ -64,7 +64,7 @@
     @include('partials.footer')
 
 <script>
-
+document.addEventListener('DOMContentLoaded', function() {
     const togglePasswords = document.querySelectorAll('.toggle-password');
     togglePasswords.forEach(icon => {
         icon.addEventListener('click', function() {
