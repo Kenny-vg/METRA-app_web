@@ -13,13 +13,14 @@ class CuentaActivadaMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $loginUrl;
+
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct($loginUrl = null)
     {
-        //
-        
+        $this->loginUrl = $loginUrl ?? url('/login');
     }
 
     /**

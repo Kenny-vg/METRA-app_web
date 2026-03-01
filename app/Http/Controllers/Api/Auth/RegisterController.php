@@ -16,7 +16,7 @@ class RegisterController extends Controller
         $data = $request->validate([
             'name'=>'required|string|max:100',
             'email'=>'required|email|unique:users,email',
-            'password'=>'required|min:6'
+            'password'=>'required|min:8'
         ], [
             'name.required' => 'El nombre es obligatorio.',
             'name.max' => 'El nombre no debe exceder los 100 caracteres.',
@@ -24,7 +24,7 @@ class RegisterController extends Controller
             'email.email' => 'El correo electrónico no tiene un formato válido.',
             'email.unique' => 'El correo electrónico ya se encuentra registrado.',
             'password.required' => 'La contraseña es obligatoria.',
-            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
         ]);
 
         $user = User::create([
@@ -45,7 +45,7 @@ class RegisterController extends Controller
         $data = $request->validate([
             'email'=>'required|email',
             'token'=>'required',
-            'password'=>'requiired|min:6'
+            'password'=>'required|min:8'
         ]);
 
         $user= User::where('email',$data['email'])
@@ -62,7 +62,7 @@ class RegisterController extends Controller
             'estado'=>true
         ]);
 
-        return ApiResonse::success([
+        return ApiResponse::success([
             'usuario'=>$user
         ], 'Cuenta activada correctamente');
     }

@@ -44,6 +44,16 @@ Route::get('/register', function () {
     return view('auth.register');
 })->name('register');
 
+// Olvidé mi contraseña (vista)
+Route::get('/forgot-password', function () {
+    return view('auth.forgot-password');
+})->name('password.request');
+
+// Restablecer contraseña (vista)
+Route::get('/reset-password', function () {
+    return view('auth.reset-password');
+})->name('password.reset');
+
 // Logout manejado por frontend API
 Route::get('/logout', function () {
     return redirect('/login');

@@ -3,8 +3,8 @@
 
 @section('content')
     <header class="mb-5 border-bottom pb-4" style="border-color: var(--border-light) !important;">
-        <h2 class="fw-bold" style="color: var(--black-primary); font-family: 'Inter', sans-serif; letter-spacing: -1px;">Configuración de Ecosistema</h2>
-        <p class="m-0" style="color: var(--text-muted); font-size: 0.95rem;">Gestiona la identidad pública y oferta de Café Central.</p>
+        <h2 class="fw-bold" style="color: var(--black-primary); font-family: 'Inter', sans-serif; letter-spacing: -1px;">Configuración de mi Negocio</h2>
+        <p class="m-0" style="color: var(--text-muted); font-size: 0.95rem;">Gestiona la identidad pública y los datos de contacto de tu establecimiento.</p>
     </header>
 
     <style>
@@ -26,12 +26,12 @@
                     
                     <div class="mb-4">
                         <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Nombre del establecimiento</label>
-                        <input type="text" class="form-control border-0 shadow-sm rounded-3 p-3" name="nombre_franquicia" value="Café Central Tehuacán" maxlength="100" style="background: var(--off-white); font-weight: 500; color: var(--black-primary);">
+                        <input type="text" class="form-control border-0 shadow-sm rounded-3 p-3" name="nombre_franquicia" value="" placeholder="Cargando..." maxlength="100" style="background: var(--off-white); font-weight: 500; color: var(--black-primary);">
                     </div>
                     
                     <div class="mb-3">
                         <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Descripción del establecimiento</label>
-                        <textarea class="form-control border-0 shadow-sm rounded-3 p-3" name="descripcion" rows="4" maxlength="255" style="background: var(--off-white); font-weight: 400; color: var(--text-main); line-height: 1.6;">Fusionamos granos locales con panadería artesanal. Un ambiente perfecto para trabajar o reunirse con amigos en el corazón de la ciudad.</textarea>
+                        <textarea class="form-control border-0 shadow-sm rounded-3 p-3" name="descripcion" rows="4" maxlength="255" placeholder="Escribe aquí la descripción de tu negocio..." style="background: var(--off-white); font-weight: 400; color: var(--text-main); line-height: 1.6;"></textarea>
                     </div>
                 </div>
 
@@ -81,7 +81,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Teléfono</label>
-                            <input type="tel" name="telefono" class="form-control border-0 shadow-sm rounded-3 p-3" value="238 123 4567" maxlength="20" inputmode="numeric" pattern="[0-9\s\-\+]+" style="background: var(--off-white);">
+                            <input type="tel" name="telefono" class="form-control border-0 shadow-sm rounded-3 p-3" value="" placeholder="Ej. 238 000 0000" maxlength="20" inputmode="numeric" pattern="[0-9\s\-\+]+" style="background: var(--off-white);">
                         </div>
                     </div>
                 </div>
@@ -91,12 +91,18 @@
                 <!-- Portafolio Visual -->
                 <div class="card border-0 p-4 p-md-5 rounded-4 mb-4 premium-card">
                     <h5 class="fw-bold mb-4 text-dark" style="letter-spacing: -0.5px;"><i class="bi bi-image me-2" style="color: var(--accent-gold);"></i>Imagen Principal del Negocio</h5>
-                    <div style="position: relative; border-radius: 12px; overflow: hidden; margin-bottom: 16px; background: var(--off-white); min-height: 200px; cursor: pointer;" onclick="document.getElementById('inputFoto').click()">
+                    <div id="container-foto" style="position: relative; border-radius: 12px; overflow: hidden; margin-bottom: 16px; background: #f0f0f0; min-height: 200px; cursor: pointer; display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('inputFoto').click()">
                         <img id="previewFoto"
-                             src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800"
-                             class="img-fluid w-100" style="object-fit: cover; height: 200px; transition: opacity 0.2s;">
-                        <div style="position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.35) 0%, transparent 60%); pointer-events: none;"></div>
-                        <div style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.55); color: #fff; font-size: 0.78rem; font-weight: 600; padding: 5px 14px; border-radius: 50px; white-space: nowrap; pointer-events: none;">
+                             src=""
+                             class="img-fluid w-100 d-none" style="object-fit: cover; height: 200px; transition: opacity 0.2s;">
+                        
+                        <div id="placeholder-foto" class="text-center p-4">
+                            <i class="bi bi-cloud-arrow-up fs-1 text-muted"></i>
+                            <p class="text-muted small fw-bold mt-2">Haz clic para subir una foto <br>de tu establecimiento</p>
+                        </div>
+
+                        <div id="overlay-foto" class="d-none" style="position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.35) 0%, transparent 60%); pointer-events: none;"></div>
+                        <div id="label-foto" class="d-none" style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.55); color: #fff; font-size: 0.78rem; font-weight: 600; padding: 5px 14px; border-radius: 50px; white-space: nowrap; pointer-events: none;">
                             <i class="bi bi-pencil me-1"></i>Cambiar imagen
                         </div>
                     </div>
@@ -104,31 +110,14 @@
                     <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i>JPG o PNG · Máx. 2 MB. Esta imagen aparece en la página pública de tu cafetería.</p>
                 </div>
 
-                <!-- Highlights Menú -->
-                <div class="card border-0 p-4 p-md-5 rounded-4 mb-4 premium-card">
-                    <h5 class="fw-bold mb-4 text-dark" style="letter-spacing: -0.5px;"><i class="bi bi-star me-2" style="color: var(--accent-gold);"></i>Destacados Menú</h5>
-                    
-                    <div class="d-flex align-items-center mb-3 p-2 rounded-3" style="border: 1px solid var(--border-light); background: var(--off-white);">
-                        <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=100" class="rounded-2 me-3" width="50" style="height: 50px; object-fit: cover;">
-                        <div class="flex-grow-1">
-                            <p class="mb-0 fw-bold small text-dark">Expreso Doble Origen</p>
-                            <span class="badge" style="background: var(--white-pure); color: var(--text-muted); border: 1px solid var(--border-light); font-size: 0.6rem;">Item Frecuente</span>
+                <div class="alert alert-info border-0 rounded-4 p-4 shadow-sm" style="background: rgba(212, 175, 55, 0.08);">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-info-circle-fill fs-4 me-3" style="color: var(--accent-gold);"></i>
+                        <div>
+                            <h6 class="fw-bold mb-1" style="color: var(--black-primary);">Recordatorio</h6>
+                            <p class="small mb-0 text-muted">Si realizas cualquier cambio en tu información, debes presionar el botón <strong>Guardar Cambios</strong> al final de la página para que se apliquen correctamente.</p>
                         </div>
-                        <button class="btn btn-link text-danger p-0 ms-2"><i class="bi bi-x-circle"></i></button>
                     </div>
-                    
-                    <div class="d-flex align-items-center mb-4 p-2 rounded-3" style="border: 1px solid var(--border-light); background: transparent;">
-                        <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=100" class="rounded-2 me-3" width="50" style="height: 50px; object-fit: cover;">
-                        <div class="flex-grow-1">
-                            <p class="mb-0 fw-bold small text-dark">Chilaquiles Suizos VIP</p>
-                            <span class="badge" style="background: var(--white-pure); color: var(--text-muted); border: 1px solid var(--border-light); font-size: 0.6rem;">Item Frecuente</span>
-                        </div>
-                         <button class="btn btn-link text-danger p-0 ms-2"><i class="bi bi-x-circle"></i></button>
-                    </div>
-                    
-                    <button type="button" class="btn-admin-secondary w-100 py-2">
-                        <i class="bi bi-plus me-1"></i>Incorporar Platillo
-                    </button>
                 </div>
 
 
@@ -181,6 +170,15 @@
                 if (cafe.telefono) document.querySelector('input[name="telefono"]').value = cafe.telefono;
                 if (cafe.foto_url) {
                     document.getElementById('previewFoto').src = '/storage/' + cafe.foto_url + '?v=' + new Date().getTime();
+                    document.getElementById('previewFoto').classList.remove('d-none');
+                    document.getElementById('placeholder-foto').classList.add('d-none');
+                    document.getElementById('overlay-foto').classList.remove('d-none');
+                    document.getElementById('label-foto').classList.remove('d-none');
+                } else {
+                    document.getElementById('previewFoto').classList.add('d-none');
+                    document.getElementById('placeholder-foto').classList.remove('d-none');
+                    document.getElementById('overlay-foto').classList.add('d-none');
+                    document.getElementById('label-foto').classList.add('d-none');
                 }
                 
             } catch (e) {
@@ -198,7 +196,14 @@
                 return;
             }
             const reader = new FileReader();
-            reader.onload = e => { document.getElementById('previewFoto').src = e.target.result; };
+            reader.onload = e => { 
+                const preview = document.getElementById('previewFoto');
+                preview.src = e.target.result;
+                preview.classList.remove('d-none');
+                document.getElementById('placeholder-foto').classList.add('d-none');
+                document.getElementById('overlay-foto').classList.remove('d-none');
+                document.getElementById('label-foto').classList.remove('d-none');
+            };
             reader.readAsDataURL(file);
         });
 

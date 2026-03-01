@@ -36,7 +36,7 @@
                         Ya puedes acceder al panel de administración para empezar a gestionar tus reservas y personalizar tu negocio dentro de la plataforma METRA.
                     </p>
                     <div class="btn-container">
-                        <a href="{{ url('/login') }}" class="btn">Ingresar al panel</a>
+                        <a href="{{ $loginUrl ?? url('/login') }}" class="btn">Ingresar al panel</a>
                     </div>
                     <p class="text" style="font-size: 14px; margin-bottom: 0;">
                         Si tienes algún problema para acceder, no dudes en contactar a nuestro soporte técnico.

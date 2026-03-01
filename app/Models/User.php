@@ -23,7 +23,8 @@ class User extends Authenticatable
         'cafe_id',
         'estado',
         'google_id',
-        'avatar'
+        'avatar',
+        'activation_token'
     ];
 
     //campos que no se devuelven en respuestas JSON

@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\Superadmin\SolicitudesController;
 use App\Http\Controllers\Api\Superadmin\AprobacionController;
 use App\Http\Controllers\Api\Superadmin\CafeteriaController;
 use App\Http\Controllers\Api\Superadmin\ConfiguracionController;
+use App\Http\Controllers\Api\Auth\PasswordResetController;
 /*
 |------------------------------------------
 | RUTAS PÚBLICAS
@@ -29,6 +30,12 @@ Route::post('/register-cliente', [RegisterController::class, 'registerCliente'])
 
 //Login con Google
 Route::post('/auth/google', [GoogleController::class, 'loginGoogle']);
+
+// Olvidé mi contraseña
+Route::post('/forgot-password', [PasswordResetController::class, 'forgotPassword']);
+
+// Restablecer contraseña
+Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
 
 // Planes públicos 
 Route::get('/planes-publicos', [RegistroNegocioController::class, 'planesPublicos']);

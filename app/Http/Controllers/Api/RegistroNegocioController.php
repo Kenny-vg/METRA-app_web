@@ -147,11 +147,11 @@ class RegistroNegocioController extends Controller
         ]);
 
         // Guardar archivo
-        $path = $request->file('comprobante')->store('comprobantes', 'public');
+        $path = $request->file('comprobante')->store('comprobantes');
 
         // Actualizar el comprobante en la cafetería
         $cafeteria->update([
-            'comprobante_url' => $path,
+            ['comprobante_url' =>$path]
         ]);
 
         return ApiResponse::success(

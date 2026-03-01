@@ -366,7 +366,7 @@ function accionSolicitud(cafeteriaId, accion) {
                 }
                 
                 await cargarDashboard();
-                Swal.fire('¡Listo!', `La solicitud fue ${finalTexto === 'Aprobar' ? 'aprobada' : (finalTexto === 'Suspender' ? 'suspendida' : 'rechazada')} con éxito.`, 'success');
+                Swal.fire('¡Listo!', `Cafetería ${finalTexto === 'Aprobar' ? 'aprobada' : (finalTexto === 'Suspender' ? 'suspendida' : 'rechazada')} correctamente.`, 'success');
                 
             } catch (e) {
                 if(e.message === 'Ocurrió un problema al procesar la solicitud. Intenta nuevamente.' || e.message === 'Algo salió mal. Intenta de nuevo.') {

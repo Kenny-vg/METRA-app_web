@@ -81,73 +81,26 @@ class CafeteriaController extends Controller
         );
     }
 
-    /*
-     * Cambiar el estado de una cafetería (superadmin).
-     * Usado para aprobar/rechazar registros en revisión.
-     
-    public function cambiarEstado(Request $request, Cafeteria $cafeteria)
-    {
-        $data = $request->validate([
-            'estado' => 'required|in:activa,suspendida,pendiente,en_revision',
-        ]);
-
-        $cafeteria->update(['estado' => $data['estado']]);
-
-        // aprobado
-        if ($data['estado'] === 'activa' && $cafeteria->gerente) {
-            
-            //activar gerente
-            $cafeteria->gerente->update([
-                'estado'=> 1 //true
-            ]);
-            try {
-                Mail::to($cafeteria->gerente->email)
-                    ->send(new ActivacionCafeteriaMail($cafeteria));
-            } catch (\Exception $e) {
-                \Log::error($e->getMessage());
-            }
-
-            //actualizar suscripcion a pagado
-            optional($cafeteria->suscripcionActual)->update([
-                'estado_pago'      => 'pagado',
-                'fecha_validacion' => now(),
-            ]);
-        } 
-            
-        // Si se rechaza/suspende: desactivar gerente
-        if ($data['estado'] === 'suspendida' && $cafeteria->gerente) {
-            $cafeteria->gerente->update([
-                'estado' => 0 //false
-            ]);
-
-            // cancelar suscripción
-            optional($cafeteria->suscripcionActual)->update([
-                'estado_pago' => 'cancelado'
-            ]);
-        }
-
-        $cafeteria->load(['gerente', 'suscripcionActual.plan']);
-
-        return ApiResponse::success(
-            $cafeteria,
-            'Estado de cafetería actualizado correctamente'
-        );
-    }
-    */
 
     /**
      * Ver URL del comprobante de pago (superadmin).
      */
     public function verComprobante(Cafeteria $cafeteria)
-    {
+{
         if (!$cafeteria->comprobante_url) {
-            return ApiResponse::error('Esta cafetería no tiene comprobante subido', 404);
+            return ApiResponse::error(
+                'Esta cafetería no tiene comprobante',
+                404
+            );
         }
 
-        return ApiResponse::success([
-            'comprobante_url' => Storage::url($cafeteria->comprobante_url),
-            'cafeteria'       => $cafeteria->nombre,
-        ], 'Comprobante encontrado');
+        $path = storage_path('app/'.$cafeteria->comprobante_url);
+
+        if (!file_exists($path)) {
+            return ApiResponse::error('Archivo no encontrado',404);
+        }
+
+        return response()->file($path);
     }
 
 

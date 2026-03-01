@@ -9,21 +9,20 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ActivacionCuentaMail extends Mailable
+class ResetPasswordMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $token;
+    public $url;
     public $email;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($token, $email)
+    public function __construct($url, $email)
     {
-        //
-        $this->token = $token;
-        $this->email = $email; 
+        $this->url = $url;
+        $this->email = $email;
     }
 
     /**
@@ -32,7 +31,7 @@ class ActivacionCuentaMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Activacion de cuenta METRA',
+            subject: 'Restablecer contraseña - METRA',
         );
     }
 
@@ -42,7 +41,7 @@ class ActivacionCuentaMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.activation',
+            view: 'emails.reset-password',
         );
     }
 

@@ -30,8 +30,15 @@ class AprobacionController extends Controller
         ]);
 
         if ($cafeteria->gerente) {
-            Mail::to($cafeteria->gerente->email)
-                ->send(new CuentaActivadaMail());
+            try {
+                $loginUrl = env('FRONTEND_URL', url('/')) . '/login';
+
+                Mail::to($cafeteria->gerente->email)
+                    ->queue(new CuentaActivadaMail($loginUrl));
+
+            } catch (\Throwable $e) {
+                \Log::error("Error enviando mail: ".$e->getMessage());
+            }
         }
 
         return ApiResponse::success(
