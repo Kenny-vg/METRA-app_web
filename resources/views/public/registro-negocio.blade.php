@@ -324,7 +324,7 @@
     let selectedPlanId = null;
     let registeredCafeteriaId = null;
 
-    async function cargarPlanes() {
+    window.cargarPlanes = async function() {
         try {
             const res = await fetch(`${API_BASE}/planes-publicos`);
             const json = await res.json();
@@ -332,14 +332,18 @@
             renderPlanes(planesData);
             renderPlanSelector(planesData);
         } catch (e) {
+            console.error('Error cargando planes:', e);
             document.getElementById('planes-container').innerHTML =
-                '<div class="col-12 text-center text-danger">Error de conectividad al cargar catálogo de planes.</div>';
+                '<div class="col-12 text-center text-danger py-4"><i class="bi bi-exclamation-triangle fs-2 mb-2 d-block"></i> Error de conectividad al cargar catálogo de planes.</div>';
         }
-    }
+    };
 
     function renderPlanes(planes) {
         const container = document.getElementById('planes-container');
-        if (!planes.length) return;
+        if (!planes || planes.length === 0) {
+            container.innerHTML = '<div class="col-12 text-center py-5 text-muted">No hay planes disponibles por el momento.</div>';
+            return;
+        }
         const midIndex = Math.floor(planes.length / 2);
         container.innerHTML = planes.map((plan, i) => {
             const featured = i === midIndex;
@@ -359,7 +363,7 @@
                         <div class="plan-feature"><i class="bi bi-check-circle-fill"></i> Vigencia ${plan.duracion_dias} días</div>
                         <div class="plan-feature"><i class="bi bi-check-circle-fill"></i> Soporte Especializado</div>
                     </div>
-                    <button class="${featured ? 'btn-metra-main' : 'btn-plan-outline'} w-100 mt-auto" style="border-radius: 50px;" onclick="selectPlanAndScroll(${plan.id})">
+                    <button class="${featured ? 'btn-metra-main' : 'btn-plan-outline'} w-100 mt-auto" style="border-radius: 50px;" onclick="window.selectPlanAndScroll(${plan.id})">
                         Seleccionar
                     </button>
                 </div>
@@ -367,9 +371,9 @@
         }).join('');
     }
 
-    function renderPlanSelector(planes) {
+    window.renderPlanSelector = function(planes) {
         document.getElementById('plan-selector').innerHTML = planes.map(plan => `
-            <div class="plan-option d-flex justify-content-between align-items-center" id="po-${plan.id}" onclick="selectPlan(${plan.id})">
+            <div class="plan-option d-flex justify-content-between align-items-center" id="po-${plan.id}" onclick="window.selectPlan(${plan.id})">
                 <div>
                     <div class="fw-bold" style="color: var(--black-primary);">${plan.nombre_plan}</div>
                     <div class="text-muted small">${plan.max_reservas_mes} reservas · ${plan.max_usuarios_admin} admin</div>
@@ -377,78 +381,102 @@
                 <div class="fw-bold fs-5" style="color: var(--accent-gold);">$${parseFloat(plan.precio).toLocaleString('es-MX')}</div>
             </div>
         `).join('');
-    }
+    };
 
-    function selectPlan(id) {
+    window.selectPlan = function(id) {
         selectedPlanId = id;
         document.querySelectorAll('.plan-option').forEach(el => el.classList.remove('selected'));
         document.getElementById(`po-${id}`)?.classList.add('selected');
-    }
+    };
 
-    function selectPlanAndScroll(id) {
-        selectPlan(id);
-        document.getElementById('registro').scrollIntoView({ behavior: 'smooth' });
-        setTimeout(() => goToStep(2), 500);
-    }
+    window.selectPlanAndScroll = function(id) {
+        window.selectPlan(id);
+        const registroSection = document.getElementById('registro');
+        if (registroSection) {
+            registroSection.scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => window.goToStep(2), 500);
+        }
+    };
 
-    function validarPaso1() {
+    window.validarPaso1 = function() {
         const nombre = document.getElementById('nombre').value.trim();
         const calle = document.getElementById('calle').value.trim();
         const num_exterior = document.getElementById('num_exterior').value.trim();
+        const num_interior = document.getElementById('num_interior').value.trim();
         const colonia = document.getElementById('colonia').value.trim();
         const ciudad = document.getElementById('ciudad').value.trim();
         const estado = document.getElementById('estado_republica').value.trim();
         const cp = document.getElementById('cp').value.trim();
         const telefono = document.getElementById('telefono').value.trim();
 
-        if (!nombre || nombre.length < 3 || !calle || !num_exterior || !colonia || !ciudad || !estado || !cp || !telefono) {
-            showAlert('Completa todos los datos obligatorios.');
+        if (!nombre) { showAlert('El nombre del negocio es obligatorio.'); return false; }
+        if (nombre.length < 3) { showAlert('El nombre del negocio debe tener al menos 3 caracteres.'); return false; }
+        if (!calle) { showAlert('La calle es obligatoria.'); return false; }
+        if (!num_exterior) { showAlert('El número exterior es obligatorio.'); return false; }
+        
+        // Validar solo números en campos numéricos
+        const regexNum = /^\d+$/;
+        if (!regexNum.test(num_exterior)) { showAlert('El número exterior debe contener solo números.'); return false; }
+        if (num_interior && !regexNum.test(num_interior)) { showAlert('El número interior debe contener solo números.'); return false; }
+        
+        if (!colonia) { showAlert('La colonia es obligatoria.'); return false; }
+        if (!ciudad) { showAlert('La ciudad es obligatoria.'); return false; }
+        if (!estado) { showAlert('El estado es obligatorio.'); return false; }
+        
+        if (!cp) { showAlert('El código postal es obligatorio.'); return false; }
+        if (cp.length !== 5 || !regexNum.test(cp)) {
+            showAlert('El código postal debe ser de exactamente 5 dígitos numéricos.');
             return false;
         }
         
-        if (telefono.length !== 10) {
-            showAlert('Revisa los campos marcados. El teléfono debe tener 10 dígitos.');
+        if (!telefono) { showAlert('El teléfono es obligatorio.'); return false; }
+        if (telefono.length !== 10 || !regexNum.test(telefono)) {
+            showAlert('El teléfono debe ser de exactamente 10 dígitos numéricos.');
             return false;
         }
         
-        if (cp.length !== 5) {
-            showAlert('Revisa los campos marcados. El código postal debe ser de 5 dígitos.');
-            return false;
-        }
         return true;
-    }
+    };
 
-    function goToStep(step) {
-        if (step === 2 && !validarPaso1()) {
+    window.goToStep = function(step) {
+        if (step === 2 && !window.validarPaso1()) {
             return;
         }
         
-        hideAlert();
         document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
-        document.getElementById(`step-${step}`).classList.add('active');
+        const nextStep = document.getElementById(`step-${step}`);
+        if (nextStep) {
+            nextStep.classList.add('active');
+        }
         
         for (let i = 1; i <= 3; i++) {
             const dot = document.getElementById(`dot-${i}`);
-            dot.classList.remove('active', 'done');
-            if (i < step) dot.classList.add('done');
-            else if (i === step) dot.classList.add('active');
+            if (dot) {
+                dot.classList.remove('active', 'done');
+                if (i < step) dot.classList.add('done');
+                else if (i === step) dot.classList.add('active');
+            }
         }
-    }
+    };
 
-    async function registrarNegocio() {
+    window.registrarNegocio = async function() {
         const name  = document.getElementById('gerente_name').value.trim();
         const email = document.getElementById('gerente_email').value.trim();
         const password = document.getElementById('gerente_password').value;
         const password_confirmation = document.getElementById('gerente_password_confirmation').value;
 
-        if (!name || !email || !password || !password_confirmation) { showAlert('Completa todos los datos obligatorios.'); return; }
+        // Validaciones Paso 2
+        if (!name) { showAlert('El nombre completo es obligatorio.'); return; }
+        if (!email) { showAlert('El correo corporativo es obligatorio.'); return; }
         
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailPattern.test(email)) { showAlert('El correo no es válido.'); return; }
+        if (!emailPattern.test(email)) { showAlert('El formato del correo institucional no es válido.'); return; }
         
-        if (password.length < 8) { showAlert('Revisa los campos marcados. La contraseña debe tener al menos 8 caracteres.'); return; }
-        if (password !== password_confirmation) { showAlert('Las contraseñas no coinciden.'); return; }
-        if (!selectedPlanId) { showAlert('Completa todos los datos obligatorios (Debes elegir un plan).'); return; }
+        if (!password) { showAlert('La contraseña es obligatoria.'); return; }
+        if (password.length < 8) { showAlert('La contraseña debe tener al menos 8 caracteres.'); return; }
+        if (password !== password_confirmation) { showAlert('Las contraseñas no coinciden. Por favor verifica.'); return; }
+        
+        if (!selectedPlanId) { showAlert('Debes seleccionar un plan de suscripción para continuar.'); return; }
 
         const btnTxt = document.getElementById('btn-text');
         const btnLd = document.getElementById('btn-loading');
@@ -547,15 +575,14 @@
         document.getElementById('upload-area').style.display = 'block';
     }
 
-    async function subirComprobante() {
+    window.subirComprobante = async function() {
         const input = document.getElementById('comprobante-input');
-        if (!input.files.length) { showAlert('Por favor selecciona el soporte de pago visual.'); return; }
+        if (!input || !input.files.length) { showAlert('Por favor selecciona el soporte de pago visual.'); return; }
         
         const file = input.files[0];
-        // 5 MB en Bytes
         if (file.size > 5 * 1024 * 1024) { 
             showAlert('El archivo excede el límite de 5MB. Por favor selecciona uno más ligero.'); 
-            input.value = ''; // Limpiar el input
+            input.value = '';
             document.getElementById('file-preview').innerHTML = '';
             return; 
         }
@@ -567,7 +594,7 @@
         const fd = new FormData(); 
         fd.append('comprobante', file);
         if (selectedPlanId) {
-            fd.append('plan_id', selectedPlanId); // <- Se envía siempre junto como solicitaste
+            fd.append('plan_id', selectedPlanId);
         }
 
         try {
@@ -579,14 +606,12 @@
                 throw new Error(json.message || 'Ocurrió un error en la transferencia del archivo.');
             }
             
-            // Go to success
             document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
             document.getElementById('step-success').classList.add('active');
             document.querySelectorAll('.step-dot').forEach(d => { d.classList.remove('active'); d.classList.add('done'); });
-            hideAlert();
         } catch(e) { showAlert(e.message); }
         finally { btnTxt.classList.remove('d-none'); btnLd.classList.add('d-none'); }
-    }
+    };
 
     function showAlert(msg) { 
         Swal.fire({
@@ -602,7 +627,7 @@
     // Drag N Drop
     const ua = document.getElementById('upload-area');
     ua.addEventListener('dragover', e => { e.preventDefault(); ua.classList.add('dragover'); });
-    ua.addEventListener('dragleave', () => ua.classList.remove('dragover'); });
+    ua.addEventListener('dragleave', () => ua.classList.remove('dragover'));
     ua.addEventListener('drop', e => { e.preventDefault(); ua.classList.remove('dragover'); document.getElementById('comprobante-input').files = e.dataTransfer.files; previewFile(document.getElementById('comprobante-input')); });
 
     // Contraseñas Toggle Ojo

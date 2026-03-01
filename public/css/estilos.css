@@ -1115,3 +1115,11 @@ input[type="password"]::-webkit-contacts-auto-fill-button,
 input[type="password"]::-webkit-credentials-auto-fill-button {
     display: none !important;
 }
+
+.toggle-password {
+    color: var(--text-muted) !important;
+    font-size: 1.15rem !important;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    z-index: 20 !important;
+}
