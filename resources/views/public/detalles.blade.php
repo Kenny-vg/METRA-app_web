@@ -166,7 +166,7 @@
                                 <p class="text-muted small mb-0">Elige tu horario y asegura tu lugar.</p>
                             </div>
 
-                            <a href="{{ url('/reservar') }}" class="btn-metra-main w-100 d-flex align-items-center justify-content-center py-3 mb-4" style="border-radius: 12px; font-size: 1rem;">
+                            <a href="{{ url('/reservar') }}" id="btn-reservar-lateral" class="btn-metra-main w-100 d-flex align-items-center justify-content-center py-3 mb-4" style="border-radius: 12px; font-size: 1rem;">
                                 <i class="bi bi-calendar3 me-2"></i>Continuar con la reserva
                             </a>
 
