@@ -37,9 +37,27 @@ class Cafeteria extends Model
     }
 
     public function suscripcionActual()
-{
-    return $this->hasOne(Suscripcion::class, 'cafe_id')
-        ->where('fecha_fin', '>', now())
-        ->latest('fecha_fin');
+    {
+        return $this->hasOne(Suscripcion::class, 'cafe_id')
+            ->where('fecha_fin', '>', now())
+            ->latest('fecha_fin');
+    }
+
+    public function getComprobanteFullUrlAttribute()
+    {
+        $value = $this->attributes['comprobante_url'] ?? null;
+
+        return $value
+            ? url('/api/admin/comprobante/' . $this->id)
+            : null;
+    }
+
+    public function getFotoFullUrlAttribute()
+    {
+        $value = $this->attributes['foto_url'] ?? null;
+
+        return $value
+            ? asset('storage/' . $value)
+            : null;
 }
 }

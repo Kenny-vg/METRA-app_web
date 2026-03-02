@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class RegistroNegocioController extends Controller
 {
@@ -133,30 +132,12 @@ class RegistroNegocioController extends Controller
      */
     public function subirComprobante(Request $request, Cafeteria $cafeteria)
     {
-        
-        if (!in_array($cafeteria->estado, ['en_revision', 'activa', 'suspendida'])) {
-            return ApiResponse::error(
-                'No se puede subir el comprobante de pago en el estado actual',
-                400
-            );
-        }
-        $request->validate([
-            'comprobante' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
-        ]);
+        $file = $request->file('comprobante');
 
-        // Guardar archivo
-        $uploaded = Cloudinary::upload(
-            $request->file('comprobante')->getRealPath(),
-            [
-                'folder' => 'comprobantes'
-            ]
-        );
+        $path = $file->store('comprobantes');
 
-        $path = $uploaded->getSecurePath();
-
-        // Actualizar el comprobante en la cafetería
         $cafeteria->update([
-            'comprobante_url' =>$path
+            'comprobante_url' => $path
         ]);
 
         return ApiResponse::success(
@@ -164,4 +145,6 @@ class RegistroNegocioController extends Controller
             'Comprobante subido correctamente. El equipo revisará tu solicitud.'
         );
     }
+
+    
 }

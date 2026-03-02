@@ -127,6 +127,11 @@ Route::middleware([
     Route::put('/configuracion-pago', [ConfiguracionController::class, 'update']);    
 });
 
+    //VER COMPROBANTE
+    Route::get(
+        '/admin/comprobante/{cafeteria}',
+        [RegistroNegocioController::class, 'verComprobante']
+    )->middleware('auth:sanctum');
 
 /*
 |------------------------------------------

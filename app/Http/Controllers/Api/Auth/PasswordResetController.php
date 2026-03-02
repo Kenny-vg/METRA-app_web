@@ -36,9 +36,19 @@ class PasswordResetController extends Controller
         $url = env('FRONTEND_URL') .
             "/reset-password?token={$token}&email={$user->email}";
 
-        Mail::to($user->email)->send(
-            new ResetPasswordMail($url, $user->email)
-        );
+        try {
+            Mail::to($user->email)->send(
+                new ResetPasswordMail($url, $user->email)
+            );
+        } catch (\Exception $e) {
+            // log para debug
+            \Log::error('Error enviando mail reset: '.$e->getMessage());
+
+            return ApiResponse::error(
+                'No se pudo enviar el correo en este momento.',
+                500
+            );
+        }
 
         return ApiResponse::success([], 'Correo enviado correctamente.');
     }

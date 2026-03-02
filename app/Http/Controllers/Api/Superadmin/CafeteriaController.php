@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ActivacionCafeteriaMail;
 
+
 class CafeteriaController extends Controller
 {
     /**
@@ -86,19 +87,16 @@ class CafeteriaController extends Controller
      * Ver URL del comprobante de pago (superadmin).
      */
     public function verComprobante(Cafeteria $cafeteria)
-{
+    {
         if (!$cafeteria->comprobante_url) {
-            return ApiResponse::error(
-                'Esta cafetería no tiene comprobante',
-                404
-            );
+            return ApiResponse::error('Esta cafetería no tiene comprobante', 404);
         }
 
-        $path = storage_path('app/'.$cafeteria->comprobante_url);
-
-        if (!file_exists($path)) {
-            return ApiResponse::error('Archivo no encontrado',404);
+        if (!Storage::disk('local')->exists($cafeteria->comprobante_url)) {
+            return ApiResponse::error('Archivo no encontrado', 404);
         }
+
+        $path = Storage::disk('local')->path($cafeteria->comprobante_url);
 
         return response()->file($path);
     }
