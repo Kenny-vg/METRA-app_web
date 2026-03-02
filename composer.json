@@ -15,7 +15,10 @@
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.24",
         "laravel/tinker": "^2.10.1",
-        "resend/resend-laravel": "^1.3"
+        "resend/resend-laravel": "^1.3",
+        "symfony/brevo-mailer": "^7.4",
+        "symfony/http-client": "^7.4",
+        "symfony/sendinblue-mailer": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
