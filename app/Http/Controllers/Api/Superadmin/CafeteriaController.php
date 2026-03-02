@@ -88,15 +88,24 @@ class CafeteriaController extends Controller
      */
     public function verComprobante(Cafeteria $cafeteria)
     {
-        if (!$cafeteria->comprobante_url) {
-            return ApiResponse::error('Esta cafetería no tiene comprobante', 404);
+        $comprobante = $cafeteria->comprobante_url;
+
+        // Fallback: Si el negocio no lo tiene directamente, buscar en su última suscripción
+        if (!$comprobante) {
+            $ultimaSub = $cafeteria->suscripciones()->whereNotNull('comprobante_url')->latest()->first();
+            $comprobante = $ultimaSub ? $ultimaSub->comprobante_url : null;
         }
 
-        if (!Storage::disk('local')->exists($cafeteria->comprobante_url)) {
-            return ApiResponse::error('Archivo no encontrado', 404);
+        if (!$comprobante) {
+            return ApiResponse::error('Este negocio no tiene comprobante registrado', 404);
         }
 
-        $path = Storage::disk('local')->path($cafeteria->comprobante_url);
+        $exists = Storage::disk('local')->exists($comprobante);
+        if (!$exists) {
+            return ApiResponse::error('El archivo físico del comprobante no existe en el servidor', 404);
+        }
+
+        $path = Storage::disk('local')->path($comprobante);
 
         return response()->file($path);
     }

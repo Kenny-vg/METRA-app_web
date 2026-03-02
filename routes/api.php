@@ -102,8 +102,16 @@ Route::middleware([
     Route::get('/cafeterias/{cafeteria}/comprobante', [CafeteriaController::class, 'verComprobante']);
 
     Route::get('/suscripciones/{suscripcion}/comprobante', function (\App\Models\Suscripcion $suscripcion) {
-        if (!$suscripcion->comprobante_url) abort(404);
-        return response()->file(storage_path('app/' . $suscripcion->comprobante_url));
+        // Buscar el comprobante en la suscripción o en la cafetería vinculada (por retrocompatibilidad)
+        $comprobante = $suscripcion->comprobante_url ?: ($suscripcion->cafeteria ? $suscripcion->cafeteria->comprobante_url : null);
+        
+        if (!$comprobante) abort(404, 'No hay comprobante registrado');
+        
+        $exists = \Illuminate\Support\Facades\Storage::disk('local')->exists($comprobante);
+        if (!$exists) abort(404, 'Archivo no encontrado físicamente');
+        
+        $path = \Illuminate\Support\Facades\Storage::disk('local')->path($comprobante);
+        return response()->file($path);
     });
 
 

@@ -88,22 +88,22 @@ function renderPlanes() {
                             <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Precio (MXN)</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-0 text-muted">$</span>
-                                <input type="number" step="0.01" min="0" class="form-control bg-light border-0 fw-bold" id="precio-${plan.id}" value="${plan.precio}" required>
+                                <input type="text" inputmode="decimal" class="form-control bg-light border-0 fw-bold" id="precio-${plan.id}" value="${plan.precio}" oninput="validarPrecio(this)" placeholder="0.00" required>
                             </div>
                         </div>
                         <div class="row g-2 mb-3">
                             <div class="col-6">
                                 <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Máx. Reservas</label>
-                                <input type="number" min="0" class="form-control bg-light border-0 text-center" id="reservas-${plan.id}" value="${plan.max_reservas_mes}" required>
+                                <input type="number" min="0" class="form-control bg-light border-0 text-center" id="reservas-${plan.id}" value="${plan.max_reservas_mes}" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                             </div>
                             <div class="col-6">
                                 <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Máx. Admins</label>
-                                <input type="number" min="1" class="form-control bg-light border-0 text-center" id="usuarios-${plan.id}" value="${plan.max_usuarios_admin}" required>
+                                <input type="number" min="1" class="form-control bg-light border-0 text-center" id="usuarios-${plan.id}" value="${plan.max_usuarios_admin}" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Duración (Días)</label>
-                            <input type="number" min="1" class="form-control bg-light border-0" id="duracion-${plan.id}" value="${plan.duracion_dias}" required>
+                            <input type="number" min="1" class="form-control bg-light border-0" id="duracion-${plan.id}" value="${plan.duracion_dias}" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                         </div>
                         <div class="mb-4">
                             <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Descripción</label>
@@ -140,22 +140,22 @@ function renderPlanes() {
                             <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Precio (MXN)</label>
                             <div class="input-group">
                                 <span class="input-group-text text-muted">$</span>
-                                <input type="number" step="0.01" min="0" class="form-control fw-bold" id="precio-nuevo" placeholder="0.00" required>
+                                <input type="text" inputmode="decimal" class="form-control fw-bold" id="precio-nuevo" placeholder="0.00" oninput="validarPrecio(this)" required>
                             </div>
                         </div>
                         <div class="row g-2 mb-3">
                             <div class="col-6">
                                 <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Máx. Reservas</label>
-                                <input type="number" min="0" class="form-control text-center" id="reservas-nuevo" value="0" required>
+                                <input type="number" min="0" class="form-control text-center" id="reservas-nuevo" value="0" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                             </div>
                             <div class="col-6">
                                 <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Máx. Admins</label>
-                                <input type="number" min="1" class="form-control text-center" id="usuarios-nuevo" value="1" required>
+                                <input type="number" min="1" class="form-control text-center" id="usuarios-nuevo" value="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Duración (Días)</label>
-                            <input type="number" min="1" class="form-control" id="duracion-nuevo" value="30" required>
+                            <input type="number" min="1" class="form-control" id="duracion-nuevo" value="30" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                         </div>
                         <div class="mb-4">
                             <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Descripción</label>
@@ -170,6 +170,16 @@ function renderPlanes() {
             </div>
         </div>
     `;
+}
+
+function validarPrecio(input) {
+    // Permitir números y un solo punto decimal
+    let value = input.value.replace(/[^0-9.]/g, '');
+    let parts = value.split('.');
+    if (parts.length > 2) {
+        value = parts[0] + '.' + parts.slice(1).join('');
+    }
+    input.value = value;
 }
 
 async function guardarPlan(id) {

@@ -22,9 +22,9 @@ class PlanController extends Controller
     public function store(Request $request, Plan $plan)
     {
         $data=$request->validate([
-            'nombre_plan'=>'required|unique:planes',
+            'nombre_plan'=>'required|string|max:100|unique:planes',
             'precio'=>'required|numeric|min:0',
-            'max_reservas_mes'=>'required|integer|min:1',
+            'max_reservas_mes'=>'required|integer|min:0',
             'max_usuarios_admin'=>'required|integer|min:1',
             'duracion_dias'=>'required|integer|min:1',
             'descripcion'=>'nullable|string|max:255',
@@ -42,9 +42,9 @@ class PlanController extends Controller
     public function update(Request $request, Plan $plan)
     {
         $data=$request->validate([
-            'nombre_plan'=>'sometimes|string|unique:planes,nombre_plan,'.$plan->id,
+            'nombre_plan'=>'sometimes|string|max:100|unique:planes,nombre_plan,'.$plan->id,
             'precio'=>'sometimes|numeric|min:0',
-            'max_reservas_mes'=>'sometimes|integer|min:1',
+            'max_reservas_mes'=>'sometimes|integer|min:0',
             'max_usuarios_admin'=>'sometimes|integer|min:1',
             'duracion_dias'=>'sometimes|integer|min:1',
             'descripcion'=>'nullable|string|max:255',

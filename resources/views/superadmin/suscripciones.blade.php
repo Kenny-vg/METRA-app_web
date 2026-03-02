@@ -117,7 +117,7 @@ function renderTabla(suscripciones) {
             <td>${badgeEstado}</td>
             <td class="text-end">
                 <div class="d-flex justify-content-end gap-2">
-                    ${s.comprobante_url 
+                    ${(s.comprobante_url || (s.cafeteria && s.cafeteria.comprobante_url)) 
                         ? `<button class="btn btn-sm btn-outline-dark rounded-pill px-3" onclick="verComprobanteSub(${s.id})"><i class="bi bi-file-earmark-text me-1"></i>Recibo</button>` 
                         : ''}
                     ${s.estado_pago !== 'cancelado' && s.cafeteria?.estado !== 'suspendida'
@@ -209,7 +209,9 @@ async function verDetalle(cafeteriaId) {
                             <span class="text-muted">Plan Actual</span>
                             <span class="fw-bold" style="color: var(--accent-gold);">${plan}</span>
                         </div>
-                        ${c.comprobante_url ? `<button onclick="verComprobante(${c.id})" class="btn btn-outline-secondary w-100 rounded-pill"><i class="bi bi-file-earmark-text me-2"></i>Ver Comprobante de Pago</button>` : '<p class="text-muted small text-center m-0">Sin comprobante subido</p>'}
+                        ${(c.comprobante_url || (c.suscripcion_actual && c.suscripcion_actual.comprobante_url)) 
+                            ? `<button onclick="verComprobante(${c.id})" class="btn btn-outline-secondary w-100 rounded-pill"><i class="bi bi-file-earmark-text me-2"></i>Ver Comprobante de Pago</button>` 
+                            : '<p class="text-muted small text-center m-0">Sin comprobante subido</p>'}
                     </div>
                 </div>
             </div>

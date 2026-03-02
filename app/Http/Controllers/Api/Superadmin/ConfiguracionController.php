@@ -15,13 +15,13 @@ class ConfiguracionController extends Controller
     {
         $data = $request->validate([
             'banco' => 'nullable|string',
-            'clabe' => 'nullable|string',
+            'clabe' => 'nullable|numeric|digits:18',
             'beneficiario' => 'nullable|string',
             'instrucciones_pago' => 'nullable|string',
 
             'email_soporte' => 'nullable|email',
-            'telefono_soporte' => 'nullable|string',
-            'whatsapp_soporte' => 'nullable|string',
+            'telefono_soporte' => 'nullable|string|max:15',
+            'whatsapp_soporte' => 'nullable|string|max:15',
         ]);
 
         $config = ConfiguracionSistema::firstOrCreate();

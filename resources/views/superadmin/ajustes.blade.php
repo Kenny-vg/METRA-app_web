@@ -97,7 +97,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">CLABE Interbancaria</label>
-                                    <input type="text" class="form-control bg-light border-0" id="conf_clabe" placeholder="18 dígitos" maxlength="18">
+                                    <input type="text" class="form-control bg-light border-0" id="conf_clabe" placeholder="18 dígitos" maxlength="18" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Beneficiario</label>
@@ -117,11 +117,11 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Teléfono de Soporte</label>
-                                    <input type="text" class="form-control bg-light border-0" id="conf_telefono" placeholder="+52 238 000 0000">
+                                    <input type="text" class="form-control bg-light border-0" id="conf_telefono" placeholder="+52 238 000 0000" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 43" oninput="this.value = this.value.replace(/[^0-9+]/g, '');">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">WhatsApp de Soporte</label>
-                                    <input type="text" class="form-control bg-light border-0" id="conf_whatsapp" placeholder="+52 238 000 0000">
+                                    <input type="text" class="form-control bg-light border-0" id="conf_whatsapp" placeholder="+52 238 000 0000" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 43" oninput="this.value = this.value.replace(/[^0-9+]/g, '');">
                                 </div>
                             </div>
                         </div>
