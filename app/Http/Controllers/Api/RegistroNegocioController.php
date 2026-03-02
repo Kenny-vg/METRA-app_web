@@ -143,10 +143,17 @@ class RegistroNegocioController extends Controller
         $file = $request->file('comprobante');
         $path = $file->store('comprobantes');
 
-
         $cafeteria->update([
             'comprobante_url' => $path
         ]);
+
+        $suscripcion = $cafeteria->suscripciones()->latest()->first();
+        if ($suscripcion) {
+            $suscripcion->update([ 'comprobante_url' => $path ]);
+        }
+
+
+
 
         return ApiResponse::success(
             ['comprobante_url' => $path],

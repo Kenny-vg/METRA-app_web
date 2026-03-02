@@ -15,6 +15,7 @@
         </div>
     </div>
 
+
     <div class="row g-4 mb-5">
         <div class="col-12 col-sm-6 col-xl-3">
             <div class="card border-0 p-4 h-100 premium-card">
@@ -180,6 +181,7 @@
         async function cargarDashboard() {
             try {
                 const res = await fetch(`${API}/gerente/cafeteria/perfil`, { headers: authHeaders() });
+
                 if (!res.ok) return;
                 const json = await res.json();
                 const cafe = json.data;
@@ -187,6 +189,8 @@
 
                 renderWidgetSuscripcion(cafe);
             } catch (e) {
+
+
                 console.error('Error cargando perfil:', e);
             }
         }
@@ -254,6 +258,7 @@
                 </div>
             `;
         }
+
 
         async function abrirModalRenovar(estado = '') {
             const modal = new bootstrap.Modal(document.getElementById('modalRenovar'));

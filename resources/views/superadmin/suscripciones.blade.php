@@ -116,12 +116,18 @@ function renderTabla(suscripciones) {
             <td style="color: var(--text-muted);">${fechaFin}</td>
             <td>${badgeEstado}</td>
             <td class="text-end">
-                ${s.estado_pago !== 'cancelado' && s.cafeteria?.estado !== 'suspendida'
-                    ? `<button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="cambiarEstado(${s.cafe_id}, 'suspendida')">Suspender</button>`
-                    : `<button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="cambiarEstado(${s.cafe_id}, 'activa')">Reactivar</button>`
-                }
+                <div class="d-flex justify-content-end gap-2">
+                    ${s.comprobante_url 
+                        ? `<button class="btn btn-sm btn-outline-dark rounded-pill px-3" onclick="verComprobanteSub(${s.id})"><i class="bi bi-file-earmark-text me-1"></i>Recibo</button>` 
+                        : ''}
+                    ${s.estado_pago !== 'cancelado' && s.cafeteria?.estado !== 'suspendida'
+                        ? `<button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="cambiarEstado(${s.cafe_id}, 'suspendida')">Suspender</button>`
+                        : `<button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="cambiarEstado(${s.cafe_id}, 'activa')">Reactivar</button>`
+                    }
+                </div>
             </td>
         </tr>`;
+
     }).join('');
 }
 
@@ -225,6 +231,49 @@ async function verComprobante(cafeteriaId) {
     
     try {
         const url = `${API}/superadmin/cafeterias/${cafeteriaId}/comprobante`;
+        const response = await fetch(url, { headers: authHeaders() });
+        
+        if (!response.ok) throw new Error('Error al cargar el comprobante');
+        
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const contentType = response.headers.get('content-type');
+        
+        if (contentType && contentType.includes('pdf')) {
+            body.innerHTML = `
+                <div class="text-center p-4">
+                    <i class="bi bi-file-earmark-pdf fs-1 text-danger mb-3 d-block"></i>
+                    <a href="${blobUrl}" target="_blank" class="btn btn-dark px-4 rounded-pill">
+                        <i class="bi bi-box-arrow-up-right me-2"></i>Abrir PDF
+                    </a>
+                </div>
+            `;
+        } else {
+            body.innerHTML = `
+                <div class="text-center">
+                    <img src="${blobUrl}" class="img-fluid rounded-3 shadow-sm mb-3" style="max-height: 400px;" alt="Comprobante">
+                    <div>
+                        <a href="${blobUrl}" download="comprobante" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                            <i class="bi bi-download me-1"></i>Descargar
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+    } catch (e) {
+        body.innerHTML = '<p class="text-danger text-center">No pudimos cargar el comprobante.</p>';
+    }
+}
+
+async function verComprobanteSub(suscripcionId) {
+    const modal = new bootstrap.Modal(document.getElementById('modalDetalle'));
+    const body = document.getElementById('detalle-body');
+    
+    body.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Cargando comprobante...</p></div>';
+    modal.show();
+    
+    try {
+        const url = `${API}/superadmin/suscripciones/${suscripcionId}/comprobante`;
         const response = await fetch(url, { headers: authHeaders() });
         
         if (!response.ok) throw new Error('Error al cargar el comprobante');

@@ -17,9 +17,13 @@ class Suscripcion extends Model
         'fecha_fin',
         'estado_pago',
         'monto',
+        'comprobante_url',
         'user_id',
         'fecha_validacion'
     ];
+
+
+
 
     //relaciones
     public function cafeteria(){

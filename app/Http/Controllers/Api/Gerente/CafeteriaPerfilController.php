@@ -22,6 +22,8 @@ class CafeteriaPerfilController extends Controller
         );
     }
 
+
+
     //Actualizar mi cafetería
     public function update(Request $request)
     {

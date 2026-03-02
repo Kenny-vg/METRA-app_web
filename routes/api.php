@@ -101,6 +101,12 @@ Route::middleware([
     // CAFETERÍAS — revisión de registros auto-gestionados
     Route::get('/cafeterias/{cafeteria}/comprobante', [CafeteriaController::class, 'verComprobante']);
 
+    Route::get('/suscripciones/{suscripcion}/comprobante', function (\App\Models\Suscripcion $suscripcion) {
+        if (!$suscripcion->comprobante_url) abort(404);
+        return response()->file(storage_path('app/' . $suscripcion->comprobante_url));
+    });
+
+
     // PLANES
     Route::get('/planes', [PlanController::class, 'index']);
     Route::post('/planes', [PlanController::class, 'store']);
@@ -132,6 +138,8 @@ Route::middleware([
         '/admin/comprobante/{cafeteria}',
         [RegistroNegocioController::class, 'verComprobante']
     )->middleware('auth:sanctum');
+
+
 
 /*
 |------------------------------------------
