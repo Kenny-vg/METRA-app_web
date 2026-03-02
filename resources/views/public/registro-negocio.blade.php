@@ -599,17 +599,28 @@
 
         try {
             const res = await fetch(`${API_BASE}/registro-negocio/${registeredCafeteriaId}/comprobante`, {
-                method: 'POST', headers: { 'Accept': 'application/json' }, body: fd
+                method: 'POST', 
+                headers: { 'Accept': 'application/json' }, 
+                body: fd
             });
+            
+            const json = await res.json();
+            
             if (!res.ok) {
-                const json = await res.json();
+                // Si el backend devuelve errores de validación (422)
+                if (res.status === 422 && json.errors && json.errors.comprobante) {
+                    throw new Error(json.errors.comprobante[0]);
+                }
                 throw new Error(json.message || 'Ocurrió un error en la transferencia del archivo.');
             }
             
             document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
             document.getElementById('step-success').classList.add('active');
             document.querySelectorAll('.step-dot').forEach(d => { d.classList.remove('active'); d.classList.add('done'); });
-        } catch(e) { showAlert(e.message); }
+        } catch(e) { 
+            showAlert(e.message); 
+        }
+
         finally { btnTxt.classList.remove('d-none'); btnLd.classList.add('d-none'); }
     };
 

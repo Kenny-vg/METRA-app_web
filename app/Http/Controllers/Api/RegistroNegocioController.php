@@ -132,9 +132,17 @@ class RegistroNegocioController extends Controller
      */
     public function subirComprobante(Request $request, Cafeteria $cafeteria)
     {
-        $file = $request->file('comprobante');
+        $request->validate([
+            'comprobante' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
+        ], [
+            'comprobante.required' => 'El comprobante de pago es obligatorio.',
+            'comprobante.mimes'    => 'El formato del archivo debe ser JPG, PNG o PDF.',
+            'comprobante.max'      => 'El archivo no debe exceder los 5MB.',
+        ]);
 
+        $file = $request->file('comprobante');
         $path = $file->store('comprobantes');
+
 
         $cafeteria->update([
             'comprobante_url' => $path
