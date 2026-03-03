@@ -24,7 +24,8 @@ class User extends Authenticatable
         'estado',
         'google_id',
         'avatar',
-        'activation_token'
+        'activation_token',
+        'estatus_registro',
     ];
 
     //campos que no se devuelven en respuestas JSON
