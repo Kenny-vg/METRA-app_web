@@ -13,10 +13,10 @@ class CafeteriaSeeder extends Seeder
      */
     public function run(): void
     {
-        
+
         Cafeteria::updateOrCreate([
             'nombre' => 'Cafe Demo METRA',
-            'estado' => true
+            'estado' => 'activa',
         ]);
     }
 }
