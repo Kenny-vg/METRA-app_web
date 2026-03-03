@@ -197,7 +197,7 @@ class RegistroNegocioController extends Controller
             $file = $request->file('comprobante');
 
             // Asegurar que use el disco public
-            $path = $file->store('comprobantes', 'public');
+            $path = $file->store('comprobantes');
 
             $cafeteria->update([
                 'comprobante_url' => $path
