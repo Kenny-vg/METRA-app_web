@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use App\Helpers\ApiResponse;
 use App\Mail\ResetPasswordMail;
-use App\Services\BrevoMailService;
+
 
 class PasswordResetController extends Controller
 {
@@ -38,14 +38,8 @@ class PasswordResetController extends Controller
             "/reset-password?token={$token}&email={$user->email}";
 
         try {
-            BrevoMailService::send(
-                $user->email,
-                "Restablecer contraseña - METRA",
-                "
-                <h2>Restablecer contraseña</h2>
-                <p>Haz clic en el siguiente enlace:</p>
-                <a href='{$url}'>Restablecer contraseña</a>
-                "
+            Mail::to($user->email)->send(
+                new ResetPasswordMail($url, $user->email)
             );
         } catch (\Exception $e) {
             // log para debug

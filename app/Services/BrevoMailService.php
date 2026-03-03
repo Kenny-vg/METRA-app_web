@@ -12,14 +12,14 @@ class BrevoMailService
 
         $client->post('https://api.brevo.com/v3/smtp/email', [
             'headers' => [
-                'api-key' => env('BREVO_API_KEY'),
-                'Content-Type' => 'application/json',
+                'api-key' => config('services.brevo.key'),
                 'accept' => 'application/json',
+                'Content-Type' => 'application/json',
             ],
             'json' => [
                 'sender' => [
                     'name' => env('MAIL_FROM_NAME'),
-                    'email' => env('MAIL_FROM_ADDRESS'),
+                    'email' => env('MAIL_FROM_ADDRESS')
                 ],
                 'to' => [
                     ['email' => $to]

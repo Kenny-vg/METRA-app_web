@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class RegistroNegocioController extends Controller
 {
@@ -49,7 +50,14 @@ class RegistroNegocioController extends Controller
             'telefono'         => 'nullable|string|max:20',
 
             'gerente.name'     => 'required|string|max:100',
-            'gerente.email'    => 'required|email|unique:users,email',
+            'gerente.email' => [
+                'required',
+                'email',
+                Rule::unique('users','email')
+                    ->where(function ($query) {
+                        return $query->where('estado', true);
+                    }),
+            ],
             'gerente.password' => 'required|string|min:8|confirmed',
 
             'plan_id'          => 'required|exists:planes,id',
@@ -68,36 +76,79 @@ class RegistroNegocioController extends Controller
         $plan = Plan::findOrFail($data['plan_id']);
 
         $result = DB::transaction(function () use ($data, $plan) {
+
+            $gerenteExistente = User::where('email', $data['gerente']['email'])
+                ->where('estado', false)
+                ->first();
+
             // 1. Crear cafetería en estado "en_revision"
-            $cafeteria = Cafeteria::create([
-                'nombre'           => $data['nombre'],
-                'descripcion'      => $data['descripcion'] ?? null,
-                'calle'            => $data['calle'] ?? null,
-                'num_exterior'     => $data['num_exterior'] ?? null,
-                'num_interior'     => $data['num_interior'] ?? null,
-                'colonia'          => $data['colonia'] ?? null,
-                'ciudad'           => $data['ciudad'] ?? null,
-                'estado_republica' => $data['estado_republica'] ?? null,
-                'cp'               => $data['cp'] ?? null,
-                'telefono'         => $data['telefono'] ?? null,
-                'estado'           => 'en_revision',
-            ]);
+            if ($gerenteExistente && $gerenteExistente->cafe_id) {
+
+                $cafeteria = Cafeteria::find($gerenteExistente->cafe_id);
+
+                $cafeteria->update([
+                    'nombre'           => $data['nombre'],
+                    'descripcion'      => $data['descripcion'] ?? null,
+                    'calle'            => $data['calle'] ?? null,
+                    'num_exterior'     => $data['num_exterior'] ?? null,
+                    'num_interior'     => $data['num_interior'] ?? null,
+                    'colonia'          => $data['colonia'] ?? null,
+                    'ciudad'           => $data['ciudad'] ?? null,
+                    'estado_republica' => $data['estado_republica'] ?? null,
+                    'cp'               => $data['cp'] ?? null,
+                    'telefono'         => $data['telefono'] ?? null,
+                ]);
+
+            } else {
+
+                $cafeteria = Cafeteria::create([
+                    'nombre'           => $data['nombre'],
+                    'descripcion'      => $data['descripcion'] ?? null,
+                    'calle'            => $data['calle'] ?? null,
+                    'num_exterior'     => $data['num_exterior'] ?? null,
+                    'num_interior'     => $data['num_interior'] ?? null,
+                    'colonia'          => $data['colonia'] ?? null,
+                    'ciudad'           => $data['ciudad'] ?? null,
+                    'estado_republica' => $data['estado_republica'] ?? null,
+                    'cp'               => $data['cp'] ?? null,
+                    'telefono'         => $data['telefono'] ?? null,
+                    'estado'           => 'en_revision',
+                ]);
+            }
 
             // 2. Crear el gerente/dueño (inactivo hasta que se apruebe)
             
-            $gerente = User::create([
-                'name'                => $data['gerente']['name'],
-                'email'               => $data['gerente']['email'],
-                'password'            => Hash::make($data['gerente']['password']),
-                'role'                => 'gerente',
-                'cafe_id'             => $cafeteria->id,
-                'estado'              => false
-            ]);
+            if ($gerenteExistente) {
+
+                $gerenteExistente->update([
+                    'name' => $data['gerente']['name'],
+                    'password' => Hash::make($data['gerente']['password']),
+                    'role' => 'gerente',
+                    'cafe_id' => $cafeteria->id,
+                ]);
+
+                $gerente = $gerenteExistente;
+
+            } else {
+
+                $gerente = User::create([
+                    'name'     => $data['gerente']['name'],
+                    'email'    => $data['gerente']['email'],
+                    'password' => Hash::make($data['gerente']['password']),
+                    'role'     => 'gerente',
+                    'cafe_id'  => $cafeteria->id,
+                    'estado'   => false
+                ]);
+}
 
             // 3. Vincular cafetería con el gerente
             $cafeteria->update(['user_id' => $gerente->id]);
 
             // 4. Crear suscripción pendiente
+            Suscripcion::where('cafe_id', $cafeteria->id)
+                ->where('estado_pago', 'pendiente')
+                ->delete();
+                
             $inicio = now();
             $fin    = $inicio->copy()->addDays($plan->duracion_dias);
             Suscripcion::create([

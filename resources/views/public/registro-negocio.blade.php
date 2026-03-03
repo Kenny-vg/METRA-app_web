@@ -218,10 +218,12 @@
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Nombre completo *</label>
                     <input type="text" class="form-metra w-100" id="gerente_name" placeholder="Juan García" maxlength="100" required>
+                    <div class="text-danger small mt-1 d-none validation-error" id="error-gerente_name"></div>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Correo corporativo *</label>
                     <input type="email" class="form-metra w-100" id="gerente_email" placeholder="admin@cafe.com" maxlength="255" required>
+                    <div class="text-danger small mt-1 d-none validation-error" id="error-gerente_email"></div>
                 </div>
             </div>
             
@@ -232,6 +234,7 @@
                         <input type="password" class="form-metra w-100 pe-5" id="gerente_password" placeholder="Mínimo 8 caracteres" minlength="8" required>
                         <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 text-muted toggle-password" style="cursor: pointer; z-index: 10;"></i>
                     </div>
+                    <div class="text-danger small mt-1 d-none validation-error" id="error-gerente_password"></div>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Confirmar contraseña *</label>
@@ -239,11 +242,13 @@
                         <input type="password" class="form-metra w-100 pe-5" id="gerente_password_confirmation" placeholder="Repite tu contraseña" minlength="8" required>
                         <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 text-muted toggle-password" style="cursor: pointer; z-index: 10;"></i>
                     </div>
+                    <div class="text-danger small mt-1 d-none validation-error" id="error-gerente_password_confirmation"></div>
                 </div>
             </div>
             
             <label class="form-label fw-semibold mb-2">Selección de plan *</label>
             <div id="plan-selector"></div>
+            <div class="text-danger small mt-1 d-none validation-error" id="error-plan_id"></div>
             
             <div class="d-flex justify-content-between mt-5">
                 <button class="btn-prev" onclick="goToStep(1)"><i class="bi bi-arrow-left me-2"></i>Atrás</button>
@@ -324,6 +329,12 @@
     let selectedPlanId = null;
     let registeredCafeteriaId = null;
 
+    const formatterMXN = new Intl.NumberFormat('es-MX', {
+        style: 'currency',
+        currency: 'MXN',
+        currencyDisplay: 'symbol'
+    });
+
     window.cargarPlanes = async function() {
         try {
             const res = await fetch(`${API_BASE}/planes-publicos`);
@@ -353,7 +364,7 @@
                     ${featured ? '<div class="plan-badge-featured"><i class="bi bi-star-fill me-1"></i> Recomendado</div>' : ''}
                     <h4 class="fw-bold" style="color: var(--black-primary); text-transform: uppercase; font-size:1.1rem; letter-spacing:1px">${plan.nombre_plan}</h4>
                     <div class="plan-price mt-3 mb-2">
-                        <span>$</span>${parseFloat(plan.precio).toLocaleString('es-MX')}<sub class="text-muted">/mes</sub>
+                        ${formatterMXN.format(plan.precio)} MXN<sub class="text-muted"> / mes</sub>
                     </div>
                     ${plan.descripcion ? `<p class="text-muted small mt-3 mb-0">${plan.descripcion}</p>` : ''}
                     <hr style="border-color: rgba(56,44,38,0.1); margin: 25px 0;">
@@ -378,7 +389,7 @@
                     <div class="fw-bold" style="color: var(--black-primary);">${plan.nombre_plan}</div>
                     <div class="text-muted small">${plan.max_reservas_mes} reservas · ${plan.max_usuarios_admin} admin</div>
                 </div>
-                <div class="fw-bold fs-5" style="color: var(--accent-gold);">$${parseFloat(plan.precio).toLocaleString('es-MX')}</div>
+                <div class="fw-bold fs-5" style="color: var(--accent-gold);">${formatterMXN.format(plan.precio)} MXN</div>
             </div>
         `).join('');
     };
@@ -459,6 +470,30 @@
         }
     };
 
+    function clearValidationErrors() {
+        document.querySelectorAll('.validation-error').forEach(el => {
+            el.textContent = '';
+            el.classList.add('d-none');
+        });
+        document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+    }
+
+    function showValidationErrors(errors) {
+        for (const [field, messages] of Object.entries(errors)) {
+            const elementId = field.replace(/\./g, '_');
+            const errorElement = document.getElementById(`error-${elementId}`);
+            const inputElement = document.getElementById(elementId);
+            
+            if (errorElement) {
+                errorElement.textContent = messages[0];
+                errorElement.classList.remove('d-none');
+            }
+            if (inputElement) {
+                inputElement.classList.add('is-invalid');
+            }
+        }
+    }
+
     window.registrarNegocio = async function() {
         const name  = document.getElementById('gerente_name').value.trim();
         const email = document.getElementById('gerente_email').value.trim();
@@ -477,6 +512,8 @@
         if (password !== password_confirmation) { showAlert('Las contraseñas no coinciden. Por favor verifica.'); return; }
         
         if (!selectedPlanId) { showAlert('Debes seleccionar un plan de suscripción para continuar.'); return; }
+
+        clearValidationErrors();
 
         const btnTxt = document.getElementById('btn-text');
         const btnLd = document.getElementById('btn-loading');
@@ -505,17 +542,26 @@
             const json = await res.json();
             
             if (!res.ok) {
-                let errorMsg = 'Algo salió mal. Intenta de nuevo.';
-                if (res.status === 422 || json.errors || res.status === 400) {
-                    errorMsg = 'Revisa los campos marcados. Podría haber un error en el correo (quizá ya registrado) o datos inválidos.';
+                if (res.status === 422 && json.errors) {
+                    showValidationErrors(json.errors);
+                    Swal.fire({
+                        title: 'Atención',
+                        text: 'Revisa los campos marcados.',
+                        icon: 'warning',
+                        confirmButtonColor: '#382C26'
+                    });
+                } else {
+                    let errorMsg = 'Algo salió mal. Intenta de nuevo.';
+                    if (res.status === 400 || json.message) {
+                        errorMsg = json.message || errorMsg;
+                    }
+                    Swal.fire({
+                        title: 'Atención',
+                        text: errorMsg,
+                        icon: 'warning',
+                        confirmButtonColor: '#382C26'
+                    });
                 }
-                
-                Swal.fire({
-                    title: 'Atención',
-                    text: errorMsg,
-                    icon: 'warning',
-                    confirmButtonColor: '#382C26'
-                });
                 return;
             }
             
