@@ -187,6 +187,44 @@ window.handleCredentialResponse = async function(response) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+
+    window.continuarSubida = async function(email) {
+        if (!email) return;
+
+        try {
+            const API_URL = "{{ url('/api') }}";
+            const res = await fetch(`${API_URL}/registro-pendiente`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ email })
+            });
+            
+            const result = await res.json();
+            
+            if (res.ok && result.data && result.data.cafeteria_id) {
+                window.location.href = '/subir-comprobante/' + result.data.cafeteria_id;
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se encontró registro pendiente.',
+                    confirmButtonColor: '#382C26'
+                });
+            }
+        } catch (error) {
+            console.error(error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de conexión',
+                text: 'Fallo de conexión al servidor.',
+                confirmButtonColor: '#382C26'
+            });
+        }
+    }
+    
     const togglePasswords = document.querySelectorAll('.toggle-password');
     togglePasswords.forEach(icon => {
         icon.addEventListener('click', function() {
@@ -240,6 +278,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: JSON.stringify({ email, password })
                 });
 
+                console.log('STATUS:', response.status);
+                const raw = await response.clone().json();
+                console.log('BODY:', raw);
+
                 if (response.ok) {
                     const result = await response.json();
                     try {
@@ -251,6 +293,23 @@ document.addEventListener('DOMContentLoaded', function() {
                         else window.location.href = '/public/perfil';
                     } catch (err) {}
                 } else {
+                    if (response.status === 423) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Solicitud pendiente',
+                            text: 'Tu registro está pendiente. Debes subir tu comprobante para continuar.',
+                            showCancelButton: true,
+                            confirmButtonText: 'Subir comprobante',
+                            cancelButtonText: 'Cancelar',
+                            confirmButtonColor: '#382C26'
+                        }).then((result) => {
+                            if(result.isConfirmed) {
+                                continuarSubida(email);
+                            }
+                        });
+                        return; // Detiene la ejecución normal
+                    }
+
                     const errorData = await response.json();
                     let errorMsg = errorData.message || 'Credenciales inválidas.';
                     if (errorData.errors) {

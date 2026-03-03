@@ -23,12 +23,11 @@
             </button>
             <div class="collapse navbar-collapse" id="navBienvenida">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-2 gap-lg-4 mt-3 mt-lg-0">
-                    <li class="nav-item"><a href="#como-funciona" class="nav-link nav-link-custom">Cómo funciona</a></li>
-                    <li class="nav-item"><a href="#para-clientes" class="nav-link nav-link-custom">Para clientes</a></li>
-                    <li class="nav-item"><a href="#app-staff" class="nav-link nav-link-custom">App Staff</a></li>
-                    <li class="nav-item"><a href="/login" class="nav-link nav-link-custom fw-bold">Acceso Gerentes</a></li>
+                    <li class="nav-item"><a href="{{ url('/') }}" class="nav-link nav-link-custom">Inicio</a></li>
+                    <li class="nav-item"><a href="{{ url('/#cafeterias') }}" class="nav-link nav-link-custom">Ver Cafeterías</a></li>
+                    <li class="nav-item"><a href="{{ url('/registro-negocio') }}" class="nav-link nav-link-custom">Sumar Cafetería</a></li>
                     <li class="nav-item">
-                        <a href="#para-negocios" class="btn-metra-main px-4 py-2" style="font-size: 0.9rem; border-radius: 6px;">Contratar METRA</a>
+                        <a href="{{ url('/login') }}" class="btn-metra-main px-4 py-2" style="font-size: 0.9rem; border-radius: 6px;">Iniciar Sesión</a>
                     </li>
                 </ul>
             </div>

@@ -28,6 +28,21 @@ Route::get('/registro-negocio', function () {
     return view('public.registro-negocio');
 });
 
+// Pantalla para subir comprobante pendiente
+Route::get('/subir-comprobante/{id}', function ($id) {
+    if(!is_numeric($id)) abort(404);
+    return view('public.subir-comprobante', ['id' => $id]);
+});
+
+// Condiciones y Privacidad
+Route::get('/terminos', function () {
+    return view('public.terminos');
+});
+
+Route::get('/privacidad', function () {
+    return view('public.privacidad');
+});
+
 /*
 |--------------------------------------------------------------------------
 | RUTAS DE AUTENTICACIÓN

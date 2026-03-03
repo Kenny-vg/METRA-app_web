@@ -21,9 +21,9 @@
                 <ul class="list-unstyled">
                     <li class="mb-2"><a href="{{ url('/') }}" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Inicio</a></li>
                     <li class="mb-2"><a href="{{ url('/#como-funciona') }}" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Conócenos</a></li>
-                    <li class="mb-2"><a href="{{ url('/reservar') }}" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Reservar Mesa</a></li>
-                    <li class="mb-2"><a href="{{ url('/login') }}" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Acceso Clientes</a></li>
-                    <li class="mb-2"><a href="{{ url('/login') }}" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Acceso Restaurantes</a></li>
+                    <li class="mb-2"><a href="{{ url('/#cafeterias') }}" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Restaurantes Activos</a></li>
+                    <li class="mb-2"><a href="{{ url('/registro-negocio') }}" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Sumar Cafetería</a></li>
+                    <li class="mb-2"><a href="{{ url('/login') }}" class="text-decoration-none opacity-75 hover-white" style="color: inherit; transition: 0.3s;">Acceso Administrativo</a></li>
                 </ul>
             </div>
 
@@ -70,8 +70,8 @@
                 </div>
             </div>
             <div class="col-md-6 text-center text-md-end">
-                <a href="#" class="small text-decoration-none opacity-50 me-3" style="color: inherit;">Privacidad</a>
-                <a href="#" class="small text-decoration-none opacity-50" style="color: inherit;">Términos</a>
+                <a href="{{ url('/privacidad') }}" class="small text-decoration-none opacity-50 me-3" style="color: inherit;">Privacidad</a>
+                <a href="{{ url('/terminos') }}" class="small text-decoration-none opacity-50" style="color: inherit;">Términos</a>
             </div>
         </div>
     </div>

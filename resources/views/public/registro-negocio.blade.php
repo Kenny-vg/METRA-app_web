@@ -18,13 +18,23 @@
 <body>
 
 <!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg navbar-light-custom sticky-top py-3">
+<nav class="navbar navbar-expand-lg py-3 py-lg-4" style="background: rgba(248, 249, 250, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-light); position: sticky; top: 0; z-index: 1000;">
     <div class="container">
-        <a class="navbar-brand fw-bold fs-3" href="{{ url('/') }}" style="color: var(--black-primary);">
-            <i class="bi bi-cup-hot-fill me-2" style="color: var(--accent-gold);"></i>METRA
+        <a class="navbar-brand fw-bold fs-3" href="{{ url('/') }}" style="color: var(--black-primary); letter-spacing: -0.5px;">
+            <i class="bi bi-hexagon-fill me-2" style="color: var(--accent-gold); font-size: 1.2rem;"></i>METRA
         </a>
-        <div class="ms-auto text-end">
-            <a href="/login" class="btn fw-semibold" style="color: var(--texto-s);">Iniciar Sesión</a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navRegistro">
+            <i class="bi bi-list fs-2" style="color: var(--black-primary);"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navRegistro">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-2 gap-lg-4 mt-3 mt-lg-0">
+                <li class="nav-item"><a href="{{ url('/') }}" class="nav-link nav-link-custom">Inicio</a></li>
+                <li class="nav-item"><a href="{{ url('/#cafeterias') }}" class="nav-link nav-link-custom">Ver Cafeterías</a></li>
+                <li class="nav-item"><a href="{{ url('/registro-negocio') }}" class="nav-link nav-link-custom">Sumar Cafetería</a></li>
+                <li class="nav-item">
+                    <a href="{{ url('/login') }}" class="btn-metra-main px-4 py-2" style="font-size: 0.9rem; border-radius: 6px;">Iniciar Sesión</a>
+                </li>
+            </ul>
         </div>
     </div>
 </nav>
