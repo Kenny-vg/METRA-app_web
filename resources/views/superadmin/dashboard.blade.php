@@ -500,6 +500,66 @@ async function cargarPlanesModal() {
     }
 }
 
+// ────────────────────────────────────────────
+// Refresco silencioso (Polling)
+// ────────────────────────────────────────────
+async function refreshDashboardSilently() {
+    try {
+        const [resCafes, resSols] = await Promise.all([
+            fetch(`${API}/superadmin/cafeterias`, { headers: authHeaders() }),
+            fetch(`${API}/superadmin/solicitudes`, { headers: authHeaders() })
+        ]);
+
+        // Manejo estricto de errores (419, 500) según requerimiento
+        if (resCafes.status === 419 || resCafes.status >= 500 || resSols.status === 419 || resSols.status >= 500) {
+            console.error("Inconsistencia detectada en servidor: Error 500/419 al intentar actualizar la tabla por polling. Posible causante de cierre de sesión inesperado.", "Estados -> Cafeterías:", resCafes.status, "| Solicitudes:", resSols.status);
+            return; 
+        }
+
+        if (resCafes.status === 401 || resSols.status === 401) {
+             console.warn("Token expirado o inválido detectado durante el polling silencioso.");
+             localStorage.removeItem('token');
+             window.location.href = '/login';
+             return;
+        }
+
+        if (!resCafes.ok || !resSols.ok) {
+             console.warn("Advertencia: El servidor respondió con un error no crítico durante el polling.", resCafes.status, resSols.status);
+             return;
+        }
+
+        const jsonCafes = await resCafes.json();
+        const jsonSols  = await resSols.json();
+        
+        const todos = jsonCafes.data || [];
+        const enRevision = jsonSols.data || [];
+
+        const activas    = todos.filter(c => c.estado === 'activa').length;
+        const pendientes = todos.filter(c => c.estado === 'pendiente').length;
+        const revision   = enRevision.length;
+
+        document.getElementById('stat-total').textContent    = todos.length;
+        document.getElementById('stat-activas').textContent  = activas;
+        document.getElementById('stat-revision').textContent = revision;
+        document.getElementById('stat-pendientes').textContent = pendientes;
+
+        if (revision > 0) {
+            document.getElementById('badge-revision-count').textContent = `${revision} nuevas`;
+        } else {
+            document.getElementById('badge-revision-count').textContent = '';
+        }
+
+        renderTablaRevision(enRevision);
+        renderTablaTodos(todos);
+
+    } catch (e) {
+        console.error('Error de red/API durante el polling silencioso:', e);
+    }
+}
+
+// Iniciar polling automático cada 20 segundos
+setInterval(refreshDashboardSilently, 20000);
+
 // Init
 cargarDashboard();
 cargarPlanesModal();
