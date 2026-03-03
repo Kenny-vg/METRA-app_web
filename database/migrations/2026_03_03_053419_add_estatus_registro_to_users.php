@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('suscripciones', function (Blueprint $table) {
-            $table->string('comprobante_url')->nullable()->after('monto');
+        Schema::table('users', function (Blueprint $table) {
+            //
         });
     }
 
@@ -21,8 +21,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('suscripciones', function (Blueprint $table) {
-            $table->dropColumn('comprobante_url');
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('estatus_registro')
+                ->default('pendiente')
+                ->after('estado');
         });
     }
 };
