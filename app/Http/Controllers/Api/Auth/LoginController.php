@@ -47,7 +47,7 @@ class LoginController extends Controller
         }
 
         // Si ya subió pero no está aprobado
-        if($suscripcion->estado_pago !== 'aprobado'){
+        if($suscripcion->estado_pago !== 'pagado'){
             return ApiResponse::error(
                 'Tu comprobante fue enviado. Espera la validación del superadmin.',
                 423
