@@ -50,14 +50,7 @@ class RegistroNegocioController extends Controller
             'telefono'         => 'nullable|string|max:20',
 
             'gerente.name'     => 'required|string|max:100',
-            'gerente.email' => [
-                'required',
-                'email',
-                Rule::unique('users','email')
-                    ->where(function ($query) {
-                        return $query->where('estado', true);
-                    }),
-            ],
+            'gerente.email' => 'required|email|unique:users,email',
             'gerente.password' => 'required|string|min:8|confirmed',
 
             'plan_id'          => 'required|exists:planes,id',
@@ -78,7 +71,7 @@ class RegistroNegocioController extends Controller
         $result = DB::transaction(function () use ($data, $plan) {
 
             $gerenteExistente = User::where('email', $data['gerente']['email'])
-                ->where('estado', false)
+                ->where('estatus_registro', 'pendiente')
                 ->first();
 
             // 1. Crear cafetería en estado "en_revision" pero si ya existe una cafetería con ese correo, se actualiza
@@ -137,7 +130,8 @@ class RegistroNegocioController extends Controller
                     'password' => Hash::make($data['gerente']['password']),
                     'role'     => 'gerente',
                     'cafe_id'  => $cafeteria->id,
-                    'estado'   => false
+                    'estado'   => false,
+                    'estatus_registro' => 'pendiente'
                 ]);
 }
 
@@ -219,7 +213,7 @@ class RegistroNegocioController extends Controller
         ]);
 
         $user = User::where('email', $request->email)
-            ->where('estado', false)
+            ->where('estatus_registro', 'pendiente')
             ->where('role', 'gerente')
             ->whereNotNull('cafe_id')
             ->first();

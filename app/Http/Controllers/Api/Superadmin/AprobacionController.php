@@ -20,7 +20,8 @@ class AprobacionController extends Controller
 
         //activar gerente
         optional($cafeteria->gerente)->update([
-            'estado'=>1 //true
+            'estado'=>1, //true
+            'estatus_registro'=>'aprobado'
         ]);
 
         //marcar pago validado
@@ -59,7 +60,8 @@ class AprobacionController extends Controller
 
         //desactivar gerente
         optional($cafeteria->gerente)->update([
-            'estado'=>0 //false
+            'estado'=>0, //false
+            'estatus_registro'=>'rechazado'
         ]);
 
         //cancelar suscripcion
