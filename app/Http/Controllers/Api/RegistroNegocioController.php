@@ -212,5 +212,27 @@ class RegistroNegocioController extends Controller
         );
     }
 
-    
+    public function registroPendiente(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        $user = User::where('email', $request->email)
+            ->where('estado', false)
+            ->where('role', 'gerente')
+            ->whereNotNull('cafe_id')
+            ->first();
+
+        if(!$user){
+            return ApiResponse::error('No hay registro pendiente', 404);
+        }
+
+        return ApiResponse::success([
+            'cafeteria_id' => $user->cafe_id,
+            'nombre_cafeteria' => optional($user->cafeteria)->nombre,
+        ], 'Registro pendiente encontrado');
+    }
+
+
 }

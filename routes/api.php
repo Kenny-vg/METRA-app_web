@@ -69,7 +69,8 @@ Route::get('/cafeterias-publicas/{id}', function ($id) {
 // Auto-registro de negocio por el propio gerente/dueño
 Route::post('/registro-negocio', [RegistroNegocioController::class, 'store']);
 Route::post('/registro-negocio/{cafeteria}/comprobante', [RegistroNegocioController::class, 'subirComprobante']);
-
+//consultar si existe registro pendiente
+Route::post('/registro-pendiente', [RegistroNegocioController::class, 'registroPendiente']);
 
 /*
 |------------------------------------------

@@ -24,16 +24,66 @@ class LoginController extends Controller
         return ApiResponse::error('Credenciales incorrectas', 401);
     }
 
-    if(!$user ->estado){
-        return ApiResponse::error('Usuario inactivo', 403);
+    if(!$user->estado && $user->role === 'gerente'){
+
+        $cafeteria = $user->cafeteria;
+        $suscripcion = $cafeteria
+            ? $cafeteria->suscripciones()->latest()->first()
+            : null;
+
+        if(!$suscripcion){
+            return ApiResponse::error(
+                'Tu suscripción aún no ha sido creada.',
+                423
+            );
+        }
+
+        // Si NO ha subido comprobante
+        if(!$suscripcion->comprobante_url){
+            return ApiResponse::error(
+                'Debes subir tu comprobante para continuar.',
+                423
+            );
+        }
+
+        // Si ya subió pero no está aprobado
+        if($suscripcion->estado_pago !== 'aprobado'){
+            return ApiResponse::error(
+                'Tu comprobante fue enviado. Espera la validación del superadmin.',
+                423
+            );
+        }
     }
+
     //bloquear acceso si la cafeteria no tiene suscripción activa
     if(in_array($user->role,['gerente','personal'])){
-        $cafeteria=$user->cafeteria;
-        if(!$cafeteria||!$cafeteria->suscripcionActual){
+
+        $cafeteria = $user->cafeteria;
+
+        if(!$cafeteria){
             return ApiResponse::error(
-                'La suscripción de tu cafeteria ha vencido', 
-                403);
+                'No tienes una cafetería asociada.',
+                403
+            );
+        }
+
+        $suscripcion = $cafeteria->suscripciones()
+            ->latest()
+            ->first();
+
+        if(!$suscripcion){
+            return ApiResponse::error(
+                'Tu suscripción aún no ha sido creada.',
+                403
+            );
+        }
+
+        //  Bloquear si está pendiente
+        if($suscripcion->estado_pago !== 'aprobado'){
+            return ApiResponse::error(
+                'Tu suscripción está pendiente de aprobación. Por favor espera la validación del superadmin.',
+                423
+            );
         }
     }
 
