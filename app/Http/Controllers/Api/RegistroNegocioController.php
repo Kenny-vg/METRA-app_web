@@ -50,7 +50,18 @@ class RegistroNegocioController extends Controller
             'telefono'         => 'nullable|string|max:20',
 
             'gerente.name'     => 'required|string|max:100',
-            'gerente.email' => 'required|email|unique:users,email',
+            'gerente.email' => [
+                'required',
+                'email',
+                Rule::unique('users','email')
+                    ->where(function ($query) {
+                        return $query->whereIn('estatus_registro', [
+                            'aprobado',
+                            'rechazado',
+                            'desactivado'
+                        ]);
+                    }),
+            ],
             'gerente.password' => 'required|string|min:8|confirmed',
 
             'plan_id'          => 'required|exists:planes,id',
