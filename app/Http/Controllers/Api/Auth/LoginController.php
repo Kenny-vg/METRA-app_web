@@ -80,9 +80,18 @@ class LoginController extends Controller
 
         //  Bloquear si está pendiente
         if($suscripcion->estado_pago !== 'aprobado'){
+
+            if($user->role === 'gerente'){
+                return ApiResponse::error(
+                    'Tu suscripción está pendiente de aprobación. Por favor espera la validación del superadmin.',
+                    423
+                );
+            }
+
+            // Si es personal (staff)
             return ApiResponse::error(
-                'Tu suscripción está pendiente de aprobación. Por favor espera la validación del superadmin.',
-                423
+                'La cafetería aún no ha sido aprobada. Contacta al gerente.',
+                403
             );
         }
     }
