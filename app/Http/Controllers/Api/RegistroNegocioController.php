@@ -81,7 +81,7 @@ class RegistroNegocioController extends Controller
                 ->where('estado', false)
                 ->first();
 
-            // 1. Crear cafetería en estado "en_revision"
+            // 1. Crear cafetería en estado "en_revision" pero si ya existe una cafetería con ese correo, se actualiza
             if ($gerenteExistente && $gerenteExistente->cafe_id) {
 
                 $cafeteria = Cafeteria::find($gerenteExistente->cafe_id);
