@@ -190,31 +190,40 @@ class RegistroNegocioController extends Controller
     {
         $request->validate([
             'comprobante' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
-        ], [
-            'comprobante.required' => 'El comprobante de pago es obligatorio.',
-            'comprobante.mimes'    => 'El formato del archivo debe ser JPG, PNG o PDF.',
-            'comprobante.max'      => 'El archivo no debe exceder los 5MB.',
         ]);
 
-        $file = $request->file('comprobante');
-        $path = $file->store('comprobantes');
+        try {
 
-        $cafeteria->update([
-            'comprobante_url' => $path
-        ]);
+            $file = $request->file('comprobante');
 
-        $suscripcion = $cafeteria->suscripciones()->latest()->first();
-        if ($suscripcion) {
-            $suscripcion->update([ 'comprobante_url' => $path ]);
+            // Asegurar que use el disco public
+            $path = $file->store('comprobantes', 'public');
+
+            $cafeteria->update([
+                'comprobante_url' => $path
+            ]);
+
+            $suscripcion = $cafeteria->suscripciones()->latest()->first();
+            if ($suscripcion) {
+                $suscripcion->update([
+                    'comprobante_url' => $path
+                ]);
+            }
+
+            return ApiResponse::success(
+                ['comprobante_url' => $path],
+                'Comprobante subido correctamente.'
+            );
+
+        } catch (\Throwable $e) {
+
+            \Log::error("Error al subir comprobante: " . $e->getMessage());
+
+            return ApiResponse::error(
+                'Error interno al subir el comprobante.',
+                500
+            );
         }
-
-
-
-
-        return ApiResponse::success(
-            ['comprobante_url' => $path],
-            'Comprobante subido correctamente. El equipo revisará tu solicitud.'
-        );
     }
 
     public function registroPendiente(Request $request)
