@@ -79,7 +79,7 @@ class LoginController extends Controller
         }
 
         //  Bloquear si está pendiente
-        if($suscripcion->estado_pago !== 'aprobado'){
+        if($suscripcion->estado_pago !== 'pagado'){
 
             if($user->role === 'gerente'){
                 return ApiResponse::error(
