@@ -29,9 +29,6 @@
 
                 <div class="d-grid gap-3 mt-4">
                     <a href="#" class="btn btn-dark fw-bold rounded-pill p-3 d-flex align-items-center justify-content-center" style="background: var(--black-primary); font-size: 1.05rem;">
-                        <i class="bi bi-apple fs-4 me-2"></i> Descargar para iOS
-                    </a>
-                    <a href="#" class="btn btn-dark fw-bold rounded-pill p-3 d-flex align-items-center justify-content-center" style="background: var(--black-primary); font-size: 1.05rem;">
                         <i class="bi bi-google-play fs-4 me-2"></i> Descargar para Android
                     </a>
                 </div>
