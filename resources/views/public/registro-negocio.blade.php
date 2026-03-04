@@ -338,6 +338,7 @@
     const API_BASE = "{{ url('/api') }}";
     let selectedPlanId = null;
     let registeredCafeteriaId = null;
+    let wizardInitialized = false;
 
     const formatterMXN = new Intl.NumberFormat('es-MX', {
         style: 'currency',
@@ -576,6 +577,7 @@
             }
             
             registeredCafeteriaId = json.data.cafeteria_id;
+            localStorage.setItem('registro_cafeteria_id', registeredCafeteriaId);
             hideAlert();
             goToStep(3); // Visual trick covered by normal goto
         } catch (e) { showAlert(e.message); } 
@@ -673,6 +675,7 @@
             document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
             document.getElementById('step-success').classList.add('active');
             document.querySelectorAll('.step-dot').forEach(d => { d.classList.remove('active'); d.classList.add('done'); });
+            localStorage.removeItem('registro_cafeteria_id');
         } catch(e) { 
             showAlert(e.message); 
         }
@@ -750,6 +753,19 @@
 
     cargarPlanes();
     cargarConfiguracionPago();
+
+    // Comprobar si hay un registro pendiente en localStorage SOLO al cargar la página
+    document.addEventListener("DOMContentLoaded", function() {
+        const pendingId = localStorage.getItem('registro_cafeteria_id');
+        if (pendingId && !wizardInitialized) {
+            registeredCafeteriaId = pendingId;
+            // Redirigir directamente al paso 3 sin perder el state
+            setTimeout(() => {
+                goToStep(3);
+            }, 100);
+        }
+        wizardInitialized = true;
+    });
 </script>
 </body>
 </html>
