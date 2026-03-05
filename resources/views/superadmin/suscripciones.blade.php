@@ -34,7 +34,7 @@
                         <th>Monto Mensual</th>
                         <th>Próximo Pago</th>
                         <th>Estado</th>
-                        <th class="text-end">Acciones</th>
+                        <th class="text-center pe-4">Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="tabla-suscripciones">
@@ -55,6 +55,35 @@
                 <div class="modal-body p-4 pt-0">
                     <div id="detalle-body" class="text-center">
                         <div class="spinner-border text-primary" role="status"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Historial de Suscripciones -->
+    <div class="modal fade" id="modalHistorial" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 rounded-4 shadow">
+                <div class="modal-header border-0 p-4 pb-0">
+                    <h5 class="fw-bold m-0" style="color: var(--black-primary);">Historial de <span id="historial-cafe-nombre"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr class="small text-muted text-uppercase">
+                                    <th>Periodo</th>
+                                    <th>Plan</th>
+                                    <th>Monto</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historial-body">
+                                <tr><td colspan="4" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -99,6 +128,7 @@ function renderTabla(suscripciones) {
     
     tbody.innerHTML = suscripciones.map(s => {
         const cafe = s.cafeteria?.nombre || '—';
+        const safeName = cafe.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
         const plan = s.plan?.nombre_plan || '—';
         const monto = s.monto ? `$${parseFloat(s.monto).toFixed(2)}` : '—';
         const fechaFin = new Date(s.fecha_fin).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -115,14 +145,15 @@ function renderTabla(suscripciones) {
             <td class="fw-bold" style="color: var(--black-primary);">${monto}</td>
             <td style="color: var(--text-muted);">${fechaFin}</td>
             <td>${badgeEstado}</td>
-            <td class="text-end">
-                <div class="d-flex justify-content-end gap-2">
+            <td class="text-center pe-4">
+                <div class="d-flex justify-content-center gap-3 text-nowrap">
+                    <button type="button" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Historial" onclick="verHistorial(${s.cafe_id}, '${safeName}')"><i class="bi bi-clock-history"></i></button>
                     ${(s.comprobante_url || (s.cafeteria && s.cafeteria.comprobante_url)) 
-                        ? `<button class="btn btn-sm btn-outline-dark rounded-pill px-3" onclick="verComprobanteSub(${s.id})"><i class="bi bi-file-earmark-text me-1"></i>Recibo</button>` 
+                        ? `<button type="button" class="btn btn-sm btn-outline-dark rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Recibo" onclick="verComprobanteSub(${s.id})"><i class="bi bi-file-earmark-text"></i></button>` 
                         : ''}
                     ${s.estado_pago !== 'cancelado' && s.cafeteria?.estado !== 'suspendida'
-                        ? `<button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="cambiarEstado(${s.cafe_id}, 'suspendida')">Suspender</button>`
-                        : `<button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="cambiarEstado(${s.cafe_id}, 'activa')">Reactivar</button>`
+                        ? `<button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="cambiarEstado(${s.cafe_id}, 'suspendida')">Suspender</button>`
+                        : `<button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="cambiarEstado(${s.cafe_id}, 'activa')">Reactivar</button>`
                     }
                 </div>
             </td>
@@ -310,7 +341,92 @@ async function verComprobanteSub(suscripcionId) {
     }
 }
 
+async function verHistorial(cafeteriaId, nombre) {
+    const modal = new bootstrap.Modal(document.getElementById('modalHistorial'));
+    document.getElementById('historial-cafe-nombre').innerHTML = nombre;
+    const tbody = document.getElementById('historial-body');
+    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-muted">Cargando historial...</p></td></tr>';
+    modal.show();
+
+    try {
+        const res = await fetch(`${API}/superadmin/suscripciones?cafe_id=${cafeteriaId}`, { headers: authHeaders() });
+        const json = await res.json();
+        if (!res.ok) throw new Error("Error del servidor");
+        
+        const historial = json.data || [];
+        
+        if (!historial.length) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">No hay historial registrado para esta cafetería.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = historial.map(s => {
+            const plan = s.plan?.nombre_plan || '—';
+            const monto = s.monto ? `$${parseFloat(s.monto).toFixed(2)}` : '—';
+            const fechaInicio = new Date(s.fecha_inicio).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+            const fechaFin = new Date(s.fecha_fin).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+            
+            let badgePlan = `<span class="badge bg-light text-dark border">${plan}</span>`;
+            
+            let badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7;">● Pagado</span>`;
+            if (s.estado_pago === 'pendiente') {
+                badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #FFF8E1; color: #FFA000; border: 1px solid #FFE082;">● Pendiente</span>`;
+            } else if (s.estado_pago === 'vencido') {
+                badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A;">● Vencido</span>`;
+            } else if (s.estado_pago === 'cancelado') {
+                badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #F5F5F5; color: #757575; border: 1px solid #E0E0E0;">● Cancelado</span>`;
+            }
+
+            return `<tr>
+                <td style="color: var(--text-muted); font-size: 0.9rem;">
+                    <span class="fw-bold text-dark">Inicio:</span> ${fechaInicio} <br> 
+                    <span class="fw-bold text-dark">Vence:</span>  ${fechaFin}
+                </td>
+                <td>${badgePlan}</td>
+                <td class="fw-bold" style="color: var(--black-primary);">${monto}</td>
+                <td>${badgeEstado}</td>
+            </tr>`;
+        }).join('');
+
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-danger text-center py-4">Ocurrió un problema al cargar el historial. Intenta nuevamente.</td></tr>';
+    }
+}
+
 // Init
 cargarSuscripciones();
+
+// Initialize tooltips after rendering the table
+document.addEventListener('DOMContentLoaded', function () {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+
+// We need to re-initialize tooltips dynamically when the table is re-rendered
+function reinitializeTooltips() {
+    // Dispose old tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+        const instance = bootstrap.Tooltip.getInstance(tooltipTriggerEl);
+        if (instance) {
+            instance.dispose();
+        }
+    });
+
+    // Initialize new tooltips
+    const newTooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    newTooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+}
+// Hook into renderTabla implicitly by calling reinitializeTooltips at the end of renderTabla
+const originalRenderTabla = renderTabla;
+renderTabla = function(suscripciones) {
+    originalRenderTabla(suscripciones);
+    setTimeout(reinitializeTooltips, 100); // Small delay to ensure DOM is updated
+};
+
 </script>
 @endsection
