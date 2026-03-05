@@ -338,7 +338,47 @@
     const API_BASE = "{{ url('/api') }}";
     let selectedPlanId = null;
     let registeredCafeteriaId = null;
-    let wizardInitialized = false;
+
+    // Recuperar estado al cargar
+    document.addEventListener("DOMContentLoaded", function() {
+        // Restaurar IDs
+        const savedCafeId = localStorage.getItem('registro_cafeteria_id');
+        if (savedCafeId) {
+            registeredCafeteriaId = savedCafeId;
+            goToStep(3);
+        }
+
+        // Restaurar datos guardados
+        const savedData = localStorage.getItem('wizard_form_data');
+        if (savedData) {
+            try {
+                const data = JSON.parse(savedData);
+                Object.keys(data).forEach(key => {
+                    const el = document.getElementById(key);
+                    if (el) el.value = data[key];
+                });
+                if (data.plan_id) {
+                    selectedPlanId = data.plan_id;
+                    // El selector visual se actualizará en renderPlanSelector
+                }
+            } catch (e) {
+                console.error("Error al restaurar el estado del formulario", e);
+            }
+        }
+    });
+
+    // Guardar estado
+    function saveFormState() {
+        const inputs = ['nombre', 'descripcion', 'calle', 'num_exterior', 'num_interior', 'colonia', 'ciudad', 'estado_republica', 'cp', 'telefono', 'gerente_name', 'gerente_email'];
+        const data = {};
+        inputs.forEach(id => {
+            const val = document.getElementById(id)?.value;
+            if (val) data[id] = val;
+        });
+        if (selectedPlanId) data.plan_id = selectedPlanId;
+        
+        localStorage.setItem('wizard_form_data', JSON.stringify(data));
+    }
 
     const formatterMXN = new Intl.NumberFormat('es-MX', {
         style: 'currency',
@@ -409,6 +449,7 @@
         selectedPlanId = id;
         document.querySelectorAll('.plan-option').forEach(el => el.classList.remove('selected'));
         document.getElementById(`po-${id}`)?.classList.add('selected');
+        saveFormState();
     };
 
     window.selectPlanAndScroll = function(id) {
@@ -457,6 +498,7 @@
             return false;
         }
         
+        saveFormState();
         return true;
     };
 
@@ -552,35 +594,33 @@
             });
             const json = await res.json();
             
+            clearValidationErrors();
+
             if (!res.ok) {
                 if (res.status === 422 && json.errors) {
                     showValidationErrors(json.errors);
-                    Swal.fire({
-                        title: 'Atención',
-                        text: 'Revisa los campos marcados.',
-                        icon: 'warning',
-                        confirmButtonColor: '#382C26'
-                    });
+                    showAlert('Revisa los campos marcados en rojo.');
                 } else {
-                    let errorMsg = 'Algo salió mal. Intenta de nuevo.';
+                    let errorMsg = 'Algo salió mal al procesar tu solicitud. Intenta de nuevo más tarde.';
                     if (res.status === 400 || json.message) {
                         errorMsg = json.message || errorMsg;
                     }
-                    Swal.fire({
-                        title: 'Atención',
-                        text: errorMsg,
-                        icon: 'warning',
-                        confirmButtonColor: '#382C26'
-                    });
+                    showAlert(errorMsg);
                 }
                 return;
             }
             
-            registeredCafeteriaId = json.data.cafeteria_id;
-            localStorage.setItem('registro_cafeteria_id', registeredCafeteriaId);
-            hideAlert();
-            goToStep(3); // Visual trick covered by normal goto
-        } catch (e) { showAlert(e.message); } 
+            if (json.data && json.data.cafeteria_id) {
+                registeredCafeteriaId = json.data.cafeteria_id;
+                localStorage.setItem('registro_cafeteria_id', registeredCafeteriaId);
+                saveFormState();
+                goToStep(3);
+            } else {
+                showAlert('No se pudo obtener el ID del negocio. Contacta a soporte.');
+            }
+        } catch (e) { 
+            showAlert('Error de conexión. ' + e.message); 
+        } 
         finally { btnTxt.classList.remove('d-none'); btnLd.classList.add('d-none'); }
     }
 
@@ -640,14 +680,18 @@
         const file = input.files[0];
         if (file.size > 5 * 1024 * 1024) { 
             showAlert('El archivo excede el límite de 5MB. Por favor selecciona uno más ligero.'); 
-            input.value = '';
-            document.getElementById('file-preview').innerHTML = '';
+            rmFile(); // Limpia la vista en vez de solo remover valor
             return; 
         }
 
         const btnTxt = document.getElementById('btn-subir-text');
         const btnLd = document.getElementById('btn-subir-loading');
-        btnTxt.classList.add('d-none'); btnLd.classList.remove('d-none');
+        
+        // Bloquear UX
+        btnTxt.classList.add('d-none'); 
+        btnLd.classList.remove('d-none');
+        document.getElementById('btn-subir').disabled = true;
+        document.querySelector('#step-3 .btn-prev').disabled = true;
 
         const fd = new FormData(); 
         fd.append('comprobante', file);
@@ -665,29 +709,43 @@
             const json = await res.json();
             
             if (!res.ok) {
-                // Si el backend devuelve errores de validación (422)
+                if (res.status === 409) {
+                    showAlert(json.message || 'Tu comprobante ya fue enviado y está en revisión', 'info');
+                    // Bloquear vista, no permitir envíos adicionales
+                    document.getElementById('btn-subir').disabled = true;
+                    rmFile();
+                    document.getElementById('upload-area').innerHTML = `<p class="text-danger fw-bold m-0"><i class="bi bi-shield-lock me-2"></i> ${json.message || 'Registro en revisión'}</p>`;
+                    return;
+                }
                 if (res.status === 422 && json.errors && json.errors.comprobante) {
                     throw new Error(json.errors.comprobante[0]);
                 }
-                throw new Error(json.message || 'Ocurrió un error en la transferencia del archivo.');
+                throw new Error(json.message || 'Ocurrió un error general en el servidor. (HTTP ' + res.status + ')');
             }
+            
+            // Éxito! Limpiar estado local y avanzar
+            localStorage.removeItem('registro_cafeteria_id');
+            localStorage.removeItem('wizard_form_data');
             
             document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
             document.getElementById('step-success').classList.add('active');
             document.querySelectorAll('.step-dot').forEach(d => { d.classList.remove('active'); d.classList.add('done'); });
-            localStorage.removeItem('registro_cafeteria_id');
+            
         } catch(e) { 
             showAlert(e.message); 
+        } finally { 
+            btnTxt.classList.remove('d-none'); 
+            btnLd.classList.add('d-none'); 
+            document.getElementById('btn-subir').disabled = false;
+            document.querySelector('#step-3 .btn-prev').disabled = false;
         }
-
-        finally { btnTxt.classList.remove('d-none'); btnLd.classList.add('d-none'); }
     };
 
-    function showAlert(msg) { 
+    function showAlert(msg, icon = 'warning') { 
         Swal.fire({
-            title: 'Atención',
+            title: icon === 'info' ? 'Aviso' : 'Atención',
             text: msg,
-            icon: 'warning',
+            icon: icon,
             confirmButtonColor: '#382C26',
             confirmButtonText: 'Entendido'
         });
@@ -751,21 +809,15 @@
         }
     }
 
+    // Render inicial del plan seleccionado después de cargar planes
+    const originalRenderPlanSelector = renderPlanSelector;
+    renderPlanSelector = function(planes) {
+        originalRenderPlanSelector(planes);
+        if (selectedPlanId) selectPlan(selectedPlanId); // Reaplicar clase visual si había uno guardado en localStorage
+    };
+
     cargarPlanes();
     cargarConfiguracionPago();
-
-    // Comprobar si hay un registro pendiente en localStorage SOLO al cargar la página
-    document.addEventListener("DOMContentLoaded", function() {
-        const pendingId = localStorage.getItem('registro_cafeteria_id');
-        if (pendingId && !wizardInitialized) {
-            registeredCafeteriaId = pendingId;
-            // Redirigir directamente al paso 3 sin perder el state
-            setTimeout(() => {
-                goToStep(3);
-            }, 100);
-        }
-        wizardInitialized = true;
-    });
 </script>
 </body>
 </html>
