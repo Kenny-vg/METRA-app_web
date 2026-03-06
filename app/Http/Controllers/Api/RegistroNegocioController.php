@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class RegistroNegocioController extends Controller
 {
@@ -36,8 +37,23 @@ class RegistroNegocioController extends Controller
      * Crea: Cafetería (en_revision) + Gerente (inactivo) + Suscripción (pendiente).
      */
     public function store(Request $request)
-{
-    $data = $request->validate([
+    {
+        // 1. CHECAR SI ES RECHAZADO ANTES DE VALIDAR (para evitar 422 shadowing 403)
+        $email = $request->input('gerente.email') ?: $request->input('email');
+        if ($email) {
+            $userRechazado = User::where('email', $email)
+                ->where('estatus_registro', 'rechazado')
+                ->first();
+            
+            if ($userRechazado) {
+                return ApiResponse::error(
+                    'Este correo ya fue utilizado en un registro que fue rechazado. Contacta a soporte para más información.',
+                    403
+                );
+            }
+        }
+
+        $data = $request->validate([
         'nombre'           => 'required|string|max:100',
         'descripcion'      => 'nullable|string|max:255',
         'calle'            => 'nullable|string|max:100',
@@ -78,8 +94,19 @@ class RegistroNegocioController extends Controller
         if ($cafeteria && $cafeteria->comprobante_url) {
             return ApiResponse::error(
                 'Tu comprobante ya fue enviado y está en revisión.',
-                409
+                409,
+                ['cafeteria_id' => $cafeteria->id]
             );
+        }
+
+        // si no existe la cafeteria (inconsistencia), crearla
+        if (!$cafeteria) {
+            $cafeteria = Cafeteria::create([
+                'nombre' => $data['nombre'],
+                'user_id' => $gerenteExistente->id,
+                'estado' => 'en_revision'
+            ]);
+            $gerenteExistente->update(['cafe_id' => $cafeteria->id]);
         }
 
         // actualizar datos mientras no haya comprobante

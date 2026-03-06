@@ -293,23 +293,26 @@ document.addEventListener('DOMContentLoaded', function() {
                         else window.location.href = '/public/perfil';
                     } catch (err) {}
                 } else {
+                    const errorData = await response.json();
+                    const errorMsg = errorData.message || '';
+                    const msgLower = errorMsg.toLowerCase();
+
+                    // Caso 1: Rechazado (Status 403 o mensaje con palabras clave)
+                    if (response.status === 403 || msgLower.includes('rechazado') || msgLower.includes('soporte')) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Registro Rechazado',
+                            text: errorMsg || 'Tu registro ha sido rechazado. Por favor contacta a soporte.',
+                            confirmButtonColor: '#D32F2F',
+                            confirmButtonText: 'Entendido'
+                        });
+                        return;
+                    }
+
+                    // Caso 2: Pendiente / Revisión (Status 423)
                     if (response.status === 423) {
-                        const errorData = await response.json();
-                        const errorMsg = errorData.message || '';
-                        const msgLower = errorMsg.toLowerCase();
-                        
-                        // Nuevo: Si el mensaje indica rechazo (usamos palabras clave que el usuario pondrá en el backend)
-                        if (msgLower.includes('rechazado') || msgLower.includes('soporte')) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Registro Rechazado',
-                                text: errorMsg,
-                                confirmButtonColor: '#D32F2F',
-                                confirmButtonText: 'Entendido'
-                            });
-                        } 
-                        // Si el mensaje indica que ya fue enviado o espera validación
-                        else if (msgLower.includes('espera') || msgLower.includes('revisión')) {
+                        // Si el mensaje indica espera/revisión
+                        if (msgLower.includes('espera') || msgLower.includes('revisión')) {
                             Swal.fire({
                                 icon: 'info',
                                 title: 'Solicitud en revisión',
@@ -318,7 +321,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 confirmButtonText: 'Entendido'
                             });
                         } else {
-                            // Caso: Falta subir el comprobante
+                            // Caso: Falta subir el comprobante u otras causas de 423
                             Swal.fire({
                                 icon: 'info',
                                 title: 'Solicitud pendiente',

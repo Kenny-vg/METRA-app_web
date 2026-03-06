@@ -26,6 +26,14 @@ class LoginController extends Controller
 
     if(!$user->estado && $user->role === 'gerente'){
 
+        // 1. Prioridad: Si el registro fue rechazado
+        if($user->estatus_registro === 'rechazado'){
+            return ApiResponse::error(
+                'Tu registro ha sido rechazado. Por favor contacta a soporte para más información.',
+                403
+            );
+        }
+
         $cafeteria = $user->cafeteria;
         $suscripcion = $cafeteria
             ? $cafeteria->suscripciones()->latest()->first()
@@ -46,14 +54,6 @@ class LoginController extends Controller
             );
         }
 
-        // Si el registro fue rechazado
-        if($user->estatus_registro === 'rechazado'){
-            return ApiResponse::error(
-                'Tu registro ha sido rechazado. Por favor contacta a soporte para más información.',
-                403
-            );
-        }
-
         // Si la suscripción sigue pendiente
         if($suscripcion->estado_pago === 'pendiente'){
             return ApiResponse::error(
@@ -61,8 +61,6 @@ class LoginController extends Controller
                 423
             );
         }
-
-
     }
 
     //bloquear acceso si la cafeteria no tiene suscripción activa

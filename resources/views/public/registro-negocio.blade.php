@@ -382,7 +382,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    const API_BASE = "/api";
+    const API_BASE = "{{ url('/api') }}";
     let selectedPlanId = null;
     let registeredCafeteriaId = null;
 
