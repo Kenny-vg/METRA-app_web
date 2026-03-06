@@ -339,20 +339,22 @@ document.addEventListener('DOMContentLoaded', function() {
                         return; // Detiene la ejecución normal
                     }
 
-                    const errorData = await response.json();
-                    let errorMsg = errorData.message || 'Credenciales inválidas.';
+
+                    // Si no es ninguno de los anteriores, mostrar error genérico o de validación
+                    let displayMsg = errorData.message || 'Credenciales inválidas.';
+                    
                     if (errorData.errors) {
-                        errorMsg = `<ul class="text-start mb-0" style="color: #D32F2F;">`;
+                        displayMsg = `<ul class="text-start mb-0" style="color: #D32F2F;">`;
                         Object.values(errorData.errors).forEach(errArray => {
                             errArray.forEach(err => {
-                                errorMsg += `<li>${err}</li>`;
+                                displayMsg += `<li>${err}</li>`;
                             });
                         });
-                        errorMsg += `</ul>`;
+                        displayMsg += `</ul>`;
                         Swal.fire({
                             icon: 'error',
                             title: 'Acceso Denegado',
-                            html: errorMsg,
+                            html: displayMsg,
                             confirmButtonColor: '#382C26',
                             confirmButtonText: 'Aceptar'
                         });
@@ -360,7 +362,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         Swal.fire({
                             icon: 'error',
                             title: 'Acceso Denegado',
-                            text: errorMsg,
+                            text: displayMsg,
                             confirmButtonColor: '#382C26',
                             confirmButtonText: 'Aceptar'
                         });
