@@ -311,21 +311,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     // Caso 2: Pendiente / Revisión (Status 423)
                     if (response.status === 423) {
-                        // Si el mensaje indica espera/revisión
-                        if (msgLower.includes('espera') || msgLower.includes('revisión')) {
+                        // 1. Mostrar pantalla de subir comprobante
+                        if (errorMsg === 'Debes subir tu comprobante para continuar.' || msgLower.includes('subir tu comprobante')) {
                             Swal.fire({
                                 icon: 'info',
-                                title: 'Solicitud en revisión',
+                                title: 'Comprobante requerido',
                                 text: errorMsg,
-                                confirmButtonColor: '#382C26',
-                                confirmButtonText: 'Entendido'
-                            });
-                        } else {
-                            // Caso: Falta subir el comprobante u otras causas de 423
-                            Swal.fire({
-                                icon: 'info',
-                                title: 'Solicitud pendiente',
-                                text: errorMsg || 'Tu registro está pendiente. Debes subir tu comprobante para continuar.',
                                 showCancelButton: true,
                                 confirmButtonText: 'Subir comprobante',
                                 cancelButtonText: 'Cancelar',
@@ -334,6 +325,36 @@ document.addEventListener('DOMContentLoaded', function() {
                                 if(result.isConfirmed) {
                                     continuarSubida(email);
                                 }
+                            });
+                        } 
+                        // 2. Mostrar pantalla de "Solicitud en revisión"
+                        else if (errorMsg === 'Tu comprobante fue enviado. Espera la validación del superadmin.' || msgLower.includes('espera la validación')) {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Solicitud en revisión',
+                                text: errorMsg,
+                                confirmButtonColor: '#382C26',
+                                confirmButtonText: 'Entendido'
+                            });
+                        } 
+                        // 3. Mostrar pantalla de estado pendiente
+                        else if (errorMsg === 'Tu cuenta está en revisión.' || msgLower.includes('cuenta está en revisión')) {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Cuenta en revisión',
+                                text: errorMsg,
+                                confirmButtonColor: '#382C26',
+                                confirmButtonText: 'Entendido'
+                            });
+                        } 
+                        // Fallback para otros 423
+                        else {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Atención',
+                                text: errorMsg || 'Acción requerida.',
+                                confirmButtonColor: '#382C26',
+                                confirmButtonText: 'Entendido'
                             });
                         }
                         return; // Detiene la ejecución normal

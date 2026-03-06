@@ -26,46 +26,50 @@ class LoginController extends Controller
 
     if(!$user->estado && $user->role === 'gerente'){
 
-        // 1. Prioridad: Si el registro fue rechazado
-        if($user->estatus_registro === 'rechazado'){
+    if($user->estatus_registro === 'rechazado'){
+        return ApiResponse::error(
+            'Tu registro ha sido rechazado. Contacta a soporte.',
+            403
+        );
+    }
+
+    if($user->estatus_registro === 'pendiente'){
+
+        $cafeteria = $user->cafeteria;
+
+        if(!$cafeteria){
             return ApiResponse::error(
-                'Tu registro ha sido rechazado. Por favor contacta a soporte para más información.',
-                403
+                'No tienes una cafetería asociada.',
+                423
             );
         }
 
-        if($user->estatus_registro === 'pendiente'){
-            $cafeteria = $user->cafeteria;
-            $suscripcion = $cafeteria ? $cafeteria->suscripciones()->latest()->first() : null;
+        $suscripcion = $cafeteria->suscripciones()
+            ->orderByDesc('id')
+            ->first();
 
-            if(!$suscripcion){
-                return ApiResponse::error(
-                    'Tu suscripción aún no ha sido creada.',
-                    423
-                );
-            }
-
-            if(!$suscripcion->comprobante_url){
-                return ApiResponse::error(
-                    'Debes subir tu comprobante para continuar.',
-                    423
-                );
-            }
-
-            if($suscripcion->estado_pago === 'pendiente'){
-                return ApiResponse::error(
-                    'Tu comprobante fue enviado. Espera la validación del superadmin.',
-                    423
-                );
-            }
-
-            // Fallback por seguridad si está pendiente pero no cayó en lo anterior
+        if(!$suscripcion){
             return ApiResponse::error(
-                'Tu cuenta está en revisión.',
+                'Debes subir tu comprobante para continuar.',
+                423
+            );
+        }
+
+        if(empty($suscripcion->comprobante_url) && empty($cafeteria->comprobante_url)){
+            return ApiResponse::error(
+                'Debes subir tu comprobante para continuar.',
+                423
+            );
+        }
+
+        if($suscripcion->estado_pago === 'pendiente'){
+            return ApiResponse::error(
+                'Tu comprobante fue enviado. Espera la validación del superadmin.',
                 423
             );
         }
     }
+}
 
     //bloquear acceso si la cafeteria no tiene suscripción activa
     if(in_array($user->role,['gerente','personal'])){
@@ -85,8 +89,8 @@ class LoginController extends Controller
 
         if(!$suscripcion){
             return ApiResponse::error(
-                'Tu suscripción aún no ha sido creada.',
-                403
+                'Tu cuenta está en revisión.',
+                423
             );
         }
 
@@ -95,7 +99,7 @@ class LoginController extends Controller
 
             if($user->role === 'gerente'){
                 return ApiResponse::error(
-                    'Tu suscripción está pendiente de aprobación. Por favor espera la validación del superadmin.',
+                    'Tu cuenta está en revisión.',
                     423
                 );
             }

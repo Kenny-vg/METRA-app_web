@@ -45,7 +45,7 @@ class User extends Authenticatable
 
     public function cafeteria()
     {
-        return $this->belongsTo(Cafeteria::class, 'cafeteria_id');
+        return $this->belongsTo(Cafeteria::class, 'cafe_id');
     }
     
 }
