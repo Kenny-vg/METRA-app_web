@@ -130,8 +130,8 @@ class RegistroNegocioController extends Controller
 
         $suscripcion = $cafeteria->suscripciones()->latest()->first();
 
-        if ($suscripcion && $suscripcion->plan_id != $data['plan_id']) {
-
+    if ($suscripcion) {
+        if ($suscripcion->plan_id != $data['plan_id']) {
             $inicio = now();
             $fin = $inicio->copy()->addDays($plan->duracion_dias);
 
@@ -142,12 +142,27 @@ class RegistroNegocioController extends Controller
                 'monto' => $plan->precio
             ]);
         }
+    } else {
+        // Fallback crucial: si el intento anterior falló antes de crear la suscripción, se crea ahora
+        $inicio = now();
+        $fin = $inicio->copy()->addDays($plan->duracion_dias);
 
-        return ApiResponse::success([
-            'cafeteria_id' => $cafeteria->id,
-            'registro_existente' => true
-        ], 'Registro actualizado. Continúa con el comprobante.');
+        Suscripcion::create([
+            'cafe_id'      => $cafeteria->id,
+            'plan_id'      => $plan->id,
+            'user_id'      => $gerenteExistente->id,
+            'fecha_inicio' => $inicio,
+            'fecha_fin'    => $fin,
+            'estado_pago'  => 'pendiente',
+            'monto'        => $plan->precio,
+        ]);
     }
+
+    return ApiResponse::success([
+        'cafeteria_id' => $cafeteria->id,
+        'registro_existente' => true
+    ], 'Registro actualizado. Continúa con el comprobante.');
+}
 
     $result = DB::transaction(function () use ($data, $plan) {
 

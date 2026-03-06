@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\Superadmin\AprobacionController;
 use App\Http\Controllers\Api\Superadmin\CafeteriaController;
 use App\Http\Controllers\Api\Superadmin\ConfiguracionController;
 use App\Http\Controllers\Api\Auth\PasswordResetController;
+use App\Http\Controllers\Api\Gerente\ZonaController;
 /*
 |------------------------------------------
 | RUTAS PÚBLICAS
@@ -161,4 +162,10 @@ Route::middleware([
 ])->prefix('gerente')->group(function () {
     Route::get('/mi-cafeteria', [CafeteriaPerfilController::class, 'show']);
     Route::put('/mi-cafeteria', [CafeteriaPerfilController::class, 'update']);
+
+    //CRUD ZONAS
+    Route::get('/zonas', [ZonaController::class, 'index']);
+    Route::post('/zonas', [ZonaController::class, 'store']);
+    Route::put('/zonas/{id}', [ZonaController::class, 'update']);
+    Route::delete('/zonas/{id}', [ZonaController::class, 'destroy']);
 });

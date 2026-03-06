@@ -34,30 +34,34 @@ class LoginController extends Controller
             );
         }
 
-        $cafeteria = $user->cafeteria;
-        $suscripcion = $cafeteria
-            ? $cafeteria->suscripciones()->latest()->first()
-            : null;
+        if($user->estatus_registro === 'pendiente'){
+            $cafeteria = $user->cafeteria;
+            $suscripcion = $cafeteria ? $cafeteria->suscripciones()->latest()->first() : null;
 
-        if(!$suscripcion){
-            return ApiResponse::error(
-                'Tu suscripción aún no ha sido creada.',
-                423
-            );
-        }
+            if(!$suscripcion){
+                return ApiResponse::error(
+                    'Tu suscripción aún no ha sido creada.',
+                    423
+                );
+            }
 
-        // Si NO ha subido comprobante
-        if(!$suscripcion->comprobante_url){
-            return ApiResponse::error(
-                'Debes subir tu comprobante para continuar.',
-                423
-            );
-        }
+            if(!$suscripcion->comprobante_url){
+                return ApiResponse::error(
+                    'Debes subir tu comprobante para continuar.',
+                    423
+                );
+            }
 
-        // Si la suscripción sigue pendiente
-        if($suscripcion->estado_pago === 'pendiente'){
+            if($suscripcion->estado_pago === 'pendiente'){
+                return ApiResponse::error(
+                    'Tu comprobante fue enviado. Espera la validación del superadmin.',
+                    423
+                );
+            }
+
+            // Fallback por seguridad si está pendiente pero no cayó en lo anterior
             return ApiResponse::error(
-                'Tu comprobante fue enviado. Espera la validación del superadmin.',
+                'Tu cuenta está en revisión.',
                 423
             );
         }
