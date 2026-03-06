@@ -134,9 +134,16 @@ function renderTabla(suscripciones) {
         const fechaFin = new Date(s.fecha_fin).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
         
         let badgePlan = `<span class="badge rounded-pill px-3 py-2" style="background: #FFF8E1; color: #FFA000; border: 1px solid #FFE082;">${plan}</span>`;
-        let badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7;">● Pagado</span>`;
-        if(s.estado_pago === 'cancelado') {
+        
+        // Lógica de Estado Mejorada
+        let badgeEstado = '';
+        if(s.estado_pago === 'pagado') {
+            badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7;">● Pagado</span>`;
+        } else if(s.estado_pago === 'cancelado') {
             badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A;">● Cancelado</span>`;
+        } else {
+            // Pendiente u otros
+            badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #FFF8E1; color: #FFA000; border: 1px solid #FFE082;">● Pendiente</span>`;
         }
 
         return `<tr class="${s.estado_pago === 'cancelado' ? 'opacity-75' : ''}">
@@ -151,9 +158,11 @@ function renderTabla(suscripciones) {
                     ${(s.comprobante_url || (s.cafeteria && s.cafeteria.comprobante_url)) 
                         ? `<button type="button" class="btn btn-sm btn-outline-dark rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Recibo" onclick="verComprobanteSub(${s.id})"><i class="bi bi-file-earmark-text"></i></button>` 
                         : ''}
-                    ${s.estado_pago !== 'cancelado' && s.cafeteria?.estado !== 'suspendida'
-                        ? `<button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="cambiarEstado(${s.cafe_id}, 'suspendida')">Suspender</button>`
-                        : `<button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="cambiarEstado(${s.cafe_id}, 'activa')">Reactivar</button>`
+                    ${(s.cafeteria?.estado === 'en_revision')
+                        ? `<span class="badge text-muted border px-2 py-1 small">Revisión pendiente</span>`
+                        : (s.estado_pago !== 'cancelado' && s.cafeteria?.estado !== 'suspendida'
+                            ? `<button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="cambiarEstado(${s.cafe_id}, 'suspendida')">Suspender</button>`
+                            : `<button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="cambiarEstado(${s.cafe_id}, 'activa')">Reactivar</button>`)
                     }
                 </div>
             </td>

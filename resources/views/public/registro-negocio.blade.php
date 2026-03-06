@@ -272,23 +272,70 @@
         <!-- PASO 3 -->
         <div class="wizard-step" id="step-3">
             <h4 class="fw-bold mb-1" style="color: var(--black-primary);">Validación de Pago</h4>
+            <p class="text-muted mb-4 small">Por favor, realiza la transferencia y sube tu comprobante para activar tu cuenta.</p>
+
+            <div class="mb-4 p-4 rounded-4 bg-light border-0 shadow-sm" id="resumen-pedido" style="border-left: 4px solid var(--accent-gold) !important;">
+                <h6 class="fw-bold text-dark border-bottom pb-2 mb-3"><i class="bi bi-info-circle me-2 text-primary"></i>Resumen de Solicitud</h6>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">Negocio:</span>
+                    <span class="fw-bold small" id="res-negocio">---</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">Plan Seleccionado:</span>
+                    <span class="fw-bold small" id="res-plan">---</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted small">Monto a Transferir:</span>
+                    <span class="fw-bold h5 mb-0" style="color: var(--accent-gold);" id="res-monto">---</span>
+                </div>
+            </div>
             
-            <div class="mb-4 p-4 rounded-4 bg-white border border-secondary border-opacity-25 shadow-sm" id="pago-s-info" style="display:none;">
-                <h6 class="fw-bold text-dark border-bottom pb-2 mb-3"><i class="bi bi-bank me-2 text-primary"></i>Datos de Transferencia</h6>
-                <div class="row g-2 small text-muted mb-4">
-                    <div class="col-12 col-md-6"><strong class="text-dark">Banco:</strong> <span id="dyn-banco"></span></div>
-                    <div class="col-12 col-md-6"><strong class="text-dark">Beneficiario:</strong> <span id="dyn-beneficiario"></span></div>
-                    <div class="col-12"><strong class="text-dark">CLABE:</strong> <span id="dyn-clabe" style="color: var(--accent-gold); font-weight:bold; letter-spacing:1px;"></span></div>
-                    <div class="col-12 mt-2 p-3 bg-light rounded-3" id="dyn-inst-box" style="display:none;">
-                        <i class="bi bi-info-circle me-1 text-primary"></i> <span id="dyn-instrucciones"></span>
+            <div class="mb-4 p-4 rounded-4 border-0 shadow-sm" id="pago-s-info" style="background: #fdfaf8; border: 1px solid rgba(181, 146, 126, 0.2) !important;">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-metra-gold text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 28px; height: 28px; background-color: var(--accent-gold);">
+                        <i class="bi bi-bank" style="font-size: 0.9rem;"></i>
                     </div>
+                    <h6 class="fw-bold mb-0" style="color: var(--black-primary); font-size: 1rem;">Instrucciones de Pago</h6>
                 </div>
                 
-                <h6 class="fw-bold text-dark border-bottom pb-2 mb-3"><i class="bi bi-headset me-2 text-primary"></i>Contacto Soporte</h6>
-                <div class="d-flex flex-wrap gap-4 small fw-semibold">
-                    <span id="dyn-email-box" style="display:none;"><i class="bi bi-envelope-fill me-1 text-danger"></i> <span id="dyn-email" class="text-dark"></span></span>
-                    <span id="dyn-tel-box" style="display:none;"><i class="bi bi-telephone-fill me-1 text-primary"></i> <span id="dyn-telefono" class="text-dark"></span></span>
-                    <span id="dyn-wts-box" style="display:none;"><i class="bi bi-whatsapp me-1 text-success"></i> <span id="dyn-whatsapp" class="text-dark"></span></span>
+                <p class="small text-muted mb-3">Transfiere el monto exacto a la siguiente cuenta:</p>
+
+                <div id="loading-pago-wizard" class="py-3 text-center">
+                    <div class="spinner-border spinner-border-sm text-gold" style="color: var(--accent-gold);" role="status"></div>
+                </div>
+
+                <div id="pago-details-wizard" style="display:none;">
+                    <div class="row g-3 small text-muted mb-2">
+                        <div class="col-12 payment-detail-row">
+                            <span class="text-muted d-block" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Banco</span>
+                            <span class="fw-bold text-dark fs-6" id="dyn-banco">---</span>
+                        </div>
+                        <div class="col-12 payment-detail-row">
+                            <span class="text-muted d-block" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">CLABE Interbancaria</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fw-bold fs-5" id="dyn-clabe" style="color: var(--accent-gold); letter-spacing:1px;">---</span>
+                                <button class="btn btn-sm p-0 text-muted" onclick="copyClabeWizard()" title="Copiar CLABE">
+                                    <i class="bi bi-copy" id="clabe-copy-icon"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-12 payment-detail-row">
+                            <span class="text-muted d-block" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Beneficiario / Destinatario</span>
+                            <span class="fw-bold text-dark fs-6" id="dyn-beneficiario">---</span>
+                        </div>
+                        <div class="col-12 mt-3 p-3 bg-white bg-opacity-50 rounded-3 border-top" id="dyn-inst-box" style="display:none; border-top-style: dashed !important;">
+                            <i class="bi bi-info-circle me-1" style="color: var(--accent-gold);"></i> <span id="dyn-instrucciones" class="text-muted"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-3 border-top" style="border-top-style: solid !important;">
+                        <h6 class="fw-bold text-dark mb-2" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Centro de Soporte</h6>
+                        <div class="d-flex flex-wrap gap-3 small fw-semibold">
+                            <span id="dyn-email-box" style="display:none;"><i class="bi bi-envelope-at text-danger me-1"></i> <span id="dyn-email" class="text-dark"></span></span>
+                            <span id="dyn-tel-box" style="display:none;"><i class="bi bi-telephone text-primary me-1"></i> <span id="dyn-telefono" class="text-dark"></span></span>
+                            <span id="dyn-wts-box" style="display:none;"><i class="bi bi-whatsapp text-success me-1"></i> <span id="dyn-whatsapp" class="text-dark"></span></span>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -335,7 +382,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    const API_BASE = "{{ url('/api') }}";
+    const API_BASE = "/api";
     let selectedPlanId = null;
     let registeredCafeteriaId = null;
 
@@ -519,6 +566,17 @@
                 dot.classList.remove('active', 'done');
                 if (i < step) dot.classList.add('done');
                 else if (i === step) dot.classList.add('active');
+            }
+        }
+
+        if (step === 3) {
+            // Llenar resumen
+            document.getElementById('res-negocio').textContent = document.getElementById('nombre').value;
+            // Buscar plan nombre
+            const planCard = document.getElementById(`po-${selectedPlanId}`);
+            if (planCard) {
+                document.getElementById('res-plan').textContent = planCard.querySelector('.fw-bold').textContent;
+                document.getElementById('res-monto').textContent = planCard.querySelector('.fs-5').textContent;
             }
         }
     };
@@ -776,12 +834,15 @@
 
     // Consumo de endpoint de configuración
     async function cargarConfiguracionPago() {
+        const loading = document.getElementById('loading-pago-wizard');
+        const details = document.getElementById('pago-details-wizard');
+        
         try {
             const res = await fetch(`${API_BASE}/configuracion-pago`);
             const json = await res.json();
+            
             if(res.ok && json.data) {
                 const config = json.data;
-                document.getElementById('pago-s-info').style.display = 'block';
                 
                 document.getElementById('dyn-banco').textContent = config.banco || 'No provisto';
                 document.getElementById('dyn-beneficiario').textContent = config.beneficiario || 'No provisto';
@@ -790,23 +851,48 @@
                 if (config.instrucciones_pago) {
                     document.getElementById('dyn-inst-box').style.display = 'block';
                     document.getElementById('dyn-instrucciones').textContent = config.instrucciones_pago;
+                } else {
+                    document.getElementById('dyn-inst-box').style.display = 'none';
                 }
+                
                 if (config.email_soporte) {
-                    document.getElementById('dyn-email-box').style.display = 'block';
+                    document.getElementById('dyn-email-box').style.display = 'inline-block';
                     document.getElementById('dyn-email').textContent = config.email_soporte;
                 }
                 if (config.telefono_soporte) {
-                    document.getElementById('dyn-tel-box').style.display = 'block';
+                    document.getElementById('dyn-tel-box').style.display = 'inline-block';
                     document.getElementById('dyn-telefono').textContent = config.telefono_soporte;
                 }
                 if (config.whatsapp_soporte) {
-                    document.getElementById('dyn-wts-box').style.display = 'block';
+                    document.getElementById('dyn-wts-box').style.display = 'inline-block';
                     document.getElementById('dyn-whatsapp').textContent = config.whatsapp_soporte;
                 }
+
+                if (loading) loading.style.display = 'none';
+                if (details) details.style.display = 'block';
+            } else {
+                // Si no hay datos, ocultar sección o mostrar mensaje amable
+                if (loading) loading.innerHTML = '<span class="text-muted small">Pendiente de configurar por el administrador.</span>';
             }
         } catch(e) {
             console.error('Error al cargar config pago', e);
+            if (loading) loading.innerHTML = '<span class="text-danger small">Error al cargar datos. Verifica tu conexión.</span>';
         }
+    }
+
+    window.copyClabeWizard = function() {
+        const clabe = document.getElementById('dyn-clabe').textContent;
+        if (!clabe || clabe === '---') return;
+        
+        navigator.clipboard.writeText(clabe).then(() => {
+            const icon = document.getElementById('clabe-copy-icon');
+            icon.classList.remove('bi-copy');
+            icon.classList.add('bi-check-lg', 'text-success');
+            setTimeout(() => {
+                icon.classList.remove('bi-check-lg', 'text-success');
+                icon.classList.add('bi-copy');
+            }, 2000);
+        });
     }
 
     // Render inicial del plan seleccionado después de cargar planes

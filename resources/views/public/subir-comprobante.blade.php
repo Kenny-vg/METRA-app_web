@@ -46,7 +46,52 @@
         <div class="card border-0 shadow-sm" style="border-radius: 16px; max-width: 500px; width: 100%;">
             <div class="card-body p-4 p-md-5">
                 <h4 class="fw-bold mb-2 text-center" style="color: var(--black-primary); font-family: 'Inter', sans-serif;">Subir Comprobante</h4>
+                <p id="negocio-nombre" class="text-center fw-bold mb-1" style="color: var(--accent-gold); font-size: 1.1rem; display: none;"></p>
                 <p class="text-center mb-4" style="color: var(--text-muted); font-size: 0.95rem;">Su registro requiere un comprobante de pago para ser procesado.</p>
+
+                <!-- Sección de Datos Bancarios Refinada -->
+                <div id="datos-pago-container" class="mb-4 p-4 rounded-4 border-0" style="display: none; background: #fdfaf8; border: 1px solid rgba(181, 146, 126, 0.2) !important;">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-metra-gold text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 28px; height: 28px; background-color: var(--accent-gold);">
+                            <i class="bi bi-bank" style="font-size: 0.9rem;"></i>
+                        </div>
+                        <h6 class="fw-bold mb-0" style="color: var(--black-primary); font-size: 0.95rem; letter-spacing: 0.3px;">Instrucciones de Pago</h6>
+                    </div>
+                    
+                    <div id="loading-pago" class="text-center py-3">
+                        <div class="spinner-border spinner-border-sm text-gold" style="color: var(--accent-gold);"></div>
+                    </div>
+
+                    <div id="datos-pago-content" style="display: none;">
+                        <p class="small text-muted mb-3">Realiza tu transferencia con los siguientes datos:</p>
+                        
+                        <div class="payment-detail-row mb-2">
+                            <span class="text-muted d-block" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Banco</span>
+                            <span class="fw-bold text-dark" id="pago-banco" style="font-size: 1rem;">---</span>
+                        </div>
+                        
+                        <div class="payment-detail-row mb-2">
+                            <span class="text-muted d-block" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">CLABE Interbancaria</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fw-bold text-metra-gold" id="pago-clabe" style="font-size: 1.1rem; color: var(--accent-gold); letter-spacing: 1px;">---</span>
+                                <button class="btn btn-sm p-0 text-muted" onclick="copyClabeUpload()" title="Copiar CLABE">
+                                    <i class="bi bi-copy" id="clabe-copy-icon-up"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="payment-detail-row mb-3">
+                            <span class="text-muted d-block" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">Beneficiario / Destinatario</span>
+                            <span class="fw-bold text-dark" id="pago-beneficiario" style="font-size: 1rem;">---</span>
+                        </div>
+
+                        <div id="pago-instrucciones-container" class="mt-3 pt-3 border-top" style="display: none; border-top-style: dashed !important;">
+                            <p class="small mb-0" style="color: var(--text-muted); line-height: 1.4;">
+                                <i class="bi bi-info-circle me-1"></i> <span id="pago-instrucciones"></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="upload-area" id="upload-area" onclick="document.getElementById('comprobante-input').click()">
                     <i class="bi bi-cloud-arrow-up"></i>
@@ -71,7 +116,7 @@
     </div>
 
 <script>
-    const API_BASE = "{{ url('/api') }}";
+    const API_BASE = "/api";
     const cafeteriaId = "{{ $id }}";
 
     function previewFile(input) {
@@ -199,6 +244,74 @@
             btnEnviar.disabled = false;
         }
     };
+
+    // Cargar datos de pago al iniciar
+    async function cargarDatosPago() {
+        const container = document.getElementById('datos-pago-container');
+        const loading = document.getElementById('loading-pago');
+        const content = document.getElementById('datos-pago-content');
+        
+        container.style.display = 'block';
+
+        try {
+            const response = await fetch(`${API_BASE}/configuracion-pago`);
+            const result = await response.json();
+
+            if (response.ok && result.data) {
+                const d = result.data;
+                document.getElementById('pago-banco').textContent = d.banco || 'No especificado';
+                document.getElementById('pago-clabe').textContent = d.clabe || 'No especificado';
+                document.getElementById('pago-beneficiario').textContent = d.beneficiario || 'No especificado';
+                
+                if (d.instrucciones_pago) {
+                    document.getElementById('pago-instrucciones').textContent = d.instrucciones_pago;
+                    document.getElementById('pago-instrucciones-container').style.display = 'block';
+                } else {
+                    document.getElementById('pago-instrucciones-container').style.display = 'none';
+                }
+                
+                if (loading) loading.style.display = 'none';
+                if (content) content.style.display = 'block';
+            } else {
+                if (loading) loading.innerHTML = '<span class="text-muted small">Pendiente de configurar por el administrador.</span>';
+            }
+        } catch (error) {
+            console.error('Error cargando datos de pago:', error);
+            if (loading) loading.innerHTML = '<span class="text-danger small">Error de conexión.</span>';
+        }
+    }
+
+    window.copyClabeUpload = function() {
+        const clabe = document.getElementById('pago-clabe').textContent;
+        if (!clabe || clabe === '---') return;
+        
+        navigator.clipboard.writeText(clabe).then(() => {
+            const icon = document.getElementById('clabe-copy-icon-up');
+            icon.classList.remove('bi-copy');
+            icon.classList.add('bi-check-lg', 'text-success');
+            setTimeout(() => {
+                icon.classList.remove('bi-check-lg', 'text-success');
+                icon.classList.add('bi-copy');
+            }, 2000);
+        });
+    }
+
+    async function cargarInfoCafeteria() {
+        try {
+            const response = await fetch(`${API_BASE}/cafeterias-publicas/${cafeteriaId}`);
+            const result = await response.json();
+            if (response.ok && result.data) {
+                const el = document.getElementById('negocio-nombre');
+                el.textContent = result.data.nombre;
+                el.style.display = 'block';
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        cargarDatosPago();
+        cargarInfoCafeteria();
+    });
 </script>
 </body>
 </html>

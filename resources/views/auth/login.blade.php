@@ -294,19 +294,34 @@ document.addEventListener('DOMContentLoaded', function() {
                     } catch (err) {}
                 } else {
                     if (response.status === 423) {
-                        Swal.fire({
-                            icon: 'info',
-                            title: 'Solicitud pendiente',
-                            text: 'Tu registro está pendiente. Debes subir tu comprobante para continuar.',
-                            showCancelButton: true,
-                            confirmButtonText: 'Subir comprobante',
-                            cancelButtonText: 'Cancelar',
-                            confirmButtonColor: '#382C26'
-                        }).then((result) => {
-                            if(result.isConfirmed) {
-                                continuarSubida(email);
-                            }
-                        });
+                        const errorData = await response.json();
+                        const errorMsg = errorData.message || '';
+                        
+                        // Si el mensaje indica que ya fue enviado o espera validación
+                        if (errorMsg.toLowerCase().includes('espera') || errorMsg.toLowerCase().includes('revisión')) {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Solicitud en revisión',
+                                text: errorMsg,
+                                confirmButtonColor: '#382C26',
+                                confirmButtonText: 'Entendido'
+                            });
+                        } else {
+                            // Caso: Falta subir el comprobante
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Solicitud pendiente',
+                                text: errorMsg || 'Tu registro está pendiente. Debes subir tu comprobante para continuar.',
+                                showCancelButton: true,
+                                confirmButtonText: 'Subir comprobante',
+                                cancelButtonText: 'Cancelar',
+                                confirmButtonColor: '#382C26'
+                            }).then((result) => {
+                                if(result.isConfirmed) {
+                                    continuarSubida(email);
+                                }
+                            });
+                        }
                         return; // Detiene la ejecución normal
                     }
 
