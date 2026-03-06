@@ -23,17 +23,17 @@
         <a class="navbar-brand fw-bold fs-3" href="{{ url('/') }}" style="color: var(--black-primary); letter-spacing: -0.5px;">
             <i class="bi bi-hexagon-fill me-2" style="color: var(--accent-gold); font-size: 1.2rem;"></i>METRA
         </a>
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navRegistro">
-            <i class="bi bi-list fs-2" style="color: var(--black-primary);"></i>
-        </button>
-        <div class="collapse navbar-collapse" id="navRegistro">
-            <ul class="navbar-nav ms-auto align-items-lg-center gap-2 gap-lg-4 mt-3 mt-lg-0">
+        <div class="d-flex align-items-center gap-3 order-lg-3 ms-auto ms-lg-0">
+            <a href="{{ url('/login') }}" class="btn-metra-main px-4 py-2 rounded-pill" style="font-size: 0.9rem;">Iniciar Sesión</a>
+            <button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navRegistro">
+                <i class="bi bi-list fs-2" style="color: var(--black-primary);"></i>
+            </button>
+        </div>
+        <div class="collapse navbar-collapse order-lg-2" id="navRegistro">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-2 gap-lg-4 mt-3 mt-lg-0 me-lg-4">
                 <li class="nav-item"><a href="{{ url('/') }}" class="nav-link nav-link-custom">Inicio</a></li>
                 <li class="nav-item"><a href="{{ url('/#cafeterias') }}" class="nav-link nav-link-custom">Ver Cafeterías</a></li>
                 <li class="nav-item"><a href="{{ url('/registro-negocio') }}" class="nav-link nav-link-custom">Sumar Cafetería</a></li>
-                <li class="nav-item">
-                    <a href="{{ url('/login') }}" class="btn-metra-main px-4 py-2" style="font-size: 0.9rem; border-radius: 6px;">Iniciar Sesión</a>
-                </li>
             </ul>
         </div>
     </div>

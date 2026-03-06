@@ -32,7 +32,12 @@
                     <li class="nav-item d-none d-lg-block">
                         <div style="height: 30px; width: 1px; background-color: var(--border-light);"></div>
                     </li>
-                    <li class="nav-item d-flex align-items-center bg-white px-3 py-2 rounded-pill" style="border: 1px solid var(--border-light); cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.02)">
+                    <li class="nav-item" id="nav-login-btn" style="display: none;">
+                        <a href="{{ url('/login') }}" class="btn btn-outline-dark px-4 py-2" style="font-size: 0.85rem; border-radius: 8px;">
+                            Iniciar Sesión
+                        </a>
+                    </li>
+                    <li class="nav-item align-items-center bg-white px-3 py-2 rounded-pill" id="nav-profile-btn" style="border: 1px solid var(--border-light); cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.02); display: none !important;">
                         <div class="me-3 text-end d-none d-sm-block">
                             <p id="clientName" class="m-0 fw-bold small" style="color: var(--black-primary); line-height: 1;">Cargando...</p>
                             <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">Cliente</span>
@@ -53,6 +58,7 @@
     document.addEventListener('DOMContentLoaded', async function() {
         const token = localStorage.getItem('token');
         if (token) {
+            document.getElementById('nav-profile-btn').style.setProperty('display', 'flex', 'important');
             try {
                 const API_URL = "{{ url('/api') }}";
                 const response = await fetch(`${API_URL}/mi-perfil`, {
@@ -78,6 +84,9 @@
             } catch (error) {
                 console.error('Error fetching global profile data:', error);
             }
+        } else {
+            const loginBtn = document.getElementById('nav-login-btn');
+            if (loginBtn) loginBtn.style.display = 'block';
         }
     });
     </script>
