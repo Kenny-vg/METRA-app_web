@@ -20,8 +20,6 @@
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
             <h5 class="fw-bold m-0" style="color: var(--black-primary);"><i class="bi bi-credit-card-2-front me-2" style="color: var(--accent-gold);"></i>Control de Pagos y Planes</h5>
             <div class="input-group" style="max-width: 300px;">
-                <span class="input-group-text bg-light border-0" style="background: var(--off-white) !important; border-radius: 8px 0 0 8px;"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control bg-light border-0 small" placeholder="Buscar negocio..." style="border-radius: 0 8px 8px 0; background: var(--off-white) !important;">
             </div>
         </div>
 
@@ -90,6 +88,15 @@
         </div>
     </div>
 
+<style>
+.cafe-name-cell {
+    text-decoration: none !important;
+    transition: color 0.2s ease;
+}
+.cafe-name-cell:hover {
+    color: var(--accent-gold) !important;
+}
+</style>
 <script>
 const API = '/api';
 let authToken = localStorage.getItem('token') || '';
@@ -147,7 +154,7 @@ function renderTabla(suscripciones) {
         }
 
         return `<tr class="${s.estado_pago === 'cancelado' ? 'opacity-75' : ''}">
-            <td class="fw-bold" style="color: var(--black-primary); cursor: pointer; text-decoration: underline;" onclick="verDetalle(${s.cafe_id})">${cafe}</td>
+            <td class="fw-bold cafe-name-cell" style="color: var(--black-primary); cursor: pointer;" onclick="verDetalle(${s.cafe_id})">${cafe}</td>
             <td>${badgePlan}</td>
             <td class="fw-bold" style="color: var(--black-primary);">${monto}</td>
             <td style="color: var(--text-muted);">${fechaFin}</td>
@@ -159,10 +166,10 @@ function renderTabla(suscripciones) {
                         ? `<button type="button" class="btn btn-sm btn-outline-dark rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Recibo" onclick="verComprobanteSub(${s.id})"><i class="bi bi-file-earmark-text"></i></button>` 
                         : ''}
                     ${(s.cafeteria?.estado === 'en_revision')
-                        ? `<span class="badge text-muted border px-2 py-1 small">Revisión pendiente</span>`
+                        ? `<span class="btn btn-sm btn-outline-warning rounded-pill px-3 disabled" style="width: 110px; opacity: 0.8; pointer-events: none; border-color: #ffc107; color: #ffc107;">Pendiente</span>`
                         : (s.estado_pago !== 'cancelado' && s.cafeteria?.estado !== 'suspendida'
-                            ? `<button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="cambiarEstado(${s.cafe_id}, 'suspendida')">Suspender</button>`
-                            : `<button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="cambiarEstado(${s.cafe_id}, 'activa')">Reactivar</button>`)
+                            ? `<button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" style="width: 110px;" onclick="cambiarEstado(${s.cafe_id}, 'suspendida')">Suspender</button>`
+                            : `<button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3" style="width: 110px;" onclick="cambiarEstado(${s.cafe_id}, 'activa')">Reactivar</button>`)
                     }
                 </div>
             </td>

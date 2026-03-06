@@ -21,6 +21,9 @@
                 <a href="{{ url('/') }}" class="nav-link nav-link-custom d-flex align-items-center gap-1" style="color: var(--text-muted); font-size: 0.9rem;">
                     <i class="bi bi-arrow-left-short fs-5"></i> Volver
                 </a>
+                <a href="{{ url('/login') }}" class="btn btn-outline-dark px-4 py-2" style="font-size: 0.9rem; border-radius: 6px;">
+                    Iniciar Sesión
+                </a>
                 <a href="#" id="btn-reservar-navbar" class="btn-metra-main px-4 py-2" style="font-size: 0.9rem; border-radius: 6px;">
                     Reservar mesa
                 </a>
