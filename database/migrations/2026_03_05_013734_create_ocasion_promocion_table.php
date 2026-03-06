@@ -13,6 +13,15 @@ return new class extends Migration
     {
         Schema::create('ocasion_promocion', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('ocasion_id')
+                    ->constrained('ocasion_especials')
+                    ->cascadeOnDelete();
+
+            $table->foreignId('promocion_id')
+                    ->constrained('promocions')
+                    ->cascadeOnDelete();
+
             $table->timestamps();
         });
     }

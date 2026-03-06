@@ -46,13 +46,23 @@ class LoginController extends Controller
             );
         }
 
-        // Si ya subió pero no está aprobado
-        if($suscripcion->estado_pago !== 'pagado'){
+        // Si el registro fue rechazado
+        if($user->estatus_registro === 'rechazado'){
+            return ApiResponse::error(
+                'Tu registro ha sido rechazado. Por favor contacta a soporte para más información.',
+                403
+            );
+        }
+
+        // Si la suscripción sigue pendiente
+        if($suscripcion->estado_pago === 'pendiente'){
             return ApiResponse::error(
                 'Tu comprobante fue enviado. Espera la validación del superadmin.',
                 423
             );
         }
+
+
     }
 
     //bloquear acceso si la cafeteria no tiene suscripción activa

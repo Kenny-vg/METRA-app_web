@@ -8,6 +8,7 @@ use App\Helpers\ApiResponse;
 use App\Models\Cafeteria;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\CuentaActivadaMail;
+use App\Mail\CuentaRechazadaMail;
 
 class AprobacionController extends Controller
 {
@@ -68,6 +69,16 @@ class AprobacionController extends Controller
         optional($cafeteria->suscripcionActual)->update([
             'estado_pago'=>'cancelado'
         ]);
+
+        // Notificar al gerente
+        if ($cafeteria->gerente) {
+            try {
+                Mail::to($cafeteria->gerente->email)
+                    ->queue(new CuentaRechazadaMail());
+            } catch (\Throwable $e) {
+                \Log::error("Error enviando mail de rechazo: ".$e->getMessage());
+            }
+        }
 
         return ApiResponse::success(
             $cafeteria,

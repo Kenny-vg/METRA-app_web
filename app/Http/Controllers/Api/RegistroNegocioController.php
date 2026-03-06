@@ -243,6 +243,18 @@ class RegistroNegocioController extends Controller
             'email' => 'required|email'
         ]);
 
+        $gerenteRechazado = User::where('email', $request->email)
+            ->where('estatus_registro', 'rechazado')
+            ->where('role', 'gerente')
+            ->first();
+
+        if ($gerenteRechazado) {
+            return ApiResponse::error(
+                'Este correo ya fue utilizado en un registro que fue rechazado. Contacta a soporte para más información.',
+                403
+            );
+        }
+
         $user = User::where('email', $request->email)
             ->where('estatus_registro', 'pendiente')
             ->where('role', 'gerente')

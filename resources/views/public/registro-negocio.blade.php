@@ -658,6 +658,17 @@
                 if (res.status === 422 && json.errors) {
                     showValidationErrors(json.errors);
                     showAlert('Revisa los campos marcados en rojo.');
+                } else if (res.status === 403) {
+                    // Rechazado
+                    showAlert(json.message || 'Tu registro ha sido rechazado. Contacta a soporte.', 'error');
+                } else if (res.status === 409) {
+                    // Ya tiene comprobante
+                    showAlert(json.message || 'Tu comprobante ya fue enviado y está en revisión.', 'info');
+                    if (json.data && json.data.cafeteria_id) {
+                        registeredCafeteriaId = json.data.cafeteria_id;
+                        localStorage.setItem('registro_cafeteria_id', registeredCafeteriaId);
+                        goToStep(3);
+                    }
                 } else {
                     let errorMsg = 'Algo salió mal al procesar tu solicitud. Intenta de nuevo más tarde.';
                     if (res.status === 400 || json.message) {
@@ -671,6 +682,12 @@
             if (json.data && json.data.cafeteria_id) {
                 registeredCafeteriaId = json.data.cafeteria_id;
                 localStorage.setItem('registro_cafeteria_id', registeredCafeteriaId);
+                
+                // Si es un registro existente que aún no tiene comprobante (o recarga de datos)
+                if (json.data.registro_existente) {
+                    console.log("Registro existente detectado, avanzando a paso 3");
+                }
+
                 saveFormState();
                 goToStep(3);
             } else {

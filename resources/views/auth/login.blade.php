@@ -296,9 +296,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (response.status === 423) {
                         const errorData = await response.json();
                         const errorMsg = errorData.message || '';
+                        const msgLower = errorMsg.toLowerCase();
                         
+                        // Nuevo: Si el mensaje indica rechazo (usamos palabras clave que el usuario pondrá en el backend)
+                        if (msgLower.includes('rechazado') || msgLower.includes('soporte')) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Registro Rechazado',
+                                text: errorMsg,
+                                confirmButtonColor: '#D32F2F',
+                                confirmButtonText: 'Entendido'
+                            });
+                        } 
                         // Si el mensaje indica que ya fue enviado o espera validación
-                        if (errorMsg.toLowerCase().includes('espera') || errorMsg.toLowerCase().includes('revisión')) {
+                        else if (msgLower.includes('espera') || msgLower.includes('revisión')) {
                             Swal.fire({
                                 icon: 'info',
                                 title: 'Solicitud en revisión',

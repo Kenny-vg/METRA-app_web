@@ -16,7 +16,7 @@ class RegisterController extends Controller
         $data = $request->validate([
             'name'=>'required|string|max:100',
             'email'=>'required|email|unique:users,email',
-            'password'=>'required|min:8'
+            'password'=>'required|min:8|confirmed'
         ], [
             'name.required' => 'El nombre es obligatorio.',
             'name.max' => 'El nombre no debe exceder los 100 caracteres.',

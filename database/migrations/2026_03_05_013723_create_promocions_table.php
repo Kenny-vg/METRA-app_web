@@ -13,6 +13,18 @@ return new class extends Migration
     {
         Schema::create('promocions', function (Blueprint $table) {
             $table->id();
+
+            $table->string('nombre_promocion',100);
+            $table->string('descripcion',255)->nullable();
+
+            $table->decimal('precio',8,2);
+
+            $table->boolean('activo')->default(true);
+
+            $table->foreignId('cafe_id')
+                    ->constrained('cafeterias')
+                    ->cascadeOnDelete();
+
             $table->timestamps();
         });
     }

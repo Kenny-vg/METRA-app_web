@@ -13,6 +13,21 @@ return new class extends Migration
     {
         Schema::create('mesas', function (Blueprint $table) {
             $table->id();
+
+            $table->tinyInteger('numero_mesa');
+            $table->tinyInteger('capacidad');
+
+            $table->string('ubicacion');
+            $table->boolean('activo')->default(true);
+
+            $table->foreignId('zona_id')
+                    ->constrained('zonas')
+                    ->cascadeOnDelete();
+            
+            $table->foreignId('cafe_id')
+                    ->constrained('cafeterias')
+                    ->cascadeOnDelete();
+
             $table->timestamps();
         });
     }

@@ -15,6 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('nombre_zona',50);
             $table->boolean('activo')->default(true);
+
+            $table->foreignId('cafe_id')
+                    ->constrained('cafeterias')
+                    ->cascadeOnDelete();
             $table->timestamps();
         });
     }

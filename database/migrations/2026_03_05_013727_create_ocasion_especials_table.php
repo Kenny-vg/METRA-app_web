@@ -13,6 +13,16 @@ return new class extends Migration
     {
         Schema::create('ocasion_especials', function (Blueprint $table) {
             $table->id();
+
+            $table->string('nombre', 100);
+            $table->string('descripcion', 255)->nullable();
+
+            $table->boolean('activo')->default(true);
+
+            $table->foreignId('cafe_id')
+                    ->constrained('cafeterias')
+                    ->cascadeOnDelete();
+
             $table->timestamps();
         });
     }

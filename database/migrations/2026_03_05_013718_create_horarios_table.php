@@ -13,6 +13,25 @@ return new class extends Migration
     {
         Schema::create('horarios', function (Blueprint $table) {
             $table->id();
+
+            $table->enum('dia_semana', [
+                'Lunes',
+                'Martes',
+                'Miercoles',
+                'Jueves',
+                'Viernes',
+                'Sabado',
+                'Domingo'
+            ]);
+
+            $table->time('hora_apertura');
+            $table->time('hora_cierre');
+
+            $table->boolean('activo')->default(true);
+
+            $table->foreignId('cafe_id')
+                    ->constrained('cafeterias')
+                    ->cascadeOnDelete();
             $table->timestamps();
         });
     }
