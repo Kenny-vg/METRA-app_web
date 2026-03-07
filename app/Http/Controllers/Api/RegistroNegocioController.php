@@ -68,7 +68,7 @@ class RegistroNegocioController extends Controller
         'gerente.name'     => 'required|string|max:100',
         'gerente.email' => [
             'required',
-            'email',
+            'email:dns',
             Rule::unique('users', 'email')->where(function ($query) {
                 return $query->where('estatus_registro', '!=', 'pendiente');
             })
