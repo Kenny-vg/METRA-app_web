@@ -16,6 +16,9 @@ class Horario extends Model
     ];
     public function cafeteria()
     {
-        return $this->belongsTo(Cafeteria::class);
+        return $this->belongsTo(Cafeteria::class, 'cafe_id');
     }
+
+
+    
 }

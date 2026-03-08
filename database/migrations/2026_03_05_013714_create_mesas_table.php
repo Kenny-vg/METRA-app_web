@@ -17,7 +17,6 @@ return new class extends Migration
             $table->tinyInteger('numero_mesa');
             $table->tinyInteger('capacidad');
 
-            $table->string('ubicacion');
             $table->boolean('activo')->default(true);
 
             $table->foreignId('zona_id')
@@ -27,6 +26,9 @@ return new class extends Migration
             $table->foreignId('cafe_id')
                     ->constrained('cafeterias')
                     ->cascadeOnDelete();
+
+            // evita mesas duplicadas en la misma zona
+            $table->unique(['cafe_id','zona_id','numero_mesa']);
 
             $table->timestamps();
         });

@@ -17,7 +17,6 @@ class ZonaController extends Controller
         $cafeId= $request->user()->cafe_id;
 
         $zonas= Zona::where('cafe_id', $cafeId)
-                            ->where('activo', true)
                             ->orderBy('nombre_zona')
                             ->get();
 
@@ -98,5 +97,25 @@ class ZonaController extends Controller
         ]);
 
         return ApiResponse::success($zona, 'Zona desactivada correctamente');
+    }
+
+    /**
+     * REACTIVAR ZONA
+     */
+    public function activar(Request $request, string $id)
+    {
+        $zona = Zona::where('id', $id)
+                            ->where('cafe_id', $request->user()->cafe_id)
+                            ->first();
+
+        if(!$zona){
+            return ApiResponse::error('Zona no encontrada', 404);
+        }
+
+        $zona->update([
+            'activo'=>true,
+        ]);
+
+        return ApiResponse::success($zona, 'Zona reactivada correctamente');
     }
 }

@@ -5,8 +5,10 @@ use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\GoogleController;
 use App\Http\Controllers\Api\Auth\ProfileController;
+use App\Http\Controllers\Api\Auth\PasswordResetController;
+
 use App\Http\Controllers\Api\RegistroNegocioController;
-use App\Http\Controllers\Api\Gerente\CafeteriaPerfilController;
+
 use App\Http\Controllers\Api\Superadmin\PlanController;
 use App\Http\Controllers\Api\Superadmin\SuscripcionController;
 use App\Http\Controllers\Api\Superadmin\DashboardController;
@@ -14,8 +16,13 @@ use App\Http\Controllers\Api\Superadmin\SolicitudesController;
 use App\Http\Controllers\Api\Superadmin\AprobacionController;
 use App\Http\Controllers\Api\Superadmin\CafeteriaController;
 use App\Http\Controllers\Api\Superadmin\ConfiguracionController;
-use App\Http\Controllers\Api\Auth\PasswordResetController;
+
+
+use App\Http\Controllers\Api\Gerente\CafeteriaPerfilController;
 use App\Http\Controllers\Api\Gerente\ZonaController;
+use App\Http\Controllers\Api\Gerente\MesaController;
+use App\Http\Controllers\Api\Gerente\HorarioController;
+
 /*
 |------------------------------------------
 | RUTAS PÚBLICAS
@@ -160,12 +167,12 @@ Route::middleware([
     'auth:sanctum',
     'role:gerente'
 ])->prefix('gerente')->group(function () {
-    Route::get('/mi-cafeteria', [CafeteriaPerfilController::class, 'show']);
-    Route::put('/mi-cafeteria', [CafeteriaPerfilController::class, 'update']);
 
-    //CRUD ZONAS
-    Route::get('/zonas', [ZonaController::class, 'index']);
-    Route::post('/zonas', [ZonaController::class, 'store']);
-    Route::put('/zonas/{id}', [ZonaController::class, 'update']);
-    Route::delete('/zonas/{id}', [ZonaController::class, 'destroy']);
+    Route::apiResource('zonas', ZonaController::class);
+    Route::apiResource('mesas', MesaController::class);
+    Route::apiResource('horarios', HorarioController::class);
+
+    Route::patch('zonas/{id}/activar', [ZonaController::class, 'activar']);
+    Route::patch('mesas/{id}/activar', [MesaController::class, 'activar']);
+    Route::patch('horarios/{id}/activar', [HorarioController::class, 'activar']);
 });
