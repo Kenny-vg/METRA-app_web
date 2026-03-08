@@ -6,7 +6,7 @@
     <title>METRA Admin - @yield('title')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/variables.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
     <!-- SweetAlert2 -->
@@ -40,6 +40,9 @@
             </a>
             <a href="/admin/gestion_negocio" class="nav-link-admin {{ request()->is('admin/gestion_negocio') ? 'active' : '' }}">
                 <i class="bi bi-shop me-3"></i>Gestión del Negocio
+            </a>
+            <a href="/admin/carta" class="nav-link-admin {{ request()->is('admin/carta') ? 'active' : '' }}">
+                <i class="bi bi-book-half me-3"></i>Ménu Digital
             </a>
             <a href="/admin/reservaciones" class="nav-link-admin {{ request()->is('admin/reservaciones') ? 'active' : '' }}">
                 <i class="bi bi-calendar3 me-3"></i>Reservaciones

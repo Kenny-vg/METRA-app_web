@@ -71,7 +71,15 @@ class RegistroNegocioController extends Controller
             'email:dns',
             Rule::unique('users', 'email')->where(function ($query) {
                 return $query->where('estatus_registro', '!=', 'pendiente');
-            })
+            }),
+            function ($attribute, $value, $fail) {
+                $allowedDomains = ['gmail.com', 'outlook.com', 'hotmail.com', 'yahoo.com', 'live.com', 'icloud.com'];
+                $parts = explode('@', $value);
+                $domain = strtolower(array_pop($parts));
+                if (!in_array($domain, $allowedDomains)) {
+                    $fail('El correo debe ser uno de los dominios válidos (ej. gmail.com, outlook.com, hotmail.com).');
+                }
+            }
         ],
         'gerente.password' => 'required|string|min:8|confirmed',
 

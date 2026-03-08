@@ -28,6 +28,7 @@ return new class extends Migration
             ]);
 
             $table->decimal('monto',10,2);
+            $table->string('comprobante_url')->nullable();
 
             $table->foreignId('user_id')->nullable()->constrained('users');
             $table->dateTime('fecha_validacion')->nullable();

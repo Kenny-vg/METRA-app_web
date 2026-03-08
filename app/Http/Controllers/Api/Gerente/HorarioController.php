@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Horario;
 use App\Helpers\ApiResponse;
+use App\Traits\Activable;
 
 class HorarioController extends Controller
 {
+    use Activable;
+    protected $model = Horario::class;
     /**
      * Display a listing of the resource.
      */
@@ -29,10 +32,9 @@ class HorarioController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'dia_semana' => 'required|
-            in:Lunes,Martes,Miercoles,Jueves,Viernes,Sabado,Domingo',
+            'dia_semana' => 'required|in:Lunes,Martes,Miercoles,Jueves,Viernes,Sabado,Domingo',
             'hora_apertura'=>'required|date_format:H:i',
-            'hora_cierre'=>'required|date_format:H:i',
+            'hora_cierre'=>'required|date_format:H:i|after:hora_apertura',
         ]);
 
         if ($request->hora_cierre <= $request->hora_apertura) {
@@ -71,7 +73,7 @@ class HorarioController extends Controller
     {
         $request->validate([
             'hora_apertura'=>'required|date_format:H:i',
-            'hora_cierre'=>'required|date_format:H:i',
+            'hora_cierre'=>'required|date_format:H:i|after:hora_apertura',
         ]);
 
         if ($request->hora_cierre <= $request->hora_apertura) {
@@ -117,20 +119,4 @@ class HorarioController extends Controller
         return ApiResponse::success($horario, 'Horario desactivado correctamente');
     }
 
-    public function activar(Request $request, $id)
-    {
-        $horario = Horario::where('id', $id)
-            ->where('cafe_id', $request->user()->cafe_id)
-            ->first();
-
-        if (!$horario) {
-            return ApiResponse::error('Horario no encontrado',404);
-        }
-
-        $horario->update([
-            'activo' => true
-        ]);
-
-        return ApiResponse::success($horario, 'Horario reactivado');
-    }
 }

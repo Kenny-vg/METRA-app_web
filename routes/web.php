@@ -108,6 +108,10 @@ Route::get('/admin/gestion_negocio', function () {
     return view('admin.gestion_negocio');
 });
 
+Route::get('/admin/carta', function () {
+    return view('admin.carta');
+});
+
 Route::get('/admin/reservaciones', function () {
     return view('admin.reservaciones');
 });

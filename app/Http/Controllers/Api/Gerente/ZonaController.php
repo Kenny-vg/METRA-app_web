@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Zona;
 use App\Helpers\ApiResponse;
+use App\Traits\Activable;
 
 class ZonaController extends Controller
 {
+    use Activable;
+    protected $model = Zona::class;
     /**
      * LISTAR ZONAS
      */
@@ -79,43 +82,5 @@ class ZonaController extends Controller
         return ApiResponse::success($zona, 'Zona actualizada correctamente');
     }
 
-    /**
-     * DESACTIVAR ZONA
-     */
-    public function destroy(Request $request, string $id)
-    {
-        $zona = Zona::where('id', $id)
-                            ->where('cafe_id', $request->user()->cafe_id)
-                            ->first();
 
-        if(!$zona){
-            return ApiResponse::error('Zona no encontrada', 404);
-        }
-
-        $zona->update([
-            'activo'=>false,
-        ]);
-
-        return ApiResponse::success($zona, 'Zona desactivada correctamente');
-    }
-
-    /**
-     * REACTIVAR ZONA
-     */
-    public function activar(Request $request, string $id)
-    {
-        $zona = Zona::where('id', $id)
-                            ->where('cafe_id', $request->user()->cafe_id)
-                            ->first();
-
-        if(!$zona){
-            return ApiResponse::error('Zona no encontrada', 404);
-        }
-
-        $zona->update([
-            'activo'=>true,
-        ]);
-
-        return ApiResponse::success($zona, 'Zona reactivada correctamente');
-    }
 }

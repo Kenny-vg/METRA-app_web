@@ -7,9 +7,12 @@ use Illuminate\Http\Request;
 use App\Models\Mesa;
 use App\Models\Zona;
 use App\Helpers\ApiResponse;
+use App\Traits\Activable;
 
 class MesaController extends Controller
 {
+    use Activable;
+    protected $model = Mesa::class;
     /**
      * Listar mesas
      */
@@ -157,23 +160,4 @@ class MesaController extends Controller
         return ApiResponse::success($mesa, 'Mesa desactivada correctamente');
     }
 
-    /**
-     * REACTIVAR MESA
-     */
-    public function activar(Request $request, $id)
-    {
-        $mesa = Mesa::where('id', $id)
-        ->where('cafe_id', $request->user()->cafe_id)
-        ->first();
-
-        if (!$mesa) {
-            return ApiResponse::error('Mesa no encontrada',404);
-        }
-
-        $mesa->update([
-            'activo'=>true,
-        ]);
-
-        return ApiResponse::success($mesa, 'Mesa reactivada correctamente');
-    }
 }

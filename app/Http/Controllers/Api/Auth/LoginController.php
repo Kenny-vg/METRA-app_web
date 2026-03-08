@@ -71,6 +71,10 @@ class LoginController extends Controller
     }
 }
 
+    if(!$user->estado){
+        return ApiResponse::error('Usuario inactivo', 403);
+    }
+
     //bloquear acceso si la cafeteria no tiene suscripción activa
     if(in_array($user->role,['gerente','personal'])){
 

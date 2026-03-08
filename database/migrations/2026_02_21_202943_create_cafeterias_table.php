@@ -35,6 +35,11 @@ return new class extends Migration
             ])->default('pendiente');
 
             $table->string('foto_url')->nullable();
+            
+            // Gerente que registró la cafetería
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            // Comprobante de pago subido por el gerente
+            $table->string('comprobante_url')->nullable();
 
             $table->timestamps();
         });

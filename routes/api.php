@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\Gerente\CafeteriaPerfilController;
 use App\Http\Controllers\Api\Gerente\ZonaController;
 use App\Http\Controllers\Api\Gerente\MesaController;
 use App\Http\Controllers\Api\Gerente\HorarioController;
+use App\Http\Controllers\Api\Gerente\MenuController;
 
 /*
 |------------------------------------------
@@ -79,6 +80,20 @@ Route::post('/registro-negocio', [RegistroNegocioController::class, 'store']);
 Route::post('/registro-negocio/{cafeteria}/comprobante', [RegistroNegocioController::class, 'subirComprobante']);
 //consultar si existe registro pendiente
 Route::post('/registro-pendiente', [RegistroNegocioController::class, 'registroPendiente']);
+
+//Ver menú
+Route::get('/cafeterias/{id}/menu', function ($id) {
+
+    $menu = \App\Models\Menu::where('cafe_id',$id)
+        ->where('activo',true)
+        ->orderBy('nombre_producto')
+        ->get();
+
+    return response()->json([
+        'success'=>true,
+        'data'=>$menu
+    ]);
+});
 
 /*
 |------------------------------------------
@@ -168,11 +183,22 @@ Route::middleware([
     'role:gerente'
 ])->prefix('gerente')->group(function () {
 
+    // Perfil de la cafetería
+    Route::get('mi-cafeteria', [CafeteriaPerfilController::class, 'show']);
+    Route::post('mi-cafeteria', [CafeteriaPerfilController::class, 'update']);
+    Route::put('mi-cafeteria', [CafeteriaPerfilController::class, 'update']);
+    
+
     Route::apiResource('zonas', ZonaController::class);
     Route::apiResource('mesas', MesaController::class);
     Route::apiResource('horarios', HorarioController::class);
+    
+    // Rutas para el menú (Permite spoofing method _method=PUT para imágenes)
+    Route::post('menu/{menu}', [MenuController::class, 'update']);
+    Route::apiResource('menu', MenuController::class);
 
     Route::patch('zonas/{id}/activar', [ZonaController::class, 'activar']);
     Route::patch('mesas/{id}/activar', [MesaController::class, 'activar']);
     Route::patch('horarios/{id}/activar', [HorarioController::class, 'activar']);
+    Route::patch('menu/{id}/activar', [MenuController::class, 'activar']);
 });

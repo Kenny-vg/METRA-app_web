@@ -352,35 +352,61 @@
         });
 
         async function deleteZona(id) {
-            if (!confirm('¿Seguro que deseas desactivar esta zona?')) return;
-            try {
-                const res = await fetch(`${API_URL}/zonas/${id}`, { method: 'DELETE', headers: headers() });
-                if (res.ok) {
-                    showToast('success', 'Zona desactivada');
-                    loadZonas();
-                } else {
-                    const err = await res.json();
-                    Swal.fire('Error', err.message || 'Error al desactivar zona', 'error');
+            Swal.fire({
+                title: '¿Desactivar Zona?',
+                text: 'Esta zona dejará de estar disponible.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, desactivar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const res = await fetch(`${API_URL}/zonas/${id}`, { method: 'DELETE', headers: headers() });
+                        if (res.ok) {
+                            showToast('success', 'Zona desactivada');
+                            loadZonas();
+                            loadMesas();
+                        } else {
+                            const err = await res.json();
+                            Swal.fire('Error', err.message || 'Error al desactivar zona', 'error');
+                        }
+                    } catch (error) {
+                        Swal.fire('Error', 'Error de conexión', 'error');
+                    }
                 }
-            } catch (error) {
-                Swal.fire('Error', 'Error de conexión', 'error');
-            }
+            });
         }
 
         async function reactivateZona(id) {
-            try {
-                const res = await fetch(`${API_URL}/zonas/${id}/activar`, { method: 'PATCH', headers: headers() });
-                if (res.ok) {
-                    showToast('success', 'Zona reactivada');
-                    loadZonas();
-                    loadMesas();
-                } else {
-                    const err = await res.json();
-                    Swal.fire('Error', err.message || 'Error al reactivar zona', 'error');
+            Swal.fire({
+                title: '¿Reactivar Zona?',
+                text: 'Esta zona volverá a estar disponible.',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, reactivar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const res = await fetch(`${API_URL}/zonas/${id}/activar`, { method: 'PATCH', headers: headers() });
+                        if (res.ok) {
+                            showToast('success', 'Zona reactivada');
+                            loadZonas();
+                            loadMesas();
+                        } else {
+                            const err = await res.json();
+                            Swal.fire('Error', err.message || 'Error al reactivar zona', 'error');
+                        }
+                    } catch (error) {
+                        Swal.fire('Error', 'Error de conexión', 'error');
+                    }
                 }
-            } catch (error) {
-                Swal.fire('Error', 'Error de conexión', 'error');
-            }
+            });
         }
 
         // --- MESAS ---
@@ -476,34 +502,59 @@
         });
 
         async function deleteMesa(id) {
-            if (!confirm('¿Seguro que deseas desactivar esta mesa?')) return;
-            try {
-                const res = await fetch(`${API_URL}/mesas/${id}`, { method: 'DELETE', headers: headers() });
-                if (res.ok) {
-                    showToast('success', 'Mesa desactivada');
-                    loadMesas();
-                } else {
-                    const err = await res.json();
-                    Swal.fire('Error', err.message || 'Error al desactivar mesa', 'error');
+            Swal.fire({
+                title: '¿Desactivar Mesa?',
+                text: 'Esta mesa dejará de estar disponible.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, desactivar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const res = await fetch(`${API_URL}/mesas/${id}`, { method: 'DELETE', headers: headers() });
+                        if (res.ok) {
+                            showToast('success', 'Mesa desactivada');
+                            loadMesas();
+                        } else {
+                            const err = await res.json();
+                            Swal.fire('Error', err.message || 'Error al desactivar mesa', 'error');
+                        }
+                    } catch (error) {
+                        Swal.fire('Error', 'Error de conexión', 'error');
+                    }
                 }
-            } catch (error) {
-                Swal.fire('Error', 'Error de conexión', 'error');
-            }
+            });
         }
 
         async function reactivateMesa(id) {
-            try {
-                const res = await fetch(`${API_URL}/mesas/${id}/activar`, { method: 'PATCH', headers: headers() });
-                if (res.ok) {
-                    showToast('success', 'Mesa reactivada');
-                    loadMesas();
-                } else {
-                    const err = await res.json();
-                    Swal.fire('Error', err.message || 'Error al reactivar mesa. Verifica la zona', 'error');
+            Swal.fire({
+                title: '¿Reactivar Mesa?',
+                text: 'Esta mesa volverá a estar disponible.',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, reactivar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const res = await fetch(`${API_URL}/mesas/${id}/activar`, { method: 'PATCH', headers: headers() });
+                        if (res.ok) {
+                            showToast('success', 'Mesa reactivada');
+                            loadMesas();
+                        } else {
+                            const err = await res.json();
+                            Swal.fire('Error', err.message || 'Error al reactivar mesa. Verifica la zona', 'error');
+                        }
+                    } catch (error) {
+                        Swal.fire('Error', 'Error de conexión', 'error');
+                    }
                 }
-            } catch (error) {
-                Swal.fire('Error', 'Error de conexión', 'error');
-            }
+            });
         }
 
         // --- HORARIOS ---
@@ -611,34 +662,59 @@
         });
 
         async function deleteHorario(id) {
-            if (!confirm('¿Seguro que deseas desactivar este horario?')) return;
-            try {
-                const res = await fetch(`${API_URL}/horarios/${id}`, { method: 'DELETE', headers: headers() });
-                if (res.ok) {
-                    showToast('success', 'Horario desactivado');
-                    loadHorarios();
-                } else {
-                    const err = await res.json();
-                    Swal.fire('Error', err.message || 'Error al desactivar horario', 'error');
+            Swal.fire({
+                title: '¿Desactivar Horario?',
+                text: 'Este horario dejará de estar disponible.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, desactivar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const res = await fetch(`${API_URL}/horarios/${id}`, { method: 'DELETE', headers: headers() });
+                        if (res.ok) {
+                            showToast('success', 'Horario desactivado');
+                            loadHorarios();
+                        } else {
+                            const err = await res.json();
+                            Swal.fire('Error', err.message || 'Error al desactivar horario', 'error');
+                        }
+                    } catch (error) {
+                        Swal.fire('Error', 'Error de conexión', 'error');
+                    }
                 }
-            } catch (error) {
-                Swal.fire('Error', 'Error de conexión', 'error');
-            }
+            });
         }
 
         async function reactivateHorario(id) {
-            try {
-                const res = await fetch(`${API_URL}/horarios/${id}/activar`, { method: 'PATCH', headers: headers() });
-                if (res.ok) {
-                    showToast('success', 'Horario reactivado');
-                    loadHorarios();
-                } else {
-                    const err = await res.json();
-                    Swal.fire('Error', err.message || 'Error al reactivar horario', 'error');
+            Swal.fire({
+                title: '¿Reactivar Horario?',
+                text: 'Este horario volverá a estar disponible.',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, reactivar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const res = await fetch(`${API_URL}/horarios/${id}/activar`, { method: 'PATCH', headers: headers() });
+                        if (res.ok) {
+                            showToast('success', 'Horario reactivado');
+                            loadHorarios();
+                        } else {
+                            const err = await res.json();
+                            Swal.fire('Error', err.message || 'Error al reactivar horario', 'error');
+                        }
+                    } catch (error) {
+                        Swal.fire('Error', 'Error de conexión', 'error');
+                    }
                 }
-            } catch (error) {
-                Swal.fire('Error', 'Error de conexión', 'error');
-            }
+            });
         }
     </script>
 @endsection

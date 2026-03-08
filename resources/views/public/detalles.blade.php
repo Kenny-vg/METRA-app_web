@@ -112,30 +112,9 @@
                             <h4 class="fw-bold mb-0" style="color: var(--black-primary); letter-spacing: -0.3px;">Menú Destacado</h4>
                             <span class="small text-muted">Lo más pedido</span>
                         </div>
-                        <div class="row g-3">
-                            <div class="col-6 col-md-3 text-center">
-                                <img src="https://images.unsplash.com/photo-1541167760496-1628856ab772?w=300&q=80"
-                                     class="img-fluid shadow-sm rounded-3 mb-3 w-100" style="height: 120px; object-fit: cover;" alt="Café">
-                                <p class="small fw-bold mb-0">Flat White</p>
-                                <p class="text-muted" style="font-size: 0.75rem;">Café de especialidad</p>
-                            </div>
-                            <div class="col-6 col-md-3 text-center">
-                                <img src="https://images.unsplash.com/photo-1550461716-bf5ce596f280?w=300&q=80"
-                                     class="img-fluid shadow-sm rounded-3 mb-3 w-100" style="height: 120px; object-fit: cover;" alt="Brunch">
-                                <p class="small fw-bold mb-0">Brunch del Día</p>
-                                <p class="text-muted" style="font-size: 0.75rem;">Desayuno completo</p>
-                            </div>
-                            <div class="col-6 col-md-3 text-center">
-                                <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=300&q=80"
-                                     class="img-fluid shadow-sm rounded-3 mb-3 w-100" style="height: 120px; object-fit: cover;" alt="Bowl">
-                                <p class="small fw-bold mb-0">Bowl Orgánico</p>
-                                <p class="text-muted" style="font-size: 0.75rem;">Opción saludable</p>
-                            </div>
-                            <div class="col-6 col-md-3 text-center">
-                                <img src="https://images.unsplash.com/photo-1544145945-f90425340c7e?w=300&q=80"
-                                     class="img-fluid shadow-sm rounded-3 mb-3 w-100" style="height: 120px; object-fit: cover;" alt="Matcha">
-                                <p class="small fw-bold mb-0">Matcha Latte</p>
-                                <p class="text-muted" style="font-size: 0.75rem;">Frío o caliente</p>
+                        <div class="row g-3" id="menu-publico-container">
+                            <div class="col-12 text-center text-muted py-3">
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div> Cargando menú...
                             </div>
                         </div>
                     </section>
@@ -275,7 +254,7 @@
                 let timestamp = new Date().getTime(); // simple cache buster
                 
                 if (cafe.foto_url) {
-                    finalImgUrl = `${cafe.foto_url}?v=${timestamp}`;
+                    finalImgUrl = `/storage/${cafe.foto_url}?v=${timestamp}`;
                     document.getElementById('foto-secundaria-container').innerHTML = `
                         <img src="${finalImgUrl}" alt="El espacio" class="img-fluid rounded-4 shadow-sm w-100" style="height: 280px; object-fit: cover;">
                     `;
@@ -290,6 +269,34 @@
                 // Reveal UI
                 document.getElementById('loader-screen').classList.add('d-none');
                 document.getElementById('cafe-content').classList.remove('d-none');
+
+                // --- Load Menu ---
+                try {
+                    const resMenu = await fetch(`${API_URL}/cafeterias/${cafeId}/menu`);
+                    if(resMenu.ok) {
+                        const jsonMenu = await resMenu.json();
+                        const menuItems = jsonMenu.data || [];
+                        const menuContainer = document.getElementById('menu-publico-container');
+                        menuContainer.innerHTML = '';
+                        
+                        if(menuItems.length === 0) {
+                            menuContainer.innerHTML = '<div class="col-12"><p class="text-muted small">El menú aún no está disponible.</p></div>';
+                        } else {
+                            menuItems.forEach(item => {
+                                const img = item.imagen_url ? `${STORAGE_URL}/${item.imagen_url}` : 'https://placehold.co/300x200/faf6f0/c5a059?text=METRA';
+                                menuContainer.innerHTML += `
+                                    <div class="col-6 col-md-4 text-center mb-3">
+                                        <div style="width: 100%; height: 120px; border-radius: 12px; background-image: url('${img}'); background-size: cover; background-position: center; border: 1px solid var(--border-light);" class="mb-2 shadow-sm"></div>
+                                        <p class="small fw-bold mb-0 text-truncate" style="color: var(--black-primary);" title="${item.nombre_producto}">${item.nombre_producto}</p>
+                                        <p class="text-muted small text-truncate" style="font-size: 0.75rem;" title="${item.descripcion || ''}">${item.descripcion ? item.descripcion : ' '}</p>
+                                    </div>
+                                `;
+                            });
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error loading menu", e);
+                }
 
             } catch(e) {
                 console.error(e);

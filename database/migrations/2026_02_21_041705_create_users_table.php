@@ -33,10 +33,12 @@ return new class extends Migration
         ]);
 
         $table->boolean('estado')->default(true);
+        $table->string('estatus_registro')->default('pendiente');
 
         // Multi cafetería (SaaS)
         $table->unsignedBigInteger('cafe_id')->nullable();
 
+        $table->string('activation_token')->nullable();
         $table->rememberToken();
         $table->timestamps();
         });

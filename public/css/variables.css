@@ -1,18 +1,18 @@
 /* public/css/variables.css */
 /* Paleta Premium High-End Restaurante/SaaS */
 :root {
-    --black-primary: #1C1917;
-    /* Espresso Profundo (Stone 900) */
-    --gray-dark: #292524;
-    /* Stone 800 para contrastes sutiles */
+    --black-primary: #111111;
+    /* Negro elegante puro / Jet Black */
+    --gray-dark: #222222;
+    /* Gris muy oscuro para contrastes sutiles en sidebar */
     --white-pure: #FFFFFF;
     /* Blanco puro para superficies y tarjetas */
     --off-white: #FAF6F0;
     /* Alabastro/Crema cálido para fondos generales */
     --accent-gold: #C5A059;
     /* Champagne Gold para CTAs y acentos */
-    --text-main: #1C1917;
-    /* Espresso carbón para máxima legibilidad */
+    --text-main: #1A1A1A;
+    /* Carbón para máxima legibilidad */
     --text-muted: #78716C;
     /* Stone 500 para textos secundarios cálidos */
     --success-mint: #2D9A58;
