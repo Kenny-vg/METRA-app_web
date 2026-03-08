@@ -75,9 +75,9 @@
                         <div class="row mb-5">
                             <div class="col-12"><h5 class="section-title mb-4" style="border-bottom: 1px solid var(--border-light); padding-bottom: 12px; color: var(--black-primary); font-weight: 700;">3. Personalización</h5></div>
                             <div class="col-12 col-md-6 mb-3">
-                                <label class="small fw-bold mb-2" style="color: var(--text-muted);">¿Celebra alguna ocasión?</label>
+                                <label class="small fw-bold mb-2" style="color: var(--text-muted);">¿Celebra alguna ocasión especial?</label>
                                 <select id="ocasion-select" name="ocasion_id" class="form-select input-metra">
-                                    <option value="">Seleccionar motivo</option>
+                                    <option value="">Seleccionar ocasión</option>
                                     <!-- Opciones cargadas por JS -->
                                 </select>
                             </div>
@@ -98,30 +98,12 @@
                                 <h5 class="section-title mb-4" style="border-bottom: 1px solid var(--border-light); padding-bottom: 12px; color: var(--black-primary); font-weight: 700;">4. Complementos (Opcional)</h5>
                             </div>
                             
-                            <div class="col-12">
-                                <div class="row g-3">
-                                    <div class="col-12 col-md-6">
-                                        <input type="radio" name="combo_seleccionado" id="combo1" value="ejecutivo" class="btn-check">
-                                        <label class="card h-100 border-1 p-3 w-100" for="combo1" style="cursor: pointer; border-color: var(--border-light); transition: 0.2s;">
-                                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                                <span class="badge" style="background: var(--off-white); color: var(--black-primary);">Despensa Matutina</span>
-                                                <span class="fw-bold" style="color: var(--black-primary);">$149</span>
-                                            </div>
-                                            <h6 class="fw-bold mb-1">Desayuno Ejecutivo</h6>
-                                            <p class="x-small text-muted mb-0" style="font-size: 0.8rem;">Especialidad del chef + Bebida.</p>
-                                        </label>
-                                    </div>
-
-                                    <div class="col-12 col-md-6">
-                                        <input type="radio" name="combo_seleccionado" id="combo4" value="ninguno" class="btn-check" checked>
-                                        <label class="card h-100 border-1 p-3 w-100" for="combo4" style="cursor: pointer; border-color: var(--border-light); transition: 0.2s;">
-                                            <div class="text-center py-2">
-                                                <h6 class="fw-bold mb-1" style="color: var(--black-primary);">Ningún Complemento</h6>
-                                                <p class="x-small text-muted mb-0" style="font-size: 0.8rem;">Continuar solo con la mesa.</p>
-                                            </div>
-                                        </label>
-                                    </div>
+                            <div class="col-12" id="promos-container">
+                                <div class="text-center py-4 text-muted small" style="background: var(--off-white); border-radius: 12px; border: 1px dashed rgba(0,0,0,0.1);">
+                                    <i class="bi bi-gift fs-4 d-block mb-2 opacity-50"></i>
+                                    Selecciona una ocasión especial en el paso anterior para visualizar las promociones aplicables.
                                 </div>
+                                <input type="hidden" name="combo_seleccionado" value="ninguno">
                             </div>
                         </div>
 
@@ -182,6 +164,80 @@
             } catch (error) {
                 console.error("Error al cargar ocasiones:", error);
             }
+
+            // Detectar cambio de Ocasión y cargar promos
+            ocasionSelect.addEventListener('change', async (e) => {
+                const ocasionId = e.target.value;
+                const promosContainer = document.getElementById('promos-container');
+                
+                if (!ocasionId) {
+                    promosContainer.innerHTML = `
+                        <div class="text-center py-4 text-muted small" style="background: var(--off-white); border-radius: 12px; border: 1px dashed rgba(0,0,0,0.1);">
+                            <i class="bi bi-gift fs-4 d-block mb-2 opacity-50"></i>
+                            Selecciona una ocasión especial en el paso anterior para visualizar las promociones aplicables.
+                        </div>
+                        <input type="hidden" name="combo_seleccionado" value="ninguno">
+                    `;
+                    return;
+                }
+                
+                try {
+                    promosContainer.innerHTML = '<div class="text-center py-4"><div class="spinner-border spinner-border-sm text-muted"></div></div>';
+                    const res = await fetch(`/api/cafeterias/${cafeteriaId}/ocasiones/${ocasionId}/promociones`);
+                    if (res.ok) {
+                        const json = await res.json();
+                        const promos = json.data || [];
+                        
+                        if (promos.length === 0) {
+                            promosContainer.innerHTML = `
+                                <div class="text-center py-4 text-muted small" style="background: var(--off-white); border-radius: 12px; border: 1px dashed rgba(0,0,0,0.1);">
+                                    Esta ocasión no cuenta con promociones vinculadas por el momento.
+                                </div>
+                                <input type="hidden" name="combo_seleccionado" value="ninguno">
+                            `;
+                            return;
+                        }
+
+                        let html = '<div class="row g-3">';
+                        html += `
+                            <div class="col-12 col-md-6">
+                                <input type="radio" name="combo_seleccionado" id="promo-ninguna" value="ninguna" class="btn-check" checked>
+                                <label class="card h-100 border-1 p-3 w-100 shadow-sm" for="promo-ninguna" style="cursor: pointer; border-color: var(--border-light); transition: 0.2s;">
+                                    <div class="text-center py-2 h-100 d-flex flex-column justify-content-center">
+                                        <h6 class="fw-bold mb-1" style="color: var(--black-primary);">Sin Promoción / Complemento</h6>
+                                        <p class="x-small text-muted mb-0" style="font-size: 0.8rem;">Continuar solo con la mesa.</p>
+                                    </div>
+                                </label>
+                            </div>
+                        `;
+                        
+                        promos.forEach(p => {
+                            const isFree = parseFloat(p.precio) === 0;
+                            const displayPrice = isFree ? 'Incluido sin costo' : new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(p.precio);
+                            
+                            html += `
+                                <div class="col-12 col-md-6">
+                                    <input type="radio" name="combo_seleccionado" id="promo-${p.id}" value="${p.id}" class="btn-check">
+                                    <label class="card h-100 border-1 p-3 w-100 shadow-sm" for="promo-${p.id}" style="cursor: pointer; border-color: var(--border-light); transition: 0.2s; position: relative; overflow: hidden;">
+                                        ${isFree ? '<div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent-gold);"></div>' : ''}
+                                        <div class="d-flex justify-content-between align-items-start mb-2 ${isFree ? 'ms-2' : ''}">
+                                            <span class="badge" style="background: rgba(212,175,55,0.12); color: var(--accent-gold); border: 1px solid rgba(212,175,55,0.3); font-size: 0.65rem; letter-spacing: 0.5px; text-transform: uppercase;"><i class="bi bi-star-fill me-1"></i>Oportunidad</span>
+                                            <span class="fw-bold fs-6" style="color: ${isFree ? 'var(--accent-gold)' : 'var(--black-primary)'};">${displayPrice}</span>
+                                        </div>
+                                        <h6 class="fw-bold mb-1 ${isFree ? 'ms-2' : ''}" style="color: var(--black-primary); font-size: 0.95rem;">${p.nombre_promocion}</h6>
+                                        <p class="x-small text-muted mb-0 ${isFree ? 'ms-2' : ''}" style="font-size: 0.8rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${p.descripcion || 'Sin detalles adicionales.'}</p>
+                                    </label>
+                                </div>
+                            `;
+                        });
+                        html += '</div>';
+                        promosContainer.innerHTML = html;
+                    }
+                } catch (e) {
+                    console.error("Error loading promos", e);
+                    promosContainer.innerHTML = '<div class="text-danger small text-center py-3">Error de conexión al cargar las promociones.</div>';
+                }
+            });
         });
     </script>
 </body>

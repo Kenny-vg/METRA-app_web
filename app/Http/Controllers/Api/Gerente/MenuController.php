@@ -18,11 +18,7 @@ class MenuController extends Controller
 
     public function index(Request $request)
     {
-        $cafeId = $request->user()->cafe_id;
-
-        $menu = Menu::where('cafe_id', $cafeId)
-            ->orderBy('nombre_producto')
-            ->get();
+        $menu = Menu::orderBy('nombre_producto')->get();
 
         return ApiResponse::success($menu);
     }
@@ -59,7 +55,7 @@ class MenuController extends Controller
         return ApiResponse::success($menu, 'Producto agregado al menú');
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Menu $menu)
     {
         $cafeId = $request->user()->cafe_id;
 
@@ -68,19 +64,11 @@ class MenuController extends Controller
                 'required',
                 'string',
                 'max:100',
-                Rule::unique('menus')->ignore($id)->where(fn($query) => $query->where('cafe_id', $cafeId))
+                Rule::unique('menus')->ignore($menu->id)->where(fn($query) => $query->where('cafe_id', $cafeId))
             ],
             'descripcion' => 'nullable|string|max:255',
             'imagen_url' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120'
         ]);
-
-        $menu = Menu::where('id', $id)
-            ->where('cafe_id', $request->user()->cafe_id)
-            ->first();
-
-        if (!$menu) {
-            return ApiResponse::error('Producto no encontrado', 404);
-        }
 
         $data = [
             'nombre_producto' => $request->nombre_producto,
@@ -101,16 +89,8 @@ class MenuController extends Controller
         return ApiResponse::success($menu, 'Producto actualizado');
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, Menu $menu)
     {
-        $menu = Menu::where('id', $id)
-            ->where('cafe_id', $request->user()->cafe_id)
-            ->first();
-
-        if (!$menu) {
-            return ApiResponse::error('Producto no encontrado', 404);
-        }
-
         $menu->update([
             'activo' => false
         ]);

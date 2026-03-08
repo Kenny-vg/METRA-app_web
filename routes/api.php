@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Helpers\ApiResponse;
+
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\GoogleController;
@@ -24,6 +26,7 @@ use App\Http\Controllers\Api\Gerente\MesaController;
 use App\Http\Controllers\Api\Gerente\HorarioController;
 use App\Http\Controllers\Api\Gerente\MenuController;
 use App\Http\Controllers\Api\Gerente\OcasionController;
+use App\Http\Controllers\Api\Gerente\PromocionController;
 
 /*
 |------------------------------------------
@@ -67,13 +70,13 @@ Route::get('/cafeterias-publicas', function () {
         )
         ->get();
 
-    return response()->json(['data' => $cafeterias]);
+    return ApiResponse::success($cafeterias);
 });
 
 Route::get('/cafeterias-publicas/{id}', function ($id) {
     $cafeteria = \App\Models\Cafeteria::findOrFail($id);
 
-    return response()->json(['data' => $cafeteria]);
+    return ApiResponse::success($cafeteria);
 });
 
 // Auto-registro de negocio por el propio gerente/dueño
@@ -90,10 +93,7 @@ Route::get('/cafeterias/{id}/menu', function ($id) {
         ->orderBy('nombre_producto')
         ->get();
 
-    return response()->json([
-        'success'=>true,
-        'data'=>$menu
-    ]);
+    return ApiResponse::success($menu);
 });
 
 //Ver ocasiones especiales
@@ -104,10 +104,32 @@ Route::get('/cafeterias/{id}/ocasiones', function ($id) {
         ->orderBy('nombre')
         ->get();
 
-    return response()->json([
-        'success'=>true,
-        'data'=>$ocasiones
-    ]);
+    return ApiResponse::success($ocasiones);
+});
+
+//ver promociones ligadas a ocasiones
+Route::get('/cafeterias/{id}/ocasiones/{ocasion}/promociones', function ($id,$ocasion) {
+
+    $promociones = \App\Models\Promocion::where('cafe_id',$id)
+        ->where('activo',true)
+        ->whereHas('ocasiones', function ($q) use ($ocasion) {
+            $q->where('ocasion_especials.id', $ocasion);
+        })
+        ->orderBy('nombre_promocion')
+        ->get();
+
+    return ApiResponse::success($promociones);
+});
+
+//Ver promociones
+Route::get('/cafeterias/{id}/promociones', function ($id) {
+
+    $promociones = \App\Models\Promocion::where('cafe_id',$id)
+        ->where('activo',true)
+        ->orderBy('nombre_promocion')
+        ->get();
+
+    return ApiResponse::success($promociones);
 });
 
 /*
@@ -150,7 +172,7 @@ Route::middleware([
         if (!$exists) abort(404, 'Archivo no encontrado físicamente');
         
         $path = \Illuminate\Support\Facades\Storage::disk('local')->path($comprobante);
-        return response()->file($path);
+        return ApiResponse::success(response()->file($path));
     });
 
 
@@ -211,14 +233,21 @@ Route::middleware([
     // Rutas para el menú (Permite spoofing method _method=PUT para imágenes)
     Route::post('menu/{menu}', [MenuController::class, 'update']);
     Route::apiResource('menu', MenuController::class);
+    Route::apiResource('promociones', PromocionController::class)->parameters([
+        'promociones' => 'promocion'
+    ]);
 
     // Rutas para ocasiones especiales
-    Route::apiResource('ocasiones', OcasionController::class);
+    Route::apiResource('ocasiones', OcasionController::class)->parameters([
+        'ocasiones' => 'ocasion'
+    ]);
+
 
     //Activar registros
     Route::patch('zonas/{id}/activar', [ZonaController::class, 'activar']);
     Route::patch('mesas/{id}/activar', [MesaController::class, 'activar']);
     Route::patch('horarios/{id}/activar', [HorarioController::class, 'activar']);
     Route::patch('menu/{id}/activar', [MenuController::class, 'activar']);
+    Route::patch('promociones/{id}/activar', [PromocionController::class, 'activar']);
     Route::patch('ocasiones/{id}/activar', [OcasionController::class, 'activar']);
 });

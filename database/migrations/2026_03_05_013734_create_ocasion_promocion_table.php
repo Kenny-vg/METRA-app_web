@@ -22,6 +22,8 @@ return new class extends Migration
                     ->constrained('promocions')
                     ->cascadeOnDelete();
 
+            $table->unique(['ocasion_id', 'promocion_id']);
+
             $table->timestamps();
         });
     }

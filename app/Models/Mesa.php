@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Scopes\CafeScope;
 
 class Mesa extends Model
 {
@@ -15,6 +16,11 @@ class Mesa extends Model
         'zona_id',
         'cafe_id'
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new CafeScope);
+    }
     public function zona()
     {
         return $this->belongsTo(Zona::class);

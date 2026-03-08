@@ -17,11 +17,7 @@ class HorarioController extends Controller
      */
     public function index(Request $request)
     {
-        $cafeId = $request->user()->cafe_id;
-
-        $horarios = Horario::where('cafe_id', $cafeId)
-        ->orderBy('dia_semana')
-        ->get();
+        $horarios = Horario::orderBy('dia_semana')->get();
 
         return ApiResponse::success($horarios);
     }
@@ -47,9 +43,7 @@ class HorarioController extends Controller
         $cafeId = $request->user()->cafe_id;
 
         //evitar duplicar día
-        $existe = Horario::where('cafe_id', $cafeId)
-        ->where('dia_semana', $request->dia_semana)
-        ->exists();
+        $existe = Horario::where('dia_semana', $request->dia_semana)->exists();
 
         if ($existe) {
             return ApiResponse::error('Ya existe un horario para ese día',400);
@@ -69,7 +63,7 @@ class HorarioController extends Controller
     /**
      * ACTUALIZAR HORARIO
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Horario $horario)
     {
         $request->validate([
             'hora_apertura'=>'required|date_format:H:i',
@@ -83,14 +77,6 @@ class HorarioController extends Controller
             );
         }
 
-        $horario = Horario::where('id', $id)
-        ->where('cafe_id', $request->user()->cafe_id)
-        ->first();
-
-        if (!$horario) {
-            return ApiResponse::error('Horario no encontrado',404);
-        }
-
         $horario->update([
             'hora_apertura'=>$request->hora_apertura,
             'hora_cierre'=>$request->hora_cierre,
@@ -102,16 +88,8 @@ class HorarioController extends Controller
     /**
      * DESACTIVAR HORARIO
      */
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, Horario $horario)
     {
-        $horario = Horario::where('id', $id)
-        ->where('cafe_id', $request->user()->cafe_id)
-        ->first();
-
-        if (!$horario) {
-            return ApiResponse::error('Horario no encontrado',404);
-        }
-
         $horario->update([
             'activo'=>false,
         ]);

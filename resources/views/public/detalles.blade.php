@@ -81,27 +81,16 @@
                             <h4 class="fw-bold mb-0" style="color: var(--black-primary); letter-spacing: -0.3px;">Promociones y Eventos</h4>
                             <span class="small text-muted">Oportunidades especiales</span>
                         </div>
+
+                        <!-- Filtros Ocasiones -->
+                        <div class="d-flex flex-wrap gap-2 mb-4 d-none" id="ocasiones-filtros-container">
+                            <button class="btn btn-sm px-3 rounded-pill btn-admin-primary btn-filtro-ocasion fw-medium" id="btn-todas-promos" onclick="filtrarPromos('todas')">Todas</button>
+                            <!-- Ocasiones cargadas por JS -->
+                        </div>
+
                         <div class="row g-3" id="promos-publicas">
-                            {{-- Datos demo --}}
-                            <div class="col-12 col-sm-6">
-                                <div class="p-4 rounded-4 bg-white border h-100" style="border-color: var(--border-light) !important;">
-                                    <div class="mb-3">
-                                        <span class="fs-3">🎂</span>
-                                        <span class="badge rounded-pill ms-2" style="background: rgba(212,175,55,0.12); color: var(--accent-gold); border: 1px solid rgba(212,175,55,0.3); font-size: 0.7rem;">Disponible</span>
-                                    </div>
-                                    <h6 class="fw-bold mb-2">Cumpleaños Especial</h6>
-                                    <p class="text-muted small mb-0">Celebra tu día con nosotros. Mesa decorada y postre de cortesía para el festejado. Previa reservación.</p>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="p-4 rounded-4 bg-white border h-100" style="border-color: var(--border-light) !important;">
-                                    <div class="mb-3">
-                                        <span class="fs-3">💍</span>
-                                        <span class="badge rounded-pill ms-2" style="background: rgba(212,175,55,0.12); color: var(--accent-gold); border: 1px solid rgba(212,175,55,0.3); font-size: 0.7rem;">Disponible</span>
-                                    </div>
-                                    <h6 class="fw-bold mb-2">Tarde de Aniversario</h6>
-                                    <p class="text-muted small mb-0">Mesa reservada con ambiente especial para celebrar su aniversario. Previa reservación.</p>
-                                </div>
+                            <div class="col-12 text-center text-muted py-3">
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div> Cargando promociones...
                             </div>
                         </div>
                     </section>
@@ -298,6 +287,97 @@
                 } catch (e) {
                     console.error("Error loading menu", e);
                 }
+
+                // --- Load Promociones y Ocasiones ---
+                window.filtrarPromos = function(ocasionId) {
+                    // Update active pill styling
+                    document.querySelectorAll('.btn-filtro-ocasion').forEach(btn => {
+                        btn.classList.remove('btn-admin-primary');
+                        btn.classList.add('btn-outline-secondary');
+                    });
+                    
+                    const activeBtn = ocasionId === 'todas' 
+                        ? document.getElementById('btn-todas-promos') 
+                        : document.getElementById(`btn-ocasion-${ocasionId}`);
+                        
+                    if (activeBtn) {
+                        activeBtn.classList.remove('btn-outline-secondary');
+                        activeBtn.classList.add('btn-admin-primary');
+                    }
+                    
+                    cargarPromociones(ocasionId === 'todas' ? null : ocasionId);
+                };
+
+                async function cargarOcasionesFiltros() {
+                    try {
+                        const res = await fetch(`${API_URL}/cafeterias/${cafeId}/ocasiones`);
+                        if (res.ok) {
+                            const data = await res.json();
+                            const ocasiones = data.data || [];
+                            if (ocasiones.length > 0) {
+                                document.getElementById('ocasiones-filtros-container').classList.remove('d-none');
+                                const container = document.getElementById('ocasiones-filtros-container');
+                                ocasiones.forEach(o => {
+                                    container.innerHTML += `<button id="btn-ocasion-${o.id}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill btn-filtro-ocasion fw-medium" onclick="filtrarPromos(${o.id})">${o.nombre}</button>`;
+                                });
+                            }
+                        }
+                    } catch (e) {
+                         console.error("Error loading ocasiones", e);
+                    }
+                }
+
+                async function cargarPromociones(ocasionId = null) {
+                    try {
+                        const promosContainer = document.getElementById('promos-publicas');
+                        promosContainer.innerHTML = '<div class="col-12 text-center text-muted py-3"><div class="spinner-border spinner-border-sm me-2"></div> Cargando...</div>';
+                        
+                        const url = ocasionId 
+                            ? `${API_URL}/cafeterias/${cafeId}/ocasiones/${ocasionId}/promociones`
+                            : `${API_URL}/cafeterias/${cafeId}/promociones`;
+                            
+                        const resPromos = await fetch(url);
+                        if(resPromos.ok) {
+                            const jsonPromos = await resPromos.json();
+                            const promosData = jsonPromos.data || [];
+                            promosContainer.innerHTML = '';
+                            
+                            if(promosData.length === 0 && !ocasionId) {
+                                document.getElementById('sectionPromociones').classList.add('d-none');
+                            } else if (promosData.length === 0) {
+                                promosContainer.innerHTML = '<div class="col-12 text-center text-muted py-4"><i class="bi bi-tag d-block fs-3 mb-2 opacity-50"></i>No hay promociones publicadas para esta ocasión.</div>';
+                            } else {
+                                document.getElementById('sectionPromociones').classList.remove('d-none');
+                                promosData.forEach(p => {
+                                    const formattedPrice = parseFloat(p.precio) === 0 ? 'Incluido sin costo' : new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(p.precio);
+                                    promosContainer.innerHTML += `
+                                        <div class="col-12 col-sm-6">
+                                            <div class="p-4 rounded-4 h-100 d-flex flex-column shadow-sm" style="background: var(--off-white); border: 1px solid rgba(212,175,55,0.3); position: relative; overflow: hidden;">
+                                                <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent-gold);"></div>
+                                                <div class="d-flex justify-content-between align-items-start mb-3 ms-2">
+                                                    <h5 class="fw-bold mb-0" style="color: var(--black-primary); letter-spacing: -0.5px;">${p.nombre_promocion}</h5>
+                                                    <span class="badge rounded-pill" style="background: rgba(212,175,55,0.12); color: var(--accent-gold); border: 1px solid rgba(212,175,55,0.3); font-size: 0.7rem; letter-spacing: 0.5px; text-transform: uppercase;">
+                                                        <i class="bi bi-star-fill me-1"></i>Disponible
+                                                    </span>
+                                                </div>
+                                                <p class="text-muted small mb-4 ms-2 flex-grow-1" style="line-height: 1.5;">${p.descripcion || 'Pregunta a tu mesero por los detalles.'}</p>
+                                                <div class="mt-auto ms-2 pt-3 border-top" style="border-color: rgba(0,0,0,0.05) !important;">
+                                                    <span class="fs-4 fw-bold" style="color: var(--accent-gold);">${formattedPrice}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                });
+                            }
+                        }
+                    } catch (e) {
+                         console.error("Error loading promotions", e);
+                         promosContainer.innerHTML = '<div class="col-12 text-danger text-center"><small>No se pudieron cargar las promociones.</small></div>';
+                    }
+                }
+
+                cargarOcasionesFiltros();
+                cargarPromociones();
 
             } catch(e) {
                 console.error(e);

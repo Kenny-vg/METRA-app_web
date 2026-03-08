@@ -34,7 +34,7 @@
         </div>
 
 <!-- Métricas rápidas -->
-<div class="row g-4 mb-5">
+<div class="row g-4 mb-4">
     <div class="col-12 col-sm-6 col-lg-3">
         <div class="card border-0 p-4 h-100 premium-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -59,23 +59,35 @@
     </div>
 </div>
 
-<!-- Listado de promociones -->
-<div class="premium-card p-4 p-lg-5">
-    <h5 class="fw-bold mb-4" style="color: var(--black-primary);">Tus promociones</h5>
-
-    <div id="promos-loading" class="text-center py-5 text-muted">
-        <div class="spinner-border spinner-border-sm me-2"></div> Cargando promociones...
+<!-- Bloque informativo principal -->
+<div class="alert alert-info d-flex align-items-start rounded-3 mb-4" style="background: rgba(13, 110, 253, 0.05); border: 1px solid rgba(13, 110, 253, 0.2); color: #084298;">
+    <i class="bi bi-info-circle-fill fs-4 me-3 mt-1"></i>
+    <div>
+        <p class="mb-0 small" style="line-height: 1.4;">Las promociones pueden aplicarse a una o varias ocasiones especiales.<br>
+        <strong>Ejemplo:</strong> Cumpleaños, Aniversario, Graduación.<br>
+        Primero registra las ocasiones en su pestaña respectiva y luego crea promociones asociadas a ellas.</p>
     </div>
+</div>
 
-    <div id="promos-lista" class="row g-4" style="display:none;"></div>
-
-    <div id="promos-empty" class="text-center py-5" style="display:none;">
-        <i class="bi bi-megaphone display-4 d-block mb-3" style="color: var(--border-light);"></i>
-        <p class="fw-bold mb-1" style="color: var(--black-primary);">Aún no tienes promociones</p>
-        <p class="text-muted small">Crea tu primera promoción para atraer más clientes.</p>
-        <button class="btn-metra-main mt-2" onclick="abrirModalNuevaPromo()" style="padding: 10px 22px; font-size: 0.85rem;">
-            <i class="bi bi-plus me-2"></i>Crear primera promoción
-        </button>
+<!-- Listado de promociones -->
+<div class="card border-0 p-4 p-md-5 premium-card">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom" style="border-color: var(--border-light) !important;">
+        <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Gestión de Promociones</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table-metra mt-2">
+            <thead>
+                <tr>
+                    <th>Campaña</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th class="text-end">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-promos-body">
+                <!-- Promociones cargadas por JS -->
+            </tbody>
+        </table>
     </div>
 </div>
 </div>
@@ -107,40 +119,43 @@
 </div>
 
 <!-- Modal nueva/editar promoción -->
-<div class="modal fade" id="modalPromo" tabindex="-1">
+<div class="modal fade" id="modalPromo" tabindex="-1" style="font-family: inherit !important;">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4 shadow-lg" style="overflow: hidden;">
+        <div class="modal-content border-0 rounded-4 shadow-lg" style="overflow: visible; font-family: inherit !important;">
             <div class="modal-header border-0 px-5 pt-5 pb-3" style="background: var(--off-white);">
                 <h5 class="modal-title fw-bold" style="color: var(--black-primary);" id="modalPromoTitulo">Nueva Promoción</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body px-5 py-4">
+                <div class="alert alert-info d-flex align-items-start rounded-3 mb-4" style="background: rgba(13, 110, 253, 0.05); border: 1px solid rgba(13, 110, 253, 0.2); color: #084298;">
+                    <i class="bi bi-info-circle-fill fs-4 me-3 mt-1"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1">Información</h6>
+                        <p class="mb-0 small" style="line-height: 1.4;">Las promociones pueden aplicarse a una o varias ocasiones especiales.<br>
+                        <strong>Ejemplo:</strong> Cumpleaños, Aniversario, Graduación.<br>
+                        Antes de crear una promoción debes registrar al menos una ocasión especial.</p>
+                    </div>
+                </div>
                 <div class="row g-4">
                     <div class="col-12">
                         <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: var(--text-muted);">Título de la promoción</label>
-                        <input type="text" id="promoTitulo" class="form-control form-control-lg" style="border-radius: 10px; border-color: var(--border-light);" placeholder="Ej: Cumpleaños Especial">
+                        <input type="text" id="promoTitulo" class="form-control form-control-lg" style="border-radius: 10px; border-color: var(--border-light);" placeholder="Ej: Cumpleaños Especial" required>
                     </div>
                     <div class="col-12">
                         <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: var(--text-muted);">Descripción</label>
                         <textarea id="promoDescripcion" class="form-control" rows="3" style="border-radius: 10px; border-color: var(--border-light);" placeholder="Describe brevemente la promoción o evento especial..."></textarea>
                     </div>
-                    <div class="col-12 col-md-6">
-                        <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: var(--text-muted);">Fecha inicio</label>
-                        <input type="date" id="promoFechaInicio" class="form-control" style="border-radius: 10px; border-color: var(--border-light);">
+                    <div class="col-12 col-md-4">
+                        <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: var(--text-muted);">Precio Especial</label>
+                        <div class="input-group shadow-sm" style="border-radius: 10px; border: 1px solid var(--border-light); overflow: hidden;">
+                            <span class="input-group-text border-0 bg-white" style="color: var(--black-primary); font-weight: 600;">$</span>
+                            <input type="number" id="promoPrecio" class="form-control border-0" placeholder="85.00" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-text text-muted" style="font-size: 0.75rem; margin-top: 6px;"><i class="bi bi-info-circle me-1"></i>Si el precio es 0 la promoción se mostrará como "Incluido sin costo".</div>
                     </div>
-                    <div class="col-12 col-md-6">
-                        <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: var(--text-muted);">Fecha fin</label>
-                        <input type="date" id="promoFechaFin" class="form-control" style="border-radius: 10px; border-color: var(--border-light);">
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: var(--text-muted);">Tipo de evento</label>
-                        <select id="promoTipo" class="form-select" style="border-radius: 10px; border-color: var(--border-light);">
-                            <option value="">Selecciona un tipo</option>
-                            <option value="cumpleanos">🎂 Cumpleaños</option>
-                            <option value="aniversario">💍 Aniversario</option>
-                            <option value="temporada">🌟 Temporada especial</option>
-                            <option value="descuento">💰 Descuento</option>
-                            <option value="evento">🎉 Evento</option>
+                    <div class="col-12 col-md-8">
+                        <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: var(--text-muted);">Tipo de evento (Ocasiones)</label>
+                        <select id="promoTipo" name="ocasiones[]" multiple class="form-select shadow-sm" style="border-radius: 10px; border-color: var(--border-light);" required>
                         </select>
                     </div>
                 </div>
@@ -182,138 +197,263 @@
     </div>
 </div>
 
+<!-- Choices.js para selectors modernos -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
 <script>
 const token = localStorage.getItem('token');
 let promoEditandoId = null;
 
-// Promociones demo (frontend-only por ahora)
-let promosDemo = [
-    {
-        id: 1,
-        titulo: 'Cumpleaños Especial',
-        descripcion: 'Celebra tu día con nosotros. Mesa decorada y postre de cortesía para el festejado.',
-        tipo: 'cumpleanos',
-        fechaInicio: '2026-01-01',
-        fechaFin: '2026-12-31',
-        activa: true
-    },
-    {
-        id: 2,
-        titulo: 'Tarde de Aniversario',
-        descripcion: 'Mesa reservada con ambiente especial para celebrar su aniversario. Previa reservación.',
-        tipo: 'aniversario',
-        fechaInicio: '2026-01-01',
-        fechaFin: '2026-12-31',
-        activa: true
-    }
-];
+let modalPromoInst;
+let promoTipoChoices = null;
 
-const tipoIconos = {
-    cumpleanos: '🎂',
-    aniversario: '💍',
-    temporada: '🌟',
-    descuento: '💰',
-    evento: '🎉'
+const formatPrice = (price) => {
+    if (parseFloat(price) === 0) return 'Incluido sin costo';
+    return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(price);
 };
 
-function renderPromos() {
-    const lista = document.getElementById('promos-lista');
-    const empty = document.getElementById('promos-empty');
-    const loading = document.getElementById('promos-loading');
+async function loadPromociones() {
+    try {
+        const res = await fetch(`${API_URL}/promociones`, { headers: headers() });
+        if (!res.ok) throw new Error('Error al cargar promociones');
+        
+        const response = await res.json();
+        const promos = Array.isArray(response) ? response : (response.data || []);
+        
+        const tbody = document.getElementById('tabla-promos-body');
+        tbody.innerHTML = '';
 
-    loading.style.display = 'none';
-    document.getElementById('contador-activas').textContent = promosDemo.filter(p=>p.activa).length;
-    document.getElementById('contador-total').textContent = promosDemo.length;
+        document.getElementById('contador-activas').textContent = promos.filter(p=>p.activo).length;
+        document.getElementById('contador-total').textContent = promos.length;
 
-    if (!promosDemo.length) {
-        lista.style.display = 'none';
-        empty.style.display = 'block';
-        return;
+        if (promos.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-4">No hay promociones registradas.</td></tr>`;
+            return;
+        }
+
+        promos.forEach(p => {
+            const opacityClass = p.activo ? '' : 'opacity-50';
+            const bgClass = p.activo ? '' : 'table-secondary';
+            const badge = !p.activo ? `<span class="badge bg-secondary mb-1" style="font-size:0.65rem;">Inactiva</span><br>` : '';
+            
+            const actions = p.activo
+                ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick='editPromocion(${JSON.stringify(p)})' title="Editar"><i class="bi bi-pencil"></i></button>
+                   <button class="btn btn-sm btn-outline-danger rounded-circle" onclick="deletePromocion(${p.id})" title="Desactivar"><i class="bi bi-trash"></i></button>`
+                : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivatePromocion(${p.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
+
+            tbody.innerHTML += `
+                <tr class="${bgClass} ${opacityClass}">
+                    <td>
+                        ${badge}
+                        <span class="fw-bold" style="color: var(--black-primary); font-size: 1.05rem;">${p.nombre_promocion}</span>
+                    </td>
+                    <td><span class="text-muted small" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 300px;">${p.descripcion || '-'}</span></td>
+                    <td>
+                        <span class="badge fs-6 rounded-pill" style="background: rgba(212,175,55,0.1); color: var(--accent-gold); border: 1px solid rgba(212,175,55,0.2);">
+                            ${formatPrice(p.precio)}
+                        </span>
+                    </td>
+                    <td class="text-end align-middle">
+                        ${actions}
+                    </td>
+                </tr>
+            `;
+        });
+    } catch (error) {
+        console.error(error);
+        showToast('error', 'No se pudieron cargar las promociones');
     }
+}
 
-    lista.style.display = 'flex';
-    empty.style.display = 'none';
+let ocasionesCargadas = [];
 
-    lista.innerHTML = promosDemo.map(p => `
-        <div class="col-12 col-md-6">
-            <div class="bg-white rounded-4 border p-4 h-100" style="border-color: var(--border-light) !important;">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <span class="fs-4">${tipoIconos[p.tipo] || '📌'}</span>
-                        <span class="badge rounded-pill ms-2 ${p.activa ? '' : 'bg-secondary'}" style="${p.activa ? 'background: rgba(25,135,84,0.1); color: #198754; border: 1px solid rgba(25,135,84,0.2);' : ''} font-size: 0.7rem;">${p.activa ? 'Activa' : 'Inactiva'}</span>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-sm btn-outline-secondary rounded-pill" onclick="editarPromo(${p.id})" title="Editar">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger rounded-pill" onclick="eliminarPromo(${p.id})" title="Eliminar">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                </div>
-                <h6 class="fw-bold mb-2" style="color: var(--black-primary);">${p.titulo}</h6>
-                <p class="text-muted small mb-3">${p.descripcion}</p>
-                <p class="small mb-0" style="color: var(--text-muted);"><i class="bi bi-calendar3 me-1" style="color: var(--accent-gold);"></i>${p.fechaInicio} → ${p.fechaFin}</p>
-            </div>
-        </div>
-    `).join('');
+async function loadOcasionesForSelect() {
+    try {
+        const res = await fetch(`${API_URL}/ocasiones`, { headers: headers() });
+        if (res.ok) {
+            const data = await res.json();
+            const ocasiones = Array.isArray(data) ? data : (data.data || []);
+            ocasionesCargadas = ocasiones.filter(o => o.activo);
+            
+            const select = document.getElementById('promoTipo');
+            select.innerHTML = '';
+            
+            ocasionesCargadas.forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o.id;
+                opt.textContent = o.nombre;
+                select.appendChild(opt);
+            });
+
+            if(promoTipoChoices) {
+                promoTipoChoices.destroy();
+            }
+            promoTipoChoices = new Choices(select, {
+                removeItemButton: true,
+                placeholderValue: 'Seleccionar ocasiones',
+                searchPlaceholderValue: 'Buscar ocasión...',
+                itemSelectText: '',
+                noResultsText: 'No se encontraron resultados',
+                noChoicesText: 'No hay opciones disponibles'
+            });
+        }
+    } catch (e) { console.error('Error cargando ocasiones para el modal', e); }
 }
 
 function abrirModalNuevaPromo() {
-    promoEditandoId = null;
-    document.getElementById('modalPromoTitulo').textContent = 'Nueva Promoción';
-    document.getElementById('promoTitulo').value = '';
-    document.getElementById('promoDescripcion').value = '';
-    document.getElementById('promoFechaInicio').value = '';
-    document.getElementById('promoFechaFin').value = '';
-    document.getElementById('promoTipo').value = '';
-    new bootstrap.Modal(document.getElementById('modalPromo')).show();
-}
-
-function editarPromo(id) {
-    const p = promosDemo.find(x => x.id === id);
-    if (!p) return;
-    promoEditandoId = id;
-    document.getElementById('modalPromoTitulo').textContent = 'Editar Promoción';
-    document.getElementById('promoTitulo').value = p.titulo;
-    document.getElementById('promoDescripcion').value = p.descripcion;
-    document.getElementById('promoFechaInicio').value = p.fechaInicio;
-    document.getElementById('promoFechaFin').value = p.fechaFin;
-    document.getElementById('promoTipo').value = p.tipo;
-    new bootstrap.Modal(document.getElementById('modalPromo')).show();
-}
-
-function guardarPromo() {
-    const titulo = document.getElementById('promoTitulo').value.trim();
-    if (!titulo) { Swal.fire('Error', 'El título es requerido.', 'error'); return; }
-
-    const data = {
-        id: promoEditandoId || Date.now(),
-        titulo,
-        descripcion: document.getElementById('promoDescripcion').value.trim(),
-        fechaInicio: document.getElementById('promoFechaInicio').value,
-        fechaFin: document.getElementById('promoFechaFin').value,
-        tipo: document.getElementById('promoTipo').value,
-        activa: true
-    };
-
-    if (promoEditandoId) {
-        const idx = promosDemo.findIndex(x => x.id === promoEditandoId);
-        promosDemo[idx] = data;
-    } else {
-        promosDemo.push(data);
+    if (ocasionesCargadas.length === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Primero registra una ocasión especial',
+            text: 'Las promociones deben estar asociadas a al menos una ocasión. Ve a la pestaña "Ocasiones especiales".',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'Entendido'
+        });
+        return;
     }
 
-    bootstrap.Modal.getInstance(document.getElementById('modalPromo')).hide();
-    renderPromos();
-    Swal.fire({ icon: 'success', title: 'Guardado', text: 'Promoción guardada correctamente.', timer: 2000, showConfirmButton: false });
+    promoEditandoId = null;
+    document.getElementById('modalPromoTitulo').innerText = 'Añadir Promoción';
+    document.getElementById('promoTitulo').value = '';
+    document.getElementById('promoDescripcion').value = '';
+    document.getElementById('promoPrecio').value = '';
+    
+    if (promoTipoChoices) {
+        promoTipoChoices.removeActiveItems();
+    }
+
+    modalPromoInst.show();
 }
 
-function eliminarPromo(id) {
-    Swal.fire({ title: '¿Eliminar promoción?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar', confirmButtonColor: '#dc3545' }).then(r => {
-        if (r.isConfirmed) {
-            promosDemo = promosDemo.filter(p => p.id !== id);
-            renderPromos();
+function editPromocion(p) {
+    if (ocasionesCargadas.length === 0) {
+        Swal.fire('Error', 'No hay ocasiones registradas.', 'error');
+        return;
+    }
+
+    promoEditandoId = p.id;
+    document.getElementById('modalPromoTitulo').innerText = 'Editar Promoción';
+    document.getElementById('promoTitulo').value = p.nombre_promocion;
+    document.getElementById('promoDescripcion').value = p.descripcion || '';
+    document.getElementById('promoPrecio').value = p.precio;
+    
+    if (promoTipoChoices) {
+        promoTipoChoices.removeActiveItems();
+        if (p.ocasiones && Array.isArray(p.ocasiones)) {
+            const ocIds = p.ocasiones.map(o => (o.id || o.ocasion_id || o).toString());
+            promoTipoChoices.setChoiceByValue(ocIds);
+        }
+    }
+    
+    modalPromoInst.show();
+}
+
+async function guardarPromo() {
+    let ocasionesMarcadas = [];
+    if (promoTipoChoices) {
+        ocasionesMarcadas = promoTipoChoices.getValue(true).map(v => parseInt(v));
+    }
+
+    if (ocasionesMarcadas.length === 0) {
+        Swal.fire('Atención', 'Debes seleccionar al menos una ocasión especial.', 'warning');
+        return;
+    }
+
+    const data = {
+        nombre_promocion: document.getElementById('promoTitulo').value,
+        descripcion: document.getElementById('promoDescripcion').value,
+        precio: document.getElementById('promoPrecio').value,
+        activo: true,
+        ocasiones: ocasionesMarcadas
+    };
+    
+    const method = promoEditandoId ? 'PUT' : 'POST';
+    const url = promoEditandoId ? `${API_URL}/promociones/${promoEditandoId}` : `${API_URL}/promociones`;
+
+    try {
+        const res = await fetch(url, {
+            method,
+            headers: headers(),
+            body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+            Swal.fire({
+                icon: 'success',
+                title: promoEditandoId ? 'Promoción actualizada' : 'Promoción creada',
+                text: promoEditandoId ? 'Los datos han sido guardados.' : 'La promoción fue registrada correctamente.',
+                confirmButtonColor: '#28a745'
+            });
+            modalPromoInst.hide();
+            loadPromociones();
+        } else {
+            const errorData = await res.json();
+            let errorMsg = 'Error al guardar promoción. Verifica los datos.';
+            if (errorData.errors) {
+                errorMsg = Object.values(errorData.errors).flat().join('\n');
+            } else if (errorData.message) {
+                errorMsg = errorData.message;
+            }
+            Swal.fire('Error', errorMsg, 'error');
+        }
+    } catch (error) {
+        Swal.fire('Error', 'Error de conexión', 'error');
+    }
+}
+
+async function deletePromocion(id) {
+    Swal.fire({
+        title: '¿Deseas desactivar esta promoción?',
+        text: 'Esta promoción no será visible para los clientes.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, desactivar',
+        cancelButtonText: 'Cancelar'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                const res = await fetch(`${API_URL}/promociones/${id}`, { method: 'DELETE', headers: headers() });
+                if (res.ok) {
+                    showToast('success', 'Promoción desactivada');
+                    loadPromociones();
+                } else {
+                    const err = await res.json();
+                    Swal.fire('Error', err.message || 'Error al desactivar promoción', 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error', 'Error de conexión', 'error');
+            }
+        }
+    });
+}
+
+async function reactivatePromocion(id) {
+    Swal.fire({
+        title: '¿Reactivar Promoción?',
+        text: 'La promoción volverá a estar pública.',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, reactivar',
+        cancelButtonText: 'Cancelar'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                const res = await fetch(`${API_URL}/promociones/${id}/activar`, { method: 'PATCH', headers: headers() });
+                if (res.ok) {
+                    Swal.fire('Reactivada', 'Promoción reactivada', 'success');
+                    loadPromociones();
+                } else {
+                    const err = await res.json();
+                    Swal.fire('Error', err.message || 'Error al reactivar promoción', 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error', 'Error de conexión', 'error');
+            }
         }
     });
 }
@@ -478,9 +618,11 @@ async function reactivateOcasion(id) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(renderPromos, 400);
     modalOcasionInst = new bootstrap.Modal(document.getElementById('modalOcasion'));
+    modalPromoInst = new bootstrap.Modal(document.getElementById('modalPromo'));
     loadOcasiones();
+    loadOcasionesForSelect();
+    loadPromociones();
 });
 </script>
 @endsection

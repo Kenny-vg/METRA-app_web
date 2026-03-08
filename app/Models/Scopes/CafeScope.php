@@ -14,15 +14,15 @@ class CafeScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        if(!Auth::check()){
+        // Fuerza la resolución segura del usuario desde Auth facade o Request actual
+        $user = auth()->user() ?? request()->user();
+
+        if(!$user){
             return;
         }
-    
-        //usuario logueado
-        $user = Auth::user();
 
-        //solo filtrar si hay usuario y no es superadmin
-        if($user && $user->role !=='superadmin'){
+        // Solo filtrar si hay usuario y no es superadmin
+        if($user->role !== 'superadmin'){
             $builder->where(
                 $model->getTable().'.cafe_id',
                 $user->cafe_id

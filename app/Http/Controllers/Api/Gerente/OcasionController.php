@@ -20,11 +20,7 @@ class OcasionController extends Controller
     /**LISTAR OCASIONES */
     public function index(Request $request)
     {
-        $cafeId = $request->user()->cafe_id;
-
-        $ocasiones = OcasionEspecial::where('cafe_id', $cafeId)
-            ->orderBy('nombre')
-            ->get();
+        $ocasiones = OcasionEspecial::orderBy('nombre')->get();
 
         return ApiResponse::success($ocasiones);
     }
@@ -58,7 +54,7 @@ class OcasionController extends Controller
         return ApiResponse::success($ocasion, 'Ocasion agregada');
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, OcasionEspecial $ocasion)
     {
         $cafeId = $request->user()->cafe_id;
 
@@ -67,18 +63,10 @@ class OcasionController extends Controller
                 'required',
                 'string',
                 'max:100',
-                Rule::unique('ocasion_especials')->ignore($id)->where(fn($query) => $query->where('cafe_id', $cafeId))
+                Rule::unique('ocasion_especials')->ignore($ocasion->id)->where(fn($query) => $query->where('cafe_id', $cafeId))
             ],
             'descripcion' => 'nullable|string|max:255',
         ]);
-
-        $ocasion = OcasionEspecial::where('id', $id)
-            ->where('cafe_id', $cafeId)
-            ->first();
-
-        if (!$ocasion) {
-            return ApiResponse::error('Ocasion no encontrada', 404);
-        }
 
         $data = [
             'nombre' => $request->nombre,
@@ -90,16 +78,8 @@ class OcasionController extends Controller
         return ApiResponse::success($ocasion, 'Ocasion actualizada');
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, OcasionEspecial $ocasion)
     {
-        $ocasion = OcasionEspecial::where('id', $id)
-            ->where('cafe_id', cafe_id)
-            ->first();
-
-        if (!$ocasion) {
-            return ApiResponse::error('Ocasion no encontrada', 404);
-        }
-
         $ocasion->update([
             'activo' => false
         ]);

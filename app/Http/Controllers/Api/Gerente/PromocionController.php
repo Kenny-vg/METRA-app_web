@@ -4,46 +4,122 @@ namespace App\Http\Controllers\Api\Gerente;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Promocion;
+use App\Helpers\ApiResponse;
+use Illuminate\Validation\Rule;
+use App\Traits\Activable;
 
 class PromocionController extends Controller
 {
+    use Activable;
+    protected $model = Promocion::class;
+
     /**
-     * Display a listing of the resource.
+     * LISTAR PROMOCIONES
      */
     public function index()
     {
-        //
+        $promociones = Promocion::with('ocasiones')->orderBy('nombre_promocion')->get();
+
+        return ApiResponse::success($promociones);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * CREAR PROMOCIÓN
      */
     public function store(Request $request)
     {
-        //
+        $cafeId = $request->user()->cafe_id;
+    
+        $messages = [
+            'nombre_promocion.required' => 'El nombre de la promoción es obligatorio.',
+            'nombre_promocion.max' => 'El nombre no puede tener más de 100 caracteres.',
+            'nombre_promocion.unique' => 'Ya existe una promoción con este nombre.',
+            'precio.required' => 'El precio es obligatorio.',
+            'precio.numeric' => 'El precio debe ser un número válido.',
+            'precio.min' => 'El precio no puede ser negativo.',
+            'ocasiones.required' => 'Debes asociar la promoción a al menos una ocasión especial.',
+            'ocasiones.array' => 'El formato de las ocasiones no es válido.',
+            'ocasiones.min' => 'Debes elegir al menos una ocasión.'
+        ];
+
+        $request->validate([
+            'nombre_promocion'=>[
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('promocions')
+                ->where(fn($query) => $query->where('cafe_id', $cafeId))
+            ],
+            'descripcion'=>'nullable|string|max:255',
+            'precio'=>'required|numeric|min:0',
+            'ocasiones'=>'required|array|min:1'
+        ], $messages);
+
+        $promocion = Promocion::create([
+            'nombre_promocion'=>$request->nombre_promocion,
+            'descripcion'=>$request->descripcion,
+            'precio'=>$request->precio,
+            'activo'=>true,
+            'cafe_id'=>$cafeId
+        ]);
+
+        if ($request->has('ocasiones')) {
+            $promocion->ocasiones()->attach($request->ocasiones);
+        }
+
+        return ApiResponse::success($promocion, 'Promoción creada exitosamente');
     }
 
     /**
-     * Display the specified resource.
+     * ACTUALIZAR PROMOCIÓN
      */
-    public function show(string $id)
+    public function update(Request $request, Promocion $promocion)
     {
-        //
+        $messages = [
+            'nombre_promocion.required' => 'El nombre de la promoción es obligatorio.',
+            'nombre_promocion.max' => 'El nombre no puede tener más de 100 caracteres.',
+            'nombre_promocion.unique' => 'Ya existe una promoción con este nombre.',
+            'precio.required' => 'El precio es obligatorio.',
+            'precio.numeric' => 'El precio debe ser un número válido.',
+            'precio.min' => 'El precio no puede ser negativo.',
+            'ocasiones.required' => 'Debes asociar la promoción a al menos una ocasión especial.',
+            'ocasiones.array' => 'El formato de las ocasiones no es válido.',
+            'ocasiones.min' => 'Debes elegir al menos una ocasión.'
+        ];
+
+        $request->validate([
+            'nombre_promocion'=>[
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('promocions')->where('cafe_id', $promocion->cafe_id)->ignore($promocion->id)
+            ],
+            'descripcion'=>'nullable|string|max:255',
+            'precio'=>'required|numeric|min:0',
+            'ocasiones'=>'required|array|min:1'
+        ], $messages);
+
+        $promocion->update([
+            'nombre_promocion'=>$request->nombre_promocion,
+            'descripcion'=>$request->descripcion,
+            'precio'=>$request->precio,
+            'activo'=>$request->activo
+        ]);
+
+        if ($request->has('ocasiones')) {
+            $promocion->ocasiones()->sync($request->ocasiones);
+        }
+
+        return ApiResponse::success($promocion, 'Promoción actualizada exitosamente');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(Promocion $promocion)
     {
-        //
-    }
+        $promocion->update([
+            'activo' => false
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return ApiResponse::success(null, 'Promoción desactivada');
     }
 }

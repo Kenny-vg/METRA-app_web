@@ -9,9 +9,7 @@ trait Activable
 {
     public function activar(Request $request, $id)
     {
-        $model = $this->model::where('id', $id)
-            ->where('cafe_id', $request->user()->cafe_id)
-            ->first();
+        $model = $this->model::find($id);
 
         if (!$model) {
             return ApiResponse::error('Registro no encontrado',404);
