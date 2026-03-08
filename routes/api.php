@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\Gerente\HorarioController;
 use App\Http\Controllers\Api\Gerente\MenuController;
 use App\Http\Controllers\Api\Gerente\OcasionController;
 use App\Http\Controllers\Api\Gerente\PromocionController;
+use App\Http\Controllers\Api\Gerente\RenovarSuscripcionController;
 
 /*
 |------------------------------------------
@@ -84,6 +85,14 @@ Route::post('/registro-negocio', [RegistroNegocioController::class, 'store']);
 Route::post('/registro-negocio/{cafeteria}/comprobante', [RegistroNegocioController::class, 'subirComprobante']);
 //consultar si existe registro pendiente
 Route::post('/registro-pendiente', [RegistroNegocioController::class, 'registroPendiente']);
+
+// Planes públicos (para registro y renovación sin auth)
+Route::get('/planes-publicos', function () {
+    $planes = \App\Models\Plan::where('estado', true)->get();
+    return \App\Helpers\ApiResponse::success($planes, 'Planes disponibles');
+});
+
+
 
 //Ver menú
 Route::get('/cafeterias/{id}/menu', function ($id) {
@@ -185,6 +194,10 @@ Route::middleware([
     // SUSCRIPCIONES
     Route::get('/suscripciones', [SuscripcionController::class, 'index']);
     Route::post('/suscripciones', [SuscripcionController::class, 'store']);
+    // Aprobar renovación de suscripción pendiente (cafeteria activa que renueva)
+    Route::patch('/suscripciones/{suscripcion}/aprobar-renovacion', [SuscripcionController::class, 'aprobarRenovacion']);
+    // Ver comprobante de una suscripción
+    Route::get('/suscripciones/{suscripcion}/comprobante', [SuscripcionController::class, 'verComprobante']);
 
     //DASHBOARD
     Route::get('/dashboard', [DashboardController::class, 'index']);
@@ -250,4 +263,7 @@ Route::middleware([
     Route::patch('menu/{id}/activar', [MenuController::class, 'activar']);
     Route::patch('promociones/{id}/activar', [PromocionController::class, 'activar']);
     Route::patch('ocasiones/{id}/activar', [OcasionController::class, 'activar']);
+
+    // Renovación de suscripción (gerente activo con suscripción por vencer)
+    Route::post('renovar-suscripcion', [RenovarSuscripcionController::class, 'store']);
 });

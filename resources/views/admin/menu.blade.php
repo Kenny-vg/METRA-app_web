@@ -49,10 +49,14 @@
 
     <!-- Sidebar SaaS -->
     <aside class="sidebar d-flex flex-column min-vh-100" style="background-color: var(--black-primary); border-right: 1px solid var(--gray-dark);">
-        <div class="d-flex align-items-center justify-content-center mb-5 mt-3 d-none d-md-flex">
-             <h2 class="fw-bold m-0 d-flex align-items-center text-white" style="letter-spacing: -1px;">
+        <div class="d-flex flex-column align-items-center justify-content-center mb-4 mt-3 d-none d-md-flex">
+            <h2 class="fw-bold m-0 d-flex align-items-center text-white" style="letter-spacing: -1px;">
                 <i class="bi bi-hexagon-fill me-2" style="color: var(--accent-gold); font-size: 1.5rem;"></i>METRA
             </h2>
+            <!-- Nombre de la café -->
+            <div id="sidebar-cafe-name" class="mt-2 px-3 py-1 rounded-pill small fw-bold d-none" 
+                 style="background: rgba(181,146,126,0.15); color: var(--accent-gold); font-size: 0.72rem; letter-spacing: 0.5px; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;">
+            </div>
         </div>
         <nav class="d-flex flex-column gap-2 px-3 flex-grow-1 custom-scrollbar">
             <span class="small fw-bold text-uppercase mt-2 mb-2 ms-3" style="color: var(--text-muted); font-size: 0.7rem; letter-spacing: 1px;">Operaciones</span>
@@ -96,6 +100,16 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Nombre de cafetería en sidebar
+        const nombreCafe = localStorage.getItem('nombre_cafeteria');
+        if (nombreCafe) {
+            const pill = document.getElementById('sidebar-cafe-name');
+            if (pill) {
+                pill.textContent = nombreCafe;
+                pill.classList.remove('d-none');
+            }
+        }
+
         // Adaptación móvil
         document.addEventListener('click', function(event) {
             const sidebar = document.querySelector('.sidebar');
@@ -104,7 +118,7 @@
             if (window.innerWidth < 768 && 
                 sidebar && toggleBtn &&
                 !sidebar.contains(event.target) && 
-                !toggleBtn.contains(event.target) && 
+                !toggleBtn.contains(event.target) &&
                 sidebar.classList.contains('active')) {
                 sidebar.classList.remove('active');
             }

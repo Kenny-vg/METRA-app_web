@@ -118,15 +118,35 @@ class LoginController extends Controller
 
     $token = $user->createToken('metra_token')->plainTextToken;
 
+    // Datos extra para sidebar y banner de suscripción
+    $extraData = [];
+    if (in_array($user->role, ['gerente', 'personal'])) {
+        $cafeteria = $user->cafeteria;
+        if ($cafeteria) {
+            $extraData['nombre_cafeteria'] = $cafeteria->nombre;
+            $suscActiva = $cafeteria->suscripcionActual()->first();
+            if ($suscActiva && $suscActiva->fecha_fin) {
+                $extraData['dias_restantes'] = (int) now()->startOfDay()->diffInDays(
+                    \Carbon\Carbon::parse($suscActiva->fecha_fin)->startOfDay(),
+                    false
+                );
+                $extraData['fecha_fin_suscripcion'] = $suscActiva->fecha_fin;
+            } else {
+                $extraData['dias_restantes'] = null;
+                $extraData['fecha_fin_suscripcion'] = null;
+            }
+        }
+    }
+
     return ApiResponse::success([
         'token'=>$token,
-        'usuario'=>[
+        'usuario'=>array_merge([
             'id'=>$user->id,
             'name'=>$user->name,
             'email'=>$user->email,
             'role'=>$user->role,
             'cafe_id'=>$user->cafe_id
-        ]
+        ], $extraData)
     ], 'Login correcto');
     }
 

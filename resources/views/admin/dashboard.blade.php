@@ -180,7 +180,7 @@
 
         async function cargarDashboard() {
             try {
-                const res = await fetch(`${API}/gerente/cafeteria/perfil`, { headers: authHeaders() });
+                const res = await fetch(`${API}/gerente/mi-cafeteria`, { headers: authHeaders() });
 
                 if (!res.ok) return;
                 const json = await res.json();
@@ -298,68 +298,59 @@
 
         document.getElementById('formRenovar').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if(!cafeteriaId) return;
 
-            const planVal = document.getElementById('r-plan').value;
+            const planVal   = document.getElementById('r-plan').value;
             const fileInput = document.getElementById('r-comprobante').files[0];
-            const alertBox = document.getElementById('r-alert');
-
-            // if requires plan text check dynamically
             const selectReq = document.getElementById('r-plan').hasAttribute('required');
+
             if ((selectReq && !planVal) || !fileInput) {
-                Swal.fire({ title: 'Atención', text: 'Llena todos los campos', icon: 'warning', confirmButtonColor: '#382C26' });
+                Swal.fire({ title: 'Atención', text: 'Completa todos los campos requeridos.', icon: 'warning', confirmButtonColor: '#382C26' });
                 return;
             }
             if (fileInput.size > 5 * 1024 * 1024) {
-                Swal.fire({ title: 'Atención', text: 'El comprobante no debe superar los 5MB.', icon: 'warning', confirmButtonColor: '#382C26' });
+                Swal.fire({ title: 'Atención', text: 'El comprobante no debe superar los 5 MB.', icon: 'warning', confirmButtonColor: '#382C26' });
                 return;
             }
 
-            const submitBtn = e.target.querySelector('button');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
             submitBtn.disabled = true;
 
             const formData = new FormData();
             formData.append('comprobante', fileInput);
-            formData.append('_method', 'POST'); // for Laravel API
+            if (planVal) formData.append('plan_id', planVal);
 
-            // Si idealmente hubiera un endpoint para renovaciones, lo usaríamos aquí.
-            // Para satisfacer las reglas, usaremos subirComprobante, simulando la interfaz de revisión.
             try {
-                const res = await fetch(`${API}/registro-negocio/${cafeteriaId}/comprobante`, {
+                // Usar el endpoint dedicado de renovación (requiere auth)
+                const res = await fetch(`${API}/gerente/renovar-suscripcion`, {
                     method: 'POST',
-                    headers: { 'Authorization': `Bearer ${authToken}` },
+                    headers: { 'Authorization': `Bearer ${authToken}`, 'Accept': 'application/json' },
                     body: formData
                 });
-                
+
                 const json = await res.json();
-                
-                if(!res.ok) {
-                    throw new Error(json.message || 'Error al subir el comprobante.');
+
+                if (!res.ok) {
+                    throw new Error(json.message || 'Error al enviar la solicitud.');
                 }
 
                 bootstrap.Modal.getInstance(document.getElementById('modalRenovar')).hide();
-                
-                // Simulación visual temporal de que la renovación está en proceso ("en_revision")
-                // Ya que subirComprobante no cambia el estado general de un cafe activo a "en_revision",
-                // se lo mostramos localmente o requerimos recarga si hicimos cambio via DB.
+
                 Swal.fire({
-                    title: '¡Recibo Enviado!',
-                    text: 'Tu comprobante está en revisión por el administrador.',
+                    title: '¡Solicitud Enviada!',
+                    text: json.message || 'Tu comprobante está en revisión por el administrador.',
                     icon: 'success',
                     confirmButtonColor: '#212529'
-                }).then(() => {
-                    cargarDashboard();
-                });
+                }).then(() => cargarDashboard());
 
-            } catch(e) {
-                Swal.fire({ title: 'Error', text: e.message, icon: 'error', confirmButtonColor: '#382C26' });
+            } catch(err) {
+                Swal.fire({ title: 'Error', text: err.message, icon: 'error', confirmButtonColor: '#382C26' });
             } finally {
-                submitBtn.innerHTML = document.getElementById('btn-submit-renovar').textContent === 'Subir Nuevo Comprobante' ? 'Subir Nuevo Comprobante' : 'Enviar Renovación';
+                submitBtn.innerHTML = document.getElementById('btn-submit-renovar').dataset.label || 'Enviar Renovación';
                 submitBtn.disabled = false;
             }
-
         });
+
 
         // Init
         if(authToken) {

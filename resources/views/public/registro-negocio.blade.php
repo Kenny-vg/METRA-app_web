@@ -468,7 +468,7 @@
                     <hr style="border-color: rgba(56,44,38,0.1); margin: 25px 0;">
                     <div class="d-flex flex-column gap-2 mb-4">
                         <div class="plan-feature"><i class="bi bi-check-circle-fill"></i> ${plan.max_reservas_mes} reservas mensuales</div>
-                        <div class="plan-feature"><i class="bi bi-check-circle-fill"></i> ${plan.max_usuarios_admin} acceso(s) administrador</div>
+                        <div class="plan-feature"><i class="bi bi-check-circle-fill"></i> Hasta ${plan.max_usuarios_admin} usuarios del sistema</div>
                         <div class="plan-feature"><i class="bi bi-check-circle-fill"></i> Vigencia ${plan.duracion_dias} días</div>
                         <div class="plan-feature"><i class="bi bi-check-circle-fill"></i> Soporte Especializado</div>
                     </div>
@@ -485,7 +485,7 @@
             <div class="plan-option d-flex justify-content-between align-items-center" id="po-${plan.id}" onclick="window.selectPlan(${plan.id})">
                 <div>
                     <div class="fw-bold" style="color: var(--black-primary);">${plan.nombre_plan}</div>
-                    <div class="text-muted small">${plan.max_reservas_mes} reservas · ${plan.max_usuarios_admin} admin</div>
+                    <div class="text-muted small">${plan.max_reservas_mes} reservas · ${plan.max_usuarios_admin} usuarios</div>
                 </div>
                 <div class="fw-bold fs-5" style="color: var(--accent-gold);">${formatterMXN.format(plan.precio)} MXN</div>
             </div>

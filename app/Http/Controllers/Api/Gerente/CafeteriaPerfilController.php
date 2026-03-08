@@ -16,8 +16,14 @@ class CafeteriaPerfilController extends Controller
     //Ver mi cafetería
     public function show(Request $request)
     {
+        $cafeteria = $request->user()->cafeteria;
+
+        if ($cafeteria) {
+            $cafeteria->load(['suscripcionActual.plan']);
+        }
+
         return ApiResponse::success(
-            $request->user()->cafeteria,
+            $cafeteria,
             'Perfil cafetería'
         );
     }

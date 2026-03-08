@@ -114,10 +114,48 @@ class SuscripcionController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Servir el comprobante de una suscripción.
      */
-    public function destroy(Suscripcion $suscripcion)
+    public function verComprobante(Suscripcion $suscripcion)
     {
-    //
+        if (!$suscripcion->comprobante_url) {
+            return ApiResponse::error('Esta suscripción no tiene comprobante.', 404);
+        }
+
+        if (!\Illuminate\Support\Facades\Storage::exists($suscripcion->comprobante_url)) {
+            return ApiResponse::error('Archivo no encontrado.', 404);
+        }
+
+        return response()->file(
+            \Illuminate\Support\Facades\Storage::path($suscripcion->comprobante_url)
+        );
+    }
+
+    /**
+     * Aprobar renovación de suscripción — para cafeterías activas que renovaron.
+     * Marca la suscripción pendiente como 'pagado'.
+     */
+    public function aprobarRenovacion(Suscripcion $suscripcion)
+    {
+        if ($suscripcion->estado_pago !== 'pendiente') {
+            return ApiResponse::error('Esta suscripción no está pendiente de aprobación.', 422);
+        }
+
+        $cafeteria = $suscripcion->cafeteria;
+
+        if (!$cafeteria || $cafeteria->estado === 'suspendida') {
+            return ApiResponse::error('La cafetería asociada está suspendida o no existe.', 422);
+        }
+
+        $suscripcion->update([
+            'estado_pago'      => 'pagado',
+            'fecha_validacion' => now(),
+        ]);
+
+        return ApiResponse::success(
+            $suscripcion->fresh()->load(['cafeteria', 'plan']),
+            '¡Renovación aprobada! La suscripción estará activa a partir de ' .
+                \Carbon\Carbon::parse($suscripcion->fecha_inicio)->format('d/m/Y') . '.'
+        );
     }
 }

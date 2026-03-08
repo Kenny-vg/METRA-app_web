@@ -97,7 +97,7 @@ function renderPlanes() {
                                 <input type="number" min="0" class="form-control bg-light border-0 text-center" id="reservas-${plan.id}" value="${plan.max_reservas_mes}" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                             </div>
                             <div class="col-6">
-                                <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Máx. Admins</label>
+                                <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Usuarios del sistema</label>
                                 <input type="number" min="1" class="form-control bg-light border-0 text-center" id="usuarios-${plan.id}" value="${plan.max_usuarios_admin}" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                             </div>
                         </div>
@@ -149,7 +149,7 @@ function renderPlanes() {
                                 <input type="number" min="0" class="form-control text-center" id="reservas-nuevo" value="0" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                             </div>
                             <div class="col-6">
-                                <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Máx. Admins</label>
+                                <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Usuarios del sistema</label>
                                 <input type="number" min="1" class="form-control text-center" id="usuarios-nuevo" value="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                             </div>
                         </div>

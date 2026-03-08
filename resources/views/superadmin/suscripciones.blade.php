@@ -159,21 +159,27 @@ function renderTabla(suscripciones) {
             <td class="fw-bold" style="color: var(--black-primary);">${monto}</td>
             <td style="color: var(--text-muted);">${fechaFin}</td>
             <td>${badgeEstado}</td>
-            <td class="text-center pe-4">
-                <div class="d-flex justify-content-center gap-3 text-nowrap">
-                    <button type="button" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Historial" onclick="verHistorial(${s.cafe_id}, '${safeName}')"><i class="bi bi-clock-history"></i></button>
-                    ${(s.comprobante_url || (s.cafeteria && s.cafeteria.comprobante_url)) 
-                        ? `<button type="button" class="btn btn-sm btn-outline-dark rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Recibo" onclick="verComprobanteSub(${s.id})"><i class="bi bi-file-earmark-text"></i></button>` 
-                        : ''}
-                    ${(s.cafeteria?.estado === 'en_revision')
-                        ? `<span class="btn btn-sm btn-outline-warning rounded-pill px-3 disabled" style="width: 110px; opacity: 0.8; pointer-events: none; border-color: #ffc107; color: #ffc107;">Pendiente</span>`
-                        : (s.estado_pago !== 'cancelado' && s.cafeteria?.estado !== 'suspendida'
+                <td class="text-center pe-4">
+                    <div class="d-flex justify-content-center gap-3 text-nowrap">
+                        <button type="button" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Historial" onclick="verHistorial(${s.cafe_id}, '${safeName}')"><i class="bi bi-clock-history"></i></button>
+                        ${(s.comprobante_url || (s.cafeteria && s.cafeteria.comprobante_url)) 
+                            ? `<button type="button" class="btn btn-sm btn-outline-dark rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Recibo" onclick="verComprobanteSub(${s.id})"><i class="bi bi-file-earmark-text"></i></button>` 
+                            : ''}
+                        ${
+                          // Registro inicial pendiente de aprobar
+                          (s.cafeteria?.estado === 'en_revision')
+                            ? `<span class="btn btn-sm btn-outline-warning rounded-pill px-3 disabled" style="width: 110px; opacity: 0.8; pointer-events: none; border-color: #ffc107; color: #ffc107;">Pendiente</span>`
+                          // Renovación pendiente de cafetería activa → botón Aprobar
+                          : (s.estado_pago === 'pendiente' && s.cafeteria?.estado === 'activa')
+                            ? `<button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3" style="width: 130px;" onclick="aprobarRenovacion(${s.id})"><i class="bi bi-check-circle me-1"></i>Aprobar Renov.</button>`
+                          // Sin suscripción activa -> suspendida o cancelada
+                          : (s.estado_pago !== 'cancelado' && s.cafeteria?.estado !== 'suspendida'
                             ? `<button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" style="width: 110px;" onclick="cambiarEstado(${s.cafe_id}, 'suspendida')">Suspender</button>`
                             : `<button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3" style="width: 110px;" onclick="cambiarEstado(${s.cafe_id}, 'activa')">Reactivar</button>`)
-                    }
-                </div>
-            </td>
-        </tr>`;
+                        }
+                    </div>
+                </td>
+            </tr>`;
 
     }).join('');
 }
@@ -411,6 +417,37 @@ async function verHistorial(cafeteriaId, nombre) {
 
 // Init
 cargarSuscripciones();
+
+async function aprobarRenovacion(suscripcionId) {
+    const result = await Swal.fire({
+        title: '¿Aprobar esta renovación?',
+        text: 'La suscripción quedará activa a partir de su fecha de inicio programada.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#382C26',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, aprobar',
+        cancelButtonText: 'Cancelar'
+    });
+    if (!result.isConfirmed) return;
+
+    document.getElementById('overlay-loading').style.setProperty('display', 'flex', 'important');
+    try {
+        const res = await fetch(`${API}/superadmin/suscripciones/${suscripcionId}/aprobar-renovacion`, {
+            method: 'PATCH',
+            headers: authHeaders()
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.message || 'Error al aprobar.');
+
+        await cargarSuscripciones();
+        Swal.fire('¡Aprobado!', json.message || 'Renovación aprobada correctamente.', 'success');
+    } catch (e) {
+        Swal.fire('Error', e.message, 'error');
+    } finally {
+        document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
+    }
+}
 
 // Initialize tooltips after rendering the table
 document.addEventListener('DOMContentLoaded', function () {

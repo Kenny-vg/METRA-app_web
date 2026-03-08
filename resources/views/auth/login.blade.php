@@ -155,6 +155,15 @@ window.handleCredentialResponse = async function(response) {
             try {
                 localStorage.setItem('token', result.data.token);
                 sessionStorage.setItem('token', result.data.token);
+                if (result.data.usuario?.nombre_cafeteria) {
+                    localStorage.setItem('nombre_cafeteria', result.data.usuario.nombre_cafeteria);
+                }
+                if (result.data.usuario?.dias_restantes !== undefined && result.data.usuario?.dias_restantes !== null) {
+                    localStorage.setItem('dias_restantes', result.data.usuario.dias_restantes);
+                }
+                if (result.data.usuario?.cafe_id) {
+                    localStorage.setItem('cafe_id', result.data.usuario.cafe_id);
+                }
                 const role = result.data.usuario.role;
                 if(role === 'superadmin') window.location.href = '/superadmin/dashboard';
                 else if(role === 'gerente') window.location.href = '/admin/dashboard';
@@ -291,6 +300,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     try {
                         localStorage.setItem('token', result.data.token);
                         sessionStorage.setItem('token', result.data.token);
+                        if (result.data.usuario?.nombre_cafeteria) {
+                            localStorage.setItem('nombre_cafeteria', result.data.usuario.nombre_cafeteria);
+                        }
+                        if (result.data.usuario?.dias_restantes !== undefined && result.data.usuario?.dias_restantes !== null) {
+                            localStorage.setItem('dias_restantes', result.data.usuario.dias_restantes);
+                        }
+                        if (result.data.usuario?.cafe_id) {
+                            localStorage.setItem('cafe_id', result.data.usuario.cafe_id);
+                        }
                         const role = result.data.usuario.role;
                         if(role === 'superadmin') window.location.href = '/superadmin/dashboard';
                         else if(role === 'gerente') window.location.href = '/admin/dashboard';
