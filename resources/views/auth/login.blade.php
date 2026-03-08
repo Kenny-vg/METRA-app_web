@@ -154,6 +154,7 @@ window.handleCredentialResponse = async function(response) {
             const result = await res.json();
             try {
                 localStorage.setItem('token', result.data.token);
+                sessionStorage.setItem('token', result.data.token);
                 const role = result.data.usuario.role;
                 if(role === 'superadmin') window.location.href = '/superadmin/dashboard';
                 else if(role === 'gerente') window.location.href = '/admin/dashboard';
@@ -262,7 +263,10 @@ document.addEventListener('DOMContentLoaded', function() {
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault(); 
 
-            try { localStorage.clear(); } catch (err) {}
+            try { 
+                localStorage.clear(); 
+                sessionStorage.clear(); 
+            } catch (err) {}
 
             const email = loginForm.querySelector('input[name="email"]').value;
             const password = loginForm.querySelector('input[name="password"]').value;
@@ -286,6 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const result = await response.json();
                     try {
                         localStorage.setItem('token', result.data.token);
+                        sessionStorage.setItem('token', result.data.token);
                         const role = result.data.usuario.role;
                         if(role === 'superadmin') window.location.href = '/superadmin/dashboard';
                         else if(role === 'gerente') window.location.href = '/admin/dashboard';

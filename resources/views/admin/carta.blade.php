@@ -64,7 +64,7 @@
             loadProductos();
         });
 
-        const getToken = () => localStorage.getItem('token');
+        const getToken = () => sessionStorage.getItem('token') || localStorage.getItem('token');
 
         const authHeaders = () => ({
             'Authorization': `Bearer ${getToken()}`,

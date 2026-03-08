@@ -82,12 +82,9 @@
         </nav>
         
         <div class="mt-auto p-3">
-            <form action="{{ route('logout') }}" method="POST" id="formLogout" class="w-100 m-0 p-0">
-                @csrf
-                <button type="submit" id="btnCerrarSesion" class="btn btn-outline-danger d-flex align-items-center justify-content-center w-100" style="padding: 12px; border-radius: 8px; font-weight: 500; transition: all 0.2s;">
-                    <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
-                </button>
-            </form>
+            <button type="button" id="btnCerrarSesion" class="btn btn-outline-danger d-flex align-items-center justify-content-center w-100" style="padding: 12px; border-radius: 8px; font-weight: 500; transition: all 0.2s;">
+                <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+            </button>
         </div>
     </aside>
 
@@ -116,9 +113,9 @@
         // Limpieza de sesión
         document.getElementById('btnCerrarSesion')?.addEventListener('click', function(e) {
             e.preventDefault();
-            localStorage.removeItem('token');
             localStorage.clear();
-            document.getElementById('formLogout').submit();
+            sessionStorage.clear();
+            window.location.href = '/logout';
         });
     </script>
 </body>
