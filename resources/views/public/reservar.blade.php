@@ -76,10 +76,9 @@
                             <div class="col-12"><h5 class="section-title mb-4" style="border-bottom: 1px solid var(--border-light); padding-bottom: 12px; color: var(--black-primary); font-weight: 700;">3. Personalización</h5></div>
                             <div class="col-12 col-md-6 mb-3">
                                 <label class="small fw-bold mb-2" style="color: var(--text-muted);">¿Celebra alguna ocasión?</label>
-                                <select class="form-select input-metra">
-                                    <option>Seleccionar motivo</option>
-                                    <option>Negocios</option>
-                                    <option>Aniversario</option>
+                                <select id="ocasion-select" name="ocasion_id" class="form-select input-metra">
+                                    <option value="">Seleccionar motivo</option>
+                                    <!-- Opciones cargadas por JS -->
                                 </select>
                             </div>
                             <div class="col-12 col-md-6 mb-3">
@@ -157,5 +156,33 @@
     </main>
     @include('partials.footer')
 
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const cafeteriaId = {{ $id }};
+            const ocasionSelect = document.getElementById('ocasion-select');
+            
+            try {
+                const res = await fetch(`/api/cafeterias/${cafeteriaId}/ocasiones`);
+                if (res.ok) {
+                    const response = await res.json();
+                    const ocasiones = response.data || [];
+                    
+                    if(ocasiones.length > 0) {
+                        ocasiones.forEach(o => {
+                            const option = document.createElement('option');
+                            option.value = o.id;
+                            option.textContent = o.nombre;
+                            ocasionSelect.appendChild(option);
+                        });
+                    } else {
+                        ocasionSelect.innerHTML = '<option value="">Sin ocasiones disponibles</option>';
+                        ocasionSelect.disabled = true;
+                    }
+                }
+            } catch (error) {
+                console.error("Error al cargar ocasiones:", error);
+            }
+        });
+    </script>
 </body>
 </html>

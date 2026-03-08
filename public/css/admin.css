@@ -1,4 +1,3 @@
-
 /* public/css/admin.css */
 
 /* --- LOGIN (Centrado total) --- */
@@ -21,27 +20,30 @@
 }
 
 /* --- SIDEBAR Y MAIN --- */
-.sidebar { 
-    width: 260px; 
-    height: 100vh; 
-    background-color: #4E342E !important;; 
-    position: fixed; 
-    top: 0; left: 0; 
-    padding: 40px 25px; 
+.sidebar {
+    width: 260px;
+    height: 100vh;
+    background-color: var(--black-primary) !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 40px 25px;
     z-index: 1000;
 }
 
 .main-admin-content {
-    margin-left: 260px !important; /* Empuja el contenido a la derecha del sidebar */
+    margin-left: 260px !important;
+    /* Empuja el contenido a la derecha del sidebar */
     padding: 60px;
-    width: calc(100% - 260px); /* Ocupa el resto de la pantalla */
+    width: calc(100% - 260px);
+    /* Ocupa el resto de la pantalla */
     min-height: 100vh;
 }
 
 /* --- BOTONES DE PERFIL Y ACCIÓN --- */
-.btn-metra-main { 
-    background-color: var(--ambar) !important; 
-    color: var(--cafe-oscuro) !important; 
+.btn-metra-main {
+    background-color: var(--ambar) !important;
+    color: var(--cafe-oscuro) !important;
     border-radius: 50px !important;
     padding: 14px 35px !important;
     font-weight: 800;
@@ -53,7 +55,9 @@
     color: #ff6b6b !important;
     font-weight: bold;
     margin-top: 20px;
-}/* --- NEW PREMIUM ADMIN BUTTONS --- */
+}
+
+/* --- NEW PREMIUM ADMIN BUTTONS --- */
 
 .btn-admin-primary {
     background: var(--black-primary);

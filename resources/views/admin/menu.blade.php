@@ -55,7 +55,7 @@
             </h2>
         </div>
         <nav class="d-flex flex-column gap-2 px-3 flex-grow-1 custom-scrollbar">
-            <span class="small fw-bold text-uppercase mb-2 ms-3" style="color: var(--text-muted); font-size: 0.7rem; letter-spacing: 1px;">Operaciones</span>
+            <span class="small fw-bold text-uppercase mt-2 mb-2 ms-3" style="color: var(--text-muted); font-size: 0.7rem; letter-spacing: 1px;">Operaciones</span>
             
             <a href="/admin/dashboard" class="nav-link-admin {{ request()->is('admin/dashboard') ? 'active' : '' }}">
                 <i class="bi bi-speedometer2 me-3"></i>Métricas
@@ -70,7 +70,7 @@
                 <i class="bi bi-calendar3 me-3"></i>Reservaciones
             </a>
             <a href="/admin/marketing" class="nav-link-admin {{ request()->is('admin/marketing') ? 'active' : '' }}">
-                <i class="bi bi-megaphone me-3"></i>Promociones
+                <i class="bi bi-megaphone me-3"></i>Eventos y Promos
             </a>
 
             <span class="small fw-bold text-uppercase mt-4 mb-2 ms-3" style="color: var(--text-muted); font-size: 0.7rem; letter-spacing: 1px;">Configuración</span>

@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\Gerente\ZonaController;
 use App\Http\Controllers\Api\Gerente\MesaController;
 use App\Http\Controllers\Api\Gerente\HorarioController;
 use App\Http\Controllers\Api\Gerente\MenuController;
+use App\Http\Controllers\Api\Gerente\OcasionController;
 
 /*
 |------------------------------------------
@@ -92,6 +93,20 @@ Route::get('/cafeterias/{id}/menu', function ($id) {
     return response()->json([
         'success'=>true,
         'data'=>$menu
+    ]);
+});
+
+//Ver ocasiones especiales
+Route::get('/cafeterias/{id}/ocasiones', function ($id) {
+
+    $ocasiones = \App\Models\OcasionEspecial::where('cafe_id',$id)
+        ->where('activo',true)
+        ->orderBy('nombre')
+        ->get();
+
+    return response()->json([
+        'success'=>true,
+        'data'=>$ocasiones
     ]);
 });
 
@@ -197,8 +212,13 @@ Route::middleware([
     Route::post('menu/{menu}', [MenuController::class, 'update']);
     Route::apiResource('menu', MenuController::class);
 
+    // Rutas para ocasiones especiales
+    Route::apiResource('ocasiones', OcasionController::class);
+
+    //Activar registros
     Route::patch('zonas/{id}/activar', [ZonaController::class, 'activar']);
     Route::patch('mesas/{id}/activar', [MesaController::class, 'activar']);
     Route::patch('horarios/{id}/activar', [HorarioController::class, 'activar']);
     Route::patch('menu/{id}/activar', [MenuController::class, 'activar']);
+    Route::patch('ocasiones/{id}/activar', [OcasionController::class, 'activar']);
 });
