@@ -12,6 +12,28 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Custom Scrollbar -->
+    <style>
+        .custom-scrollbar {
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #8c714a transparent; /* Tono café de METRA y fondo transparente /
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #8c714a;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: var(--accent-gold);
+        }
+    </style>
 </head>
 <body class="zona-admin" style="background-color: var(--off-white); font-family: 'Inter', sans-serif;">
 
@@ -26,13 +48,13 @@
     </div>
 
     <!-- Sidebar SaaS -->
-    <aside class="sidebar" style="background-color: var(--black-primary); border-right: 1px solid var(--gray-dark);">
+    <aside class="sidebar d-flex flex-column min-vh-100" style="background-color: var(--black-primary); border-right: 1px solid var(--gray-dark);">
         <div class="d-flex align-items-center justify-content-center mb-5 mt-3 d-none d-md-flex">
              <h2 class="fw-bold m-0 d-flex align-items-center text-white" style="letter-spacing: -1px;">
                 <i class="bi bi-hexagon-fill me-2" style="color: var(--accent-gold); font-size: 1.5rem;"></i>METRA
             </h2>
         </div>
-        <nav class="d-flex flex-column gap-2 px-3">
+        <nav class="d-flex flex-column gap-2 px-3 flex-grow-1 custom-scrollbar">
             <span class="small fw-bold text-uppercase mb-2 ms-3" style="color: var(--text-muted); font-size: 0.7rem; letter-spacing: 1px;">Operaciones</span>
             
             <a href="/admin/dashboard" class="nav-link-admin {{ request()->is('admin/dashboard') ? 'active' : '' }}">
@@ -57,12 +79,16 @@
                 <i class="bi bi-person-circle me-3"></i>Cuenta
             </a>
             
-            <div class="mt-auto pt-5">
-                <a href="/logout" id="btnCerrarSesion" class="btn btn-outline-danger d-flex align-items-center justify-content-center w-100" style="padding: 12px; border-radius: 8px; font-weight: 500; transition: all 0.2s;">
-                    <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
-                </a>
-            </div>
         </nav>
+        
+        <div class="mt-auto p-3">
+            <form action="{{ route('logout') }}" method="POST" id="formLogout" class="w-100 m-0 p-0">
+                @csrf
+                <button type="submit" id="btnCerrarSesion" class="btn btn-outline-danger d-flex align-items-center justify-content-center w-100" style="padding: 12px; border-radius: 8px; font-weight: 500; transition: all 0.2s;">
+                    <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+                </button>
+            </form>
+        </div>
     </aside>
 
     <main class="main-content-admin" style="margin-left: 280px; min-height: 100vh;">
@@ -92,7 +118,7 @@
             e.preventDefault();
             localStorage.removeItem('token');
             localStorage.clear();
-            window.location.href = '/logout';
+            document.getElementById('formLogout').submit();
         });
     </script>
 </body>

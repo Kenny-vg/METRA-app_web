@@ -27,11 +27,6 @@
             <h2 class="fw-bold">Panel de Control Maestro</h2>
             <p class="text-muted mb-0">Gestiona los negocios registrados en METRA.</p>
         </div>
-        <div class="d-flex gap-2">
-            <button class="btn-admin-secondary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#nuevoNegocio">
-                <i class="bi bi-plus-lg me-2"></i>Registrar manualmente
-            </button>
-        </div>
     </div>
 </header>
 
@@ -102,43 +97,6 @@
 </div>
 
 
-<!-- MODAL: Nuevo Negocio (manual) -->
-<div class="modal fade" id="nuevoNegocio" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4 shadow">
-            <div class="modal-header border-0 p-4">
-                <h5 class="fw-bold m-0">Registrar Restaurante (Manual)</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4 pt-0">
-                <!-- Alert removed manually to use SweetAlert instead -->
-                <div class="mb-3">
-                    <label class="form-label small fw-bold">Nombre del Negocio</label>
-                    <input type="text" class="form-control bg-light border-0 py-2" id="m-nombre" placeholder="Ej. Café Central" maxlength="100" required>
-                </div>
-                <div class="row mb-3">
-                    <div class="col">
-                        <label class="form-label small fw-bold">Nombre del Gerente</label>
-                        <input type="text" class="form-control bg-light border-0 py-2" id="m-gerente-name" placeholder="Nombre completo" maxlength="100" required>
-                    </div>
-                    <div class="col">
-                        <label class="form-label small fw-bold">Correo del Gerente</label>
-                        <input type="email" class="form-control bg-light border-0 py-2" id="m-gerente-email" placeholder="gerente@cafe.com" maxlength="255" required>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <label class="form-label small fw-bold">Plan de Suscripción Asignado</label>
-                    <select class="form-select bg-light border-0 py-2" id="m-plan">
-                        <option value="">Cargando planes...</option>
-                    </select>
-                </div>
-                <button type="button" class="btn-metra-main w-100 py-2 fw-bold" onclick="crearNegocioManual()">
-                    Crear Cuenta de Negocio
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- MODAL: Ver Comprobante -->
 <div class="modal fade" id="modalComprobante" tabindex="-1" aria-hidden="true">

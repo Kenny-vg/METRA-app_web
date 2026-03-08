@@ -108,7 +108,7 @@
                     const badgeClass = p.activo ? 'bg-success' : 'bg-secondary';
                     const badgeText = p.activo ? 'Activo' : 'Inactivo';
                     
-                    const imgUrl = p.imagen_url ? '/storage/' + p.imagen_url + '?v=' + new Date().getTime() : 'https://placehold.co/400x300?text=Sin+Imagen';
+                    const imgUrl = p.imagen_url ? (p.imagen_url.startsWith('http') ? p.imagen_url : `{{ url('storage') }}/${p.imagen_url}`) : 'https://placehold.co/400x300?text=Sin+Imagen';
 
                     const actions = p.activo
                         ? `<button class="btn btn-sm btn-outline-dark me-2" onclick='editProducto(${JSON.stringify(p)})' title="Editar"><i class="bi bi-pencil"></i></button>

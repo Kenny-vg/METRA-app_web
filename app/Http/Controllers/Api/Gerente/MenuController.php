@@ -8,6 +8,7 @@ use App\Models\Menu;
 use App\Helpers\ApiResponse;
 use App\Traits\Activable;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class MenuController extends Controller
 {
@@ -19,7 +20,7 @@ class MenuController extends Controller
     {
         $cafeId = $request->user()->cafe_id;
 
-        $menu = Menu::where('cafe_id',$cafeId)
+        $menu = Menu::where('cafe_id', $cafeId)
             ->orderBy('nombre_producto')
             ->get();
 
@@ -28,17 +29,24 @@ class MenuController extends Controller
 
     public function store(Request $request)
     {
+        $cafeId = $request->user()->cafe_id;
+
         $request->validate([
-            'nombre_producto'=>'required|string|max:100',
-            'descripcion'=>'nullable|string|max:255',
-            'imagen_url'=>'nullable|image|mimes:jpeg,png,jpg,webp|max:5120'
+            'nombre_producto' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('menus')->where(fn($query) => $query->where('cafe_id', $cafeId))
+            ],
+            'descripcion' => 'nullable|string|max:255',
+            'imagen_url' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120'
         ]);
 
         $data = [
-            'nombre_producto'=>$request->nombre_producto,
-            'descripcion'=>$request->descripcion,
-            'activo'=>true,
-            'cafe_id'=>$request->user()->cafe_id
+            'nombre_producto' => $request->nombre_producto,
+            'descripcion' => $request->descripcion,
+            'activo' => true,
+            'cafe_id' => $request->user()->cafe_id
         ];
 
         if ($request->hasFile('imagen_url')) {
@@ -48,28 +56,35 @@ class MenuController extends Controller
 
         $menu = Menu::create($data);
 
-        return ApiResponse::success($menu,'Producto agregado al menú');
+        return ApiResponse::success($menu, 'Producto agregado al menú');
     }
 
-    public function update(Request $request,$id)
+    public function update(Request $request, $id)
     {
+        $cafeId = $request->user()->cafe_id;
+
         $request->validate([
-            'nombre_producto'=>'required|string|max:100',
-            'descripcion'=>'nullable|string|max:255',
-            'imagen_url'=>'nullable|image|mimes:jpeg,png,jpg,webp|max:5120'
+            'nombre_producto' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('menus')->ignore($id)->where(fn($query) => $query->where('cafe_id', $cafeId))
+            ],
+            'descripcion' => 'nullable|string|max:255',
+            'imagen_url' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120'
         ]);
 
-        $menu = Menu::where('id',$id)
-            ->where('cafe_id',$request->user()->cafe_id)
+        $menu = Menu::where('id', $id)
+            ->where('cafe_id', $request->user()->cafe_id)
             ->first();
 
-        if(!$menu){
-            return ApiResponse::error('Producto no encontrado',404);
+        if (!$menu) {
+            return ApiResponse::error('Producto no encontrado', 404);
         }
 
         $data = [
-            'nombre_producto'=>$request->nombre_producto,
-            'descripcion'=>$request->descripcion,
+            'nombre_producto' => $request->nombre_producto,
+            'descripcion' => $request->descripcion,
         ];
 
         if ($request->hasFile('imagen_url')) {
@@ -83,23 +98,23 @@ class MenuController extends Controller
 
         $menu->update($data);
 
-        return ApiResponse::success($menu,'Producto actualizado');
+        return ApiResponse::success($menu, 'Producto actualizado');
     }
 
-    public function destroy(Request $request,$id)
+    public function destroy(Request $request, $id)
     {
-        $menu = Menu::where('id',$id)
-            ->where('cafe_id',$request->user()->cafe_id)
+        $menu = Menu::where('id', $id)
+            ->where('cafe_id', $request->user()->cafe_id)
             ->first();
 
-        if(!$menu){
-            return ApiResponse::error('Producto no encontrado',404);
+        if (!$menu) {
+            return ApiResponse::error('Producto no encontrado', 404);
         }
 
         $menu->update([
-            'activo'=>false
+            'activo' => false
         ]);
 
-        return ApiResponse::success($menu,'Producto desactivado');
+        return ApiResponse::success($menu, 'Producto desactivado');
     }
 }

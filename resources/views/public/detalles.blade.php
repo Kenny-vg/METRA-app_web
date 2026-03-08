@@ -283,7 +283,7 @@
                             menuContainer.innerHTML = '<div class="col-12"><p class="text-muted small">El menú aún no está disponible.</p></div>';
                         } else {
                             menuItems.forEach(item => {
-                                const img = item.imagen_url ? `${STORAGE_URL}/${item.imagen_url}` : 'https://placehold.co/300x200/faf6f0/c5a059?text=METRA';
+                                const img = item.imagen_url ? (item.imagen_url.startsWith('http') ? item.imagen_url : `{{ url('storage') }}/${item.imagen_url}`) : 'https://placehold.co/300x200/faf6f0/c5a059?text=METRA';
                                 menuContainer.innerHTML += `
                                     <div class="col-6 col-md-4 text-center mb-3">
                                         <div style="width: 100%; height: 120px; border-radius: 12px; background-image: url('${img}'); background-size: cover; background-position: center; border: 1px solid var(--border-light);" class="mb-2 shadow-sm"></div>
