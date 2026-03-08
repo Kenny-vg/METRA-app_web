@@ -83,6 +83,8 @@
                 }
             } catch (error) {
                 console.error('Error fetching global profile data:', error);
+                const layoutName = document.getElementById('clientName');
+                if (layoutName) layoutName.textContent = 'Usuario';
             }
         } else {
             const loginBtn = document.getElementById('nav-login-btn');

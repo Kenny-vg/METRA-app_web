@@ -137,6 +137,12 @@
             } catch (error) {
                 console.error(error);
                 showToast('error', 'Error al cargar los productos');
+                document.getElementById('productos-container').innerHTML = `
+                    <div class="col-12 text-center text-danger py-5">
+                        <i class="bi bi-exclamation-triangle-fill mb-3 d-block" style="font-size: 3rem; opacity: 0.5;"></i>
+                        <p>No se pudieron cargar los productos debido a un problema de conexión.</p>
+                    </div>
+                `;
             }
         }
 

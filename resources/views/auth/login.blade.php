@@ -193,6 +193,7 @@ window.handleCredentialResponse = async function(response) {
         }
     } catch (error) {
         console.error('API Error', error);
+        Swal.fire('Error de conexión', 'Fallo al comunicarse con el servidor.', 'error');
     }
 }
 

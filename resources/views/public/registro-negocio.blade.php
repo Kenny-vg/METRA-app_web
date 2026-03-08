@@ -490,6 +490,11 @@
                 <div class="fw-bold fs-5" style="color: var(--accent-gold);">${formatterMXN.format(plan.precio)} MXN</div>
             </div>
         `).join('');
+
+        // Si ya hay un plan pre-seleccionado (desde la sección pública), aplica visual
+        if (selectedPlanId) {
+            document.getElementById(`po-${selectedPlanId}`)?.classList.add('selected');
+        }
     };
 
     window.selectPlan = function(id) {
@@ -560,6 +565,14 @@
             nextStep.classList.add('active');
         }
         
+        // Al llegar al paso 2: re-aplicar selección visual del plan
+        if (step === 2 && selectedPlanId) {
+            setTimeout(() => {
+                document.querySelectorAll('.plan-option').forEach(el => el.classList.remove('selected'));
+                document.getElementById(`po-${selectedPlanId}`)?.classList.add('selected');
+            }, 50);
+        }
+
         for (let i = 1; i <= 3; i++) {
             const dot = document.getElementById(`dot-${i}`);
             if (dot) {
@@ -568,6 +581,7 @@
                 else if (i === step) dot.classList.add('active');
             }
         }
+
 
         if (step === 3) {
             // Llenar resumen

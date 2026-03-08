@@ -189,9 +189,13 @@
 
                 renderWidgetSuscripcion(cafe);
             } catch (e) {
-
-
                 console.error('Error cargando perfil:', e);
+                document.getElementById('suscripcion-widget-container').innerHTML = `
+                    <div class="card border-0 p-4 text-center text-danger shadow-sm">
+                        <i class="bi bi-wifi-off fs-1 mb-3"></i>
+                        <h5 class="fw-bold">Error de conexión</h5>
+                        <p class="text-muted m-0">No se pudo cargar la información de tu cafetería. Intenta recargar la página.</p>
+                    </div>`;
             }
         }
 
@@ -292,6 +296,7 @@
                     }
                 } catch (e) {
                     console.error('Error cargando planes modal', e);
+                    Swal.fire({ title: 'Error', text: 'No se pudieron cargar los planes de renovación. Revisa tu conexión.', icon: 'error', confirmButtonColor: '#382C26' });
                 }
             }
         }

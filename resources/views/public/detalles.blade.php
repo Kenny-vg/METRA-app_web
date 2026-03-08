@@ -328,8 +328,8 @@
                 }
 
                 async function cargarPromociones(ocasionId = null) {
+                    const promosContainer = document.getElementById('promos-publicas');
                     try {
-                        const promosContainer = document.getElementById('promos-publicas');
                         promosContainer.innerHTML = '<div class="col-12 text-center text-muted py-3"><div class="spinner-border spinner-border-sm me-2"></div> Cargando...</div>';
                         
                         const url = ocasionId 

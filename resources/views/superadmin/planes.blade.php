@@ -58,6 +58,7 @@ async function cargarPlanes() {
         }
     } catch (e) {
         console.error('Error loading planes:', e);
+        document.getElementById('planes-container').innerHTML = '<div class="col-12 text-center text-danger py-5"><i class="bi bi-exclamation-triangle fs-2 mb-2 d-block"></i> Error al cargar los planes.</div>';
     } finally {
         document.getElementById('overlay-loading').style.display = 'none';
         document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');

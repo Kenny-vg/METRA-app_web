@@ -130,6 +130,24 @@ Route::get('/cafeterias/{id}/ocasiones/{ocasion}/promociones', function ($id,$oc
     return ApiResponse::success($promociones);
 });
 
+// Zonas activas (público — para el formulario de reserva)
+Route::get('/cafeterias/{id}/zonas', function ($id) {
+    $zonas = \App\Models\Zona::where('cafe_id', $id)
+        ->where('activo', true)
+        ->orderBy('nombre_zona')
+        ->get(['id', 'nombre_zona']);
+    return ApiResponse::success($zonas);
+});
+
+// Horarios activos (público)
+Route::get('/cafeterias/{id}/horarios', function ($id) {
+    $horarios = \App\Models\Horario::where('cafe_id', $id)
+        ->where('activo', true)
+        ->orderBy('hora_apertura')
+        ->get(['id', 'dia_semana', 'hora_apertura', 'hora_cierre']);
+    return ApiResponse::success($horarios);
+});
+
 //Ver promociones
 Route::get('/cafeterias/{id}/promociones', function ($id) {
 

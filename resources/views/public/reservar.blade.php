@@ -83,9 +83,8 @@
                             </div>
                             <div class="col-12 col-md-6 mb-3">
                                 <label class="small fw-bold mb-2" style="color: var(--text-muted);">Preferencia de área</label>
-                                <select class="form-select input-metra">
-                                    <option>Salón Principal (Clima Controlado)</option>
-                                    <option>Terraza Privada</option>
+                                <select id="zona-select" name="zona_id" class="form-select input-metra">
+                                    <option value="">Cargando zonas...</option>
                                 </select>
                             </div>
                             <div class="col-12">
@@ -160,9 +159,39 @@
                         ocasionSelect.innerHTML = '<option value="">Sin ocasiones disponibles</option>';
                         ocasionSelect.disabled = true;
                     }
+                } else {
+                    ocasionSelect.innerHTML = '<option value="">Error al cargar ocasiones</option>';
+                    ocasionSelect.disabled = true;
                 }
             } catch (error) {
                 console.error("Error al cargar ocasiones:", error);
+                ocasionSelect.innerHTML = '<option value="">Error de conexión</option>';
+                ocasionSelect.disabled = true;
+            }
+
+            // Cargar zonas dámicamente
+            try {
+                const zonaSelect = document.getElementById('zona-select');
+                const resZ = await fetch(`/api/cafeterias/${cafeteriaId}/zonas`);
+                if (resZ.ok) {
+                    const jsonZ = await resZ.json();
+                    const zonas = jsonZ.data || [];
+                    if (zonas.length > 0) {
+                        zonaSelect.innerHTML = '<option value="">Sin preferencia</option>' +
+                            zonas.map(z => `<option value="${z.id}">${z.nombre_zona}</option>`).join('');
+                    } else {
+                        zonaSelect.innerHTML = '<option value="">Sin áreas configuradas</option>';
+                        zonaSelect.disabled = true;
+                    }
+                } else {
+                    zonaSelect.innerHTML = '<option value="">Error al cargar zonas</option>';
+                    zonaSelect.disabled = true;
+                }
+            } catch (error) {
+                console.error("Error al cargar zonas:", error);
+                const zonaSelect = document.getElementById('zona-select');
+                zonaSelect.innerHTML = '<option value="">Error de conexión</option>';
+                zonaSelect.disabled = true;
             }
 
             // Detectar cambio de Ocasión y cargar promos

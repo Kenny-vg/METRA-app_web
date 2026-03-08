@@ -87,32 +87,36 @@ class LoginController extends Controller
             );
         }
 
-        $suscripcion = $cafeteria->suscripciones()
-            ->latest()
-            ->first();
+        // Verificar si tienen una suscripción actualmente activa
+        $suscActiva = $cafeteria->suscripcionActual()->first();
 
-        if(!$suscripcion){
-            return ApiResponse::error(
-                'Tu cuenta está en revisión.',
-                423
-            );
-        }
+        if (!$suscActiva) {
+            // No hay suscripción activa actual. Revisar la última creada para determinar el error.
+            $ultimaSusc = $cafeteria->suscripciones()->latest()->first();
 
-        //  Bloquear si está pendiente
-        if($suscripcion->estado_pago !== 'pagado'){
-
-            if($user->role === 'gerente'){
+            if(!$ultimaSusc){
                 return ApiResponse::error(
                     'Tu cuenta está en revisión.',
                     423
                 );
             }
 
-            // Si es personal (staff)
-            return ApiResponse::error(
-                'La cafetería aún no ha sido aprobada. Contacta al gerente.',
-                403
-            );
+            //  Bloquear si está pendiente o vencida
+            if($ultimaSusc->estado_pago !== 'pagado'){
+
+                if($user->role === 'gerente'){
+                    return ApiResponse::error(
+                        'Tu cuenta está en revisión.',
+                        423
+                    );
+                }
+
+                // Si es personal (staff)
+                return ApiResponse::error(
+                    'La cafetería aún no ha sido aprobada. Contacta al gerente.',
+                    403
+                );
+            }
         }
     }
 

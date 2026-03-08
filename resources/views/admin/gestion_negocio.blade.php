@@ -304,6 +304,7 @@
                 });
             } catch (error) {
                 console.error(error);
+                document.getElementById('tabla-zonas-body').innerHTML = '<tr><td colspan="2" class="text-danger text-center py-4">Error de conexión al cargar zonas.</td></tr>';
                 showToast('error', 'No se pudieron cargar las zonas');
             }
         }
@@ -449,6 +450,7 @@
                 });
             } catch (error) {
                 console.error(error);
+                document.getElementById('tabla-mesas-body').innerHTML = '<tr><td colspan="4" class="text-danger text-center py-4">Error de conexión al cargar mesas.</td></tr>';
                 showToast('error', 'No se pudieron cargar las mesas');
             }
         }
@@ -604,6 +606,7 @@
                 });
             } catch (error) {
                 console.error(error);
+                document.getElementById('horarios-container').innerHTML = '<div class="col-12 text-center text-danger py-4">Error de conexión al cargar horarios.</div>';
                 showToast('error', 'No se pudieron cargar los horarios');
             }
         }

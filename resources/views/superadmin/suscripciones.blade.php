@@ -43,7 +43,7 @@
     </div>
 
     <!-- MODAL: Detalle de Cafetería -->
-    <div class="modal fade" id="modalDetalle" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="modalDetalle" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 rounded-4 shadow">
                 <div class="modal-header border-0 p-4">
@@ -76,10 +76,11 @@
                                     <th>Plan</th>
                                     <th>Monto</th>
                                     <th>Estado</th>
+                                    <th>Comprobante</th>
                                 </tr>
                             </thead>
                             <tbody id="historial-body">
-                                <tr><td colspan="4" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>
+                                <tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -399,6 +400,10 @@ async function verHistorial(cafeteriaId, nombre) {
                 badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #F5F5F5; color: #757575; border: 1px solid #E0E0E0;">● Cancelado</span>`;
             }
 
+            let btnComprobante = s.comprobante_url 
+                ? `<button type="button" class="btn btn-sm btn-outline-dark rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" title="Ver Recibo" onclick="verComprobanteSub(${s.id})"><i class="bi bi-file-earmark-text"></i></button>`
+                : '<span class="text-muted small">—</span>';
+
             return `<tr>
                 <td style="color: var(--text-muted); font-size: 0.9rem;">
                     <span class="fw-bold text-dark">Inicio:</span> ${fechaInicio} <br> 
@@ -407,6 +412,7 @@ async function verHistorial(cafeteriaId, nombre) {
                 <td>${badgePlan}</td>
                 <td class="fw-bold" style="color: var(--black-primary);">${monto}</td>
                 <td>${badgeEstado}</td>
+                <td class="text-center">${btnComprobante}</td>
             </tr>`;
         }).join('');
 

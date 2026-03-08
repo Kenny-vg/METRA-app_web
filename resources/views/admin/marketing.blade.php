@@ -262,6 +262,7 @@ async function loadPromociones() {
         });
     } catch (error) {
         console.error(error);
+        document.getElementById('tabla-promos-body').innerHTML = '<tr><td colspan="4" class="text-center text-danger py-4">Error de conexión al cargar promociones.</td></tr>';
         showToast('error', 'No se pudieron cargar las promociones');
     }
 }
@@ -513,6 +514,7 @@ async function loadOcasiones() {
         });
     } catch (error) {
         console.error(error);
+        document.getElementById('tabla-ocasiones-body').innerHTML = '<tr><td colspan="2" class="text-center text-danger py-4">Error de conexión al cargar ocasiones.</td></tr>';
         showToast('error', 'No se pudieron cargar las ocasiones especiales');
     }
 }
