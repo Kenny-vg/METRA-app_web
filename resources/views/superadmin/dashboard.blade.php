@@ -33,28 +33,36 @@
 <!-- STATS -->
 <div class="row g-4 mb-5" id="stats-row">
     <div class="col-6 col-md-3">
-        <div class="stat-card bg-white shadow-sm border-0 border-start border-4" style="border-color: var(--black-primary) !important;">
-            <p class="text-muted small mb-2 fw-bold text-uppercase" style="letter-spacing: 0.5px;">Total cafeterías</p>
-            <h2 id="stat-total" class="text-dark">—</h2>
-        </div>
+        <a href="javascript:void(0)" onclick="window.filtrarTabla('todos', true);" class="text-decoration-none">
+            <div class="stat-card bg-white shadow-sm border-0 border-start border-4" style="border-color: var(--black-primary) !important;">
+                <p class="text-muted small mb-2 fw-bold text-uppercase" style="letter-spacing: 0.5px;">Total cafeterías</p>
+                <h2 id="stat-total" class="text-dark"><span class="spinner-border spinner-border-sm text-secondary" role="status" aria-hidden="true"></span></h2>
+            </div>
+        </a>
     </div>
     <div class="col-6 col-md-3">
-        <div class="stat-card bg-white shadow-sm border-0 border-start border-4 border-success">
-            <p class="small mb-2 fw-bold text-uppercase text-success" style="letter-spacing: 0.5px;">Activas</p>
-            <h2 id="stat-activas" class="text-dark">—</h2>
-        </div>
+        <a href="javascript:void(0)" onclick="window.filtrarTabla('activa', true);" class="text-decoration-none">
+            <div class="stat-card bg-white shadow-sm border-0 border-start border-4 border-success">
+                <p class="small mb-2 fw-bold text-uppercase text-success" style="letter-spacing: 0.5px;">Activas</p>
+                <h2 id="stat-activas" class="text-dark"><span class="spinner-border spinner-border-sm text-success" role="status" aria-hidden="true"></span></h2>
+            </div>
+        </a>
     </div>
     <div class="col-6 col-md-3">
-        <div class="stat-card bg-white shadow-sm border-0 border-start border-4 border-warning">
-            <p class="small mb-2 fw-bold text-uppercase text-warning" style="letter-spacing: 0.5px;">Pendientes</p>
-            <h2 id="stat-pendientes" class="text-dark">—</h2>
-        </div>
+        <a href="javascript:void(0)" onclick="window.filtrarTabla('pendiente', true);" class="text-decoration-none">
+            <div class="stat-card bg-white shadow-sm border-0 border-start border-4 border-warning">
+                <p class="small mb-2 fw-bold text-uppercase text-warning" style="letter-spacing: 0.5px;">Pendientes</p>
+                <h2 id="stat-pendientes" class="text-dark"><span class="spinner-border spinner-border-sm text-warning" role="status" aria-hidden="true"></span></h2>
+            </div>
+        </a>
     </div>
     <div class="col-6 col-md-3">
-        <div class="stat-card bg-white shadow-sm border-0 border-start border-4 border-danger">
-            <p class="small mb-2 fw-bold text-uppercase text-danger" style="letter-spacing: 0.5px;">En Revisión</p>
-            <h2 id="stat-revision" class="text-dark">—</h2>
-        </div>
+        <a href="#seccion-revision" class="text-decoration-none">
+            <div class="stat-card bg-white shadow-sm border-0 border-start border-4 border-danger">
+                <p class="small mb-2 fw-bold text-uppercase text-danger" style="letter-spacing: 0.5px;">En Revisión</p>
+                <h2 id="stat-revision" class="text-dark"><span class="spinner-border spinner-border-sm text-danger" role="status" aria-hidden="true"></span></h2>
+            </div>
+        </a>
     </div>
 </div>
 
@@ -174,8 +182,9 @@ async function cargarDashboard() {
         // Tabla revisión
         renderTablaRevision(enRevision);
 
-        // Tabla todos
-        renderTablaTodos(todos);
+        // Almacenar todos globalmente y aplicar el filtro actual
+        window.todosData = todos;
+        window.filtrarTabla(window.filtroActual || 'todos');
 
     } catch (e) {
         console.error('API Error:', e);
@@ -279,6 +288,21 @@ function renderTablaTodos(cafeterias) {
             </td>
         </tr>`;
     }).join('');
+}
+
+window.filtrarTabla = function(estado, shouldScroll = false) {
+    window.filtroActual = estado;
+    if (!window.todosData) return;
+    
+    if (estado === 'todos') {
+        renderTablaTodos(window.todosData);
+    } else {
+        renderTablaTodos(window.todosData.filter(c => c.estado === estado));
+    }
+    
+    if (shouldScroll) {
+        document.getElementById('tabla-todos')?.scrollIntoView({behavior: 'smooth', block: 'start'});
+    }
 }
 
 // ────────────────────────────────────────────
@@ -449,9 +473,11 @@ async function cargarPlanesModal() {
         const json = await res.json();
         if (res.ok) {
             const select = document.getElementById('m-plan');
-            const planesActivos = json.data.filter(p => p.estado === true || p.estado === 1);
-            select.innerHTML = '<option value="">Selecciona un plan...</option>' + 
-                planesActivos.map(p => `<option value="${p.id}">${p.nombre_plan} ($${p.precio})</option>`).join('');
+            if (select) {
+                const planesActivos = json.data.filter(p => p.estado === true || p.estado === 1);
+                select.innerHTML = '<option value="">Selecciona un plan...</option>' + 
+                    planesActivos.map(p => `<option value="${p.id}">${p.nombre_plan} ($${p.precio})</option>`).join('');
+            }
         }
     } catch (e) {
         console.error('Error cargando planes modal', e);
@@ -508,7 +534,8 @@ async function refreshDashboardSilently() {
         }
 
         renderTablaRevision(enRevision);
-        renderTablaTodos(todos);
+        window.todosData = todos;
+        window.filtrarTabla(window.filtroActual || 'todos');
 
     } catch (e) {
         console.error('Error de red/API durante el polling silencioso:', e);

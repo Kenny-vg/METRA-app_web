@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Auth\AuthenticationException;
+use App\Helpers\ApiResponse;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,6 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
         //
         $middleware->alias([
             'role'=>\App\Http\Middleware\RoleMiddleware::class,
+            'check.suscripcion' => \App\Http\Middleware\CheckSuscripcionActiva::class,
+            'check.web.role' => \App\Http\Middleware\CheckWebRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -23,11 +26,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function(AuthenticationException $e,
         $request
         ){
-           if($request->is('api/*') ){
-            return response()->json([
-                'success'=>false,
-                'message'=>'No autenticado'
-            ], 401);
-           } 
+            if($request->is('api/*') ){
+                return ApiResponse::error('No autenticado', 401);
+            } 
         });
     })->create();

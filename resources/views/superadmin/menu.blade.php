@@ -27,7 +27,7 @@
         </div>
         <nav class="mt-4">
             <a href="/superadmin/dashboard" class="nav-link-super {{ request()->is('superadmin/dashboard') ? 'active' : '' }}">
-                <i class="bi bi-grid-fill me-2"></i> Clientes Globales
+                <i class="bi bi-grid-fill me-2"></i> Dashboard
             </a>
             <a href="/superadmin/suscripciones" class="nav-link-super {{ request()->is('superadmin/suscripciones') ? 'active' : '' }}">
                 <i class="bi bi-wallet2 me-2"></i> Suscripciones

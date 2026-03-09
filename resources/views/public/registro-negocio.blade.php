@@ -625,18 +625,20 @@
         const password = document.getElementById('gerente_password').value;
         const password_confirmation = document.getElementById('gerente_password_confirmation').value;
 
+        const scrollToStep2 = () => document.getElementById('step-2').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
         // Validaciones Paso 2
-        if (!name) { showAlert('El nombre completo es obligatorio.'); return; }
-        if (!email) { showAlert('El correo corporativo es obligatorio.'); return; }
+        if (!name) { showAlert('El nombre completo es obligatorio.'); scrollToStep2(); return; }
+        if (!email) { showAlert('El correo corporativo es obligatorio.'); scrollToStep2(); return; }
         
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailPattern.test(email)) { showAlert('El formato del correo institucional no es válido.'); return; }
+        if (!emailPattern.test(email)) { showAlert('El formato del correo institucional no es válido.'); scrollToStep2(); return; }
         
-        if (!password) { showAlert('La contraseña es obligatoria.'); return; }
-        if (password.length < 8) { showAlert('La contraseña debe tener al menos 8 caracteres.'); return; }
-        if (password !== password_confirmation) { showAlert('Las contraseñas no coinciden. Por favor verifica.'); return; }
+        if (!password) { showAlert('La contraseña es obligatoria.'); scrollToStep2(); return; }
+        if (password.length < 8) { showAlert('La contraseña debe tener al menos 8 caracteres.'); scrollToStep2(); return; }
+        if (password !== password_confirmation) { showAlert('Las contraseñas no coinciden. Por favor verifica.'); scrollToStep2(); return; }
         
-        if (!selectedPlanId) { showAlert('Debes seleccionar un plan de suscripción para continuar.'); return; }
+        if (!selectedPlanId) { showAlert('Debes seleccionar un plan de suscripción para continuar.'); scrollToStep2(); return; }
 
         clearValidationErrors();
 

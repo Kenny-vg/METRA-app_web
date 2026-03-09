@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Helpers\ApiResponse;
+use App\Http\Middleware\CheckSuscripcionActiva;
 
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
@@ -177,7 +178,8 @@ Route::middleware('auth:sanctum')->group(function () {
 */
 Route::middleware([
     'auth:sanctum',
-    'role:superadmin'
+    'role:superadmin',
+    'check.suscripcion'
 ])->prefix('superadmin')->group(function () {
 
     // CAFETERÍAS — listar, crear, eliminar
@@ -284,4 +286,23 @@ Route::middleware([
 
     // Renovación de suscripción (gerente activo con suscripción por vencer)
     Route::post('renovar-suscripcion', [RenovarSuscripcionController::class, 'store']);
+});
+
+/*
+|------------------------------------------
+| RUTAS STAFF (APP MOVIL)
+|------------------------------------------
+*/
+
+Route::middleware([
+    'auth:sanctum',
+    'role:personal',
+    'check.suscripcion'
+])->prefix('staff')->group(function () {
+
+    Route::get('/mesas', [MesaController::class,'index']);
+    Route::get('/zonas', [ZonaController::class,'index']);
+    Route::get('/promociones', [PromocionController::class,'index']);
+    Route::get('/horarios', [HorarioController::class,'index']);
+
 });

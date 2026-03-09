@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use App\Helpers\ApiResponse;
+use Carbon\Carbon;
 
 class LoginController extends Controller
 {
@@ -88,35 +90,25 @@ class LoginController extends Controller
         }
 
         // Verificar si tienen una suscripción actualmente activa
-        $suscActiva = $cafeteria->suscripcionActual()->first();
+        $suscActiva = $cafeteria->suscripciones()
+            ->where('estado_pago', 'pagado')
+            ->where('fecha_inicio', '<=', now())
+            ->where('fecha_fin', '>=', now())
+            ->first();
 
-        if (!$suscActiva) {
-            // No hay suscripción activa actual. Revisar la última creada para determinar el error.
-            $ultimaSusc = $cafeteria->suscripciones()->latest()->first();
+        if(!$suscActiva){
 
-            if(!$ultimaSusc){
+            if($user->role === 'gerente'){
                 return ApiResponse::error(
-                    'Tu cuenta está en revisión.',
+                    'Tu cafetería no tiene una suscripción activa.',
                     423
                 );
             }
 
-            //  Bloquear si está pendiente o vencida
-            if($ultimaSusc->estado_pago !== 'pagado'){
-
-                if($user->role === 'gerente'){
-                    return ApiResponse::error(
-                        'Tu cuenta está en revisión.',
-                        423
-                    );
-                }
-
-                // Si es personal (staff)
-                return ApiResponse::error(
-                    'La cafetería aún no ha sido aprobada. Contacta al gerente.',
-                    403
-                );
-            }
+            return ApiResponse::error(
+                'La cafetería no tiene una suscripción activa.',
+                403
+            );
         }
     }
 
@@ -128,10 +120,14 @@ class LoginController extends Controller
         $cafeteria = $user->cafeteria;
         if ($cafeteria) {
             $extraData['nombre_cafeteria'] = $cafeteria->nombre;
-            $suscActiva = $cafeteria->suscripcionActual()->first();
+            $suscActiva = $cafeteria->suscripciones()
+                ->where('estado_pago', 'pagado')
+                ->where('fecha_inicio', '<=', now())
+                ->where('fecha_fin', '>=', now())
+                ->first();
             if ($suscActiva && $suscActiva->fecha_fin) {
                 $extraData['dias_restantes'] = (int) now()->startOfDay()->diffInDays(
-                    \Carbon\Carbon::parse($suscActiva->fecha_fin)->startOfDay(),
+                    Carbon::parse($suscActiva->fecha_fin)->startOfDay(),
                     false
                 );
                 $extraData['fecha_fin_suscripcion'] = $suscActiva->fecha_fin;
@@ -151,7 +147,7 @@ class LoginController extends Controller
             'role'=>$user->role,
             'cafe_id'=>$user->cafe_id
         ], $extraData)
-    ], 'Login correcto');
+    ], 'Login correcto')->withCookie(cookie('metra_role', $user->role, 60*24));
     }
 
     public function logout(Request $request)
@@ -161,6 +157,6 @@ class LoginController extends Controller
         if($token){
             $token->delete();
         }
-        return ApiResponse::success(null, 'Sesión cerrada');
+        return ApiResponse::success(null, 'Sesión cerrada')->withCookie(cookie()->forget('metra_role'));
     }
 }

@@ -9,6 +9,13 @@
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Limpiar estado de wizard de registro si se accede al login (ej. tras logout)
+    localStorage.removeItem('wizard_form_data');
+    localStorage.removeItem('registro_cafeteria_id');
+});
+</script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="zona-comensal">
@@ -276,6 +283,8 @@ document.addEventListener('DOMContentLoaded', function() {
             try { 
                 localStorage.clear(); 
                 sessionStorage.clear(); 
+                // Clear the cookie as well
+                document.cookie = 'metra_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
             } catch (err) {}
 
             const email = loginForm.querySelector('input[name="email"]').value;
@@ -301,6 +310,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     try {
                         localStorage.setItem('token', result.data.token);
                         sessionStorage.setItem('token', result.data.token);
+                        
+                        // Set cookie for web routes protection
+                        const role = result.data.usuario.role;
+                        document.cookie = `metra_role=${role}; path=/; max-age=86400`;
+
                         if (result.data.usuario?.nombre_cafeteria) {
                             localStorage.setItem('nombre_cafeteria', result.data.usuario.nombre_cafeteria);
                         }
@@ -310,7 +324,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (result.data.usuario?.cafe_id) {
                             localStorage.setItem('cafe_id', result.data.usuario.cafe_id);
                         }
-                        const role = result.data.usuario.role;
                         if(role === 'superadmin') window.location.href = '/superadmin/dashboard';
                         else if(role === 'gerente') window.location.href = '/admin/dashboard';
                         else if(role === 'personal') window.location.href = '/staff-app';
@@ -321,8 +334,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     const errorMsg = errorData.message || '';
                     const msgLower = errorMsg.toLowerCase();
 
-                    // Caso 1: Rechazado (Status 403 o mensaje con palabras clave)
-                    if (response.status === 403 || msgLower.includes('rechazado') || msgLower.includes('soporte')) {
+                    // Caso 1: Rechazado o Inactivo (Status 403 o mensaje con palabras clave)
+                    if (response.status === 403 || msgLower.includes('rechazado') || msgLower.includes('soporte') || msgLower.includes('inactivo')) {
+                        if (msgLower.includes('inactivo')) {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Cuenta en revisión',
+                                text: 'Tu cuenta está pendiente de aprobación.',
+                                confirmButtonColor: '#382C26',
+                                confirmButtonText: 'Entendido'
+                            });
+                            return;
+                        }
+
                         Swal.fire({
                             icon: 'error',
                             title: 'Registro Rechazado',
