@@ -25,11 +25,21 @@ class AprobacionController extends Controller
             'estatus_registro'=>'aprobado'
         ]);
 
-        //marcar pago validado
-        optional($cafeteria->suscripcionActual)->update([
-            'estado_pago'=>'pagado',
-            'fecha_validacion'=>now(),
-        ]);
+        //marcar pago validado y resetear fechas desde hoy
+        $suscripcion = $cafeteria->suscripcionActual ?? $cafeteria->suscripciones()->orderByDesc('created_at')->first();
+        if ($suscripcion) {
+            $plan = $suscripcion->plan;
+            $duracion = $plan ? $plan->duracion_dias : 30;
+            $inicio = now();
+            $fin    = $inicio->copy()->addDays($duracion);
+
+            $suscripcion->update([
+                'estado_pago'      => 'pagado',
+                'fecha_inicio'     => $inicio,
+                'fecha_fin'        => $fin,
+                'fecha_validacion' => now(),
+            ]);
+        }
 
         if ($cafeteria->gerente) {
             try {
