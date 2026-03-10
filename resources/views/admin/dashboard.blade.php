@@ -216,7 +216,11 @@
             const plan = sub.plan;
             const fechaFin = new Date(sub.fecha_fin);
             const hoy = new Date();
-            const diasRestantes = Math.ceil((fechaFin - hoy) / (1000 * 60 * 60 * 24));
+            // Calcular días restantes usando únicamente la fecha (sin considerar hora)
+            // para evitar que fracciones de día influyan en el conteo.
+            const inicioDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+            const finDia = new Date(fechaFin.getFullYear(), fechaFin.getMonth(), fechaFin.getDate());
+            const diasRestantes = Math.max(0, Math.round((finDia - inicioDia) / (1000 * 60 * 60 * 24)));
 
             let htmlAlertas = '';
             

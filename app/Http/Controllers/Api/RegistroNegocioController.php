@@ -38,7 +38,7 @@ class RegistroNegocioController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. CHECAR SI ES RECHAZADO ANTES DE VALIDAR (para evitar 422 shadowing 403)
+        // 1. CHECAR SI ES RECHAZADO ANTES DE VALIDAR 
         $email = $request->input('gerente.email') ?: $request->input('email');
         if ($email) {
             $userRechazado = User::where('email', $email)
