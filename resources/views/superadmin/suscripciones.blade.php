@@ -32,6 +32,7 @@
                         <th>Monto Mensual</th>
                         <th>Próximo Pago</th>
                         <th>Estado</th>
+                        <th class="text-center">Historial</th>
                         <th class="text-center pe-4">Acciones</th>
                     </tr>
                 </thead>
@@ -76,7 +77,7 @@
                                     <th>Plan</th>
                                     <th>Monto</th>
                                     <th>Estado</th>
-                                    <th>Comprobante</th>
+                                    <th class="text-center">Comprobante</th>
                                 </tr>
                             </thead>
                             <tbody id="historial-body">
@@ -160,11 +161,12 @@ function renderTabla(suscripciones) {
             <td class="fw-bold" style="color: var(--black-primary);">${monto}</td>
             <td style="color: var(--text-muted);">${fechaFin}</td>
             <td>${badgeEstado}</td>
-                <td class="text-center pe-4">
-                    <div class="d-flex justify-content-center gap-3 text-nowrap">
-                        <button type="button" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Historial" onclick="verHistorial(${s.cafe_id}, '${safeName}')"><i class="bi bi-clock-history"></i></button>
-
-                        ${
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Historial" onclick="verHistorial(${s.cafe_id}, '${safeName}')"><i class="bi bi-clock-history"></i></button>
+            </td>
+            <td class="text-center pe-4">
+                <div class="d-flex justify-content-center gap-3 text-nowrap">
+                    ${
                           // Registro inicial pendiente de aprobar
                           (s.cafeteria?.estado === 'en_revision')
                             ? `<span class="btn btn-sm btn-outline-warning rounded-pill px-3 disabled" style="width: 110px; opacity: 0.8; pointer-events: none; border-color: #ffc107; color: #ffc107;">Pendiente</span>`
@@ -260,10 +262,7 @@ async function verDetalle(cafeteriaId) {
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span class="text-muted">Plan Actual</span>
                             <span class="fw-bold" style="color: var(--accent-gold);">${plan}</span>
-                        </div>
-                        ${(c.comprobante_url || (c.suscripcion_actual && c.suscripcion_actual.comprobante_url)) 
-                            ? `<button onclick="verComprobante(${c.id})" class="btn btn-outline-secondary w-100 rounded-pill"><i class="bi bi-file-earmark-text me-2"></i>Ver Comprobante de Pago</button>` 
-                            : '<p class="text-muted small text-center m-0">Sin comprobante subido</p>'}
+
                     </div>
                 </div>
             </div>
