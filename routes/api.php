@@ -87,13 +87,6 @@ Route::post('/registro-negocio/{cafeteria}/comprobante', [RegistroNegocioControl
 //consultar si existe registro pendiente
 Route::post('/registro-pendiente', [RegistroNegocioController::class, 'registroPendiente']);
 
-// Planes públicos (para registro y renovación sin auth)
-Route::get('/planes-publicos', function () {
-    $planes = \App\Models\Plan::where('estado', true)->get();
-    return \App\Helpers\ApiResponse::success($planes, 'Planes disponibles');
-});
-
-
 
 //Ver menú
 Route::get('/cafeterias/{id}/menu', function ($id) {
@@ -250,7 +243,8 @@ Route::middleware([
 */
 Route::middleware([
     'auth:sanctum',
-    'role:gerente'
+    'role:gerente',
+    'check.suscripcion'
 ])->prefix('gerente')->group(function () {
 
     // Perfil de la cafetería
@@ -284,9 +278,15 @@ Route::middleware([
     Route::patch('promociones/{id}/activar', [PromocionController::class, 'activar']);
     Route::patch('ocasiones/{id}/activar', [OcasionController::class, 'activar']);
 
-    // Renovación de suscripción (gerente activo con suscripción por vencer)
-    Route::post('renovar-suscripcion', [RenovarSuscripcionController::class, 'store']);
 });
+
+// Renovación de suscripción — para que gerentes con sub
+// vencida también puedan renovar desde el panel
+Route::middleware(['auth:sanctum', 'role:gerente'])
+    ->prefix('gerente')
+    ->group(function () {
+        Route::post('renovar-suscripcion', [RenovarSuscripcionController::class, 'store']);
+    });
 
 /*
 |------------------------------------------
@@ -296,7 +296,7 @@ Route::middleware([
 
 Route::middleware([
     'auth:sanctum',
-    'role:personal',
+    'role:gerente,personal',
     'check.suscripcion'
 ])->prefix('staff')->group(function () {
 

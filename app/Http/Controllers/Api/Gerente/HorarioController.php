@@ -27,6 +27,13 @@ class HorarioController extends Controller
      */
     public function store(Request $request)
     {
+        // Normalizar capitalización antes de validar: lunes → Lunes
+        if ($request->has('dia_semana')) {
+            $request->merge([
+                'dia_semana' => ucfirst(strtolower($request->dia_semana))
+            ]);
+        }
+
         $request->validate([
             'dia_semana' => 'required|in:Lunes,Martes,Miercoles,Jueves,Viernes,Sabado,Domingo',
             'hora_apertura'=>'required|date_format:H:i',

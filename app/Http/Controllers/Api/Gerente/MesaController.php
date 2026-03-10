@@ -105,7 +105,7 @@ class MesaController extends Controller
         //evitar duplicar número de mesa en la misma zona
         $existe = Mesa::where('zona_id', $request->zona_id)
             ->where('numero_mesa', $request->numero_mesa)
-            ->where('id', '!=', $id)
+            ->where('id', '!=', $mesa->id)
             ->exists();
 
         if ($existe) {

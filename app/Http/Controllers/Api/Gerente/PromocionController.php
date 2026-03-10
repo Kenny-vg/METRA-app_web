@@ -101,10 +101,10 @@ class PromocionController extends Controller
         ], $messages);
 
         $promocion->update([
-            'nombre_promocion'=>$request->nombre_promocion,
-            'descripcion'=>$request->descripcion,
-            'precio'=>$request->precio,
-            'activo'=>$request->activo
+            'nombre_promocion' => $request->nombre_promocion,
+            'descripcion'      => $request->input('descripcion', $promocion->descripcion),
+            'precio'           => $request->precio,
+            'activo'           => $request->has('activo') ? $request->boolean('activo') : $promocion->activo,
         ]);
 
         if ($request->has('ocasiones')) {
