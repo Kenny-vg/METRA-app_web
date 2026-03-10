@@ -163,9 +163,7 @@ function renderTabla(suscripciones) {
                 <td class="text-center pe-4">
                     <div class="d-flex justify-content-center gap-3 text-nowrap">
                         <button type="button" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Historial" onclick="verHistorial(${s.cafe_id}, '${safeName}')"><i class="bi bi-clock-history"></i></button>
-                        ${(s.comprobante_url || (s.cafeteria && s.cafeteria.comprobante_url)) 
-                            ? `<button type="button" class="btn btn-sm btn-outline-dark rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Recibo" onclick="verComprobanteSub(${s.id})"><i class="bi bi-file-earmark-text"></i></button>` 
-                            : ''}
+
                         ${
                           // Registro inicial pendiente de aprobar
                           (s.cafeteria?.estado === 'en_revision')
