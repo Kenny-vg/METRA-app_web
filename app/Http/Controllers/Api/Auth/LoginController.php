@@ -20,7 +20,11 @@ class LoginController extends Controller
         'password'=>'required'
     ]);
 
-    $user = User::where('email',$request->email)->first();
+    $emailAComparar = strtolower(trim($request->email));
+    
+    // Al ser MySQL por defecto en BBDD ignorará upper/lower, 
+    // pero para tener la string limpia la forzamos
+    $user = User::where('email', $emailAComparar)->first();
 
     if(!$user || !Hash::check($request->password, $user->password)){
         return ApiResponse::error('Credenciales incorrectas', 401);

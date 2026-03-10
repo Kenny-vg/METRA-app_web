@@ -45,6 +45,11 @@ class Cafeteria extends Model
             ->latest('fecha_fin');
     }
 
+    public function ultimaSuscripcion()
+    {
+        return $this->hasOne(Suscripcion::class, 'cafe_id')->latest('id');
+    }
+
     public function getComprobanteFullUrlAttribute()
     {
         $value = $this->attributes['comprobante_url'] ?? null;

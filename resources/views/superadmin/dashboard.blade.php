@@ -232,7 +232,7 @@ function renderTablaRevision(cafeterias) {
         <tbody>
             ${cafeterias.map(c => {
                 const gerente = c.gerente ? `${c.gerente.name}<br><small class="text-muted">${c.gerente.email}</small>` : '—';
-                const plan    = c.suscripcion_actual?.plan?.nombre_plan || '—';
+                const plan    = c.suscripcion_actual?.plan?.nombre_plan || c.ultima_suscripcion?.plan?.nombre_plan || '—';
                 const comp    = c.comprobante_url
                     ? `<button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="verComprobante(${c.id})">
                         <i class="bi bi-receipt me-1"></i>Ver
@@ -266,7 +266,7 @@ function renderTablaTodos(cafeterias) {
     }
     tbody.innerHTML = cafeterias.map(c => {
         const gerente = c.gerente ? c.gerente.name : '—';
-        const plan    = c.suscripcion_actual?.plan?.nombre_plan || '—';
+        const plan    = c.suscripcion_actual?.plan?.nombre_plan || c.ultima_suscripcion?.plan?.nombre_plan || '—';
         return `<tr>
             <td class="fw-bold">${c.nombre}</td>
             <td>${gerente}</td>

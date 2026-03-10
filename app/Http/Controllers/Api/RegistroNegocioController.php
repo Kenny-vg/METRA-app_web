@@ -88,6 +88,9 @@ class RegistroNegocioController extends Controller
 
     $plan = Plan::findOrFail($data['plan_id']);
 
+    // Normalizar correo a minúsculas
+    $data['gerente']['email'] = strtolower(trim($data['gerente']['email']));
+
     // Verificar si ya existe registro pendiente
     $gerenteExistente = User::where('email', $data['gerente']['email'])
         ->where('estatus_registro', 'pendiente')
@@ -293,7 +296,9 @@ class RegistroNegocioController extends Controller
             'email' => 'required|email'
         ]);
 
-        $gerenteRechazado = User::where('email', $request->email)
+        $email = strtolower(trim($request->email));
+
+        $gerenteRechazado = User::where('email', $email)
             ->where('estatus_registro', 'rechazado')
             ->where('role', 'gerente')
             ->first();
@@ -305,7 +310,7 @@ class RegistroNegocioController extends Controller
             );
         }
 
-        $user = User::where('email', $request->email)
+        $user = User::where('email', $email)
             ->where('estatus_registro', 'pendiente')
             ->where('role', 'gerente')
             ->whereNotNull('cafe_id')

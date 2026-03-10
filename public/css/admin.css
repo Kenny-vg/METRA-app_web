@@ -21,23 +21,33 @@
 
 /* --- SIDEBAR Y MAIN --- */
 .sidebar {
-    width: 260px;
+    width: 280px;
     height: 100vh;
     background-color: var(--black-primary) !important;
     position: fixed;
     top: 0;
     left: 0;
     padding: 40px 25px;
-    z-index: 1000;
+    z-index: 1040;
+    transition: transform 0.3s ease;
 }
 
-.main-admin-content {
-    margin-left: 260px !important;
-    /* Empuja el contenido a la derecha del sidebar */
-    padding: 60px;
-    width: calc(100% - 260px);
-    /* Ocupa el resto de la pantalla */
+.main-content-admin {
+    margin-left: 280px;
     min-height: 100vh;
+    transition: margin-left 0.3s ease;
+}
+
+@media (max-width: 767.98px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    .main-content-admin {
+        margin-left: 0 !important;
+    }
 }
 
 /* --- BOTONES DE PERFIL Y ACCIÓN --- */

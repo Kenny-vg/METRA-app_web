@@ -39,7 +39,7 @@
         <!-- ZONAS -->
         <div class="tab-pane fade show active" id="zonas">
             <div class="card border-0 p-4 p-md-5 premium-card">
-                <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom" style="border-color: var(--border-light) !important;">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom" style="border-color: var(--border-light) !important;">
                     <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Distribución de Áreas</h5>
                     <button class="btn-admin-primary" onclick="openModalZona()">
                         <i class="bi bi-plus-lg me-2"></i>Nueva Zona
@@ -64,7 +64,7 @@
         <!-- MESAS -->
         <div class="tab-pane fade" id="mesas">
              <div class="card border-0 p-4 p-md-5 premium-card">
-                <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom" style="border-color: var(--border-light) !important;">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom" style="border-color: var(--border-light) !important;">
                     <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Inventario de Mesas</h5>
                     <button class="btn-admin-primary" onclick="openModalMesa()">
                         <i class="bi bi-plus-lg me-2"></i>Nueva Mesa

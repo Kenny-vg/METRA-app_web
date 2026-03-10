@@ -22,7 +22,7 @@ class CafeteriaController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Cafeteria::with(['gerente', 'suscripcionActual.plan']);
+        $query = Cafeteria::with(['gerente', 'suscripcionActual.plan', 'ultimaSuscripcion.plan']);
 
         // Filtrar por estado si se pasa como parámetro
         if ($request->has('estado')) {
@@ -115,7 +115,8 @@ class CafeteriaController extends Controller
     {
         $cafeteria->load([
             'gerente',
-            'suscripcionActual.plan'
+            'suscripcionActual.plan',
+            'ultimaSuscripcion.plan'
         ]);
 
         return ApiResponse::success(

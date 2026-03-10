@@ -86,7 +86,7 @@
     <div class="row g-4 mb-5">
         <div class="col-12 col-xl-7">
             <div class="card border-0 p-4 p-lg-5 h-100 premium-card">
-                <div class="d-flex justify-content-between align-items-center border-bottom pb-4 mb-4" style="border-color: var(--border-light) !important;">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center border-bottom pb-4 mb-4 gap-3" style="border-color: var(--border-light) !important;">
                     <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Flujo Analítico (Demostración)</h5>
                     <button class="btn-admin-secondary"><i class="bi bi-download me-2"></i>Exportar</button>
                 </div>
@@ -100,7 +100,7 @@
 
         <div class="col-12 col-xl-5">
              <div class="card border-0 p-4 p-lg-5 h-100 premium-card">
-                <div class="d-flex justify-content-between align-items-center border-bottom pb-4 mb-4" style="border-color: var(--border-light) !important;">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center border-bottom pb-4 mb-4 gap-3" style="border-color: var(--border-light) !important;">
                     <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Panel de Llegadas</h5>
                     <a href="/admin/reservaciones" class="small fw-bold text-decoration-none" style="color: var(--text-muted);">Ver todo →</a>
                 </div>

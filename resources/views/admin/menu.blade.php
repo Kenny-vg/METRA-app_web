@@ -68,7 +68,7 @@
                 <i class="bi bi-shop me-3"></i>Gestión del Negocio
             </a>
             <a href="/admin/carta" class="nav-link-admin {{ request()->is('admin/carta') ? 'active' : '' }}">
-                <i class="bi bi-book-half me-3"></i>Ménu Digital
+                <i class="bi bi-book-half me-3"></i>Menú Digital
             </a>
             <a href="/admin/reservaciones" class="nav-link-admin {{ request()->is('admin/reservaciones') ? 'active' : '' }}">
                 <i class="bi bi-calendar3 me-3"></i>Reservaciones
@@ -92,7 +92,7 @@
         </div>
     </aside>
 
-    <main class="main-content-admin" style="margin-left: 280px; min-height: 100vh;">
+    <main class="main-content-admin">
         <div class="p-4 p-md-5">
             @yield('content')
         </div>

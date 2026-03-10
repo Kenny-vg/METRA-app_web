@@ -95,7 +95,7 @@
     <!-- OCASIONES ESPECIALES -->
     <div class="tab-pane fade" id="ocasiones">
         <div class="card border-0 p-4 p-md-5 premium-card">
-            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom" style="border-color: var(--border-light) !important;">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom" style="border-color: var(--border-light) !important;">
                 <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Ocasiones Especiales</h5>
                 <button class="btn-admin-primary" onclick="openModalOcasion()">
                     <i class="bi bi-plus-lg me-2"></i>Nueva Ocasión

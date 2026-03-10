@@ -14,7 +14,8 @@ class SolicitudesController extends Controller
     {
         $data = Cafeteria::with([
             'gerente',
-            'suscripcionActual.plan'
+            'suscripcionActual.plan',
+            'ultimaSuscripcion.plan'
         ])
         ->where('estado','en_revision') 
         ->get();
