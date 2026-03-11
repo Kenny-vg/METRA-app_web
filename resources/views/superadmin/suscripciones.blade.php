@@ -140,16 +140,19 @@ function renderTabla(suscripciones) {
         const safeName = cafe.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
         const plan = s.plan?.nombre_plan || '—';
         const monto = s.monto ? `$${parseFloat(s.monto).toFixed(2)}` : '—';
-        const fechaFin = new Date(s.fecha_fin).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
-        
+        // Parseo robusto de la fecha de fin para evitar errores con formatos ISO (p.ej. 2026-03-10T23:59:59.000Z)
+        const fFinDate = s.fecha_fin ? new Date(s.fecha_fin) : null;
+        const isFFinValid = fFinDate instanceof Date && !isNaN(fFinDate);
+        const fechaFin = isFFinValid
+            ? fFinDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
+            : '—';
+
         let badgePlan = `<span class="badge rounded-pill px-3 py-2" style="background: #FFF8E1; color: #FFA000; border: 1px solid #FFE082;">${plan}</span>`;
         
         // Lógica de Estado Mejorada (evaluando fecha en HTML)
         let badgeEstado = '';
-        const fParts = s.fecha_fin.split(' ')[0].split('-');
-        const fFinDate = new Date(fParts[0], fParts[1] - 1, fParts[2]);
-        fFinDate.setHours(23, 59, 59, 999);
-        const isVencida = new Date() > fFinDate;
+        // Si la fecha es válida, considerar vencida cuando el momento actual supera la fecha de fin.
+        const isVencida = isFFinValid && (new Date() > fFinDate);
 
         if (s.estado_pago === 'pendiente') {
             badgeEstado = `<span class="badge rounded-pill px-3 py-2 d-inline-flex align-items-center" style="background: #FFF8E1; color: #FFA000; border: 1px solid #FFE082;">● Pendiente</span>`;
@@ -392,15 +395,20 @@ async function verHistorial(cafeteriaId, nombre) {
         tbody.innerHTML = historial.map(s => {
             const plan = s.plan?.nombre_plan || '—';
             const monto = s.monto ? `$${parseFloat(s.monto).toFixed(2)}` : '—';
-            const fechaInicio = new Date(s.fecha_inicio).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
-            const fechaFin = new Date(s.fecha_fin).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+            
+            const fFinDate = s.fecha_fin ? new Date(s.fecha_fin) : null;
+            const isFFinValid = fFinDate instanceof Date && !isNaN(fFinDate);
+
+            const fechaInicio = s.fecha_inicio
+                ? new Date(s.fecha_inicio).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
+                : '—';
+            const fechaFin = isFFinValid
+                ? fFinDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
+                : '—';
             
             let badgePlan = `<span class="badge bg-light text-dark border">${plan}</span>`;
             
-            const fParts = s.fecha_fin.split(' ')[0].split('-');
-            const fFinDate = new Date(fParts[0], fParts[1] - 1, fParts[2]);
-            fFinDate.setHours(23, 59, 59, 999);
-            const isVencida = new Date() > fFinDate;
+            const isVencida = isFFinValid && (new Date() > fFinDate);
 
             let badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7;">● Pagado</span>`;
             if (s.estado_pago === 'pendiente') {
