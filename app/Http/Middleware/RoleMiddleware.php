@@ -14,7 +14,7 @@ class RoleMiddleware
      *
      * 
      */
-    public function handle(Request $request, Closure $next, $roles): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
         
         $user = $request->user();
@@ -29,11 +29,8 @@ class RoleMiddleware
             return ApiResponse::error('Usuario inactivo', 403);
         }
 
-        //permitir varios roles
-        $rolesPermitidos = explode(',',$roles);
-
         //validar si el usuario tiene permiso
-        if(!in_array($user->role, $rolesPermitidos)){
+        if(!in_array($user->role, $roles)){
             return ApiResponse::error('No autorizado', 403);
         }
 
