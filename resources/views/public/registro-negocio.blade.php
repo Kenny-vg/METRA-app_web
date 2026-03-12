@@ -743,11 +743,26 @@
                 } else if (res.status === 409) {
                     // Ya tiene comprobante
                     showAlert(json.message || 'Tu comprobante ya fue enviado y está en revisión.', 'info');
-                    if (json.data && json.data.cafeteria_id) {
-                        registeredCafeteriaId = json.data.cafeteria_id;
-                        localStorage.setItem('registro_cafeteria_id', registeredCafeteriaId);
-                        goToStep(3);
+                    
+                    // Limpiar local storage
+                    localStorage.removeItem('registro_cafeteria_id');
+                    localStorage.removeItem('wizard_form_data');
+
+                    // Destruir el wizard completamente mostrando la pantalla de bloque
+                    const wizardCard = document.getElementById('wizard-form');
+                    if (wizardCard) {
+                        wizardCard.innerHTML = `
+                            <div class="text-center py-5">
+                                <i class="bi bi-shield-lock-fill mb-3" style="font-size: 5rem; color: var(--accent-gold);"></i>
+                                <h2 class="fw-bold mb-3" style="color: var(--black-primary);">Comprobante en Revisión</h2>
+                                <p class="text-muted mx-auto mb-4" style="max-width: 450px; line-height: 1.6;">
+                                    Hemos detectado que ya subiste el comprobante para esta cuenta. Por favor, espera a que nuestro equipo administrativo valide el formato oficial de tus credenciales de acceso.
+                                </p>
+                                <a href="${window.location.origin}" class="btn-metra-main px-4 py-2 mt-2">Volver al inicio</a>
+                            </div>
+                        `;
                     }
+                    return;
                 } else {
                     let errorMsg = 'Algo salió mal al procesar tu solicitud. Intenta de nuevo más tarde.';
                     if (res.status === 400 || json.message) {
@@ -865,10 +880,25 @@
             if (!res.ok) {
                 if (res.status === 409) {
                     showAlert(json.message || 'Tu comprobante ya fue enviado y está en revisión', 'info');
-                    // Bloquear vista, no permitir envíos adicionales
-                    document.getElementById('btn-subir').disabled = true;
-                    rmFile();
-                    document.getElementById('upload-area').innerHTML = `<p class="text-danger fw-bold m-0"><i class="bi bi-shield-lock me-2"></i> ${json.message || 'Registro en revisión'}</p>`;
+                    
+                    // Limpiar local storage
+                    localStorage.removeItem('registro_cafeteria_id');
+                    localStorage.removeItem('wizard_form_data');
+
+                    // Destruir el wizard completamente mostrando la pantalla de bloque
+                    const wizardCard = document.getElementById('wizard-form');
+                    if (wizardCard) {
+                        wizardCard.innerHTML = `
+                            <div class="text-center py-5">
+                                <i class="bi bi-shield-lock-fill mb-3" style="font-size: 5rem; color: var(--accent-gold);"></i>
+                                <h2 class="fw-bold mb-3" style="color: var(--black-primary);">Comprobante en Revisión</h2>
+                                <p class="text-muted mx-auto mb-4" style="max-width: 450px; line-height: 1.6;">
+                                    Hemos detectado que ya subiste el comprobante para esta cuenta. Por favor, espera a que nuestro equipo administrativo valide el formato oficial de tus credenciales de acceso.
+                                </p>
+                                <a href="${window.location.origin}" class="btn-metra-main px-4 py-2 mt-2">Volver al inicio</a>
+                            </div>
+                        `;
+                    }
                     return;
                 }
                 if (res.status === 422 && json.errors && json.errors.comprobante) {
