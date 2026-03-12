@@ -34,18 +34,18 @@ class HorarioController extends Controller
             ]);
         }
 
-        $request->validate([
-            'dia_semana' => 'required|in:Lunes,Martes,Miercoles,Jueves,Viernes,Sabado,Domingo',
-            'hora_apertura'=>'required|date_format:H:i',
-            'hora_cierre'=>'required|date_format:H:i|after:hora_apertura',
-        ]);
-
-        if ($request->hora_cierre <= $request->hora_apertura) {
-            return ApiResponse::error(
-                'La hora de cierre debe ser mayor que la hora de apertura',
-                400
-            );
-        }
+        // 1. VALIDACIÓN CON MENSAJES BONITOS
+    $request->validate([
+        'dia_semana' => 'required|in:Lunes,Martes,Miercoles,Jueves,Viernes,Sabado,Domingo',
+        'hora_apertura' => 'required|date_format:H:i',
+        'hora_cierre' => 'required|date_format:H:i|after:hora_apertura',
+    ], [
+        // Aquí personalizas el error que antes salía feo
+        'hora_cierre.after' => 'La hora de cierre debe ser posterior a la de apertura.',
+        'dia_semana.in' => 'Día de la semana no válido.',
+        'hora_apertura.required' => 'La hora de inicio es necesaria.',
+        'hora_cierre.required' => 'La hora de fin es necesaria.',
+    ]);
 
         $cafeId = $request->user()->cafe_id;
 

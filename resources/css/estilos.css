@@ -939,3 +939,69 @@ body.zona-superadmin {
     color: var(--white-pure);
     transform: translateY(-5px);
 }
+
+/* Contenedor principal para que no se amontone */
+#plan-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+/* La tarjeta ahora es ancha y elegante */
+.plan-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+/* Efecto Hover: se ilumina en dorado */
+.plan-card:hover {
+    border-color: #d4af37;
+    background-color: #fffdf7;
+    transform: translateX(5px); /* Se mueve tantito a la derecha */
+}
+
+/* Cuando está seleccionada */
+.plan-card.selected {
+    border: 2px solid #d4af37 !important;
+    background-color: #fffcf0;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+}
+
+/* Estilo para el nombre y detalles */
+.plan-info {
+    text-align: left;
+}
+
+.plan-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 2px;
+    display: block;
+}
+
+.plan-desc {
+    font-size: 0.85rem;
+    color: #777;
+    display: block;
+}
+
+/* Estilo para el precio */
+.plan-price-box {
+    text-align: right;
+}
+
+.plan-price-value {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #d4af37;
+}
