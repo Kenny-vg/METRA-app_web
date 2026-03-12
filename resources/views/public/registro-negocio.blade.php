@@ -192,20 +192,24 @@
             </div>
             <div class="row g-3 mb-4">
                 <div class="col-md-3">
-                    <label class="form-label fw-semibold">Colonia *</label>
-                    <input type="text" class="form-metra w-100" id="colonia" placeholder="Centro" maxlength="80" required>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label fw-semibold">Ciudad *</label>
-                    <input type="text" class="form-metra w-100" id="ciudad" placeholder="Tehuacán" maxlength="80" required>
-                </div>
-                <div class="col-md-3">
                     <label class="form-label fw-semibold">Estado *</label>
-                    <input type="text" class="form-metra w-100" id="estado_republica" placeholder="Puebla" maxlength="80" required>
+                    <select class="form-select form-metra w-100" id="estado_republica" required>
+                        <option value="">Selecciona un estado...</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Ciudad/Municipio *</label>
+                    <select class="form-select form-metra w-100" id="ciudad" required disabled>
+                        <option value="">Primero selecciona estado...</option>
+                    </select>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-semibold">C.P. *</label>
-                    <input type="text" class="form-metra w-100" id="cp" placeholder="75700" maxlength="5" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                    <input type="text" class="form-metra w-100" id="cp" placeholder="Ej. 75700" maxlength="5" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Colonia *</label>
+                    <input type="text" class="form-metra w-100" id="colonia" placeholder="Centro" maxlength="80" required>
                 </div>
             </div>
             <div class="row g-3 mb-4">
@@ -386,8 +390,64 @@
     let selectedPlanId = null;
     let registeredCafeteriaId = null;
 
+    let estadosMunicipiosData = {};
+
+    async function cargarEstadosMunicipios() {
+        try {
+            const res = await fetch('/data/estados-municipios.json');
+            estadosMunicipiosData = await res.json();
+            
+            const estadoSelect = document.getElementById('estado_republica');
+            const ciudadSelect = document.getElementById('ciudad');
+            
+            Object.keys(estadosMunicipiosData).sort().forEach(estado => {
+                const option = document.createElement('option');
+                option.value = estado;
+                option.textContent = estado;
+                estadoSelect.appendChild(option);
+            });
+            
+            estadoSelect.addEventListener('change', function() {
+                const estado = this.value;
+                ciudadSelect.innerHTML = '<option value="">Selecciona un municipio...</option>';
+                
+                if (estado && estadosMunicipiosData[estado]) {
+                    ciudadSelect.disabled = false;
+                    estadosMunicipiosData[estado].sort().forEach(municipio => {
+                        const option = document.createElement('option');
+                        option.value = municipio;
+                        option.textContent = municipio;
+                        ciudadSelect.appendChild(option);
+                    });
+                } else {
+                    ciudadSelect.innerHTML = '<option value="">Primero selecciona estado...</option>';
+                    ciudadSelect.disabled = true;
+                }
+            });
+
+            // Restaurar selects si hay datos
+            const savedDataStr = localStorage.getItem('wizard_form_data');
+            if (savedDataStr) {
+                try {
+                    const data = JSON.parse(savedDataStr);
+                    if (data.estado_republica) {
+                        estadoSelect.value = data.estado_republica;
+                        estadoSelect.dispatchEvent(new Event('change'));
+                        if (data.ciudad) {
+                           ciudadSelect.value = data.ciudad;
+                        }
+                    }
+                } catch(e){}
+            }
+        } catch(e) {
+            console.error("Error cargando estados y municipios", e);
+        }
+    }
+
     // Recuperar estado al cargar
     document.addEventListener("DOMContentLoaded", function() {
+        cargarEstadosMunicipios();
+        
         // Restaurar IDs
         const savedCafeId = localStorage.getItem('registro_cafeteria_id');
         if (savedCafeId) {
@@ -402,7 +462,10 @@
                 const data = JSON.parse(savedData);
                 Object.keys(data).forEach(key => {
                     const el = document.getElementById(key);
-                    if (el) el.value = data[key];
+                    // Evitar sobreescribir selects dinámicos controlados arriba
+                    if (el && key !== 'estado_republica' && key !== 'ciudad') {
+                        el.value = data[key];
+                    }
                 });
                 if (data.plan_id) {
                     selectedPlanId = data.plan_id;
@@ -539,7 +602,7 @@
         if (!estado) { showAlert('El estado es obligatorio.'); return false; }
         
         if (!cp) { showAlert('El código postal es obligatorio.'); return false; }
-        if (cp.length !== 5 || !regexNum.test(cp)) {
+        if (!/^\d{5}$/.test(cp)) {
             showAlert('El código postal debe ser de exactamente 5 dígitos numéricos.');
             return false;
         }

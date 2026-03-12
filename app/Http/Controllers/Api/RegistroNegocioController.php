@@ -44,7 +44,7 @@ class RegistroNegocioController extends Controller
             $userRechazado = User::where('email', $email)
                 ->where('estatus_registro', 'rechazado')
                 ->first();
-            
+
             if ($userRechazado) {
                 return ApiResponse::error(
                     'Este correo ya fue utilizado en un registro que fue rechazado. Contacta a soporte para más información.',
@@ -55,15 +55,15 @@ class RegistroNegocioController extends Controller
 
         // Limpiar inputs de HTML (Protección XSS)
         $request->merge([
-            'nombre'           => $request->filled('nombre') ? strip_tags($request->nombre) : null,
-            'descripcion'      => $request->filled('descripcion') ? strip_tags($request->descripcion) : null,
-            'calle'            => $request->filled('calle') ? strip_tags($request->calle) : null,
-            'num_exterior'     => $request->filled('num_exterior') ? strip_tags($request->num_exterior) : null,
-            'num_interior'     => $request->filled('num_interior') ? strip_tags($request->num_interior) : null,
-            'colonia'          => $request->filled('colonia') ? strip_tags($request->colonia) : null,
-            'ciudad'           => $request->filled('ciudad') ? strip_tags($request->ciudad) : null,
+            'nombre' => $request->filled('nombre') ? strip_tags($request->nombre) : null,
+            'descripcion' => $request->filled('descripcion') ? strip_tags($request->descripcion) : null,
+            'calle' => $request->filled('calle') ? strip_tags($request->calle) : null,
+            'num_exterior' => $request->filled('num_exterior') ? strip_tags($request->num_exterior) : null,
+            'num_interior' => $request->filled('num_interior') ? strip_tags($request->num_interior) : null,
+            'colonia' => $request->filled('colonia') ? strip_tags($request->colonia) : null,
+            'ciudad' => $request->filled('ciudad') ? strip_tags($request->ciudad) : null,
             'estado_republica' => $request->filled('estado_republica') ? strip_tags($request->estado_republica) : null,
-            
+
             // Si el nombre del gerente viene en un array
             'gerente' => $request->has('gerente') && is_array($request->gerente) ? array_merge($request->gerente, [
                 'name' => isset($request->gerente['name']) ? strip_tags($request->gerente['name']) : null
@@ -71,189 +71,182 @@ class RegistroNegocioController extends Controller
         ]);
 
         $data = $request->validate([
-        'nombre'           => 'required|string|max:100',
-        'descripcion'      => 'nullable|string|max:255',
-        'calle'            => 'nullable|string|max:100',
-        'num_exterior'     => 'nullable|string|max:10',
-        'num_interior'     => 'nullable|string|max:10',
-        'colonia'          => 'nullable|string|max:80',
-        'ciudad'           => 'nullable|string|max:80',
-        'estado_republica' => 'nullable|string|max:80',
-        'cp'               => 'nullable|string|max:10',
-        'telefono'         => 'nullable|string|max:20',
+            'nombre' => 'required|string|max:100',
+            'descripcion' => 'nullable|string|max:255',
+            'calle' => 'nullable|string|max:100',
+            'num_exterior' => 'nullable|string|max:10',
+            'num_interior' => 'nullable|string|max:10',
+            'colonia' => 'nullable|string|max:80',
+            'ciudad' => 'nullable|string|max:80',
+            'estado_republica' => 'nullable|string|max:80',
+            'cp' => 'nullable|regex:/^\d{5}$/',
+            'telefono' => 'nullable|regex:/^[0-9\s\-\+\(\)]{8,20}$/',
 
-        'gerente.name'     => 'required|string|max:100',
-        'gerente.email' => [
-            'required',
-            'email:dns',
-            Rule::unique('users', 'email')->where(function ($query) {
-                return $query->where('estatus_registro', '!=', 'pendiente');
-            }),
-            function ($attribute, $value, $fail) {
-                $allowedDomains = ['gmail.com', 'outlook.com', 'hotmail.com', 'yahoo.com', 'live.com', 'icloud.com'];
-                $parts = explode('@', $value);
-                $domain = strtolower(array_pop($parts));
-                if (!in_array($domain, $allowedDomains)) {
-                    $fail('El correo debe ser uno de los dominios válidos (ej. gmail.com, outlook.com, hotmail.com).');
+            'gerente.name' => 'required|string|max:100',
+            'gerente.email' => [
+                'required',
+                'email:dns',
+                Rule::unique('users', 'email')->where(function ($query) {
+            return $query->where('estatus_registro', '!=', 'pendiente');
+        }),
+            ],
+            'gerente.password' => 'required|string|min:8|confirmed',
+
+            'plan_id' => 'required|exists:planes,id,estado,1',
+        ]);
+
+        $plan = Plan::findOrFail($data['plan_id']);
+
+        // Normalizar correo a minúsculas
+        $data['gerente']['email'] = strtolower(trim($data['gerente']['email']));
+
+        // Verificar si ya existe registro pendiente
+        $gerenteExistente = User::where('email', $data['gerente']['email'])
+            ->where('estatus_registro', 'pendiente')
+            ->where('role', 'gerente')
+            ->first();
+
+        if ($gerenteExistente) {
+
+            $cafeteria = $gerenteExistente->cafeteria;
+
+            // si ya subió comprobante → bloquear
+            if ($cafeteria && $cafeteria->comprobante_url) {
+                return ApiResponse::error(
+                    'Tu comprobante ya fue enviado y está en revisión.',
+                    409,
+                ['cafeteria_id' => $cafeteria->id]
+                );
+            }
+
+            // si no existe la cafeteria (inconsistencia), crearla
+            if (!$cafeteria) {
+                $cafeteria = Cafeteria::create([
+                    'nombre' => $data['nombre'],
+                    'user_id' => $gerenteExistente->id,
+                    'estado' => 'en_revision'
+                ]);
+                $gerenteExistente->update(['cafe_id' => $cafeteria->id]);
+            }
+
+            // actualizar datos mientras no haya comprobante
+            $cafeteria->update([
+                'nombre' => $data['nombre'],
+                'descripcion' => $data['descripcion'] ?? null,
+                'calle' => $data['calle'] ?? null,
+                'num_exterior' => $data['num_exterior'] ?? null,
+                'num_interior' => $data['num_interior'] ?? null,
+                'colonia' => $data['colonia'] ?? null,
+                'ciudad' => $data['ciudad'] ?? null,
+                'estado_republica' => $data['estado_republica'] ?? null,
+                'cp' => $data['cp'] ?? null,
+                'telefono' => $data['telefono'] ?? null,
+            ]);
+
+            $gerenteExistente->update([
+                'name' => $data['gerente']['name'],
+                'password' => Hash::make($data['gerente']['password']),
+            ]);
+
+            $suscripcion = $cafeteria->suscripciones()->latest()->first();
+
+            if ($suscripcion) {
+                if ($suscripcion->plan_id != $data['plan_id']) {
+                    $inicio = now()->startOfDay();
+                    $fin = $inicio->copy()->addDays($plan->duracion_dias)->endOfDay();
+
+                    $suscripcion->update([
+                        'plan_id' => $plan->id,
+                        'fecha_inicio' => $inicio,
+                        'fecha_fin' => $fin,
+                        'monto' => $plan->precio
+                    ]);
                 }
             }
-        ],
-        'gerente.password' => 'required|string|min:8|confirmed',
+            else {
+                // Fallback crucial: si el intento anterior falló antes de crear la suscripción, se crea ahora
+                $inicio = now()->startOfDay();
+                $fin = $inicio->copy()->addDays($plan->duracion_dias)->endOfDay();
 
-        'plan_id'          => 'required|exists:planes,id,estado,1',
-    ]);
+                Suscripcion::create([
+                    'cafe_id' => $cafeteria->id,
+                    'plan_id' => $plan->id,
+                    'user_id' => $gerenteExistente->id,
+                    'fecha_inicio' => $inicio,
+                    'fecha_fin' => $fin,
+                    'estado_pago' => 'pendiente',
+                    'monto' => $plan->precio,
+                ]);
+            }
 
-    $plan = Plan::findOrFail($data['plan_id']);
-
-    // Normalizar correo a minúsculas
-    $data['gerente']['email'] = strtolower(trim($data['gerente']['email']));
-
-    // Verificar si ya existe registro pendiente
-    $gerenteExistente = User::where('email', $data['gerente']['email'])
-        ->where('estatus_registro', 'pendiente')
-        ->where('role', 'gerente')
-        ->first();
-
-    if ($gerenteExistente) {
-
-        $cafeteria = $gerenteExistente->cafeteria;
-
-        // si ya subió comprobante → bloquear
-        if ($cafeteria && $cafeteria->comprobante_url) {
-            return ApiResponse::error(
-                'Tu comprobante ya fue enviado y está en revisión.',
-                409,
-                ['cafeteria_id' => $cafeteria->id]
-            );
+            return ApiResponse::success([
+                'cafeteria_id' => $cafeteria->id,
+                'registro_existente' => true
+            ], 'Registro actualizado. Continúa con el comprobante.');
         }
 
-        // si no existe la cafeteria (inconsistencia), crearla
-        if (!$cafeteria) {
+        $result = DB::transaction(function () use ($data, $plan) {
+
+            // Crear cafetería
             $cafeteria = Cafeteria::create([
                 'nombre' => $data['nombre'],
-                'user_id' => $gerenteExistente->id,
-                'estado' => 'en_revision'
+                'descripcion' => $data['descripcion'] ?? null,
+                'calle' => $data['calle'] ?? null,
+                'num_exterior' => $data['num_exterior'] ?? null,
+                'num_interior' => $data['num_interior'] ?? null,
+                'colonia' => $data['colonia'] ?? null,
+                'ciudad' => $data['ciudad'] ?? null,
+                'estado_republica' => $data['estado_republica'] ?? null,
+                'cp' => $data['cp'] ?? null,
+                'telefono' => $data['telefono'] ?? null,
+                'estado' => 'en_revision',
             ]);
-            $gerenteExistente->update(['cafe_id' => $cafeteria->id]);
-        }
 
-        // actualizar datos mientras no haya comprobante
-        $cafeteria->update([
-            'nombre' => $data['nombre'],
-            'descripcion' => $data['descripcion'] ?? null,
-            'calle' => $data['calle'] ?? null,
-            'num_exterior' => $data['num_exterior'] ?? null,
-            'num_interior' => $data['num_interior'] ?? null,
-            'colonia' => $data['colonia'] ?? null,
-            'ciudad' => $data['ciudad'] ?? null,
-            'estado_republica' => $data['estado_republica'] ?? null,
-            'cp' => $data['cp'] ?? null,
-            'telefono' => $data['telefono'] ?? null,
-        ]);
+            // Crear gerente
+            $gerente = User::create([
+                'name' => $data['gerente']['name'],
+                'email' => $data['gerente']['email'],
+                'password' => Hash::make($data['gerente']['password']),
+                'role' => 'gerente',
+                'cafe_id' => $cafeteria->id,
+                'estado' => false,
+                'estatus_registro' => 'pendiente'
+            ]);
 
-        $gerenteExistente->update([
-            'name' => $data['gerente']['name'],
-            'password' => Hash::make($data['gerente']['password']),
-        ]);
+            // Vincular gerente a cafetería
+            $cafeteria->update([
+                'user_id' => $gerente->id
+            ]);
 
-        $suscripcion = $cafeteria->suscripciones()->latest()->first();
-
-    if ($suscripcion) {
-        if ($suscripcion->plan_id != $data['plan_id']) {
+            // Crear suscripción pendiente
             $inicio = now()->startOfDay();
             $fin = $inicio->copy()->addDays($plan->duracion_dias)->endOfDay();
 
-            $suscripcion->update([
+            Suscripcion::create([
+                'cafe_id' => $cafeteria->id,
                 'plan_id' => $plan->id,
+                'user_id' => $gerente->id,
                 'fecha_inicio' => $inicio,
                 'fecha_fin' => $fin,
-                'monto' => $plan->precio
+                'estado_pago' => 'pendiente',
+                'monto' => $plan->precio,
             ]);
-        }
-    } else {
-        // Fallback crucial: si el intento anterior falló antes de crear la suscripción, se crea ahora
-        $inicio = now()->startOfDay();
-        $fin = $inicio->copy()->addDays($plan->duracion_dias)->endOfDay();
 
-        Suscripcion::create([
-            'cafe_id'      => $cafeteria->id,
-            'plan_id'      => $plan->id,
-            'user_id'      => $gerenteExistente->id,
-            'fecha_inicio' => $inicio,
-            'fecha_fin'    => $fin,
-            'estado_pago'  => 'pendiente',
-            'monto'        => $plan->precio,
-        ]);
-    }
-
-    return ApiResponse::success([
-        'cafeteria_id' => $cafeteria->id,
-        'registro_existente' => true
-    ], 'Registro actualizado. Continúa con el comprobante.');
-}
-
-    $result = DB::transaction(function () use ($data, $plan) {
-
-        // Crear cafetería
-        $cafeteria = Cafeteria::create([
-            'nombre'           => $data['nombre'],
-            'descripcion'      => $data['descripcion'] ?? null,
-            'calle'            => $data['calle'] ?? null,
-            'num_exterior'     => $data['num_exterior'] ?? null,
-            'num_interior'     => $data['num_interior'] ?? null,
-            'colonia'          => $data['colonia'] ?? null,
-            'ciudad'           => $data['ciudad'] ?? null,
-            'estado_republica' => $data['estado_republica'] ?? null,
-            'cp'               => $data['cp'] ?? null,
-            'telefono'         => $data['telefono'] ?? null,
-            'estado'           => 'en_revision',
-        ]);
-
-        // Crear gerente
-        $gerente = User::create([
-            'name'     => $data['gerente']['name'],
-            'email'    => $data['gerente']['email'],
-            'password' => Hash::make($data['gerente']['password']),
-            'role'     => 'gerente',
-            'cafe_id'  => $cafeteria->id,
-            'estado'   => false,
-            'estatus_registro' => 'pendiente'
-        ]);
-
-        // Vincular gerente a cafetería
-        $cafeteria->update([
-            'user_id' => $gerente->id
-        ]);
-
-        // Crear suscripción pendiente
-        $inicio = now()->startOfDay();
-        $fin = $inicio->copy()->addDays($plan->duracion_dias)->endOfDay();
-
-        Suscripcion::create([
-            'cafe_id'      => $cafeteria->id,
-            'plan_id'      => $plan->id,
-            'user_id'      => $gerente->id,
-            'fecha_inicio' => $inicio,
-            'fecha_fin'    => $fin,
-            'estado_pago'  => 'pendiente',
-            'monto'        => $plan->precio,
-        ]);
-
-        return [
+            return [
             'cafeteria_id' => $cafeteria->id,
             'gerente' => [
-                'name' => $gerente->name,
-                'email' => $gerente->email,
+            'name' => $gerente->name,
+            'email' => $gerente->email,
             ],
             'plan' => $plan->nombre_plan,
-        ];
-    });
+            ];
+        });
 
-    return ApiResponse::success(
-        $result,
-        'Solicitud recibida. Por favor sube tu comprobante de pago.'
-    );
-}
+        return ApiResponse::success(
+            $result,
+            'Solicitud recibida. Por favor sube tu comprobante de pago.'
+        );
+    }
 
     /**
      * Subir el comprobante de transferencia.
@@ -291,11 +284,12 @@ class RegistroNegocioController extends Controller
             }
 
             return ApiResponse::success(
-                ['comprobante_url' => $path],
+            ['comprobante_url' => $path],
                 'Comprobante subido correctamente.'
             );
 
-        } catch (\Throwable $e) {
+        }
+        catch (\Throwable $e) {
 
             \Log::error("Error al subir comprobante: " . $e->getMessage());
 
@@ -308,7 +302,7 @@ class RegistroNegocioController extends Controller
 
     public function registroPendiente(Request $request)
     {
-        
+
         $request->validate([
             'email' => 'required|email'
         ]);
@@ -333,7 +327,7 @@ class RegistroNegocioController extends Controller
             ->whereNotNull('cafe_id')
             ->first();
 
-        if(!$user){
+        if (!$user) {
             return ApiResponse::error('No hay registro pendiente', 404);
         }
 
