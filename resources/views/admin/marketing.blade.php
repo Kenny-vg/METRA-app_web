@@ -149,7 +149,7 @@
                         <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: var(--text-muted);">Precio Especial</label>
                         <div class="input-group shadow-sm" style="border-radius: 10px; border: 1px solid var(--border-light); overflow: hidden;">
                             <span class="input-group-text border-0 bg-white" style="color: var(--black-primary); font-weight: 600;">$</span>
-                            <input type="number" id="promoPrecio" class="form-control border-0" placeholder="85.00" step="0.01" min="0" required>
+                            <input type="number" id="promoPrecio" class="form-control border-0" placeholder="85.00" step="0.01" min="0" onkeydown="return event.keyCode !== 69 && event.keyCode !== 189" required>
                         </div>
                         <div class="form-text text-muted" style="font-size: 0.75rem; margin-top: 6px;"><i class="bi bi-info-circle me-1"></i>Si el precio es 0 la promoción se mostrará como "Incluido sin costo".</div>
                     </div>
