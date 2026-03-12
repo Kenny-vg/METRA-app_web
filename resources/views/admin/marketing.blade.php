@@ -303,17 +303,14 @@ async function loadOcasionesForSelect() {
 }
 
 async function abrirModalNuevaPromo() {
-    const select = document.getElementById('promoTipo');
-
-    // Mostrar indicador de carga en el selector mientras cargamos las ocasiones.
-    if (promoTipoChoices) {
-        promoTipoChoices.destroy();
-        promoTipoChoices = null;
-    }
-    select.innerHTML = '<option value="">Cargando ocasiones...</option>';
-
-    // Reintentar cargar ocasiones si no hay datos aún
-    if (ocasionesCargadas.length === 0) {
+    // Si no hay ocasiones cargadas o no se ha inicializado el selector, intentar cargar
+    if (ocasionesCargadas.length === 0 || !promoTipoChoices) {
+        const select = document.getElementById('promoTipo');
+        if (promoTipoChoices) {
+            promoTipoChoices.destroy();
+            promoTipoChoices = null;
+        }
+        select.innerHTML = '<option value="">Cargando ocasiones...</option>';
         await loadOcasionesForSelect();
     }
 
