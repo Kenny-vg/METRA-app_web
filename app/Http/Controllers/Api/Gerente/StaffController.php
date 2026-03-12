@@ -3,47 +3,180 @@
 namespace App\Http\Controllers\Api\Gerente;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Models\Suscripcion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+use App\Helpers\ApiResponse;
+
+use App\Traits\Activable;
 
 class StaffController extends Controller
 {
+    use Activable;
+    protected $model = User::class;
+
     /**
-     * Display a listing of the resource.
+     * LISTAR STAFF DE LA CAFETERÍA
      */
     public function index()
     {
-        //
+        $staff = User::where('role', 'personal')->get();
+        return ApiResponse::success($staff, 'Lista del personal');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * CREAR NUEVO STAFF
      */
     public function store(Request $request)
     {
-        //
+        $gerente = $request->user();
+
+        $data = $request->validate([
+            'name' => 'required|string|max:100',
+            'email' => [
+                'required',
+                'email:dns',
+                Rule::unique('users', 'email')
+            ],
+            'password' => 'required|string|min:8'
+        ]);
+
+        // Obtener plan actual
+        $suscripcion = $gerente->cafeteria
+            ->suscripciones()
+            ->where('estado_pago', 'pagado')
+            ->latest()
+            ->first();
+
+        $plan = $suscripcion->plan;
+
+        // Contar staff activos
+        $staffActual = User::where('role', 'personal')
+            ->where('estado', true)
+            ->count();
+
+        // Validar límite de usuarios del plan
+        if ($staffActual >= $plan->max_usuarios_admin) {
+
+            return ApiResponse::error(
+                'Tu plan permite máximo ' . $plan->max_usuarios_admin . ' usuarios.',
+                403
+            );
+        }
+
+        // Crear staff
+        $staff = User::create([
+            'name' => $data['name'],
+            'email' => strtolower(trim($data['email'])),
+            'password' => Hash::make($data['password']),
+            'role' => 'personal',
+            'cafe_id' => $gerente->cafe_id,
+            'estado' => true
+        ]);
+
+        return ApiResponse::success($staff, 'Staff creado exitosamente');
+    }
+
+
+    /**
+     * ACTUALIZAR STAFF
+     */
+    public function update(Request $request, $id)
+    {
+        $staff = User::where('role', 'personal')->find($id);
+
+        if (!$staff) {
+            return ApiResponse::error('Usuario no encontrado', 404);
+        }
+
+        $data = $request->validate([
+            'name' => 'sometimes|string|max:100',
+            'password' => 'sometimes|string|min:8|confirmed'
+        ]);
+
+        if (isset($data['name'])) {
+            $staff->name = $data['name'];
+        }
+
+        if (isset($data['password'])) {
+            $staff->password = Hash::make($data['password']);
+
+            // cerrar sesiones activas
+            $staff->tokens()->delete();
+        }
+
+        $staff->save();
+
+        return ApiResponse::success(
+            $staff,
+            'Usuario actualizado correctamente'
+        );
     }
 
     /**
-     * Display the specified resource.
+     * DESACTIVAR STAFF
      */
-    public function show(string $id)
+    public function destroy(Request $request, User $staff)
     {
-        //
+        if (!$staff) {
+            return ApiResponse::error('Usuario no encontrado', 404);
+        }
+
+        $staff->update([
+            'estado' => false
+        ]);
+
+        // cerrar sesión
+        $staff->tokens()->delete();
+
+        return ApiResponse::success(
+            $staff,
+            'Usuario desactivado correctamente'
+        );
     }
 
     /**
-     * Update the specified resource in storage.
+     * REACTIVAR STAFF
      */
-    public function update(Request $request, string $id)
+    public function activar(Request $request, $id)
     {
-        //
-    }
+        $staff = User::where('role', 'personal')->find($id);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        if (!$staff) {
+            return ApiResponse::error('Usuario no encontrado', 404);
+        }
+
+        // Obtener plan actual y verificar límite de usuarios
+        $gerente = $request->user();
+        $suscripcion = $gerente->cafeteria
+            ->suscripciones()
+            ->where('estado_pago', 'pagado')
+            ->latest()
+            ->first();
+
+        if ($suscripcion && $suscripcion->plan) {
+            $plan = $suscripcion->plan;
+            $staffActual = User::where('role', 'personal')
+                ->where('estado', true)
+                ->count();
+
+            if ($staffActual >= $plan->max_usuarios_admin) {
+                return ApiResponse::error(
+                    'Tu plan permite máximo ' . $plan->max_usuarios_admin . ' usuarios.',
+                    403
+                );
+            }
+        }
+
+        $staff->update([
+            'estado' => true
+        ]);
+
+        return ApiResponse::success(
+            $staff,
+            'Usuario reactivado correctamente'
+        );
     }
 }

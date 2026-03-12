@@ -90,7 +90,29 @@
 
         <!-- PERSONAL -->
         <div class="tab-pane fade" id="meseros">
-             <!-- ... contenido igual ... -->
+             <div class="card border-0 p-4 p-md-5 premium-card">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom" style="border-color: var(--border-light) !important;">
+                    <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Panel de Personal</h5>
+                    <button class="btn-admin-primary" onclick="openModalStaff()">
+                        <i class="bi bi-plus-lg me-2"></i>Nuevo Personal
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table-metra mt-2">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Estado</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-staff-body">
+                            <!-- Staff cargado por JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         <!-- REVIEWS -->
@@ -213,15 +235,40 @@
         </div>
     </div>
 
-    <!-- Mismo modal de meseros pero vacío / igual que antes para evitar breaking -->
     <div class="modal fade" id="modalMesero" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4 border-0 p-2" style="box-shadow: 0 20px 50px rgba(0,0,0,0.1);">
-                <div class="modal-header border-0 pb-0"><h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Integrar Colaborador</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="fw-bold m-0" id="modalStaffTitle" style="color: var(--black-primary); letter-spacing: -0.5px;">Integrar Colaborador</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
                 <div class="modal-body pt-4">
-                    <input type="text" class="form-control border-0 shadow-sm rounded-3 mb-3" style="background: var(--off-white);" placeholder="Nombre completo del colaborador">
-                    <input type="tel" class="form-control border-0 shadow-sm rounded-3 mb-4" style="background: var(--off-white);" placeholder="Teléfono de contacto">
-                    <button class="btn-admin-primary w-100 py-3 mt-3">Agregar al equipo</button>
+                    <form id="formStaff">
+                        <input type="hidden" id="staff-id">
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">NOMBRE COMPLETO</label>
+                            <input type="text" id="staff-nombre" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="Ej. Juan Pérez" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">CORREO ELECTRÓNICO</label>
+                            <input type="email" id="staff-email" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="juan@empresa.com" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">CONTRASEÑA</label>
+                            <input type="password" id="staff-password" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="Mínimo 8 caracteres">
+                            <small class="text-muted" id="staff-password-help" style="display: none;">Dejar en blanco para mantener la contraseña actual.</small>
+                        </div>
+
+                        <div class="mb-4" id="staff-password-confirm-group">
+                            <label class="form-label small fw-bold text-muted">CONFIRMAR CONTRASEÑA</label>
+                            <input type="password" id="staff-password-confirm" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="Repite la contraseña">
+                        </div>
+
+                        <button type="submit" class="btn-admin-primary w-100 py-3 mt-3">Guardar Personal</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -233,15 +280,18 @@
         let modalZonaInst;
         let modalMesaInst;
         let modalHorarioInst;
+        let modalStaffInst;
 
         document.addEventListener('DOMContentLoaded', () => {
             modalZonaInst = new bootstrap.Modal(document.getElementById('modalZona'));
             modalMesaInst = new bootstrap.Modal(document.getElementById('modalMesa'));
             modalHorarioInst = new bootstrap.Modal(document.getElementById('modalHorario'));
+            modalStaffInst = new bootstrap.Modal(document.getElementById('modalMesero'));
             
             loadZonas();
             loadMesas();
             loadHorarios();
+            loadStaff();
         });
 
         const API_URL = '/api/gerente';
@@ -722,6 +772,200 @@
                         } else {
                             const err = await res.json();
                             Swal.fire('Error', err.message || 'Error al reactivar horario', 'error');
+                        }
+                    } catch (error) {
+                        Swal.fire('Error', 'Error de conexión', 'error');
+                    }
+                }
+            });
+        }
+
+        // --- STAFF (PERSONAL) ---
+        async function loadStaff() {
+            try {
+                const res = await fetch(`${API_URL}/staff`, { headers: headers() });
+                if (!res.ok) throw new Error('Error al cargar personal');
+                
+                const response = await res.json();
+                const staff = Array.isArray(response) ? response : (response.data || []);
+                
+                const tbody = document.getElementById('tabla-staff-body');
+                tbody.innerHTML = '';
+
+                if (staff.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">No hay personal registrado.</td></tr>';
+                    return;
+                }
+
+                staff.forEach(s => {
+                    // El estatus viene en el campo `estado`
+                    const isActivo = s.estado === true || s.estado === 1 || s.estado === '1' || s.estado === 'true';
+                    const opacityClass = isActivo ? '' : 'opacity-50';
+                    const bgClass = isActivo ? '' : 'table-secondary';
+                    const badge = isActivo 
+                        ? `<span class="badge bg-success" style="font-size:0.75rem;">Activo</span>` 
+                        : `<span class="badge bg-secondary" style="font-size:0.75rem;">Inactivo</span>`;
+                        
+                    const actions = isActivo
+                        ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick='editStaff(${JSON.stringify(s)})' title="Editar"><i class="bi bi-pencil"></i></button>
+                           <button class="btn btn-sm btn-outline-danger rounded-circle" onclick="deleteStaff(${s.id})" title="Desactivar"><i class="bi bi-trash"></i></button>`
+                        : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateStaff(${s.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
+
+                    tbody.innerHTML += `
+                        <tr class="${bgClass} ${opacityClass}">
+                            <td class="fw-bold" style="color: var(--black-primary);">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px; font-size: 14px;">
+                                        ${s.name.charAt(0).toUpperCase()}
+                                    </div>
+                                    ${s.name}
+                                </div>
+                            </td>
+                            <td class="text-muted align-middle">${s.email}</td>
+                            <td class="align-middle">${badge}</td>
+                            <td class="text-end align-middle">
+                                ${actions}
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error(error);
+                document.getElementById('tabla-staff-body').innerHTML = '<tr><td colspan="4" class="text-danger text-center py-4">Error de conexión al cargar el personal.</td></tr>';
+                showToast('error', 'No se pudo cargar el personal');
+            }
+        }
+
+        function openModalStaff() {
+            document.getElementById('formStaff').reset();
+            document.getElementById('staff-id').value = '';
+            document.getElementById('modalStaffTitle').innerText = 'Añadir Personal';
+            
+            // Habilitar campos en modo creacion
+            document.getElementById('staff-email').disabled = false;
+            document.getElementById('staff-password').required = true;
+            document.getElementById('staff-password-confirm').required = true;
+            document.getElementById('staff-password-help').style.display = 'none';
+            document.getElementById('staff-password-confirm-group').style.display = 'block';
+
+            modalStaffInst.show();
+        }
+
+        function editStaff(s) {
+            document.getElementById('formStaff').reset();
+            document.getElementById('staff-id').value = s.id;
+            document.getElementById('staff-nombre').value = s.name;
+            document.getElementById('staff-email').value = s.email;
+            
+            // Deshabilitar email, hacer contraseña opcional
+            document.getElementById('staff-email').disabled = true;
+            document.getElementById('staff-password').required = false;
+            document.getElementById('staff-password-confirm').required = false;
+            document.getElementById('staff-password-help').style.display = 'block';
+            document.getElementById('staff-password-confirm-group').style.display = 'block';
+
+            document.getElementById('modalStaffTitle').innerText = 'Editar Personal';
+            modalStaffInst.show();
+        }
+
+        document.getElementById('formStaff').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('staff-id').value;
+            const password = document.getElementById('staff-password').value;
+            const passwordConfirm = document.getElementById('staff-password-confirm').value;
+            
+            if (password && password !== passwordConfirm) {
+                Swal.fire('Error', 'Las contraseñas no coinciden', 'error');
+                return;
+            }
+
+            const data = {
+                name: document.getElementById('staff-nombre').value
+            };
+            
+            if (!id) {
+                data.email = document.getElementById('staff-email').value;
+            }
+            
+            if (password) {
+                data.password = password;
+                data.password_confirmation = passwordConfirm;
+            }
+            
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${API_URL}/staff/${id}` : `${API_URL}/staff`;
+
+            try {
+                const res = await fetch(url, {
+                    method,
+                    headers: headers(),
+                    body: JSON.stringify(data)
+                });
+
+                const result = await res.json();
+
+                if (res.ok && result.success) {
+                    showToast('success', result.message || (id ? 'Personal actualizado' : 'Personal creado'));
+                    modalStaffInst.hide();
+                    loadStaff();
+                } else {
+                    Swal.fire('Error', result.message || 'Error al guardar personal', 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error', 'Error de conexión', 'error');
+            }
+        });
+
+        async function deleteStaff(id) {
+            Swal.fire({
+                title: '¿Desactivar Personal?',
+                text: 'Este usuario no podrá acceder al sistema.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, desactivar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const res = await fetch(`${API_URL}/staff/${id}`, { method: 'DELETE', headers: headers() });
+                        const data = await res.json();
+                        
+                        if (res.ok && data.success !== false) {
+                            showToast('success', data.message || 'Personal desactivado');
+                            loadStaff();
+                        } else {
+                            Swal.fire('Error', data.message || 'Error al desactivar personal', 'error');
+                        }
+                    } catch (error) {
+                        Swal.fire('Error', 'Error de conexión', 'error');
+                    }
+                }
+            });
+        }
+
+        async function reactivateStaff(id) {
+            Swal.fire({
+                title: '¿Reactivar Personal?',
+                text: 'Este usuario volverá a tener acceso al sistema.',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, reactivar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const res = await fetch(`${API_URL}/staff/${id}/activar`, { method: 'PATCH', headers: headers() });
+                        const data = await res.json();
+                        
+                        if (res.ok && data.success !== false) {
+                            showToast('success', data.message || 'Personal reactivado');
+                            loadStaff();
+                        } else {
+                            Swal.fire('Error', data.message || 'Error al reactivar personal', 'error');
                         }
                     } catch (error) {
                         Swal.fire('Error', 'Error de conexión', 'error');

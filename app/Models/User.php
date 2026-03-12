@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens; //Permite crear tokens para API
 use App\Models\Cafeteria;
+use App\Models\Scopes\CafeScope;
+
 
 class User extends Authenticatable
 {
@@ -39,13 +41,20 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'estado'=> 'boolean',
+            'estado' => 'boolean',
         ];
     }
 
+    protected static function booted()
+    {
+        static::addGlobalScope(new CafeScope);
+    }
+
+
     public function cafeteria()
     {
-        return $this->belongsTo(Cafeteria::class, 'cafe_id');
+        return $this->belongsTo(Cafeteria::class , 'cafe_id');
     }
-    
+
+
 }
