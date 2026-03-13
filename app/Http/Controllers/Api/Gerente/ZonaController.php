@@ -36,7 +36,6 @@ class ZonaController extends Controller
                 'max:100',
                 Rule::unique('zonas')
                 ->where('cafe_id', $request->user()->cafe_id)
-                ->ignore($zona->id)
             ],
         ]);
 
