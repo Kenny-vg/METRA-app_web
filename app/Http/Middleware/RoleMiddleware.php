@@ -31,7 +31,9 @@ class RoleMiddleware
 
         //validar si el usuario tiene permiso
         if(!in_array($user->role, $roles)){
-            return ApiResponse::error('No autorizado', 403);
+            // Extraer debug por si no hizo el split
+            $debug = 'No autorizado. Mi rol: ' . $user->role . ', Esperados: ' . json_encode($roles);
+            return ApiResponse::error($debug, 403);
         }
 
         return $next($request);

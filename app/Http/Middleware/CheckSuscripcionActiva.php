@@ -21,7 +21,7 @@ class CheckSuscripcionActiva
                 $request->user()->currentAccessToken()?->delete();
 
                 return ApiResponse::error(
-                    'No tienes una cafetería asociada.',
+                    'No tienes una cafetería asociada. (Debug: cafe_id=' . $user->cafe_id . ')',
                     403
                 );
             }
@@ -38,8 +38,12 @@ class CheckSuscripcionActiva
                 // cerrar sesión si expiró
                 $request->user()->currentAccessToken()?->delete();
 
+                $todasCount = $cafeteria->suscripciones()->count();
+                $lastSub = $cafeteria->suscripciones()->latest('id')->first();
+                $debugMsg = $lastSub ? "Estado: {$lastSub->estado_pago}, Fin: {$lastSub->fecha_fin}, Now: " . now() : "Ninguna";
+
                 return ApiResponse::error(
-                    'Tu suscripción ha expirado. Renueva para continuar.',
+                    'Tu suscripción ha expirado. (Debug: SubsCount=' . $todasCount . ' Last: ' . $debugMsg . ')',
                     403
                 );
             }

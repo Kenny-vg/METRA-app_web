@@ -101,4 +101,9 @@ class Cafeteria extends Model
         }
         return $value;
     }
+
+    public function planActivo()
+    {
+        return $this->suscripcionActual()->first()?->plan;
+    }
 }

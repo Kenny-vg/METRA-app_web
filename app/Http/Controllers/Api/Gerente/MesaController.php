@@ -31,15 +31,17 @@ class MesaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'numero_mesa'=>'required|integer|min:1',
-            'capacidad'=>'required|integer|min:1',
+            'numero_mesa'=>'required|integer|min:1|max:127',
+            'capacidad'=>'required|integer|min:1|max:127',
             'zona_id'=>'required|exists:zonas,id',
         ], [
-            'numero_mesa.min' => 'El número de mesa debe ser de al menos 1',
-            'numero_mesa.integer' => 'El número de mesa debe ser un número',
+            'numero_mesa.min' => 'El número de mesa debe ser al menos 1',
+            'numero_mesa.max' => 'El número de mesa no puede ser mayor a 127',
+            'numero_mesa.integer' => 'El número de mesa debe ser un número válido',
             'numero_mesa.required' => 'El número de mesa es obligatorio',
             'capacidad.min' => 'La capacidad debe ser de al menos 1 persona',
-            'capacidad.integer' => 'La capacidad debe ser un número',
+            'capacidad.max' => 'La capacidad no puede exceder las 127 personas',
+            'capacidad.integer' => 'La capacidad debe ser un número válido',
             'capacidad.required' => 'La capacidad es obligatoria',
             'zona_id.required' => 'Debe seleccionar una zona',
             'zona_id.exists' => 'La zona seleccionada no existe'
@@ -81,15 +83,17 @@ class MesaController extends Controller
     public function update(Request $request, Mesa $mesa)
     {
         $request->validate([
-            'numero_mesa'=>'required|integer|min:1',
-            'capacidad'=>'required|integer|min:1',
+            'numero_mesa'=>'required|integer|min:1|max:127',
+            'capacidad'=>'required|integer|min:1|max:127',
             'zona_id'=>'required|exists:zonas,id',
         ], [
-            'numero_mesa.min' => 'El número de mesa debe ser de al menos 1',
-            'numero_mesa.integer' => 'El número de mesa debe ser un número',
+            'numero_mesa.min' => 'El número de mesa debe ser al menos 1',
+            'numero_mesa.max' => 'El número de mesa no puede ser mayor a 127',
+            'numero_mesa.integer' => 'El número de mesa debe ser un número válido',
             'numero_mesa.required' => 'El número de mesa es obligatorio',
             'capacidad.min' => 'La capacidad debe ser de al menos 1 persona',
-            'capacidad.integer' => 'La capacidad debe ser un número',
+            'capacidad.max' => 'La capacidad no puede exceder las 127 personas',
+            'capacidad.integer' => 'La capacidad debe ser un número válido',
             'capacidad.required' => 'La capacidad es obligatoria',
             'zona_id.required' => 'Debe seleccionar una zona',
             'zona_id.exists' => 'La zona seleccionada no existe'

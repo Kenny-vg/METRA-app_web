@@ -175,7 +175,7 @@
                         <div class="row g-3 mb-4">
                             <div class="col-6">
                                 <label class="form-label small fw-bold text-muted">NÚMERO</label>
-                                <input type="number" min="1" id="mesa-numero" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="Ej. 1" onkeydown="return event.keyCode !== 69 && event.keyCode !== 189" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
+                                <input type="number" min="1" max="127" id="mesa-numero" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="Ej. 1" onkeydown="return event.keyCode !== 69 && event.keyCode !== 189" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 3);" required>
                             </div>
                             <div class="col-6">
                                 <label class="form-label small fw-bold text-muted">ZONA</label>
@@ -185,7 +185,7 @@
                             </div>
                             <div class="col-12">
                                 <label class="form-label small fw-bold text-muted">CAPACIDAD</label>
-                                <input type="number" min="1" id="mesa-capacidad" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="Personas" onkeydown="return event.keyCode !== 69 && event.keyCode !== 189" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
+                                <input type="number" min="1" max="127" id="mesa-capacidad" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="Personas" onkeydown="return event.keyCode !== 69 && event.keyCode !== 189" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 3);" required>
                             </div>
                         </div>
                         <button type="submit" class="btn-admin-primary w-100 py-3 mt-3">Guardar Mesa</button>

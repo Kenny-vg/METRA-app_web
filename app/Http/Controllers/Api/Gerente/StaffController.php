@@ -37,20 +37,17 @@ class StaffController extends Controller
             'name' => 'required|string|max:100',
             'email' => [
                 'required',
-                'email:dns',
                 Rule::unique('users', 'email')
             ],
             'password' => 'required|string|min:8'
         ]);
 
         // Obtener plan actual
-        $suscripcion = $gerente->cafeteria
-            ->suscripciones()
-            ->where('estado_pago', 'pagado')
-            ->latest()
-            ->first();
+        $plan = $gerente->cafeteria->planActivo();
 
-        $plan = $suscripcion->plan;
+        if (!$plan) {
+            return ApiResponse::error('La cafetería no tiene un plan activo.', 403);
+        }
 
         // Contar staff activos
         $staffActual = User::where('role', 'personal')
@@ -150,14 +147,9 @@ class StaffController extends Controller
 
         // Obtener plan actual y verificar límite de usuarios
         $gerente = $request->user();
-        $suscripcion = $gerente->cafeteria
-            ->suscripciones()
-            ->where('estado_pago', 'pagado')
-            ->latest()
-            ->first();
+        $plan = $gerente->cafeteria->planActivo();
 
-        if ($suscripcion && $suscripcion->plan) {
-            $plan = $suscripcion->plan;
+        if ($plan) {
             $staffActual = User::where('role', 'personal')
                 ->where('estado', true)
                 ->count();
