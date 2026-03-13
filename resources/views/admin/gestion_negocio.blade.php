@@ -895,6 +895,11 @@
             const method = id ? 'PUT' : 'POST';
             const url = id ? `${API_URL}/staff/${id}` : `${API_URL}/staff`;
 
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Guardando...';
+            submitBtn.disabled = true;
+
             try {
                 const res = await fetch(url, {
                     method,
@@ -913,6 +918,9 @@
                 }
             } catch (error) {
                 Swal.fire('Error', 'Error de conexión', 'error');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
             }
         });
 
