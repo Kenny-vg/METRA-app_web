@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Auth\ProfileController;
 use App\Http\Controllers\Api\Auth\PasswordResetController;
 
 use App\Http\Controllers\Api\RegistroNegocioController;
+use App\Http\Controllers\Api\ReservacionController;
 
 use App\Http\Controllers\Api\Superadmin\PlanController;
 use App\Http\Controllers\Api\Superadmin\SuscripcionController;
@@ -151,10 +152,24 @@ Route::get('/cafeterias/{id}/promociones', function ($id) {
     return ApiResponse::success($promociones);
 });
 
+//Horarios disponibles
+Route::get(
+    'cafeterias/{cafe_id}/horarios-disponibles',
+[ReservacionController::class , 'horariosDisponibles']
+);
+
+//Crear reservación
+Route::post('reservaciones', [ReservacionController::class , 'store']
+);
+
 /* |------------------------------------------ | RUTAS PROTEGIDAS (TODOS LOS USUARIOS) |------------------------------------------ */
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/mi-perfil', [ProfileController::class , 'miPerfil']);
     Route::post('/logout', [LoginController::class , 'logout']);
+    //Mis reservaciones
+    Route::get('reservaciones', [ReservacionController::class , 'misReservaciones']);
+    //Cancelar reservación
+    Route::delete('reservaciones/{id}', [ReservacionController::class , 'cancelar']);
 });
 
 
@@ -219,6 +234,9 @@ Route::middleware([
 
         // CONFIGURACIÓN PAGO
         Route::put('/configuracion-pago', [ConfiguracionController::class , 'update']);
+
+
+
 
     
 });

@@ -22,6 +22,8 @@ class Cafeteria extends Model
         'foto_url',
         'user_id',
         'comprobante_url',
+        'duracion_reserva_min',
+        'intervalo_reserva_min'
     ];
 
     protected $appends = ['estado_dinamico'];
@@ -36,6 +38,18 @@ class Cafeteria extends Model
     public function suscripciones()
     {
         return $this->hasMany(Suscripcion::class, 'cafe_id');
+    }
+
+    // Horarios de la cafetería
+    public function horarios()
+    {
+        return $this->hasMany(Horario::class, 'cafe_id');
+    }
+
+    // Mesas de la cafetería
+    public function mesas()
+    {
+        return $this->hasMany(Mesa::class, 'cafe_id');
     }
 
     public function suscripcionActual()

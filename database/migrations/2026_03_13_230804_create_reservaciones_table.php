@@ -41,21 +41,21 @@ return new class extends Migration
 
             $table->string('comentarios', 255)->nullable();
 
-            $table->foreignId('id_usuario')
+            $table->foreignId('user_id')
                 ->nullable()
                 ->constrained('users')
                 ->nullOnDelete();
 
-            $table->foreignId('id_cafeteria')
+            $table->foreignId('cafe_id')
                 ->constrained('cafeterias')
                 ->cascadeOnDelete();
 
-            $table->foreignId('id_ocasion')
+            $table->foreignId('ocasion_especial_id')
                 ->nullable()
                 ->constrained('ocasion_especials')
                 ->nullOnDelete();
 
-            $table->foreignId('id_promocion')
+            $table->foreignId('promocion_id')
                 ->nullable()
                 ->constrained('promocions')
                 ->nullOnDelete();

@@ -31,11 +31,15 @@ return new class extends Migration
                 ->constrained('reservaciones')
                 ->nullOnDelete();
 
-            $table->foreignId('id_usuario')
+            $table->foreignId('cafe_id')
+                ->constrained('cafeterias')
+                ->cascadeOnDelete();
+
+            $table->foreignId('user_id')
                 ->constrained('users')
                 ->cascadeOnDelete();
 
-            $table->foreignId('id_mesa')
+            $table->foreignId('mesa_id')
                 ->constrained('mesas')
                 ->cascadeOnDelete();
 

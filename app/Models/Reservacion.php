@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Scopes\CafeScope;
 
 class Reservacion extends Model
 {
@@ -20,34 +21,39 @@ class Reservacion extends Model
         'estado',
         'tipo',
         'comentarios',
-        'id_usuario',
-        'id_cafeteria',
-        'id_ocasion',
-        'id_promocion'
+        'user_id',
+        'cafe_id',
+        'ocasion_especial_id',
+        'promocion_id'
     ];
 
-    // Usuario que hizo la reservación
-    public function usuario()
+    protected static function booted()
     {
-        return $this->belongsTo(User::class , 'id_usuario');
+        static::addGlobalScope(new CafeScope);
+    }
+
+    // Usuario que hizo la reservación
+    public function user()
+    {
+        return $this->belongsTo(User::class , 'user_id');
     }
 
     // Cafetería donde se hace la reservación
     public function cafeteria()
     {
-        return $this->belongsTo(Cafeteria::class , 'id_cafeteria');
+        return $this->belongsTo(Cafeteria::class , 'cafe_id');
     }
 
     // Ocasión especial de la reservación
-    public function ocasion()
+    public function ocasionEspecial()
     {
-        return $this->belongsTo(OcasionEspecial::class , 'id_ocasion');
+        return $this->belongsTo(OcasionEspecial::class , 'ocasion_especial_id');
     }
 
     //Promocion de la reservacion
     public function promocion()
     {
-        return $this->belongsTo(Promocion::class , 'id_promocion');
+        return $this->belongsTo(Promocion::class , 'promocion_id');
     }
 
     //Ocupacion de la reservacion

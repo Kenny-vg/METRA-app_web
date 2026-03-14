@@ -19,6 +19,10 @@ return new class extends Migration
                 ->constrained('detalle_ocupaciones')
                 ->cascadeOnDelete();
 
+            $table->foreignId('cafe_id')
+                ->constrained('cafeterias')
+                ->cascadeOnDelete();
+
             $table->string('token_resena', 50)->unique();
 
             $table->tinyInteger('calificacion');
