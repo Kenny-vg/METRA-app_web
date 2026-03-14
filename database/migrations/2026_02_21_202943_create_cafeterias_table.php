@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class extends Migration 
 {
     /**
      * Run the migrations.
@@ -27,6 +27,9 @@ return new class extends Migration
 
             $table->string('telefono')->nullable();
 
+            $table->integer('duracion_reserva_min')->default(90);
+            $table->integer('intervalo_reserva_min')->default(30);
+
             $table->enum('estado', [
                 'activa',
                 'suspendida',
@@ -35,7 +38,7 @@ return new class extends Migration
             ])->default('pendiente');
 
             $table->string('foto_url')->nullable();
-            
+
             // Gerente que registró la cafetería
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             // Comprobante de pago subido por el gerente

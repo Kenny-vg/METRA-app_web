@@ -17,8 +17,6 @@ class User extends Authenticatable
     //campos que se pueden insertar o actualizar
     protected $fillable = [
         'name',
-        'ap_paterno',
-        'ap_materno',
         'email',
         'password',
         'role',

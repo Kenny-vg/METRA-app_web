@@ -16,8 +16,6 @@ return new class extends Migration
 
         // Datos básicos
         $table->string('name');
-        $table->string('ap_paterno')->nullable();
-        $table->string('ap_materno')->nullable();
 
         $table->string('email')->unique();
         $table->string('password');
