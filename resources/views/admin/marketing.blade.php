@@ -302,7 +302,22 @@ async function loadOcasionesForSelect() {
     } catch (e) { console.error('Error cargando ocasiones para el modal', e); }
 }
 
-function abrirModalNuevaPromo() {
+async function abrirModalNuevaPromo() {
+    const select = document.getElementById('promoTipo');
+
+    // Mostrar indicador de carga en el selector mientras cargamos las ocasiones.
+    if (promoTipoChoices) {
+        promoTipoChoices.destroy();
+        promoTipoChoices = null;
+    }
+    select.innerHTML = '<option value="">Cargando ocasiones...</option>';
+
+    // Reintentar cargar ocasiones si no hay datos aún
+    if (ocasionesCargadas.length === 0) {
+        await loadOcasionesForSelect();
+    }
+
+    // Si tras cargar no hay ocasiones, prevenir creación de promo y avisar
     if (ocasionesCargadas.length === 0) {
         Swal.fire({
             icon: 'warning',
@@ -319,7 +334,8 @@ function abrirModalNuevaPromo() {
     document.getElementById('promoTitulo').value = '';
     document.getElementById('promoDescripcion').value = '';
     document.getElementById('promoPrecio').value = '';
-    
+
+    // Aseguramos que el select esté lleno y listo antes de mostrar modal
     if (promoTipoChoices) {
         promoTipoChoices.removeActiveItems();
     }
@@ -553,7 +569,8 @@ document.getElementById('formOcasion').addEventListener('submit', async (e) => {
         if (res.ok) {
             showToast('success', id ? 'Ocasión actualizada' : 'Ocasión creada');
             modalOcasionInst.hide();
-            loadOcasiones();
+            await loadOcasiones();
+            await loadOcasionesForSelect();
         } else {
             const errorData = await res.json();
             Swal.fire('Error', errorData.message || 'Error al guardar ocasión especial', 'error');
@@ -579,7 +596,8 @@ async function deleteOcasion(id) {
                 const res = await fetch(`${API_URL}/ocasiones/${id}`, { method: 'DELETE', headers: headers() });
                 if (res.ok) {
                     showToast('success', 'Ocasión desactivada');
-                    loadOcasiones();
+                    await loadOcasiones();
+                    await loadOcasionesForSelect();
                 } else {
                     const err = await res.json();
                     Swal.fire('Error', err.message || 'Error al desactivar ocasión', 'error');
@@ -607,7 +625,8 @@ async function reactivateOcasion(id) {
                 const res = await fetch(`${API_URL}/ocasiones/${id}/activar`, { method: 'PATCH', headers: headers() });
                 if (res.ok) {
                     showToast('success', 'Ocasión reactivada');
-                    loadOcasiones();
+                    await loadOcasiones();
+                    await loadOcasionesForSelect();
                 } else {
                     const err = await res.json();
                     Swal.fire('Error', err.message || 'Error al reactivar ocasión', 'error');
