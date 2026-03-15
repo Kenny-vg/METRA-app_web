@@ -220,6 +220,7 @@ Route::middleware([
         // CONFIGURACIÓN PAGO
         Route::put('/configuracion-pago', [ConfiguracionController::class , 'update']);
 
+
     
 });
 

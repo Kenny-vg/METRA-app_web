@@ -41,9 +41,10 @@ class PasswordResetController extends Controller
             Mail::to($user->email)->send(
                 new ResetPasswordMail($url, $user->email)
             );
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             // log para debug
-            \Log::error('Error enviando mail reset: '.$e->getMessage());
+            \Log::error('Error enviando mail reset: ' . $e->getMessage());
 
             return ApiResponse::error(
                 'No se pudo enviar el correo en este momento.',

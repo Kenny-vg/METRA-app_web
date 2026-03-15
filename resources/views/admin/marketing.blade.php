@@ -239,7 +239,8 @@ async function loadPromociones() {
             
             const actions = p.activo
                 ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick='editPromocion(${JSON.stringify(p)})' title="Editar"><i class="bi bi-pencil"></i></button>
-                   <button class="btn btn-sm btn-outline-danger rounded-circle" onclick="deletePromocion(${p.id})" title="Desactivar"><i class="bi bi-trash"></i></button>`
+                   <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deletePromocion(${p.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>
+                   <button class="btn btn-sm btn-outline-danger rounded-circle ms-1" title="Eliminar" disabled><i class="bi bi-trash"></i></button>`
                 : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivatePromocion(${p.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
 
             tbody.innerHTML += `
@@ -510,7 +511,8 @@ async function loadOcasiones() {
             const badge = !o.activo ? `<span class="badge bg-secondary ms-2 text-xs">Inactivo</span>` : '';
             const actions = o.activo 
                 ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick="editOcasion(${o.id}, '${o.nombre}', '${o.descripcion || ''}')" title="Editar"><i class="bi bi-pencil"></i></button>
-                   <button class="btn btn-sm btn-outline-danger rounded-circle" onclick="deleteOcasion(${o.id})" title="Desactivar"><i class="bi bi-trash"></i></button>`
+                   <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteOcasion(${o.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>
+                   <button class="btn btn-sm btn-outline-danger rounded-circle ms-1" title="Eliminar" disabled><i class="bi bi-trash"></i></button>`
                 : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateOcasion(${o.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
 
             tbody.innerHTML += `
