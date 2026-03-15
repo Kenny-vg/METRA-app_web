@@ -225,7 +225,7 @@
                             </div>
                             <div class="col-6">
                                 <label class="form-label small fw-bold text-muted">CIERRE</label>
-                                <input type="time" id="horario-cierre" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" required>
+                              <input type="time" id="horario-cierre" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" required>
                             </div>
                         </div>
                         <button type="submit" class="btn-admin-primary w-100 py-3 mt-3">Guardar Horario</button>
@@ -258,13 +258,19 @@
                         
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted">CONTRASEÑA</label>
-                            <input type="password" id="staff-password" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="Mínimo 8 caracteres">
+                            <div class="position-relative">
+                                <input type="password" id="staff-password" class="form-control border-0 shadow-sm rounded-3 pe-5" style="background: var(--off-white);" placeholder="Mínimo 8 caracteres">
+                                <i class="bi bi-eye-slash toggle-staff-pw position-absolute top-50 end-0 translate-middle-y me-3 text-muted" style="cursor: pointer; z-index: 10;"></i>
+                            </div>
                             <small class="text-muted" id="staff-password-help" style="display: none;">Dejar en blanco para mantener la contraseña actual.</small>
                         </div>
 
                         <div class="mb-4" id="staff-password-confirm-group">
                             <label class="form-label small fw-bold text-muted">CONFIRMAR CONTRASEÑA</label>
-                            <input type="password" id="staff-password-confirm" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="Repite la contraseña">
+                            <div class="position-relative">
+                                <input type="password" id="staff-password-confirm" class="form-control border-0 shadow-sm rounded-3 pe-5" style="background: var(--off-white);" placeholder="Repite la contraseña">
+                                <i class="bi bi-eye-slash toggle-staff-pw position-absolute top-50 end-0 translate-middle-y me-3 text-muted" style="cursor: pointer; z-index: 10;"></i>
+                            </div>
                         </div>
 
                         <button type="submit" class="btn-admin-primary w-100 py-3 mt-3">Guardar Personal</button>
@@ -277,6 +283,16 @@
     @include('partials.footer_admin')
 
     <script>
+        // Mask for HH:MM inputs
+       // function formatTime(input) {
+          //  let val = input.value.replace(/\D/g, '');
+           // if (val.length >= 3) {
+           //     input.value = val.substring(0, 2) + ':' + val.substring(2, 4);
+          //  } else {
+          //      input.value = val;
+          //  }
+     //   }
+
         let modalZonaInst;
         let modalMesaInst;
         let modalHorarioInst;
@@ -337,7 +353,8 @@
                     const badge = !z.activo ? `<span class="badge bg-secondary ms-2">Inactivo</span>` : '';
                     const actions = z.activo 
                         ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick="editZona(${z.id}, '${z.nombre_zona}')" title="Editar"><i class="bi bi-pencil"></i></button>
-                           <button class="btn btn-sm btn-outline-danger rounded-circle" onclick="deleteZona(${z.id})" title="Desactivar"><i class="bi bi-trash"></i></button>`
+                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteZona(${z.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>
+                           <button class="btn btn-sm btn-outline-danger rounded-circle ms-1" title="Eliminar" disabled><i class="bi bi-trash"></i></button>`
                         : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateZona(${z.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
 
                     tbody.innerHTML += `
@@ -373,8 +390,17 @@
             modalZonaInst.show();
         }
 
+        let isSubmittingZona = false;
         document.getElementById('formZona').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (isSubmittingZona) return;
+            isSubmittingZona = true;
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+
             const id = document.getElementById('zona-id').value;
             const nombre_zona = document.getElementById('zona-nombre').value;
             
@@ -398,7 +424,12 @@
                     Swal.fire('Error', errorData.message || 'Error al guardar zona', 'error');
                 }
             } catch (error) {
+                console.error(error);
                 Swal.fire('Error', 'Error de conexión', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                isSubmittingZona = false;
             }
         });
 
@@ -479,7 +510,8 @@
                     const badge = !m.activo ? `<span class="badge bg-secondary ms-2">Inactiva</span>` : '';
                     const actions = m.activo
                         ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick='editMesa(${JSON.stringify(m)})' title="Editar"><i class="bi bi-pencil"></i></button>
-                           <button class="btn btn-sm btn-outline-danger rounded-circle" onclick="deleteMesa(${m.id})" title="Desactivar"><i class="bi bi-trash"></i></button>`
+                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteMesa(${m.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>
+                           <button class="btn btn-sm btn-outline-danger rounded-circle ms-1" title="Eliminar" disabled><i class="bi bi-trash"></i></button>`
                         : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateMesa(${m.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
 
                     tbody.innerHTML += `
@@ -521,8 +553,17 @@
             modalMesaInst.show();
         }
 
+        let isSubmittingMesa = false;
         document.getElementById('formMesa').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (isSubmittingMesa) return;
+            isSubmittingMesa = true;
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+
             const id = document.getElementById('mesa-id').value;
             const data = {
                 numero_mesa: document.getElementById('mesa-numero').value,
@@ -550,6 +591,10 @@
                 }
             } catch (error) {
                 Swal.fire('Error', 'Error de conexión', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                isSubmittingMesa = false;
             }
         });
 
@@ -647,7 +692,8 @@
                     const badge = !h.activo ? `<span class="badge bg-secondary ms-2" style="font-size:0.7rem;">Inactivo</span>` : '';
                     const actions = h.activo
                         ? `<button class="btn btn-sm btn-outline-dark rounded-circle" onclick='editHorario(${JSON.stringify(h)})' title="Editar"><i class="bi bi-pencil"></i></button>
-                           <button class="btn btn-sm btn-outline-danger rounded-circle" onclick="deleteHorario(${h.id})" title="Desactivar"><i class="bi bi-trash"></i></button>`
+                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteHorario(${h.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>
+                           <button class="btn btn-sm btn-outline-danger rounded-circle ms-1" title="Eliminar" disabled><i class="bi bi-trash"></i></button>`
                         : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateHorario(${h.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
 
                     container.innerHTML += `
@@ -692,8 +738,17 @@
             modalHorarioInst.show();
         }
 
+        let isSubmittingHorario = false;
         document.getElementById('formHorario').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (isSubmittingHorario) return;
+            isSubmittingHorario = true;
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+
             const id = document.getElementById('horario-id').value;
             const data = {
                 dia_semana: document.getElementById('horario-dia').value, // Aunque disabled, leer el value funciona, pero disabled inputs don't submit in normal forms. we read it manually anyway.
@@ -721,6 +776,10 @@
                 }
             } catch (error) {
                 Swal.fire('Error', 'Error de conexión', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                isSubmittingHorario = false;
             }
         });
 
@@ -808,7 +867,8 @@
                         
                     const actions = isActivo
                         ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick='editStaff(${JSON.stringify(s)})' title="Editar"><i class="bi bi-pencil"></i></button>
-                           <button class="btn btn-sm btn-outline-danger rounded-circle" onclick="deleteStaff(${s.id})" title="Desactivar"><i class="bi bi-trash"></i></button>`
+                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteStaff(${s.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>
+                           <button class="btn btn-sm btn-outline-danger rounded-circle ms-1" title="Eliminar" disabled><i class="bi bi-trash"></i></button>`
                         : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateStaff(${s.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
 
                     tbody.innerHTML += `
@@ -981,5 +1041,21 @@
                 }
             });
         }
+
+        // Toggle password visibility
+        document.querySelectorAll('.toggle-staff-pw').forEach(icon => {
+            icon.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    this.classList.remove('bi-eye-slash');
+                    this.classList.add('bi-eye');
+                } else {
+                    input.type = 'password';
+                    this.classList.remove('bi-eye');
+                    this.classList.add('bi-eye-slash');
+                }
+            });
+        });
     </script>
 @endsection

@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="text-start mb-3">
                         <label class="form-label small fw-bold" style="color: var(--black-primary);">Correo Electrónico</label>
                         <input type="email" name="email" class="form-control input-metra" placeholder="nombre@correo.com" maxlength="100" required 
-                            value="{{ old('email') }}" autofocus oninput="this.value = this.value.trim()">
+                            value="{{ old('email') }}" autofocus oninput="this.value = this.value.trim()" tabindex="1">
                         @error('email')
                             <span class="text-danger small mt-1 d-block">{{ $message }}</span>
                         @enderror
@@ -82,19 +82,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <label class="form-label small fw-bold mb-0" style="color: var(--black-primary);">Contraseña</label>
                             @if (Route::has('password.request'))
-                                <a href="{{ route('password.request') }}" class="small text-muted text-decoration-none">¿Olvidó su contraseña?</a>
+                                <a href="{{ route('password.request') }}" class="small text-muted text-decoration-none" tabindex="4">¿Olvidó su contraseña?</a>
                             @endif
                         </div>
                         <div class="position-relative">
                             <input type="password" name="password" class="form-control input-metra pe-5" placeholder="••••••••" minlength="8" maxlength="32" required 
-                                autocomplete="current-password" oninput="this.value = this.value.trim()">
+                                autocomplete="current-password" oninput="this.value = this.value.trim()" tabindex="2">
                             <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 text-muted toggle-password" style="cursor: pointer; z-index: 10;"></i>
                         </div>
                         @error('password')
                             <span class="text-danger small mt-1 d-block">{{ $message }}</span>
                         @enderror
                     </div>
-                    <button type="submit" class="btn-metra-main w-100 py-3 mt-2" style="border-radius: 8px; font-size: 1.05rem; letter-spacing: 0.5px;">
+                    <button type="submit" class="btn-metra-main w-100 py-3 mt-2" style="border-radius: 8px; font-size: 1.05rem; letter-spacing: 0.5px;" tabindex="3">
                         Iniciar Sesión
                     </button>
                     
@@ -164,6 +164,9 @@ window.handleCredentialResponse = async function(response) {
                 sessionStorage.setItem('token', result.data.token);
                 if (result.data.usuario?.nombre_cafeteria) {
                     localStorage.setItem('nombre_cafeteria', result.data.usuario.nombre_cafeteria);
+                }
+                if (result.data.usuario?.name) {
+                    localStorage.setItem('user_name', result.data.usuario.name);
                 }
                 if (result.data.usuario?.dias_restantes !== undefined && result.data.usuario?.dias_restantes !== null) {
                     localStorage.setItem('dias_restantes', result.data.usuario.dias_restantes);
@@ -317,6 +320,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         if (result.data.usuario?.nombre_cafeteria) {
                             localStorage.setItem('nombre_cafeteria', result.data.usuario.nombre_cafeteria);
+                        }
+                        if (result.data.usuario?.name) {
+                            localStorage.setItem('user_name', result.data.usuario.name);
                         }
                         if (result.data.usuario?.dias_restantes !== undefined && result.data.usuario?.dias_restantes !== null) {
                             localStorage.setItem('dias_restantes', result.data.usuario.dias_restantes);

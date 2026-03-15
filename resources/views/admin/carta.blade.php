@@ -12,6 +12,7 @@
                 <i class="bi bi-plus-lg me-2"></i>Añadir Producto
             </button>
         </div>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     </header>
 
     <div class="row g-4" id="productos-container">
@@ -112,7 +113,8 @@
 
                     const actions = p.activo
                         ? `<button class="btn btn-sm btn-outline-dark me-2" onclick='editProducto(${JSON.stringify(p)})' title="Editar"><i class="bi bi-pencil"></i></button>
-                           <button class="btn btn-sm btn-outline-danger" onclick="deleteProducto(${p.id})" title="Desactivar"><i class="bi bi-trash"></i></button>`
+                           <button class="btn btn-sm btn-outline-primary" onclick="deleteProducto(${p.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>
+                           <button class="btn btn-sm btn-outline-danger ms-1" title="Eliminar" disabled><i class="bi bi-trash"></i></button>`
                         : `<button class="btn btn-sm btn-success w-100 mt-2" onclick="reactivateProducto(${p.id})"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
 
                     container.innerHTML += `
