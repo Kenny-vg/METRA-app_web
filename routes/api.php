@@ -84,6 +84,10 @@ Route::get('cafeterias/{cafeteria}/horarios-disponibles', [ReservacionController
 //Crear reservación
 Route::post('cafeterias/{cafeteria}/reservaciones', [ReservacionController::class , 'store']);
 
+// Detalle y cancelación pública por folio (sin auth — folio actúa como identificador)
+Route::get('reservaciones/folio/{folio}', [ReservacionController::class , 'showByFolio']);
+Route::delete('reservaciones/folio/{folio}', [ReservacionController::class , 'cancelarByFolio']);
+
 /* |------------------------------------------ | RUTAS PROTEGIDAS (TODOS LOS USUARIOS) |------------------------------------------ */
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/mi-perfil', [ProfileController::class , 'miPerfil']);

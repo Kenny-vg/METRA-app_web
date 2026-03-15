@@ -156,8 +156,14 @@ Hola <strong>{{ $reservacion->nombre_cliente }}</strong>, tu reservación se ha 
 
 </div>
 
-<p class="text">
-Guarda tu <strong>folio de reservación</strong>. Lo necesitarás para consultar o cancelar tu reserva.
+<div class="btn-container">
+<a href="{{ url('/confirmacion/' . $reservacion->folio) }}" class="btn">
+    Ver o gestionar mi reservación
+</a>
+</div>
+
+<p class="text" style="font-size: 14px; color: #888888;">
+    Usa el botón anterior para consultar los detalles, o para cancelar tu reservación en cualquier momento antes de la fecha.
 </p>
 
 </td>

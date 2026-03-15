@@ -300,6 +300,10 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
     <script>
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             const cafeSlug = document.getElementById('cafe_slug').value;
             const fechaInput = document.getElementById('fecha-select');
@@ -448,6 +452,31 @@
                     const jsonZ = await resZ.json();
                     jsonZ.data.forEach(z => { zonaSelect.innerHTML += `<option value="${z.id}">${z.nombre_zona}</option>`});
                 }
+
+                // 4. Pre-llenar si está logueado
+                const token = getToken();
+                if (token) {
+                    try {
+                        const resP = await fetch('/api/mi-perfil', {
+                            headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+                        });
+                        if (resP.ok) {
+                            const jsonP = await resP.json();
+                            const user = jsonP.data.usuario;
+                            // Separar nombre del usuario (METRA guarda nombre completo o solo name?)
+                            // Como el formulario pide Nombre, Apellido P, Apellido M, 
+                            // intentamos poblar lo que podamos.
+                            iNom.value = user.name || '';
+                            iEmail.value = user.email || '';
+                            // El teléfono no siempre está en el perfil, pero si existe, lo ponemos.
+                            if (user.telefono) iTel.value = user.telefono;
+                            
+                            checkFormValidity();
+                        }
+                    } catch (e) {
+                        console.error('Error al pre-llenar perfil', e);
+                    }
+                }
             } catch(e) { console.error('Error init', e); }
 
             // --- SINCRONIZACION DE HORAS DISPONIBLES USANDO API ---
@@ -578,12 +607,18 @@
 
                 try {
                     // Endpoint correcto
+                    const token = getToken();
+                    const headers = {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    };
+                    if (token) {
+                        headers['Authorization'] = `Bearer ${token}`;
+                    }
+
                     const res = await fetch(`/api/cafeterias/${cafeSlug}/reservaciones`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
+                        headers: headers,
                         body: JSON.stringify(payload)
                     });
                     

@@ -19,7 +19,10 @@ Route::get('/reservar/{slug}', function ($slug) {
     return view('public.reservar', ['slug' => $slug]);
 });
 
-Route::get('/confirmacion/{folio}', [\App\Http\Controllers\ReservacionController::class, 'confirmacion']);
+Route::get('/confirmacion/{folio}', function ($folio) {
+    if (!preg_match('/^RSV-[A-Z0-9]{6}$/', strtoupper($folio))) abort(404);
+    return view('public.confirmacion', ['folio' => strtoupper($folio)]);
+});
 
 // Landing de registro de negocios (pública, sin login)
 Route::get('/registro-negocio', function () {

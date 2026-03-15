@@ -16,7 +16,7 @@
                 <hr style="border-color: var(--border-light); opacity: 1;" class="w-75 mx-auto mb-4">
 
                 <div class="d-grid gap-3 mt-2">
-                    <a href="{{ url('/reservar') }}" class="btn-metra-main rounded-pill fw-bold py-3" style="font-size: 0.95rem;">
+                    <a href="{{ url('/#cafeterias') }}" class="btn-metra-main rounded-pill fw-bold py-3" style="font-size: 0.95rem;">
                         <i class="bi bi-calendar-plus me-2"></i>Nueva Reservación
                     </a>
                     
@@ -32,114 +32,237 @@
             <div class="card border-0 rounded-4 p-4 p-lg-5" style="background: var(--white-pure); box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
                 
                 <div class="d-flex justify-content-between align-items-center mb-5 pb-3 border-bottom" style="border-color: var(--border-light) !important;">
-                    <h4 class="fw-bold m-0" style="color: var(--black-primary); font-family: 'Inter', sans-serif; letter-spacing: -0.5px;">Agenda de Experiencias</h4>
-                    <span class="badge rounded-pill px-3 py-2" style="background: var(--off-white); border: 1px solid var(--border-light); color: var(--text-main); font-weight: 600;">1 Próxima</span>
+                    <h4 class="fw-bold m-0" style="color: var(--black-primary); font-family: 'Inter', sans-serif; letter-spacing: -0.5px;">Mis Reservaciones</h4>
+                    <span class="badge rounded-pill px-3 py-2" id="badge-count" style="background: var(--off-white); border: 1px solid var(--border-light); color: var(--text-main); font-weight: 600;">...</span>
                 </div>
-                
-                <!-- Ticket SaaS -->
-                <div class="p-4 rounded-4 mb-4" style="background: var(--white-pure); border: 1px solid var(--border-light); box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: all 0.3s ease;">
-                    <div class="row align-items-center">
-                        <div class="col-12 col-lg-8 mb-3 mb-lg-0">
-                            <div class="d-flex align-items-start">
-                                <div class="me-4 d-none d-sm-block">
-                                    <div class="text-center rounded-3 p-2" style="background: var(--off-white); min-width: 60px; border: 1px solid var(--border-light);">
-                                        <span class="d-block fw-bold fs-5" style="color: var(--black-primary); line-height: 1;">15</span>
-                                        <span class="d-block small text-uppercase" style="color: var(--text-muted); font-weight: 700; font-size: 0.7rem;">Feb</span>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <span class="badge rounded-pill me-2" style="background: #E8F5E9; color: #2E7D32; border: 1px solid #C8E6C9; padding: 6px 12px; font-weight: 700; font-size: 0.7rem; letter-spacing: 0.5px;">Confirmada</span>
-                                        <span class="small fw-bold" style="color: var(--text-muted); letter-spacing: 1px;">#MET-2026</span>
-                                    </div>
-                                    <h5 class="fw-bold mb-1" style="color: var(--black-primary); letter-spacing: -0.5px;">Café Central Tehuacán</h5>
-                                    <p class="m-0 small" style="color: var(--text-muted);">
-                                        <i class="bi bi-clock me-1"></i> Domingo, 08:30 PM &nbsp;•&nbsp; <i class="bi bi-people me-1"></i> 2 Invitados
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-lg-4 text-lg-end border-lg-start" style="border-color: var(--border-light) !important;">
-                            <div class="ps-lg-3">
-                                <button class="btn btn-sm w-100 mb-2 py-2 fw-bold" style="background: var(--black-primary); color: var(--white-pure); border-radius: 6px; font-size: 0.85rem;">Ver Detalles</button>
-                                <button class="btn btn-sm w-100 py-2 fw-bold" style="background: var(--white-pure); border: 1px solid var(--border-light); color: #D32F2F; border-radius: 6px; font-size: 0.85rem;">Cancelar Reserva</button>
-                            </div>
-                        </div>
-                    </div>
+
+                <!-- Estado: cargando -->
+                <div id="reservas-loading" class="text-center py-5">
+                    <div class="spinner-border spinner-border-sm" style="color: var(--accent-gold);" role="status"></div>
+                    <p class="mt-2 small text-muted fw-bold">Cargando reservaciones...</p>
                 </div>
-                <!-- /Ticket SaaS -->
+
+                <!-- Estado: vacío -->
+                <div id="reservas-empty" style="display: none;" class="text-center py-5">
+                    <i class="bi bi-calendar-x fs-1" style="color: var(--border-light);"></i>
+                    <p class="mt-3 fw-bold" style="color: var(--text-muted);">Todavía no tienes reservaciones.</p>
+                    <a href="{{ url('/') }}" class="btn-metra-main rounded-pill fw-bold px-4 py-2 mt-2" style="font-size: 0.9rem;">
+                        <i class="bi bi-calendar-plus me-2"></i>Hacer una reservación
+                    </a>
+                </div>
+
+                <!-- Estado: lista -->
+                <div id="reservas-list" style="display: none;"></div>
 
             </div>
         </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+const API_URL  = "{{ url('/api') }}";
+const BASE_URL = "{{ url('/') }}";
+const MESES    = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+
+function getToken() {
+    return localStorage.getItem('token');
+}
+
+function formatFechaCorta(isoDate) {
+    const [y, m, d] = isoDate.split('-');
+    return { dia: parseInt(d), mes: MESES[parseInt(m)-1] };
+}
+
+function getEstadoBadge(r) {
+    const inicio = new Date(`${r.fecha}T${r.hora_inicio}`);
+    if (r.estado === 'cancelada')  return { bg:'#fce8e8', color:'#c62828', border:'#f5c6cb', label:'Cancelada' };
+    if (r.estado === 'completada') return { bg:'#e8f5e9', color:'#2e7d32', border:'#c8e6c9', label:'Completada' };
+    if (inicio < new Date())       return { bg:'#f0f0f0', color:'#757575', border:'#e0e0e0', label:'Pasada' };
+    return                                { bg:'#e8f5e9', color:'#2e7d32', border:'#c8e6c9', label:'Confirmada' };
+}
+
+function esCancelable(r) {
+    if (r.estado === 'cancelada' || r.estado === 'completada') return false;
+    return new Date(`${r.fecha}T${r.hora_inicio}`) > new Date();
+}
+
+function renderReservaciones(reservas) {
+    const listEl    = document.getElementById('reservas-list');
+    const loadingEl = document.getElementById('reservas-loading');
+    const emptyEl   = document.getElementById('reservas-empty');
+    const badgeEl   = document.getElementById('badge-count');
+
+    loadingEl.style.display = 'none';
+
+    if (!reservas.length) {
+        emptyEl.style.display = 'block';
+        badgeEl.textContent   = '0 reservas';
+        return;
+    }
+
+    const proximas = reservas.filter(r => r.estado !== 'cancelada' && new Date(`${r.fecha}T${r.hora_inicio}`) >= new Date());
+    badgeEl.textContent = proximas.length > 0 ? `${proximas.length} próxima${proximas.length > 1 ? 's' : ''}` : 'Sin próximas';
+
+    let html = '';
+
+    // Renderizar todas las reservas ordenadas
+    reservas.forEach(r => {
+        const { dia, mes } = formatFechaCorta(r.fecha);
+        const badge = getEstadoBadge(r);
+        const cancelable = esCancelable(r);
+        const opacidad = (r.estado === 'cancelada' || (r.estado !== 'completada' && new Date(`${r.fecha}T${r.hora_inicio}`) < new Date())) ? 'opacity: 0.65;' : '';
+
+        html += `
+        <div class="p-4 rounded-4 mb-3" style="background: var(--white-pure); border: 1px solid var(--border-light); transition: all 0.2s ease; ${opacidad}">
+            <div class="row align-items-center">
+                <div class="col-12 col-lg-8 mb-3 mb-lg-0">
+                    <div class="d-flex align-items-start">
+                        <div class="me-4 d-none d-sm-block text-center rounded-3 p-2" style="background: var(--off-white); min-width: 60px; border: 1px solid var(--border-light);">
+                            <span class="d-block fw-bold fs-5" style="color: var(--black-primary); line-height: 1;">${dia}</span>
+                            <span class="d-block small text-uppercase" style="color: var(--text-muted); font-weight: 700; font-size: 0.7rem;">${mes}</span>
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+                                <span class="badge rounded-pill" style="background: ${badge.bg}; color: ${badge.color}; border: 1px solid ${badge.border}; padding: 5px 12px; font-weight: 700; font-size: 0.7rem; letter-spacing: 0.5px;">${badge.label}</span>
+                                <span class="small fw-bold" style="color: var(--text-muted); letter-spacing: 1px; font-family: monospace;">${r.folio}</span>
+                            </div>
+                            <h6 class="fw-bold mb-1" style="color: var(--black-primary);">${r.cafeteria ? r.cafeteria.nombre : '—'}</h6>
+                            <p class="m-0 small" style="color: var(--text-muted);">
+                                <i class="bi bi-clock me-1"></i>${r.hora_inicio.substring(0,5)} hrs
+                                &nbsp;•&nbsp;
+                                <i class="bi bi-people me-1"></i>${r.numero_personas} ${r.numero_personas > 1 ? 'personas' : 'persona'}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-4 text-lg-end">
+                    <div class="ps-lg-3 d-flex flex-column gap-2">
+                        <a href="${BASE_URL}/confirmacion/${r.folio}" class="btn btn-sm py-2 fw-bold w-100" style="background: var(--black-primary); color: var(--white-pure); border-radius: 6px; font-size: 0.82rem;">
+                            <i class="bi bi-eye me-1"></i>Ver Detalles
+                        </a>
+                        ${cancelable ? `
+                        <button onclick="cancelarReservacion(${r.id}, '${r.folio}', '${r.fecha}', '${r.hora_inicio}')"
+                            class="btn btn-sm py-2 fw-bold w-100"
+                            style="background: var(--white-pure); border: 1px solid var(--border-light); color: #D32F2F; border-radius: 6px; font-size: 0.82rem;">
+                            <i class="bi bi-x-circle me-1"></i>Cancelar
+                        </button>` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    });
+
+    listEl.innerHTML  = html;
+    listEl.style.display = 'block';
+}
+
+async function cargarReservaciones() {
+    const token = getToken();
+    if (!token) return;
+    try {
+        const res = await fetch(`${API_URL}/reservaciones`, {
+            headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+        });
+        if (!res.ok) throw new Error();
+        const json = await res.json();
+        // Ordenar: primero próximas (asc), luego pasadas (desc)
+        const data = (json.data || []).sort((a, b) => {
+            const da = new Date(`${a.fecha}T${a.hora_inicio}`);
+            const db = new Date(`${b.fecha}T${b.hora_inicio}`);
+            const now = new Date();
+            const aFut = da >= now, bFut = db >= now;
+            if (aFut && !bFut) return -1;
+            if (!aFut && bFut) return 1;
+            return aFut ? da - db : db - da;
+        });
+
+        // Necesitamos el nombre de la cafeteria — lo añadimos si viene como relación
+        renderReservaciones(data);
+    } catch(e) {
+        document.getElementById('reservas-loading').innerHTML =
+            '<p class="text-danger small fw-bold">Error al cargar reservaciones.</p>';
+    }
+}
+
+window.cancelarReservacion = async function(id, folio, fecha, hora) {
+    const confirm = await Swal.fire({
+        title: '¿Cancelar reservación?',
+        html: `Folio <strong>${folio}</strong><br>Fecha: <strong>${fecha}</strong> a las <strong>${hora.substring(0,5)} hrs</strong>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#c62828',
+        cancelButtonColor: '#111',
+        confirmButtonText: 'Sí, cancelar',
+        cancelButtonText: 'No, mantener'
+    });
+    if (!confirm.isConfirmed) return;
+
+    const token = getToken();
+    try {
+        const res = await fetch(`${API_URL}/reservaciones/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+        });
+        const json = await res.json();
+        if (res.ok) {
+            await Swal.fire({ icon: 'success', title: 'Cancelada', text: 'Tu reservación fue cancelada.', confirmButtonColor: '#111' });
+            cargarReservaciones(); // Recargar lista
+        } else {
+            Swal.fire({ icon: 'error', title: 'Error', text: json.message || 'No se pudo cancelar.', confirmButtonColor: '#111' });
+        }
+    } catch(e) {
+        Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'Intenta de nuevo.', confirmButtonColor: '#111' });
+    }
+};
+
 document.addEventListener('DOMContentLoaded', async function() {
-    const token = localStorage.getItem('token');
-    const BASE_URL = "{{ url('/') }}";
+    const token = getToken();
     if (!token) {
         window.location.href = `${BASE_URL}/login`;
         return;
     }
 
+    // Cargar perfil
     try {
-        const API_URL = "{{ url('/api') }}";
         const response = await fetch(`${API_URL}/mi-perfil`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${token}` }
         });
-
         if (response.ok) {
             const data = await response.json();
             const user = data.data.usuario;
-
-            document.getElementById('profileName').textContent = user.name;
+            document.getElementById('profileName').textContent  = user.name;
             document.getElementById('profileEmail').textContent = user.email;
-
-            if (user.avatar) {
-                document.getElementById('profileAvatar').src = user.avatar;
-            } else {
-                document.getElementById('profileAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=0A0A0A&color=FFFFFF`;
-            }
+            document.getElementById('profileAvatar').src = user.avatar
+                ? user.avatar
+                : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=0A0A0A&color=FFFFFF`;
         } else {
             localStorage.removeItem('token');
             window.location.href = `${BASE_URL}/login`;
+            return;
         }
     } catch (error) {
         console.error('Error cargando perfil:', error);
     }
+
+    // Cargar reservaciones
+    cargarReservaciones();
 });
 
 document.getElementById('btnCerrarSesionCliente')?.addEventListener('click', async function(e) {
     e.preventDefault();
-    const token = localStorage.getItem('token');
-    
+    const token = getToken();
     if (token) {
         try {
-            const API_URL = "{{ url('/api') }}";
             await fetch(`${API_URL}/logout`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${token}` }
             });
-        } catch (e) {
-            console.error('Error API Logout', e);
-        }
+        } catch (e) { console.error('Error API Logout', e); }
     }
-
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
     localStorage.clear();
-    const BASE_URL = "{{ url('/') }}";
     window.location.href = `${BASE_URL}/login`;
 });
 </script>
+
 @endsection

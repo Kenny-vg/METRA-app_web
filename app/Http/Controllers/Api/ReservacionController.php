@@ -193,7 +193,7 @@ class ReservacionController extends Controller
             $reservacion = Reservacion::create([
                 'folio' => $folio,
                 'cafe_id' => $cafeteria->id,
-                'user_id' => auth()->check() ? auth()->id() : null,
+                'user_id' => auth('sanctum')->check() ? auth('sanctum')->id() : null,
 
                 'nombre_cliente' => $request->nombre_cliente,
                 'telefono' => $request->telefono,
@@ -236,9 +236,22 @@ class ReservacionController extends Controller
             return ApiResponse::error('Debe iniciar sesión', 401);
         }
 
-        $reservas = Reservacion::where('user_id', auth()->id())
-            ->latest()
-            ->get();
+        $reservas = Reservacion::withoutGlobalScope(\App\Models\Scopes\CafeScope::class)
+            ->with('cafeteria:id,nombre')
+            ->where('user_id', auth()->id())
+            ->latest('fecha')
+            ->get()
+            ->map(fn($r) => [
+                'id'              => $r->id,
+                'folio'           => $r->folio,
+                'fecha'           => $r->fecha,
+                'hora_inicio'     => $r->hora_inicio,
+                'hora_fin'        => $r->hora_fin,
+                'numero_personas' => $r->numero_personas,
+                'estado'          => $r->estado,
+                'comentarios'     => $r->comentarios,
+                'cafeteria'       => $r->cafeteria ? ['nombre' => $r->cafeteria->nombre] : null,
+            ]);
 
         return ApiResponse::success($reservas, 'Reservaciones del usuario');
     }
@@ -323,6 +336,66 @@ class ReservacionController extends Controller
     private function generarFolio()
     {
         return 'RSV-' . Str::upper(Str::random(6));
+    }
+
+
+    /**
+     * Ver detalle de una reservación por folio (público — sin auth).
+     * Solo expone información no sensible.
+     */
+    public function showByFolio(string $folio)
+    {
+        // Usamos withoutGlobalScope para que no filtre por cafe_id
+        $r = Reservacion::withoutGlobalScope(\App\Models\Scopes\CafeScope::class)
+            ->where('folio', $folio)
+            ->with('cafeteria:id,nombre,calle,colonia,ciudad')
+            ->firstOrFail();
+
+        return ApiResponse::success([
+            'id'              => $r->id,
+            'folio'           => $r->folio,
+            'nombre_cliente'  => $r->nombre_cliente,
+            'fecha'           => $r->fecha,
+            'hora_inicio'     => $r->hora_inicio,
+            'hora_fin'        => $r->hora_fin,
+            'numero_personas' => $r->numero_personas,
+            'estado'          => $r->estado,
+            'comentarios'     => $r->comentarios,
+            'cafeteria'       => $r->cafeteria ? [
+                'nombre'  => $r->cafeteria->nombre,
+                'calle'   => $r->cafeteria->calle,
+                'colonia' => $r->cafeteria->colonia,
+                'ciudad'  => $r->cafeteria->ciudad,
+            ] : null,
+        ]);
+    }
+
+
+    /**
+     * Cancelar una reservación por folio (público — folio actúa como token).
+     */
+    public function cancelarByFolio(string $folio)
+    {
+        $r = Reservacion::withoutGlobalScope(\App\Models\Scopes\CafeScope::class)
+            ->where('folio', $folio)
+            ->firstOrFail();
+
+        if ($r->estado === 'cancelada') {
+            return ApiResponse::error('Esta reservación ya fue cancelada.', 409);
+        }
+
+        if ($r->estado === 'completada') {
+            return ApiResponse::error('No se puede cancelar una reservación completada.', 409);
+        }
+
+        $inicio = Carbon::parse($r->fecha . ' ' . $r->hora_inicio);
+        if ($inicio->isPast()) {
+            return ApiResponse::error('No se puede cancelar una reservación cuya fecha u hora ya pasaron.', 409);
+        }
+
+        $r->update(['estado' => 'cancelada']);
+
+        return ApiResponse::success(null, 'Reservación cancelada correctamente.');
     }
 
 }
