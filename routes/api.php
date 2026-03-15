@@ -140,6 +140,17 @@ Route::get('/cafeterias/{id}/horarios', function ($id) {
     return ApiResponse::success($horarios);
 });
 
+// Obtener la capacidad máxima basada en la mesa más grande
+Route::get('/cafeterias/{id}/mesas-capacidad', function ($id) {
+    $maxCapacidad = \App\Models\Mesa::where('cafe_id', $id)
+        ->where('activo', true)
+        ->max('capacidad') ?? 1; // Default a 1 si no hay mesas activas
+    return ApiResponse::success(['max_capacidad' => $maxCapacidad]);
+});
+
+// Guardar reservación (público)
+Route::post('/public/reservar', [\App\Http\Controllers\ReservacionController::class , 'store']);
+
 //Ver promociones
 Route::get('/cafeterias/{id}/promociones', function ($id) {
 
@@ -248,6 +259,8 @@ Route::middleware([
     Route::apiResource('zonas', ZonaController::class); //crud zonas
     Route::apiResource('mesas', MesaController::class); //crud mesas
     Route::apiResource('horarios', HorarioController::class); //crud horarios
+
+    Route::get('reservaciones', [\App\Http\Controllers\ReservacionController::class, 'index']);
 
     Route::apiResource('staff', StaffController::class); //crud staff
 

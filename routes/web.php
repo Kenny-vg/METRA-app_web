@@ -19,9 +19,7 @@ Route::get('/reservar/{id}', function ($id) {
     return view('public.reservar', ['id' => $id]);
 });
 
-Route::get('/confirmacion', function () {
-    return view('public.confirmacion');
-});
+Route::get('/confirmacion/{folio}', [\App\Http\Controllers\ReservacionController::class, 'confirmacion']);
 
 // Landing de registro de negocios (pública, sin login)
 Route::get('/registro-negocio', function () {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" style="scroll-behavior: smooth;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,6 +19,7 @@
                 <i class="bi bi-hexagon-fill me-2" style="color: var(--accent-gold); font-size: 1.2rem;"></i>METRA
             </a>
             <div class="d-flex align-items-center gap-3 order-lg-3 ms-auto ms-lg-0">
+                <a href="#cafeterias" class="btn btn-outline-dark px-4 py-2 rounded-pill d-none d-md-inline-block" style="font-size: 0.9rem; font-family: 'Inter', sans-serif; font-weight: 600;">Explorar Cafeterías</a>
                 <a href="{{ url('/login') }}" class="btn-metra-main px-4 py-2 rounded-pill" style="font-size: 0.9rem;">Iniciar Sesión</a>
                 <button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navBienvenida">
                     <i class="bi bi-list fs-2" style="color: var(--black-primary);"></i>

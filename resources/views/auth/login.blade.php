@@ -165,6 +165,9 @@ window.handleCredentialResponse = async function(response) {
                 if (result.data.usuario?.nombre_cafeteria) {
                     localStorage.setItem('nombre_cafeteria', result.data.usuario.nombre_cafeteria);
                 }
+                if (result.data.usuario?.name) {
+                    localStorage.setItem('user_name', result.data.usuario.name);
+                }
                 if (result.data.usuario?.dias_restantes !== undefined && result.data.usuario?.dias_restantes !== null) {
                     localStorage.setItem('dias_restantes', result.data.usuario.dias_restantes);
                 }
@@ -317,6 +320,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         if (result.data.usuario?.nombre_cafeteria) {
                             localStorage.setItem('nombre_cafeteria', result.data.usuario.nombre_cafeteria);
+                        }
+                        if (result.data.usuario?.name) {
+                            localStorage.setItem('user_name', result.data.usuario.name);
                         }
                         if (result.data.usuario?.dias_restantes !== undefined && result.data.usuario?.dias_restantes !== null) {
                             localStorage.setItem('dias_restantes', result.data.usuario.dias_restantes);

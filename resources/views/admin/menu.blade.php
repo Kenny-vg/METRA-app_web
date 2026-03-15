@@ -53,9 +53,12 @@
             <h2 class="fw-bold m-0 d-flex align-items-center text-white" style="letter-spacing: -1px;">
                 <i class="bi bi-hexagon-fill me-2" style="color: var(--accent-gold); font-size: 1.5rem;"></i>METRA
             </h2>
+            <!-- Usuario Logueado (Real) -->
+            <div id="sidebar-user-name" class="mt-2 text-white small fw-bold d-none text-uppercase text-center" style="font-size: 0.75rem; letter-spacing: 1px;">
+            </div>
             <!-- Nombre de la café -->
-            <div id="sidebar-cafe-name" class="mt-2 px-3 py-1 rounded-pill small fw-bold d-none" 
-                 style="background: rgba(181,146,126,0.15); color: var(--accent-gold); font-size: 0.72rem; letter-spacing: 0.5px; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;">
+            <div id="sidebar-cafe-name" class="mt-1 px-3 py-1 rounded-pill fw-bold d-none" 
+                 style="background: rgba(181,146,126,0.15); color: var(--accent-gold); font-size: 0.65rem; letter-spacing: 0.5px; max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;">
             </div>
         </div>
         <nav class="d-flex flex-column gap-2 px-3 flex-grow-1 custom-scrollbar">
@@ -100,13 +103,21 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Nombre de cafetería en sidebar
+        // Data in sidebar
         const nombreCafe = localStorage.getItem('nombre_cafeteria');
         if (nombreCafe) {
             const pill = document.getElementById('sidebar-cafe-name');
             if (pill) {
                 pill.textContent = nombreCafe;
                 pill.classList.remove('d-none');
+            }
+        }
+        const userName = localStorage.getItem('user_name');
+        if (userName) {
+            const upill = document.getElementById('sidebar-user-name');
+            if (upill) {
+                upill.textContent = userName;
+                upill.classList.remove('d-none');
             }
         }
 
