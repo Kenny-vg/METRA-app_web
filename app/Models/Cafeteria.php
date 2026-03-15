@@ -9,6 +9,7 @@ class Cafeteria extends Model
     protected $table = 'cafeterias';
     protected $fillable = [
         'nombre',
+        'slug',
         'descripcion',
         'calle',
         'num_exterior',
@@ -27,6 +28,26 @@ class Cafeteria extends Model
     ];
 
     protected $appends = ['estado_dinamico'];
+
+    protected static function booted()
+    {
+        static::creating(function ($cafeteria) {
+            if (empty($cafeteria->slug)) {
+                $cafeteria->slug = \Illuminate\Support\Str::slug($cafeteria->nombre);
+            }
+        });
+
+        static::updating(function ($cafeteria) {
+            if ($cafeteria->isDirty('nombre') && empty($cafeteria->slug)) {
+                $cafeteria->slug = \Illuminate\Support\Str::slug($cafeteria->nombre);
+            }
+        });
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 
     // Gerente/dueño que registró la cafetería
     public function gerente()

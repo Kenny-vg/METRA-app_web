@@ -17,6 +17,7 @@ class CafeteriaSeeder extends Seeder
         Cafeteria::updateOrCreate([
             'nombre' => 'Cafe Demo METRA',
             'estado' => 'activa',
+            'slug' => 'cafe-demo-metra',
         ]);
     }
 }

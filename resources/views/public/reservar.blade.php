@@ -182,7 +182,8 @@
 
                 <div class="reserva-card">
                     <form id="reserva-form" novalidate>
-                        <input type="hidden" id="cafe_id" value="{{ $id }}">
+                        <input type="hidden" id="cafe_slug" value="{{ $slug }}">
+                        <input type="hidden" id="cafe_id" value="">
 
                         <div id="general-error" class="alert alert-danger d-none mb-4" style="border-radius: 10px; font-weight: 500;"></div>
 
@@ -202,7 +203,7 @@
                                     <label class="form-label small fw-bold">Hora *</label>
                                     <div class="position-relative">
                                         <select id="hora-select" class="form-select input-metra" required disabled>
-                                            <option value="">Esperando día...</option>
+                                            <option value="">Seleccione fecha e invitados primero</option>
                                         </select>
                                         <div id="hora-spinner" class="spinner-border text-gold spinner-border-sm position-absolute d-none" style="right: 35px; top: 13px;" role="status"></div>
                                     </div>
@@ -300,7 +301,7 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            const cafeId = document.getElementById('cafe_id').value;
+            const cafeSlug = document.getElementById('cafe_slug').value;
             const fechaInput = document.getElementById('fecha-select');
             const horaSelect = document.getElementById('hora-select');
             const horaSpinner = document.getElementById('hora-spinner');
@@ -328,7 +329,7 @@
                 return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
             };
 
-            const getApiUrl = (endpoint) => `/api/cafeterias/${cafeId}/${endpoint}?t=${new Date().getTime()}`;
+            const getApiUrl = (endpoint) => `/api/cafeterias/${cafeSlug}/${endpoint}?t=${new Date().getTime()}`;
 
             // --- VALIDACIONES EN TIEMPO REAL ---
             const requiredInputs = [fechaInput, horaSelect, paxSelect, iNom, iApP, iEmail, iTel];
@@ -385,6 +386,13 @@
 
             // --- LLAMADAS INICIALES A LA API PARA CONFIGURAR DOM ---
             try {
+                // Fetch the actual ID from slug 
+                const resC = await fetch(`/api/cafeterias-publicas/${cafeSlug}`);
+                if(resC.ok){
+                    const jsonC = await resC.json();
+                    document.getElementById('cafe_id').value = jsonC.data.id;
+                }
+
                 // 1. Horarios Iniciales
                 const resH = await fetch(getApiUrl('horarios'));
                 if(resH.ok){
@@ -410,7 +418,7 @@
                         ],
                         onChange: function(selectedDates, dateStr, instance) {
                             fechaInput.classList.remove('is-invalid'); // Trigger visual cleanup
-                            cargarHorasPorDiaAPI(selectedDates[0]);     // REAL TIME SYNC
+                            cargarHorasDisponibles();     // USE BACKEND ENDPOINT
                             checkFormValidity();
                         }
                     });
@@ -425,6 +433,7 @@
                     for(let i=1; i<=max; i++) {
                         paxSelect.innerHTML += `<option value="${i}">${i} Persona${i>1?'s':''}</option>`;
                     }
+                    // Si ya hay algo seleccionado o si el usuario elige una opcion, buscaremos el horario
                 }
 
                 // 3. Zonas y Ocasiones (Datos estáticos de catálogo)
@@ -441,61 +450,54 @@
                 }
             } catch(e) { console.error('Error init', e); }
 
-            // --- SINCRONIZACION DE HORAS DISPONIBLES EN TIEMPO REAL ---
-            // Disparado frescamente cada que el calendario cambia de fecha
-            async function cargarHorasPorDiaAPI(dateObj) {
-                if(!dateObj) {
-                    horaSelect.innerHTML = '<option value="">Esperando día...</option>';
+            // --- SINCRONIZACION DE HORAS DISPONIBLES USANDO API ---
+            async function cargarHorasDisponibles() {
+                const fecha = fechaInput.value;
+                const pax = paxSelect.value;
+                
+                if (!fecha || !pax) {
+                    horaSelect.innerHTML = '<option value="">Seleccione fecha e invitados primero</option>';
                     horaSelect.disabled = true;
                     return;
                 }
 
-                horaSelect.innerHTML = '<option value="">Consultando horarios vivos...</option>';
+                horaSelect.innerHTML = '<option value="">Consultando disponibilidad...</option>';
                 horaSelect.disabled = true;
-                horaSpinner.classList.remove('d-none'); // Mostrar spinner dorado
+                horaSpinner.classList.remove('d-none');
 
                 try {
-                    // Fetch riguroso y fresco en tiempo real de la base de datos
-                    const resH = await fetch(getApiUrl('horarios'));
-                    if(!resH.ok) throw new Error('Network response fail');
+                    const url = `/api/cafeterias/${cafeSlug}/horarios-disponibles?fecha=${fecha}&numero_personas=${pax}`;
+                    const resH = await fetch(url);
+                    
+                    if (!resH.ok) throw new Error('Error al consultar horarios');
                     const jsonH = await resH.json();
-                    const liveHorarios = jsonH.data || [];
-
-                    const dayName = normalizarStr(diasMap[dateObj.getDay()]);
-                    const dHorario = liveHorarios.find(h => normalizarStr(h.dia_semana) === dayName);
-
-                    if(!dHorario) {
-                        horaSelect.innerHTML = '<option value="">Cerrado este día</option>';
+                    
+                    const horarios = jsonH.data || [];
+                    
+                    if (horarios.length === 0) {
+                        horaSelect.innerHTML = '<option value="">No hay horarios disponibles</option>';
                         horaSelect.disabled = true;
                         horaSelect.classList.remove('is-invalid');
-                        horaSpinner.classList.add('d-none');
-                        return;
+                    } else {
+                        horaSelect.innerHTML = '<option value="">Seleccione un horario</option>';
+                        horarios.forEach(hora => {
+                            horaSelect.innerHTML += `<option value="${hora}">${hora} hrs</option>`;
+                        });
+                        horaSelect.disabled = false;
                     }
-
-                    horaSelect.innerHTML = '<option value="">Seleccione un rango horario</option>';
-                    horaSelect.disabled = false;
-                    
-                    let curr = dHorario.hora_apertura;
-                    let fin = dHorario.hora_cierre;
-
-                    while(curr < fin) {
-                        let val = curr.substring(0,5);
-                        horaSelect.innerHTML += `<option value="${val}">${val} hrs</option>`;
-                        let [h, m] = curr.split(':').map(Number);
-                        m += 30;
-                        if(m >= 60) { h++; m -= 60; }
-                        curr = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:00`;
-                    }
-                    
                     horaSelect.value = '';
                     checkFormValidity();
                 } catch(e) {
                     console.error('Error cargando horas', e);
-                    horaSelect.innerHTML = '<option value="">Se perdió la conexión</option>';
+                    horaSelect.innerHTML = '<option value="">Error de conexión</option>';
                 } finally {
-                    horaSpinner.classList.add('d-none'); // Ocultar spinner
+                    horaSpinner.classList.add('d-none');
                 }
             }
+
+            paxSelect.addEventListener('change', () => {
+                cargarHorasDisponibles();
+            });
 
             // --- PROMOCIONES DINAMICAS DINAMICAS ---
             ocasionSelect.addEventListener('change', async (e) => {
@@ -509,7 +511,7 @@
                 pCont.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-secondary spinner-border-sm"></div><div class="mt-2 text-muted x-small">Cargando beneficios...</div></div>';
                 try {
                     // Fetch en tiempo real para no atrapar promociones caducas
-                    const resP = await fetch(`/api/cafeterias/${cafeId}/ocasiones/${oId}/promociones?t=${new Date().getTime()}`);
+                    const resP = await fetch(`/api/cafeterias/${cafeSlug}/ocasiones/${oId}/promociones?t=${new Date().getTime()}`);
                     const jsonP = await resP.json();
                     const promos = jsonP.data || [];
 
@@ -563,21 +565,20 @@
                 const telefonoLimpio = iTel.value.trim().replace(/\s/g, '');
 
                 const payload = {
-                    id_cafeteria: cafeId,
                     fecha: fechaInput.value,
-                    hora_inicio: horaSelect.value,
-                    numero_personas: paxSelect.value,
+                    hora_inicio: horaSelect.value.length === 5 ? horaSelect.value + ':00' : horaSelect.value,
+                    numero_personas: parseInt(paxSelect.value),
                     nombre_cliente: nombreCompleto,
                     email: iEmail.value.trim(),
                     telefono: telefonoLimpio,
-                    id_ocasion: ocasionSelect.value || null,
-                    id_promocion: document.getElementById('promocion_id')?.value || null,
+                    ocasion_especial_id: ocasionSelect.value ? parseInt(ocasionSelect.value) : null,
+                    promocion_id: document.getElementById('promocion_id')?.value ? parseInt(document.getElementById('promocion_id').value) : null,
                     comentarios: document.getElementById('comentarios').value.trim(),
                 };
 
                 try {
-                    // Llamada al endpoint API, no necesita Cache Busting xq es un POST
-                    const res = await fetch('/api/public/reservar', {
+                    // Endpoint correcto
+                    const res = await fetch(`/api/cafeterias/${cafeSlug}/reservaciones`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -589,10 +590,25 @@
                     const json = await res.json();
                     
                     if(res.ok && json.success) {
-                        // Navegar a confirmacion usando el Folio Real en BD
-                        // Pasamos la zona como parametro auxiliar porque es texto dinamico UI
-                        const zonaNombre = document.getElementById('zona-select').options[document.getElementById('zona-select').selectedIndex].text;
-                        window.location.href = `/confirmacion/${json.data.folio}?zona=${encodeURIComponent(zonaNombre)}`;
+                        // Mostrar pantalla de confirmación tal como se pidió
+                        const rsv = json.data;
+                        document.querySelector('.reserva-card').innerHTML = `
+                            <div class="text-center py-5">
+                                <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                                <h3 class="mt-4 mb-3 fw-bold">¡Reserva Confirmada!</h3>
+                                <p class="text-muted fs-5 mb-5">Tu reservación fue creada correctamente.<br>Revisa tu correo para ver los detalles.</p>
+                                
+                                <div class="bg-light rounded-4 p-4 text-start d-inline-block shadow-sm" style="min-width: 300px;">
+                                    <p class="mb-2"><small class="text-muted">Folio de reservación</small><br><span class="fw-bold fs-5 text-gold">${rsv.folio || 'N/A'}</span></p>
+                                    <p class="mb-2"><small class="text-muted">Fecha</small><br><span class="fw-bold fs-6">${payload.fecha}</span></p>
+                                    <p class="mb-0"><small class="text-muted">Hora</small><br><span class="fw-bold fs-6">${payload.hora_inicio}</span></p>
+                                </div>
+                                
+                                <div class="mt-5">
+                                    <a href="/" class="btn btn-outline-dark rounded-pill px-4 py-2">Volver al inicio</a>
+                                </div>
+                            </div>
+                        `;
                     } else {
                         btnSubmit.disabled = false;
                         btnSubmit.innerHTML = originalText;

@@ -10,21 +10,68 @@ use App\Models\Mesa;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\Helpers\ApiResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ReservaConfirmada;
 
 class ReservacionController extends Controller
 {
 
     /**
+     * Listar reservaciones del día (o futuras) para el gerente.
+     * El CafeScope filtra automáticamente por el cafe_id del usuario autenticado.
+     */
+    public function index(Request $request)
+    {
+        $modo = $request->query('modo', 'dia');
+
+        $query = Reservacion::with(['ocasionEspecial'])
+            ->where('estado', '!=', 'cancelada')
+            ->orderBy('hora_inicio');
+
+        if ($modo === 'futuras') {
+            // Todas las reservaciones desde mañana en adelante
+            $query->where('fecha', '>', now()->toDateString());
+        } else {
+            // Por fecha específica (default: hoy)
+            $fecha = $request->query('fecha', now()->toDateString());
+            $query->where('fecha', $fecha);
+        }
+
+        $reservaciones = $query->get()->map(function ($r) {
+            return [
+                'id'              => $r->id,
+                'folio'          => $r->folio,
+                'nombre_cliente' => $r->nombre_cliente,
+                'telefono'       => $r->telefono,
+                'email'          => $r->email,
+                'fecha'          => $r->fecha,
+                'hora_inicio'    => $r->hora_inicio,
+                'hora_fin'       => $r->hora_fin,
+                'numero_personas' => $r->numero_personas,
+                'estado'         => $r->estado,
+                'comentarios'    => $r->comentarios,
+                // El frontend espera la relación como "ocasion"
+                'ocasion'        => $r->ocasionEspecial
+                                        ? ['nombre' => $r->ocasionEspecial->nombre]
+                                        : null,
+            ];
+        });
+
+        return ApiResponse::success($reservaciones, 'Reservaciones');
+    }
+
+
+
+    /**
      * Obtener horarios disponibles
      */
-    public function horariosDisponibles(Request $request, $cafe_id)
+    public function horariosDisponibles(Request $request, Cafeteria $cafeteria)
     {
         $request->validate([
             'fecha' => 'required|date',
             'numero_personas' => 'required|integer|min:1'
         ]);
-
-        $cafeteria = Cafeteria::findOrFail($cafe_id);
 
         $fecha = Carbon::parse($request->fecha);
         $dias = [
@@ -64,7 +111,7 @@ class ReservacionController extends Controller
             }
 
             if ($this->validarDisponibilidad(
-            $cafe_id,
+            $cafeteria->id,
             $request->fecha,
             $inicio,
             $fin,
@@ -80,16 +127,14 @@ class ReservacionController extends Controller
     }
 
 
-
     /**
      * Crear reservación
      */
-    public function store(Request $request)
+    public function store(Request $request, Cafeteria $cafeteria)
     {
         $request->validate([
-            'cafe_id' => 'required|exists:cafeterias,id',
             'fecha' => 'required|date',
-            'hora_inicio' => 'required',
+            'hora_inicio' => 'required|date_format:H:i:s',
             'numero_personas' => 'required|integer|min:1',
 
             'nombre_cliente' => 'required|string|max:150',
@@ -100,8 +145,6 @@ class ReservacionController extends Controller
             'promocion_id' => 'nullable|exists:promocions,id'
         ]);
 
-        $cafeteria = Cafeteria::findOrFail($request->cafe_id);
-
         $horaInicio = Carbon::parse($request->hora_inicio);
         $horaFin = $horaInicio->copy()->addMinutes($cafeteria->duracion_reserva_min);
 
@@ -111,44 +154,75 @@ class ReservacionController extends Controller
             return ApiResponse::error('No se puede reservar en un horario pasado');
         }
 
-        if (!$this->validarDisponibilidad(
-        $request->cafe_id,
-        $request->fecha,
-        $horaInicio,
-        $horaFin,
-        $request->numero_personas
-        )) {
-            return ApiResponse::error('No hay disponibilidad en ese horario');
-        }
+        return DB::transaction(function () use ($request, $cafeteria, $horaInicio, $horaFin) {
 
-        $folio = $this->generarFolio();
+            if (!$this->validarDisponibilidad(
+            $cafeteria->id,
+            $request->fecha,
+            $horaInicio,
+            $horaFin,
+            $request->numero_personas
+            )) {
+                return ApiResponse::error('No hay disponibilidad en ese horario');
+            }
 
-        $reservacion = Reservacion::create([
-            'folio' => $folio,
-            'cafe_id' => $request->cafe_id,
-            'user_id' => auth()->check() ? auth()->id() : null,
+            $duplicada = Reservacion::where('cafe_id', $cafeteria->id)
+                ->where('fecha', $request->fecha)
+                ->where(function ($query) use ($horaInicio, $horaFin) {
+                $query->where('hora_inicio', '<', $horaFin)
+                    ->where('hora_fin', '>', $horaInicio);
+            }
+            )
+                ->where(function ($query) use ($request) {
+                $query->where('telefono', $request->telefono);
 
-            'nombre_cliente' => $request->nombre_cliente,
-            'telefono' => $request->telefono,
-            'email' => $request->email,
+                if ($request->email) {
+                    $query->orWhere('email', $request->email);
+                }
+            }
+            )
+                ->where('estado', '!=', 'cancelada')
+                ->exists();
 
-            'fecha' => $request->fecha,
-            'hora_inicio' => $horaInicio,
-            'hora_fin' => $horaFin,
-            'numero_personas' => $request->numero_personas,
+            if ($duplicada) {
+                return ApiResponse::error('Ya existe una reservación con esos datos en ese horario');
+            }
 
-            'comentarios' => $request->comentarios,
+            $folio = $this->generarFolio();
 
-            'ocasion_especial_id' => $request->ocasion_especial_id,
-            'promocion_id' => $request->promocion_id,
+            $reservacion = Reservacion::create([
+                'folio' => $folio,
+                'cafe_id' => $cafeteria->id,
+                'user_id' => auth()->check() ? auth()->id() : null,
 
-            'estado' => 'pendiente'
-        ]);
+                'nombre_cliente' => $request->nombre_cliente,
+                'telefono' => $request->telefono,
+                'email' => $request->email,
 
-        return ApiResponse::success(
-            $reservacion,
-            'Reservación creada correctamente'
-        );
+                'fecha' => $request->fecha,
+                'hora_inicio' => $horaInicio->format('H:i:s'),
+                'hora_fin' => $horaFin->format('H:i:s'),
+                'numero_personas' => $request->numero_personas,
+
+                'comentarios' => $request->comentarios ?? null,
+
+                'ocasion_especial_id' => $request->ocasion_especial_id,
+                'promocion_id' => $request->promocion_id,
+
+                'estado' => 'pendiente'
+            ]);
+
+            if ($reservacion->email) {
+                Mail::to($reservacion->email)
+                    ->send(new ReservaConfirmada($reservacion));
+            }
+
+            return ApiResponse::success(
+                $reservacion,
+                'Reservación creada correctamente'
+            );
+
+        });
     }
 
 
@@ -210,8 +284,13 @@ class ReservacionController extends Controller
             ->where('activo', true)
             ->get();
 
-        $capacidadTotal = $mesas->sum('capacidad');
-        $mesaMayor = $mesas->max('capacidad');
+        $capacidadTotal = Mesa::where('cafe_id', $cafeId)
+            ->where('activo', true)
+            ->sum('capacidad');
+
+        $mesaMayor = Mesa::where('cafe_id', $cafeId)
+            ->where('activo', true)
+            ->max('capacidad');
 
         if (!$mesaMayor) {
             return false;

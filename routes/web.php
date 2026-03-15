@@ -11,12 +11,12 @@ Route::get('/', function () {
     return view('public.bienvenida');
 });
 
-Route::get('/detalles/{id}', function ($id) {
-    return view('public.detalles', ['id' => $id]);
+Route::get('/detalles/{slug}', function ($slug) {
+    return view('public.detalles', ['slug' => $slug]);
 });
 
-Route::get('/reservar/{id}', function ($id) {
-    return view('public.reservar', ['id' => $id]);
+Route::get('/reservar/{slug}', function ($slug) {
+    return view('public.reservar', ['slug' => $slug]);
 });
 
 Route::get('/confirmacion/{folio}', [\App\Http\Controllers\ReservacionController::class, 'confirmacion']);

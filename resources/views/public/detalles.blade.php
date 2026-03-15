@@ -208,14 +208,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            const cafeId = {{ $id }};
+            const cafeSlug = "{{ $slug }}";
             const API_URL = "{{ url('/api') }}";
             const STORAGE_URL = "{{ asset('storage') }}";
             const BASE_URL = "{{ url('/') }}";
             const FALLBACK_IMG = "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&q=80&w=1600";
 
             try {
-                const res = await fetch(`${API_URL}/cafeterias-publicas/${cafeId}`);
+                const res = await fetch(`${API_URL}/cafeterias-publicas/${cafeSlug}`);
                 if (!res.ok) {
                     throw new Error('No encontrado');
                 }
@@ -252,8 +252,8 @@
                 document.getElementById('cafe-hero-img').src = finalImgUrl;
 
                 // Update reservation specific button
-                document.getElementById('btn-reservar-lateral').href = `${BASE_URL}/reservar/${cafe.id}`;
-                document.getElementById('btn-reservar-navbar').href = `${BASE_URL}/reservar/${cafe.id}`;
+                document.getElementById('btn-reservar-lateral').href = `${BASE_URL}/reservar/${cafe.slug}`;
+                document.getElementById('btn-reservar-navbar').href = `${BASE_URL}/reservar/${cafe.slug}`;
 
                 // Reveal UI
                 document.getElementById('loader-screen').classList.add('d-none');
@@ -261,7 +261,7 @@
 
                 // --- Load Menu ---
                 try {
-                    const resMenu = await fetch(`${API_URL}/cafeterias/${cafeId}/menu`);
+                    const resMenu = await fetch(`${API_URL}/cafeterias/${cafe.slug}/menu`);
                     if(resMenu.ok) {
                         const jsonMenu = await resMenu.json();
                         const menuItems = jsonMenu.data || [];
@@ -310,7 +310,7 @@
 
                 async function cargarOcasionesFiltros() {
                     try {
-                        const res = await fetch(`${API_URL}/cafeterias/${cafeId}/ocasiones`);
+                        const res = await fetch(`${API_URL}/cafeterias/${cafe.slug}/ocasiones`);
                         if (res.ok) {
                             const data = await res.json();
                             const ocasiones = data.data || [];
@@ -333,8 +333,8 @@
                         promosContainer.innerHTML = '<div class="col-12 text-center text-muted py-3"><div class="spinner-border spinner-border-sm me-2"></div> Cargando...</div>';
                         
                         const url = ocasionId 
-                            ? `${API_URL}/cafeterias/${cafeId}/ocasiones/${ocasionId}/promociones`
-                            : `${API_URL}/cafeterias/${cafeId}/promociones`;
+                            ? `${API_URL}/cafeterias/${cafe.slug}/ocasiones/${ocasionId}/promociones`
+                            : `${API_URL}/cafeterias/${cafe.slug}/promociones`;
                             
                         const resPromos = await fetch(url);
                         if(resPromos.ok) {

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id(); // id estándar laravel
 
             $table->string('nombre');
+            $table->string('slug')->unique();
             $table->string('descripcion')->nullable();
 
             $table->string('calle')->nullable();

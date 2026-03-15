@@ -298,7 +298,7 @@
 
     async function cargarInfoCafeteria() {
         try {
-            const response = await fetch(`${API_BASE}/cafeterias-publicas/${cafeteriaId}`);
+            const response = await fetch(`${API_BASE}/cafeterias-publicas-id/${cafeteriaId}`);
             const result = await response.json();
             if (response.ok && result.data) {
                 const el = document.getElementById('negocio-nombre');

@@ -731,6 +731,8 @@
             });
             const json = await res.json();
             
+            console.log("registro response:", json);
+            
             clearValidationErrors();
 
             if (!res.ok) {
@@ -868,8 +870,11 @@
             fd.append('plan_id', selectedPlanId);
         }
 
+        console.log("registeredCafeteriaId:", registeredCafeteriaId);
+        console.log("URL comprobante:", `/api/registro-negocio/${registeredCafeteriaId}/comprobante`);
+
         try {
-            const res = await fetch(`${API_BASE}/registro-negocio/${registeredCafeteriaId}/comprobante`, {
+            const res = await fetch(`/api/registro-negocio/${registeredCafeteriaId}/comprobante`, {
                 method: 'POST', 
                 headers: { 'Accept': 'application/json' }, 
                 body: fd

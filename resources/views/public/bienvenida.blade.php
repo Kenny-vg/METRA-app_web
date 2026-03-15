@@ -369,7 +369,7 @@
 
             container.innerHTML = cafeterias.map(cafe => `
                 <div class="col-12 col-sm-6 col-lg-4">
-                    <a href="${BASE_URL}/detalles/${cafe.id}" class="text-decoration-none d-block h-100">
+                    <a href="${BASE_URL}/detalles/${cafe.slug}" class="text-decoration-none d-block h-100">
                         <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden" style="transition: transform 0.2s ease, box-shadow 0.2s ease;"
                              onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 40px rgba(0,0,0,0.12)'"
                              onmouseout="this.style.transform='';this.style.boxShadow=''">

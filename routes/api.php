@@ -31,6 +31,7 @@ use App\Http\Controllers\Api\Gerente\OcasionController;
 use App\Http\Controllers\Api\Gerente\PromocionController;
 use App\Http\Controllers\Api\Gerente\RenovarSuscripcionController;
 use App\Http\Controllers\Api\Gerente\StaffController;
+use App\Http\Controllers\Api\Publico\PublicCafeteriaController;
 
 /* |------------------------------------------ | RUTAS PÚBLICAS |------------------------------------------ */
 Route::post('/login', [LoginController::class , 'login']);
@@ -56,122 +57,32 @@ Route::get('/planes-publicos', [RegistroNegocioController::class , 'planesPublic
 // Información de pago
 Route::get('/configuracion-pago', [ConfiguracionController::class , 'showPublic']);
 
-// Cafeterías activas (uso público: landing page)
-Route::get('/cafeterias-publicas', function () {
-    $cafeterias = \App\Models\Cafeteria::where('estado', 'activa')
-        ->select(
-        'id',
-        'nombre',
-        'descripcion',
-        'calle',
-        'num_exterior',
-        'colonia',
-        'foto_url'
-    )
-        ->get();
-
-    return ApiResponse::success($cafeterias);
-});
-
-Route::get('/cafeterias-publicas/{id}', function ($id) {
-    $cafeteria = \App\Models\Cafeteria::findOrFail($id);
-
-    return ApiResponse::success($cafeteria);
+// Rutas Públicas de Cafeterías
+Route::controller(PublicCafeteriaController::class)->group(function () {
+    Route::get('/cafeterias-publicas', 'index');
+    Route::get('/cafeterias-publicas/{cafeteria}', 'show'); // Usa slug
+    Route::get('/cafeterias-publicas-id/{cafeteria:id}', 'show'); // Usa id explicitamente
+    Route::get('/cafeterias/{cafeteria}/menu', 'menu');
+    Route::get('/cafeterias/{cafeteria}/ocasiones', 'ocasiones');
+    Route::get('/cafeterias/{cafeteria}/ocasiones/{ocasion}/promociones', 'promocionesPorOcasion');
+    Route::get('/cafeterias/{cafeteria}/zonas', 'zonas');
+    Route::get('/cafeterias/{cafeteria}/horarios', 'horarios');
+    Route::get('/cafeterias/{cafeteria}/mesas-capacidad', 'mesasCapacidad');
+    Route::get('/cafeterias/{cafeteria}/promociones', 'promociones');
 });
 
 // Auto-registro de negocio por el propio gerente/dueño
 Route::post('/registro-negocio', [RegistroNegocioController::class , 'store']);
-Route::post('/registro-negocio/{cafeteria}/comprobante', [RegistroNegocioController::class , 'subirComprobante']);
+Route::post('/registro-negocio/{cafeteria:id}/comprobante', [RegistroNegocioController::class , 'subirComprobante']);
 //consultar si existe registro pendiente
 Route::post('/registro-pendiente', [RegistroNegocioController::class , 'registroPendiente']);
 
 
-//Ver menú
-Route::get('/cafeterias/{id}/menu', function ($id) {
-
-    $menu = \App\Models\Menu::where('cafe_id', $id)
-        ->where('activo', true)
-        ->orderBy('nombre_producto')
-        ->get();
-
-    return ApiResponse::success($menu);
-});
-
-//Ver ocasiones especiales
-Route::get('/cafeterias/{id}/ocasiones', function ($id) {
-
-    $ocasiones = \App\Models\OcasionEspecial::where('cafe_id', $id)
-        ->where('activo', true)
-        ->orderBy('nombre')
-        ->get();
-
-    return ApiResponse::success($ocasiones);
-});
-
-//ver promociones ligadas a ocasiones
-Route::get('/cafeterias/{id}/ocasiones/{ocasion}/promociones', function ($id, $ocasion) {
-
-    $promociones = \App\Models\Promocion::where('cafe_id', $id)
-        ->where('activo', true)
-        ->whereHas('ocasiones', function ($q) use ($ocasion) {
-            $q->where('ocasion_especials.id', $ocasion);
-        }
-        )
-            ->orderBy('nombre_promocion')
-            ->get();
-
-        return ApiResponse::success($promociones);
-    });
-
-// Zonas activas (público — para el formulario de reserva)
-Route::get('/cafeterias/{id}/zonas', function ($id) {
-    $zonas = \App\Models\Zona::where('cafe_id', $id)
-        ->where('activo', true)
-        ->orderBy('nombre_zona')
-        ->get(['id', 'nombre_zona']);
-    return ApiResponse::success($zonas);
-});
-
-// Horarios activos (público)
-Route::get('/cafeterias/{id}/horarios', function ($id) {
-    $horarios = \App\Models\Horario::where('cafe_id', $id)
-        ->where('activo', true)
-        ->orderBy('hora_apertura')
-        ->get(['id', 'dia_semana', 'hora_apertura', 'hora_cierre']);
-    return ApiResponse::success($horarios);
-});
-
-// Obtener la capacidad máxima basada en la mesa más grande
-Route::get('/cafeterias/{id}/mesas-capacidad', function ($id) {
-    $maxCapacidad = \App\Models\Mesa::where('cafe_id', $id)
-        ->where('activo', true)
-        ->max('capacidad') ?? 1; // Default a 1 si no hay mesas activas
-    return ApiResponse::success(['max_capacidad' => $maxCapacidad]);
-});
-
-// Guardar reservación (público)
-Route::post('/public/reservar', [\App\Http\Controllers\ReservacionController::class , 'store']);
-
-//Ver promociones
-Route::get('/cafeterias/{id}/promociones', function ($id) {
-
-    $promociones = \App\Models\Promocion::where('cafe_id', $id)
-        ->where('activo', true)
-        ->orderBy('nombre_promocion')
-        ->get();
-
-    return ApiResponse::success($promociones);
-});
-
 //Horarios disponibles
-Route::get(
-    'cafeterias/{cafe_id}/horarios-disponibles',
-[ReservacionController::class , 'horariosDisponibles']
-);
+Route::get('cafeterias/{cafeteria}/horarios-disponibles', [ReservacionController::class , 'horariosDisponibles']);
 
 //Crear reservación
-Route::post('reservaciones', [ReservacionController::class , 'store']
-);
+Route::post('cafeterias/{cafeteria}/reservaciones', [ReservacionController::class , 'store']);
 
 /* |------------------------------------------ | RUTAS PROTEGIDAS (TODOS LOS USUARIOS) |------------------------------------------ */
 Route::middleware('auth:sanctum')->group(function () {
@@ -194,11 +105,11 @@ Route::middleware([
     // CAFETERÍAS — listar, crear, eliminar
     Route::get('/cafeterias', [CafeteriaController::class , 'index']);
     Route::post('/cafeterias', [CafeteriaController::class , 'store']);
-    Route::get('/cafeterias/{cafeteria}', [CafeteriaController::class , 'show']);
-    Route::delete('/cafeterias/{cafeteria}', [CafeteriaController::class , 'destroy']);
+    Route::get('/cafeterias/{cafeteria:id}', [CafeteriaController::class , 'show']);
+    Route::delete('/cafeterias/{cafeteria:id}', [CafeteriaController::class , 'destroy']);
 
     // CAFETERÍAS — revisión de registros auto-gestionados
-    Route::get('/cafeterias/{cafeteria}/comprobante', [CafeteriaController::class , 'verComprobante']);
+    Route::get('/cafeterias/{cafeteria:id}/comprobante', [CafeteriaController::class , 'verComprobante']);
 
     Route::get('/suscripciones/{suscripcion}/comprobante', function (\App\Models\Suscripcion $suscripcion) {
             // Buscar el comprobante en la suscripción o en la cafetería vinculada (por retrocompatibilidad)
@@ -238,13 +149,18 @@ Route::middleware([
         Route::get('/solicitudes', [SolicitudesController::class , 'index']);
 
         //APROBACION
-        Route::patch('/solicitudes/{cafeteria}/aprobar',
+        Route::patch('/solicitudes/{cafeteria:id}/aprobar',
         [AprobacionController::class , 'aprobar']);
-        Route::patch('/solicitudes/{cafeteria}/rechazar',
+        Route::patch('/solicitudes/{cafeteria:id}/rechazar',
         [AprobacionController::class , 'rechazar']);
 
         // CONFIGURACIÓN PAGO
         Route::put('/configuracion-pago', [ConfiguracionController::class , 'update']);
+
+
+
+
+
 
 
 
@@ -253,7 +169,7 @@ Route::middleware([
 
 //VER COMPROBANTE
 Route::get(
-    '/admin/comprobante/{cafeteria}',
+    '/admin/comprobante/{cafeteria:id}',
 [RegistroNegocioController::class , 'verComprobante']
 )->middleware('auth:sanctum');
 
@@ -276,7 +192,7 @@ Route::middleware([
     Route::apiResource('mesas', MesaController::class); //crud mesas
     Route::apiResource('horarios', HorarioController::class); //crud horarios
 
-    Route::get('reservaciones', [\App\Http\Controllers\ReservacionController::class , 'index']);
+    Route::get('reservaciones', [ReservacionController::class , 'index']);
 
     Route::apiResource('staff', StaffController::class); //crud staff
 

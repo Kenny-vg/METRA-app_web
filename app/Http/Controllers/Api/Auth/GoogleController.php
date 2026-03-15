@@ -15,13 +15,14 @@ class GoogleController extends Controller
     public function loginGoogle(Request $request)
     {
         $data = $request->validate([
-            'email'=>'required|email',
-            'name'=>'required|string',
-            'google_id'=>'required|string',
-            'avatar'=>'nullable|string'
+            'email' => 'required|email',
+            'name' => 'required|string',
+            'google_id' => 'required|string',
+            'avatar' => 'nullable|string'
         ]);
 
-        $user = User::where('email',$data['email'])->first();
+        $emailAComparar = strtolower(trim($data['email']));
+        $user = User::where('email', $emailAComparar)->first();
 
         if (!$user) {
             return ApiResponse::error(
@@ -29,118 +30,122 @@ class GoogleController extends Controller
                 422
             );
         }
-        
-        if($user){
-            $user->update([
-                'google_id'=>$data['google_id'],
-                'avatar'=>$data['avatar']
-            ]);
-        }
-        
-        if(!$user->estado && $user->role === 'gerente'){
 
-            if($user->estatus_registro === 'rechazado'){
+        $user->update([
+            'google_id' => $data['google_id'],
+            'avatar' => $data['avatar']
+        ]);
+
+        if (!$user->estado && $user->role === 'gerente') {
+
+            if ($user->estatus_registro === 'rechazado') {
                 return ApiResponse::error(
                     'Tu registro ha sido rechazado. Contacta a soporte.',
                     403
                 );
             }
 
-            if($user->estatus_registro === 'pendiente'){
-        
+            if ($user->estatus_registro === 'pendiente') {
+
                 $cafeteria = $user->cafeteria;
-        
-                if(!$cafeteria){
+
+                if (!$cafeteria) {
                     return ApiResponse::error(
                         'No tienes una cafetería asociada.',
                         423
                     );
                 }
-        
+
                 $suscripcion = $cafeteria->suscripciones()
                     ->orderByDesc('id')
                     ->first();
-        
-                if(!$suscripcion){
+
+                if (!$suscripcion) {
                     return ApiResponse::error(
                         'Debes subir tu comprobante para continuar.',
                         423
                     );
                 }
-        
-                if(empty($suscripcion->comprobante_url) && empty($cafeteria->comprobante_url)){
+
+                if (empty($suscripcion->comprobante_url) && empty($cafeteria->comprobante_url)) {
                     return ApiResponse::error(
                         'Debes subir tu comprobante para continuar.',
                         423
                     );
                 }
-        
-            if($suscripcion->estado_pago === 'pendiente'){
-                return ApiResponse::error(
-                    'Tu comprobante fue enviado. Espera la validación del superadmin.',
-                    423
-                );
+
+                if ($suscripcion->estado_pago === 'pendiente') {
+                    return ApiResponse::error(
+                        'Tu comprobante fue enviado. Espera la validación del superadmin.',
+                        423
+                    );
+                }
             }
         }
-    }
 
-    if(!$user->estado){
-        return ApiResponse::error('Usuario inactivo', 403);
-    }
+        if (!$user->estado) {
+            return ApiResponse::error('Usuario inactivo', 403);
+        }
 
-    //bloquear acceso si la cafeteria no tiene suscripción activa
-        if(in_array($user->role,['gerente','personal'])){
-    
+        //bloquear acceso si la cafeteria no tiene suscripción activa
+        if (in_array($user->role, ['gerente', 'personal'])) {
+
             $cafeteria = $user->cafeteria;
-    
-            if(!$cafeteria){
+
+            if (!$cafeteria) {
                 return ApiResponse::error(
                     'No tienes una cafetería asociada.',
                     403
                 );
             }
-    
-            $suscripcion = $cafeteria->suscripciones()
-                ->latest()
+
+            // Verificar si tienen una suscripción actualmente activa
+            $suscActiva = $cafeteria->suscripciones()
+                ->where('estado_pago', 'pagado')
+                ->where('fecha_inicio', '<=', now())
+                ->where('fecha_fin', '>=', now())
                 ->first();
-    
-            if(!$suscripcion){
-                return ApiResponse::error(
-                    'Tu cuenta está en revisión.',
-                    423
-                );
-            }
-    
-            //  Bloquear si está pendiente
-            if($suscripcion->estado_pago !== 'pagado'){
-    
-                if($user->role === 'gerente'){
+
+            if (!$suscActiva) {
+                if ($user->role === 'gerente') {
+                    $tienePendiente = $cafeteria->suscripciones()
+                        ->where('estado_pago', 'pendiente')
+                        ->exists();
+
+                    if ($tienePendiente) {
+                        return ApiResponse::error(
+                            'Tu comprobante fue enviado. Espera la validación del superadmin.',
+                            423
+                        );
+                    }
+
                     return ApiResponse::error(
-                        'Tu cuenta está en revisión.',
+                        'Tu cafetería no tiene una suscripción activa.',
                         423
                     );
                 }
-    
-                // Si es personal (staff)
-                return ApiResponse::error(
-                    'La cafetería aún no ha sido aprobada. Contacta al gerente.',
-                    403
-                );
+
+                if ($user->role === 'personal') {
+                    return ApiResponse::error(
+                        'La cafetería no tiene una suscripción activa.',
+                        403
+                    );
+                }
             }
         }
 
         $token = $user->createToken('metra_token')->plainTextToken;
 
         return ApiResponse::success([
-            'token'=>$token,
-            'usuario'=>[
-                'id'=>$user->id,
-                'name'=>$user->name,
-                'email'=>$user->email,
-                'role'=>$user->role,
-                'cafe_id'=>$user->cafe_id,
-                'avatar'=>$user->avatar
+            'token' => $token,
+            'usuario' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'cafe_id' => $user->cafe_id,
+                'avatar' => $user->avatar
             ]
-        ], 'Login con Google exitoso');
+        ], 'Login con Google exitoso')->withCookie(cookie('metra_role', $user->role, 60 * 24));
     }
 }
