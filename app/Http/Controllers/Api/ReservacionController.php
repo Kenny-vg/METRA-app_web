@@ -25,7 +25,7 @@ class ReservacionController extends Controller
     {
         $modo = $request->query('modo', 'dia');
 
-        $query = Reservacion::with(['ocasionEspecial'])
+        $query = Reservacion::with(['ocasionEspecial', 'promocion'])
             ->where('estado', '!=', 'cancelada')
             ->orderBy('hora_inicio');
 
@@ -52,9 +52,11 @@ class ReservacionController extends Controller
             'numero_personas' => $r->numero_personas,
             'estado' => $r->estado,
             'comentarios' => $r->comentarios,
-            // El frontend espera la relación como "ocasion"
             'ocasion' => $r->ocasionEspecial
             ? ['nombre' => $r->ocasionEspecial->nombre]
+            : null,
+            'promocion' => $r->promocion
+            ? ['nombre' => $r->promocion->nombre_promocion, 'precio' => $r->promocion->precio]
             : null,
             'tipo' => $r->tipo,
             ];
@@ -220,7 +222,7 @@ class ReservacionController extends Controller
                 'ocasion_especial_id' => $request->ocasion_especial_id,
                 'promocion_id' => $request->promocion_id,
 
-                'estado' => 'confirmada'
+                'estado' => 'pendiente'
             ]);
 
             if ($reservacion->email) {
@@ -352,8 +354,8 @@ class ReservacionController extends Controller
             return ApiResponse::error('La reservación aún no inicia');
         }
 
-        if ($reservacion->estado !== 'confirmada') {
-            return ApiResponse::error('Solo reservaciones confirmadas pueden completarse');
+        if (!in_array($reservacion->estado, ['pendiente', 'confirmada'])) {
+            return ApiResponse::error('Solo reservaciones pendientes o confirmadas pueden completarse');
         }
 
         $reservacion->estado = 'completada';
