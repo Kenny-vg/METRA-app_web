@@ -70,7 +70,7 @@ class ReservacionController extends Controller
      */
     public function show($id)
     {
-        $reservacion = Reservacion::with('ocasionEspecial')
+        $reservacion = Reservacion::with(['ocasionEspecial', 'promocion'])
             ->findOrFail($id);
 
         return ApiResponse::success($reservacion, 'Detalle de reservación');
