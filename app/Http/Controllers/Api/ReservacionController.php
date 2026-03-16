@@ -25,14 +25,15 @@ class ReservacionController extends Controller
     {
         $modo = $request->query('modo', 'dia');
 
-        $query = Reservacion::with(['ocasionEspecial'])
+        $query = Reservacion::with(['ocasionEspecial', 'promocion'])
             ->where('estado', '!=', 'cancelada')
             ->orderBy('hora_inicio');
 
         if ($modo === 'futuras') {
             // Todas las reservaciones desde mañana en adelante
             $query->where('fecha', '>', now()->toDateString());
-        } else {
+        }
+        else {
             // Por fecha específica (default: hoy)
             $fecha = $request->query('fecha', now()->toDateString());
             $query->where('fecha', $fecha);
@@ -40,28 +41,40 @@ class ReservacionController extends Controller
 
         $reservaciones = $query->get()->map(function ($r) {
             return [
-                'id'              => $r->id,
-                'folio'          => $r->folio,
-                'nombre_cliente' => $r->nombre_cliente,
-                'telefono'       => $r->telefono,
-                'email'          => $r->email,
-                'fecha'          => $r->fecha,
-                'hora_inicio'    => $r->hora_inicio,
-                'hora_fin'       => $r->hora_fin,
-                'numero_personas' => $r->numero_personas,
-                'estado'         => $r->estado,
-                'comentarios'    => $r->comentarios,
-                // El frontend espera la relación como "ocasion"
-                'ocasion'        => $r->ocasionEspecial
-                                        ? ['nombre' => $r->ocasionEspecial->nombre]
-                                        : null,
+            'id' => $r->id,
+            'folio' => $r->folio,
+            'nombre_cliente' => $r->nombre_cliente,
+            'telefono' => $r->telefono,
+            'email' => $r->email,
+            'fecha' => $r->fecha,
+            'hora_inicio' => $r->hora_inicio,
+            'hora_fin' => $r->hora_fin,
+            'numero_personas' => $r->numero_personas,
+            'estado' => $r->estado,
+            'comentarios' => $r->comentarios,
+            'ocasion' => $r->ocasionEspecial
+            ? ['nombre' => $r->ocasionEspecial->nombre]
+            : null,
+            'promocion' => $r->promocion
+            ? ['nombre' => $r->promocion->nombre_promocion, 'precio' => $r->promocion->precio]
+            : null,
+            'tipo' => $r->tipo,
             ];
         });
 
         return ApiResponse::success($reservaciones, 'Reservaciones');
     }
 
+    /**
+     * Mostrar una reservación específica
+     */
+    public function show($id)
+    {
+        $reservacion = Reservacion::with(['ocasionEspecial', 'promocion'])
+            ->findOrFail($id);
 
+        return ApiResponse::success($reservacion, 'Detalle de reservación');
+    }
 
     /**
      * Obtener horarios disponibles
@@ -246,16 +259,16 @@ class ReservacionController extends Controller
             ->latest('fecha')
             ->get()
             ->map(fn($r) => [
-                'id'              => $r->id,
-                'folio'           => $r->folio,
-                'fecha'           => $r->fecha,
-                'hora_inicio'     => $r->hora_inicio,
-                'hora_fin'        => $r->hora_fin,
-                'numero_personas' => $r->numero_personas,
-                'estado'          => $r->estado,
-                'comentarios'     => $r->comentarios,
-                'cafeteria'       => $r->cafeteria ? ['nombre' => $r->cafeteria->nombre] : null,
-            ]);
+        'id' => $r->id,
+        'folio' => $r->folio,
+        'fecha' => $r->fecha,
+        'hora_inicio' => $r->hora_inicio,
+        'hora_fin' => $r->hora_fin,
+        'numero_personas' => $r->numero_personas,
+        'estado' => $r->estado,
+        'comentarios' => $r->comentarios,
+        'cafeteria' => $r->cafeteria ? ['nombre' => $r->cafeteria->nombre] : null,
+        ]);
 
         return ApiResponse::success($reservas, 'Reservaciones del usuario');
     }
@@ -332,7 +345,31 @@ class ReservacionController extends Controller
         return ($personasReservadas + $personas) <= $capacidadTotal;
     }
 
+    /**
+     * Marcar reservación como completada
+     */
+    public function completar($id)
+    {
+        $reservacion = Reservacion::findOrFail($id);
 
+        $inicio = Carbon::parse($reservacion->fecha . ' ' . $reservacion->hora_inicio);
+
+        if ($inicio->isFuture()) {
+            return ApiResponse::error('La reservación aún no inicia');
+        }
+
+        if (!in_array($reservacion->estado, ['pendiente', 'confirmada'])) {
+            return ApiResponse::error('Solo reservaciones pendientes o confirmadas pueden completarse');
+        }
+
+        $reservacion->estado = 'completada';
+        $reservacion->save();
+
+        return ApiResponse::success(
+            $reservacion,
+            'Cliente marcado como llegado'
+        );
+    }
 
     /**
      * Generar folio
@@ -356,20 +393,20 @@ class ReservacionController extends Controller
             ->firstOrFail();
 
         return ApiResponse::success([
-            'id'              => $r->id,
-            'folio'           => $r->folio,
-            'nombre_cliente'  => $r->nombre_cliente,
-            'fecha'           => $r->fecha,
-            'hora_inicio'     => $r->hora_inicio,
-            'hora_fin'        => $r->hora_fin,
+            'id' => $r->id,
+            'folio' => $r->folio,
+            'nombre_cliente' => $r->nombre_cliente,
+            'fecha' => $r->fecha,
+            'hora_inicio' => $r->hora_inicio,
+            'hora_fin' => $r->hora_fin,
             'numero_personas' => $r->numero_personas,
-            'estado'          => $r->estado,
-            'comentarios'     => $r->comentarios,
-            'cafeteria'       => $r->cafeteria ? [
-                'nombre'  => $r->cafeteria->nombre,
-                'calle'   => $r->cafeteria->calle,
+            'estado' => $r->estado,
+            'comentarios' => $r->comentarios,
+            'cafeteria' => $r->cafeteria ? [
+                'nombre' => $r->cafeteria->nombre,
+                'calle' => $r->cafeteria->calle,
                 'colonia' => $r->cafeteria->colonia,
-                'ciudad'  => $r->cafeteria->ciudad,
+                'ciudad' => $r->cafeteria->ciudad,
             ] : null,
         ]);
     }
@@ -400,6 +437,26 @@ class ReservacionController extends Controller
         $r->update(['estado' => 'cancelada']);
 
         return ApiResponse::success(null, 'Reservación cancelada correctamente.');
+    }
+
+    /**
+     * Cancelar una reservación por ID (gerente).
+     */
+    public function cancelarGerente($id)
+    {
+        $reservacion = Reservacion::findOrFail($id);
+
+        if ($reservacion->estado === 'completada') {
+            return ApiResponse::error('No se puede cancelar una reservación completada');
+        }
+
+        $reservacion->estado = 'cancelada';
+        $reservacion->save();
+
+        return ApiResponse::success(
+            null,
+            'Reservación cancelada por el gerente'
+        );
     }
 
 }

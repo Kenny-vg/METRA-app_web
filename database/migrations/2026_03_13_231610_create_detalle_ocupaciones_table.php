@@ -15,6 +15,12 @@ return new class extends Migration
 
             $table->id();
 
+            $table->integer('numero_personas');
+
+            $table->string('nombre_cliente', 150)->nullable();
+            $table->string('email')->nullable();
+
+            $table->enum('tipo', ['reservacion', 'walkin'])->default('walkin');
             $table->string('comentarios', 255)->nullable();
 
             $table->dateTime('hora_entrada')->nullable();

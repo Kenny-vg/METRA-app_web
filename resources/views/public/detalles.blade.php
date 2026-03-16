@@ -122,6 +122,18 @@
                             </div>
                         </div>
                     </section>
+                    
+                    <!-- RESEÑAS -->
+                    <section class="mb-5" id="sectionResenas">
+                        <div class="d-flex align-items-baseline justify-content-between mb-4">
+                            <h4 class="fw-bold mb-0" style="color: var(--black-primary); letter-spacing: -0.3px;">Lo que dicen nuestros clientes</h4>
+                        </div>
+                        <div class="row g-3" id="resenas-container">
+                            <div class="col-12 text-center text-muted py-3">
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div> Cargando reseñas...
+                            </div>
+                        </div>
+                    </section>
                 </div>
 
                 <!-- Sidebar reserva -->
@@ -378,6 +390,52 @@
 
                 cargarOcasionesFiltros();
                 cargarPromociones();
+                
+                // --- Load Reseñas ---
+                try {
+                    const resResenas = await fetch(`${API_URL}/cafeterias/${cafe.slug}/resenas`);
+                    if(resResenas.ok) {
+                        const jsonResenas = await resResenas.json();
+                        const resenasList = jsonResenas.data || [];
+                        const resenasContainer = document.getElementById('resenas-container');
+                        const sectionResenas = document.getElementById('sectionResenas');
+                        
+                        resenasContainer.innerHTML = '';
+                        if(resenasList.length > 0) {
+                            resenasList.forEach(r => {
+                                let starsHtml = '';
+                                for(let i=1; i<=5; i++){
+                                    if(i <= r.calificacion){
+                                        starsHtml += `<i class="bi bi-star-fill text-warning me-1"></i>`;
+                                    } else {
+                                        starsHtml += `<i class="bi bi-star text-muted me-1" style="opacity:0.3;"></i>`;
+                                    }
+                                }
+                                
+                                resenasContainer.innerHTML += `
+                                    <div class="col-12 col-md-6 mb-3">
+                                        <div class="p-4 rounded-4 shadow-sm h-100" style="background: var(--off-white); border: 1px solid var(--border-light);">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <div class="small fw-bold text-muted">${r.fecha}</div>
+                                                <div>${starsHtml}</div>
+                                            </div>
+                                            <p class="mb-0 text-muted" style="line-height: 1.5; font-size: 0.95rem;">"${r.comentario || 'Excelente servicio.'}"</p>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            resenasContainer.innerHTML = `
+                                <div class="col-12 text-center py-4">
+                                    <i class="bi bi-chat-square-text display-5 d-block mb-3" style="color: var(--border-light);"></i>
+                                    <p class="text-muted mb-0">Este negocio aún no tiene reseñas. ¡Sé el primero en compartir tu experiencia!</p>
+                                </div>
+                            `;
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error loading resenas", e);
+                }
 
             } catch(e) {
                 console.error(e);

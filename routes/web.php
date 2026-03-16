@@ -24,6 +24,10 @@ Route::get('/confirmacion/{folio}', function ($folio) {
     return view('public.confirmacion', ['folio' => strtoupper($folio)]);
 });
 
+Route::get('/resena/{token}', function ($token) {
+    return view('public.resena', ['token' => $token]);
+});
+
 // Landing de registro de negocios (pública, sin login)
 Route::get('/registro-negocio', function () {
     return view('public.registro-negocio');
@@ -128,6 +132,10 @@ Route::middleware(['check.web.role:gerente'])->group(function () {
 
     Route::get('/admin/marketing', function () {
         return view('admin.marketing');
+    });
+
+    Route::get('/admin/resenas', function () {
+        return view('admin.resenas');
     });
 });
 

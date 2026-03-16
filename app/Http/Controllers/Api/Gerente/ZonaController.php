@@ -85,6 +85,10 @@ class ZonaController extends Controller
             'activo' => false,
         ]);
 
-        return ApiResponse::success(null, 'Zona desactivada correctamente');
+        $zona->mesas()->update([
+            'activo' => false,
+        ]);
+
+        return ApiResponse::success(null, 'Zona y sus mesas desactivadas correctamente');
     }
 }

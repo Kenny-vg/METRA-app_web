@@ -12,6 +12,8 @@ use App\Http\Controllers\Api\Auth\PasswordResetController;
 
 use App\Http\Controllers\Api\RegistroNegocioController;
 use App\Http\Controllers\Api\ReservacionController;
+use App\Http\Controllers\Api\OcupacionController;
+use App\Http\Controllers\Api\ResenaController;
 
 use App\Http\Controllers\Api\Superadmin\PlanController;
 use App\Http\Controllers\Api\Superadmin\SuscripcionController;
@@ -88,6 +90,12 @@ Route::post('cafeterias/{cafeteria}/reservaciones', [ReservacionController::clas
 Route::get('reservaciones/folio/{folio}', [ReservacionController::class , 'showByFolio']);
 Route::delete('reservaciones/folio/{folio}', [ReservacionController::class , 'cancelarByFolio']);
 
+Route::get('/resena/{token}', [ResenaController::class , 'show']);
+Route::post('/resena/{token}', [ResenaController::class , 'store']);
+
+Route::get('/cafeterias/{cafeteria}/resenas',
+[PublicCafeteriaController::class , 'resenas']);
+
 /* |------------------------------------------ | RUTAS PROTEGIDAS (TODOS LOS USUARIOS) |------------------------------------------ */
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/mi-perfil', [ProfileController::class , 'miPerfil']);
@@ -161,13 +169,6 @@ Route::middleware([
         // CONFIGURACIÓN PAGO
         Route::put('/configuracion-pago', [ConfiguracionController::class , 'update']);
 
-
-
-
-
-
-
-
     
 });
 
@@ -222,11 +223,19 @@ Route::middleware([
     Route::patch('ocasiones/{id}/activar', [OcasionController::class , 'activar']);
     Route::patch('staff/{id}/activar', [StaffController::class , 'activar']);
 
+    Route::patch('/reservaciones/{id}/completar', [ReservacionController::class , 'completar']);
+    Route::patch('/reservaciones/{id}/cancelar', [ReservacionController::class , 'cancelarGerente']);
+
+    Route::get('/resenas', [ResenaController::class , 'index']);
+    Route::patch('/resenas/{id}/aprobar', [ResenaController::class , 'aprobar']);
+    Route::patch('/resenas/{id}/ocultar', [ResenaController::class , 'ocultar']);
 });
 
 // Renovación de suscripción — para que gerentes con sub
 // vencida también puedan renovar desde el panel (y desde el login sin token)
 Route::post('gerente/renovar-suscripcion', [RenovarSuscripcionController::class , 'store']);
+
+
 
 /* |------------------------------------------ | RUTAS STAFF (APP MOVIL) |------------------------------------------ */
 
@@ -240,5 +249,11 @@ Route::middleware([
     Route::get('/zonas', [ZonaController::class , 'index']);
     Route::get('/promociones', [PromocionController::class , 'index']);
     Route::get('/horarios', [HorarioController::class , 'index']);
-
+    Route::get('/reservaciones', [ReservacionController::class , 'index']);
+    Route::get('/reservaciones/{id}', [ReservacionController::class , 'show']);
+    Route::get('/ocupaciones', [OcupacionController::class , 'index']);
+    Route::post('/ocupaciones', [OcupacionController::class , 'store']);
+    Route::patch('/ocupaciones/{id}/finalizar', [OcupacionController::class , 'finalizar']);
+    Route::patch('/reservaciones/{id}/completar', [ReservacionController::class , 'completar']);
+    Route::get('/mesas-estado', [OcupacionController::class , 'estadoMesas']);
 });
