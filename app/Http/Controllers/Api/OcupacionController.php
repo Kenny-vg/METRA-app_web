@@ -8,6 +8,9 @@ use App\Models\DetalleOcupacion;
 use App\Models\Mesa;
 use App\Models\Reservacion;
 use App\Helpers\ApiResponse;
+use App\Mail\SolicitarResena;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class OcupacionController extends Controller
 {
@@ -70,6 +73,7 @@ class OcupacionController extends Controller
             'comentarios' => $request->comentarios,
             'hora_entrada' => now(),
             'estado' => 'activa',
+            'token_resena' => Str::random(40),
             'cafe_id' => auth()->user()->cafe_id,
             'user_id' => auth()->id()
         ]);
@@ -94,6 +98,16 @@ class OcupacionController extends Controller
             'hora_salida' => now()
         ]);
 
+        $email = $ocupacion->email;
+
+        if (!$email && $ocupacion->reservacion) {
+            $email = $ocupacion->reservacion->email;
+        }
+
+        if ($email) {
+            Mail::to($email)->send(new SolicitarResena($ocupacion));
+        }
+
         return ApiResponse::success($ocupacion, 'Mesa cerrada');
     }
 
@@ -101,36 +115,16 @@ class OcupacionController extends Controller
     {
         $mesas = Mesa::with('zona')->get()->map(function ($mesa) {
 
-            // Ver si la mesa está ocupada
             $ocupada = DetalleOcupacion::where('mesa_id', $mesa->id)
                 ->where('estado', 'activa')
                 ->exists();
-
-            // Ver reservación próxima
-            $reservacion = Reservacion::where('mesa_id', $mesa->id)
-                ->where('fecha', today())
-                ->where('estado', 'confirmada')
-                ->orderBy('hora_inicio')
-                ->first();
-
-            $estado = 'libre';
-            $hora_reserva = null;
-
-            if ($ocupada) {
-                $estado = 'ocupada';
-            }
-            elseif ($reservacion) {
-                $estado = 'reservada';
-                $hora_reserva = $reservacion->hora_inicio;
-            }
 
             return [
             'id' => $mesa->id,
             'numero' => $mesa->numero,
             'capacidad' => $mesa->capacidad,
             'zona' => $mesa->zona->nombre,
-            'estado' => $estado,
-            'hora_reserva' => $hora_reserva
+            'estado' => $ocupada ? 'ocupada' : 'libre'
             ];
         });
 

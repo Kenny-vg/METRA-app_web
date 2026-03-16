@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('detalle_ocupacion_id')
+                ->unique()
                 ->constrained('detalle_ocupaciones')
                 ->cascadeOnDelete();
 
@@ -23,13 +24,9 @@ return new class extends Migration
                 ->constrained('cafeterias')
                 ->cascadeOnDelete();
 
-            $table->string('token_resena', 50)->unique();
-
             $table->tinyInteger('calificacion');
 
             $table->string('comentario', 255)->nullable();
-
-            $table->dateTime('fecha_resena')->nullable();
 
             $table->enum('estado', [
                 'pendiente',

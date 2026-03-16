@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Scopes\CafeScope;
+use Illuminate\Support\Str;
 
 class DetalleOcupacion extends Model
 {
@@ -30,6 +31,9 @@ class DetalleOcupacion extends Model
     protected static function booted()
     {
         static::addGlobalScope(new CafeScope);
+        static::creating(function ($ocupacion) {
+            $ocupacion->token_resena = Str::random(40);
+        });
     }
 
     public function cafeteria()
@@ -56,4 +60,5 @@ class DetalleOcupacion extends Model
     {
         return $this->hasOne(Resena::class , 'detalle_ocupacion_id');
     }
+
 }

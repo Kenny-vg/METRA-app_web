@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Auth\PasswordResetController;
 use App\Http\Controllers\Api\RegistroNegocioController;
 use App\Http\Controllers\Api\ReservacionController;
 use App\Http\Controllers\Api\OcupacionController;
+use App\Http\Controllers\Api\ResenaController;
 
 use App\Http\Controllers\Api\Superadmin\PlanController;
 use App\Http\Controllers\Api\Superadmin\SuscripcionController;
@@ -89,6 +90,12 @@ Route::post('cafeterias/{cafeteria}/reservaciones', [ReservacionController::clas
 Route::get('reservaciones/folio/{folio}', [ReservacionController::class , 'showByFolio']);
 Route::delete('reservaciones/folio/{folio}', [ReservacionController::class , 'cancelarByFolio']);
 
+Route::get('/resena/{token}', [ResenaController::class , 'show']);
+Route::post('/resena/{token}', [ResenaController::class , 'store']);
+
+Route::get('/cafeterias/{cafeteria}/resenas',
+[PublicCafeteriaController::class , 'resenas']);
+
 /* |------------------------------------------ | RUTAS PROTEGIDAS (TODOS LOS USUARIOS) |------------------------------------------ */
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/mi-perfil', [ProfileController::class , 'miPerfil']);
@@ -161,6 +168,7 @@ Route::middleware([
 
         // CONFIGURACIÓN PAGO
         Route::put('/configuracion-pago', [ConfiguracionController::class , 'update']);
+
 
 
 

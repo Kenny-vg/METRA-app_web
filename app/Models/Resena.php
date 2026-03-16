@@ -10,10 +10,8 @@ class Resena extends Model
     protected $fillable = [
         'detalle_ocupacion_id',
         'cafe_id',
-        'token_resena',
         'calificacion',
         'comentario',
-        'fecha_resena',
         'estado'
     ];
 
@@ -24,11 +22,11 @@ class Resena extends Model
 
     public function cafeteria()
     {
-        return $this->belongsTo(Cafeteria::class, 'cafe_id');
+        return $this->belongsTo(Cafeteria::class , 'cafe_id');
     }
 
     public function detalleOcupacion()
     {
-        return $this->belongsTo(DetalleOcupacion::class, 'detalle_ocupacion_id');
+        return $this->belongsTo(DetalleOcupacion::class , 'detalle_ocupacion_id');
     }
 }
