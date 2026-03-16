@@ -178,25 +178,22 @@
         function calcularEstadoReserva(horaInicioStr, horaFinStr, dateObj) {
             const now = new Date(); // Hora real actual
             
-            // Si la fecha seleccionada en el selector no es HOY, la logica de "tiempo real" no aplica tanto
-            // Si es un dia pasado:
-            if(dateObj.toDateString() !== now.toDateString()) {
-                if(dateObj < now && dateObj.toDateString() !== now.toDateString()) return 'finalizada'; // Ayer o mas atras
-                if(dateObj > now) return 'programada'; // Mañana o futuro
-            }
-
-            // Si es hoy:
-            const start = parseTimeStringToDate(horaInicioStr, now);
+            // Creamos un Date que junte la fecha de la reserva con su hora de inicio real
+            const start = parseTimeStringToDate(horaInicioStr, dateObj);
+            
             let end = null;
             if(horaFinStr) {
-                end = parseTimeStringToDate(horaFinStr, now);
+                end = parseTimeStringToDate(horaFinStr, dateObj);
             } else {
-                // Si no hay fin, asumimos 2 horas despues
                 end = new Date(start.getTime() + (2 * 60 * 60 * 1000));
             }
 
             const thirtyMinsBefore = new Date(start.getTime() - (30 * 60 * 1000));
 
+            // Si el fin de la reserva es estrictamente anterior al mismísimo momento actual (time real), ya pasó.
+            if (end < now) {
+                return 'finalizada'; 
+            }
             if (now >= start && now <= end) {
                 return 'curso'; // Ya empezó
             } else if (now >= thirtyMinsBefore && now < start) {
@@ -227,7 +224,8 @@
             if(!r) return;
 
             // Calcular el estado en tiempo real al abrir
-            const estadoActual = calcularEstadoReserva(r.hora_inicio, r.hora_fin, currentDate);
+            const rsrvDate = new Date(r.fecha + 'T00:00:00');
+            const estadoActual = calcularEstadoReserva(r.hora_inicio, r.hora_fin, rsrvDate);
             const estilos = getStatusStyling(estadoActual);
 
             document.getElementById('m_folio').textContent = r.folio || '#N/A';
@@ -241,7 +239,11 @@
             document.getElementById('m_email').textContent = r.email;
             
             let notas = [];
-            if(r.ocasion) notas.push('Ocasión: ' + r.ocasion.nombre);
+            if(r.zona && r.zona.nombre_zona) notas.push('Zona: ' + r.zona.nombre_zona);
+            else if(r.zona_id) notas.push('Zona: Asignada');
+            
+            if(r.ocasion && r.ocasion.nombre) notas.push('Ocasión: ' + r.ocasion.nombre);
+            
             if(r.comentarios) notas.push(r.comentarios);
             
             if(notas.length > 0) {
@@ -273,10 +275,22 @@
             
             // Renderizamos por tarjeta suelta en un layout grid masonry-ish
             reservaciones.forEach(r => {
-                const estado = calcularEstadoReserva(r.hora_inicio, r.hora_fin, currentDate);
+                const rsrvDate = new Date(r.fecha + 'T00:00:00');
+                const estado = calcularEstadoReserva(r.hora_inicio, r.hora_fin, rsrvDate);
+                
+                // DEBUG: Imprimir en consola para diagnosticar
+                if (modoVista === 'futuras') {
+                    const debugEnd = r.hora_fin ? parseTimeStringToDate(r.hora_fin, rsrvDate) : new Date(parseTimeStringToDate(r.hora_inicio, rsrvDate).getTime() + (2*60*60*1000));
+                    console.log(`[DEBUG PRÓXIMAS] Reserva: ${r.nombre_cliente} | fecha: ${r.fecha} | hora: ${r.hora_inicio} | end: ${debugEnd.toString()} | now: ${new Date().toString()} | estado: ${estado}`);
+                }
+
+                // PRUEBA MAESTRA: Mostrar TODAS sin filtrar para confirmar que el JSON las trae
+                // (Descomenta el bloque de abajo una vez confirmado el diagnóstico)
+                // if (modoVista === 'futuras' && estado === 'finalizada') return;
+
                 const estilos = getStatusStyling(estado);
                 const opacidadBaja = estado === 'finalizada' ? 'opacity: 0.75;' : '';
-                const datePrefix = modoVista === 'futuras' ? new Date(r.fecha + 'T00:00:00').toLocaleDateString('es-ES', {month:'short', day:'numeric'}).toUpperCase() + ' - ' : '';
+                const datePrefix = modoVista === 'futuras' ? rsrvDate.toLocaleDateString('es-ES', {month:'short', day:'numeric'}).toUpperCase() + ' - ' : '';
 
                 html += `
                     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
@@ -306,7 +320,8 @@
                                         ${r.nombre_cliente}
                                     </h5>
                                     <p class="m-0 text-truncate" style="color: ${estilos.text}; opacity: 0.75; font-size: 0.85rem;">
-                                        <i class="bi bi-hash me-1"></i> ${r.folio || 'N/A'}
+                                        <i class="bi bi-hash me-1"></i> ${r.folio || 'N/A'} 
+                                        ${r.zona && r.zona.nombre_zona ? ' | <i class="bi bi-geo-alt-fill mx-1"></i> ' + r.zona.nombre_zona : ''}
                                     </p>
                                 </div>
                             </div>
@@ -350,8 +365,23 @@
                 }
 
                 const json = await res.json();
-                const reservaciones = json.data || [];
+                let reservaciones = json.data || [];
 
+                // Envolver en try-catch para evitar que un dato mal formado rompa todo el grid
+                try {
+                    // Si estamos en modo futuras, ordenar secuencialmente (fecha + hora_inicio) de menor a mayor
+                    if (modoVista === 'futuras') {
+                        reservaciones.sort((a, b) => {
+                            // Obtenemos un pseudo timestamp uniendo fecha y hora: "2026-03-16T14:30:00"
+                            const tA = new Date(`${a.fecha}T${a.hora_inicio}`).getTime();
+                            const tB = new Date(`${b.fecha}T${b.hora_inicio}`).getTime();
+                            return tA - tB;
+                        });
+                    }
+                } catch (e) {
+                    console.warn("Fallo al ordenar las reservaciones futuras:", e);
+                }
+                
                 // Calcular Estadisticas
                 const isToday = (isoDateString === new Date().toISOString().split('T')[0]);
                 const totalPersonas = reservaciones.reduce((sum, r) => sum + r.numero_personas, 0);
@@ -359,7 +389,7 @@
 
                 // Calcular En Curso
                 const now = new Date();
-                const enCursoCount = reservaciones.filter(r => calcularEstadoReserva(r.hora_inicio, r.hora_fin, currentDate) === 'curso').length;
+                const enCursoCount = reservaciones.filter(r => calcularEstadoReserva(r.hora_inicio, r.hora_fin, new Date(r.fecha + 'T00:00:00')) === 'curso').length;
                 document.getElementById('statEnCurso').textContent = enCursoCount;
 
                 if(reservaciones.length === 0) {

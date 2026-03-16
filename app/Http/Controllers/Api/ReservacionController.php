@@ -142,7 +142,8 @@ class ReservacionController extends Controller
             'email' => 'nullable|email',
 
             'ocasion_especial_id' => 'nullable|exists:ocasion_especials,id',
-            'promocion_id' => 'nullable|exists:promocions,id'
+            'promocion_id' => 'nullable|exists:promocions,id',
+            'zona_id' => 'nullable|exists:zonas,id'
         ]);
 
         $horaInicio = Carbon::parse($request->hora_inicio);
@@ -208,6 +209,7 @@ class ReservacionController extends Controller
 
                 'ocasion_especial_id' => $request->ocasion_especial_id,
                 'promocion_id' => $request->promocion_id,
+                'zona_id' => $request->zona_id,
 
                 'estado' => 'pendiente'
             ]);
@@ -216,6 +218,8 @@ class ReservacionController extends Controller
                 Mail::to($reservacion->email)
                     ->send(new ReservaConfirmada($reservacion));
             }
+
+            $reservacion->load(['cafeteria', 'ocasionEspecial', 'zona']);
 
             return ApiResponse::success(
                 $reservacion,

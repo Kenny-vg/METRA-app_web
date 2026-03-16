@@ -24,7 +24,8 @@ class Reservacion extends Model
         'user_id',
         'cafe_id',
         'ocasion_especial_id',
-        'promocion_id'
+        'promocion_id',
+        'zona_id'
     ];
 
     protected static function booted()
@@ -60,5 +61,11 @@ class Reservacion extends Model
     public function detalleOcupacion()
     {
         return $this->hasOne(DetalleOcupacion::class , 'reservacion_id');
+    }
+
+    // Zona solicitada para la reservación
+    public function zona()
+    {
+        return $this->belongsTo(Zona::class, 'zona_id');
     }
 }

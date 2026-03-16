@@ -192,10 +192,17 @@
                             <h5 class="section-title">1. Detalles de la Experiencia</h5>
                             <div class="row g-4">
                                 <div class="col-12 col-md-4">
+                                    <label class="form-label small fw-bold">Invitados *</label>
+                                    <select id="invitados-select" class="form-select input-metra" required>
+                                        <option value="">Cargando plazas...</option>
+                                    </select>
+                                    <div class="invalid-feedback-custom">Seleccione el número de invitados.</div>
+                                </div>
+                                <div class="col-12 col-md-4">
                                     <label class="form-label small fw-bold">Fecha *</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-metra-light border-end-0"><i class="bi bi-calendar-event"></i></span>
-                                        <input type="text" id="fecha-select" class="form-control input-metra border-start-0 ps-0" placeholder="Seleccione día" required readonly>
+                                        <input type="text" id="fecha-select" class="form-control input-metra border-start-0 ps-0" placeholder="Seleccione invitados primero" required readonly disabled>
                                     </div>
                                     <div class="invalid-feedback-custom">Por favor seleccione una fecha válida.</div>
                                 </div>
@@ -208,13 +215,6 @@
                                         <div id="hora-spinner" class="spinner-border text-gold spinner-border-sm position-absolute d-none" style="right: 35px; top: 13px;" role="status"></div>
                                     </div>
                                     <div class="invalid-feedback-custom">Seleccione la hora de reservación.</div>
-                                </div>
-                                <div class="col-12 col-md-4">
-                                    <label class="form-label small fw-bold">Invitados *</label>
-                                    <select id="invitados-select" class="form-select input-metra" required>
-                                        <option value="">Cargando plazas...</option>
-                                    </select>
-                                    <div class="invalid-feedback-custom">Seleccione el número de invitados.</div>
                                 </div>
                             </div>
                         </div>
@@ -244,8 +244,8 @@
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label small fw-bold">Teléfono móvil *</label>
-                                    <input type="tel" id="telefono" class="form-control input-metra" placeholder="A 10 dígitos min." minlength="10" required>
-                                    <div class="invalid-feedback-custom">Número telefónico inválido (mín. 10 dígitos).</div>
+                                    <input type="text" id="telefono" class="form-control input-metra" placeholder="10 dígitos numéricos" maxlength="10" required>
+                                    <div class="invalid-feedback-custom">El teléfono debe contener exactamente 10 números.</div>
                                 </div>
                             </div>
                         </div>
@@ -286,7 +286,7 @@
                         </div>
 
                         <div class="mt-5 pt-2">
-                            <button type="submit" id="btn-submit" class="btn btn-metra-main w-100 py-3 d-flex justify-content-center align-items-center" disabled>
+                            <button type="submit" id="btn-submit" class="btn btn-metra-main w-100 py-3 d-flex justify-content-center align-items-center">
                                 Confirmar y Reservar
                             </button>
                         </div>
@@ -344,27 +344,17 @@
             }
 
             function checkFormValidity() {
-                let isValid = true;
-                requiredInputs.forEach(input => {
-                    if (!input.value.trim()) {
-                        isValid = false;
-                    }
-                });
-
-                if(iEmail.value.trim() && !validateEmail(iEmail.value.trim())) {
-                    isValid = false;
-                }
-
-                if(iTel.value.trim().replace(/\s/g,'').length < 10) {
-                    isValid = false;
-                }
-
-                btnSubmit.disabled = !isValid;
+                // El botón submit se mantiene siempre habilitado 
+                // para que el usuario reciba retroalimentación visual al enviar vacíos.
             }
 
             // Eliminar bordes rojos ON INPUT (cuando se tipea)
             requiredInputs.forEach(input => {
                 input.addEventListener('input', () => {
+                    // Restricción visual en tiempo real para el teléfono
+                    if (input.id === 'telefono') {
+                        input.value = input.value.replace(/\D/g, '').substring(0, 10);
+                    }
                     input.classList.remove('is-invalid'); // Instant feedback removal
                     checkFormValidity();
                 });
@@ -380,7 +370,7 @@
                         input.classList.add('is-invalid');
                     } else if(input.id === 'email' && !validateEmail(input.value.trim())) {
                         input.classList.add('is-invalid');
-                    } else if(input.id === 'telefono' && input.value.trim().replace(/\s/g,'').length < 10) {
+                    } else if(input.id === 'telefono' && !/^\d{10}$/.test(input.value.replace(/\s/g,''))) {
                         input.classList.add('is-invalid');
                     }
                     checkFormValidity();
@@ -453,30 +443,9 @@
                     jsonZ.data.forEach(z => { zonaSelect.innerHTML += `<option value="${z.id}">${z.nombre_zona}</option>`});
                 }
 
-                // 4. Pre-llenar si está logueado
-                const token = getToken();
-                if (token) {
-                    try {
-                        const resP = await fetch('/api/mi-perfil', {
-                            headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-                        });
-                        if (resP.ok) {
-                            const jsonP = await resP.json();
-                            const user = jsonP.data.usuario;
-                            // Separar nombre del usuario (METRA guarda nombre completo o solo name?)
-                            // Como el formulario pide Nombre, Apellido P, Apellido M, 
-                            // intentamos poblar lo que podamos.
-                            iNom.value = user.name || '';
-                            iEmail.value = user.email || '';
-                            // El teléfono no siempre está en el perfil, pero si existe, lo ponemos.
-                            if (user.telefono) iTel.value = user.telefono;
-                            
-                            checkFormValidity();
-                        }
-                    } catch (e) {
-                        console.error('Error al pre-llenar perfil', e);
-                    }
-                }
+                // 4. Limpieza: Se ha eliminado el pre-llenado asumiendo perfiles de usuario/gerente,
+                // asegurando que los datos de cliente siempre deban ingresarse limpios a petición.
+                
             } catch(e) { console.error('Error init', e); }
 
             // --- SINCRONIZACION DE HORAS DISPONIBLES USANDO API ---
@@ -525,7 +494,19 @@
             }
 
             paxSelect.addEventListener('change', () => {
-                cargarHorasDisponibles();
+                if(paxSelect.value) {
+                    fechaInput.disabled = false;
+                    fechaInput.placeholder = "Seleccione día";
+                    if(fechaInput.value) {
+                        cargarHorasDisponibles();
+                    }
+                } else {
+                    fechaInput.disabled = true;
+                    fechaInput.value = '';
+                    fechaInput.placeholder = "Seleccione invitados primero";
+                    horaSelect.innerHTML = '<option value="">Seleccione fecha e invitados primero</option>';
+                    horaSelect.disabled = true;
+                }
             });
 
             // --- PROMOCIONES DINAMICAS DINAMICAS ---
@@ -575,7 +556,7 @@
                     } else if(input.id === 'email' && !validateEmail(input.value.trim())) {
                         input.classList.add('is-invalid');
                         if(!focusTriggered) { input.focus(); focusTriggered = true; }
-                    } else if(input.id === 'telefono' && input.value.trim().replace(/\s/g,'').length < 10) {
+                    } else if(input.id === 'telefono' && !/^\d{10}$/.test(input.value.replace(/\s/g,''))) {
                         input.classList.add('is-invalid');
                         if(!focusTriggered) { input.focus(); focusTriggered = true; }
                     }
@@ -591,7 +572,7 @@
                 // Concatenar el Nombre Completo para la BD
                 const nombreCompleto = `${iNom.value.trim()} ${iApP.value.trim()} ${iApM.value.trim()}`.trim();
                 // Limpiar teléfono de espacios
-                const telefonoLimpio = iTel.value.trim().replace(/\s/g, '');
+                const telefonoLimpio = iTel.value.replace(/\D/g, '');
 
                 const payload = {
                     fecha: fechaInput.value,
@@ -602,6 +583,7 @@
                     telefono: telefonoLimpio,
                     ocasion_especial_id: ocasionSelect.value ? parseInt(ocasionSelect.value) : null,
                     promocion_id: document.getElementById('promocion_id')?.value ? parseInt(document.getElementById('promocion_id').value) : null,
+                    zona_id: zonaSelect.value ? parseInt(zonaSelect.value) : null,
                     comentarios: document.getElementById('comentarios').value.trim(),
                 };
 
@@ -627,20 +609,58 @@
                     if(res.ok && json.success) {
                         // Mostrar pantalla de confirmación tal como se pidió
                         const rsv = json.data;
+                        const cafeNombre = rsv.cafeteria ? rsv.cafeteria.nombre : 'La Cafetería';
+                        const zonaP = rsv.zona ? rsv.zona.nombre_zona : 'Área General';
+                        const ocasionP = rsv.ocasion_especial ? rsv.ocasion_especial.nombre : 'Sin Ocasión Especial';
+                        
                         document.querySelector('.reserva-card').innerHTML = `
-                            <div class="text-center py-5">
-                                <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
-                                <h3 class="mt-4 mb-3 fw-bold">¡Reserva Confirmada!</h3>
-                                <p class="text-muted fs-5 mb-5">Tu reservación fue creada correctamente.<br>Revisa tu correo para ver los detalles.</p>
+                            <div class="text-center py-5 px-3">
+                                <div class="mb-4">
+                                    <i class="bi bi-check-circle-fill text-gold" style="font-size: 5rem; text-shadow: 0 10px 20px rgba(212,175,55,0.2);"></i>
+                                </div>
+                                <h3 class="page-title mb-3" style="font-size: 2.2rem;">¡Reserva Confirmada!</h3>
+                                <p class="text-muted fs-5 mb-5" style="max-width: 500px; margin: 0 auto;">Tu mesa en <strong>${cafeNombre}</strong> ha sido asegurada. Revisa tu correo electrónico para los detalles formales de acceso.</p>
                                 
-                                <div class="bg-light rounded-4 p-4 text-start d-inline-block shadow-sm" style="min-width: 300px;">
-                                    <p class="mb-2"><small class="text-muted">Folio de reservación</small><br><span class="fw-bold fs-5 text-gold">${rsv.folio || 'N/A'}</span></p>
-                                    <p class="mb-2"><small class="text-muted">Fecha</small><br><span class="fw-bold fs-6">${payload.fecha}</span></p>
-                                    <p class="mb-0"><small class="text-muted">Hora</small><br><span class="fw-bold fs-6">${payload.hora_inicio}</span></p>
+                                <div class="bg-metra-light rounded-4 p-4 text-start d-inline-block shadow-sm w-100" style="max-width: 480px; border: 1px solid #e0ddd5;">
+                                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3" style="border-bottom: 1px dashed #d1c8b3;">
+                                        <div>
+                                            <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.75rem; letter-spacing: 1px;">Folio de Acceso</small>
+                                            <span class="fw-bold fs-4 text-gold">${rsv.folio || 'N/A'}</span>
+                                        </div>
+                                        <div class="text-end">
+                                            <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.75rem; letter-spacing: 1px;">Destino</small>
+                                            <span class="fw-bold fs-6 text-dark">${cafeNombre}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row g-4 mb-2">
+                                        <div class="col-6">
+                                            <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">Fecha</small>
+                                            <span class="fw-bold fs-6 cl-dark"><i class="bi bi-calendar-check me-2 text-gold"></i>${payload.fecha}</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">Horario</small>
+                                            <span class="fw-bold fs-6 cl-dark"><i class="bi bi-clock me-2 text-gold"></i>${payload.hora_inicio}</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">Invitados</small>
+                                            <span class="fw-bold fs-6 cl-dark"><i class="bi bi-people me-2 text-gold"></i>${payload.numero_personas} Personas</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">Ubicación Preferente</small>
+                                            <span class="fw-bold fs-6 cl-dark"><i class="bi bi-geo-alt me-2 text-gold"></i>${zonaP}</span>
+                                        </div>
+                                        <div class="col-12 mt-4 pt-2" style="border-top: 1px dashed #d1c8b3;">
+                                            <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">Ocasión Declarada</small>
+                                            <span class="badge bg-dark fw-normal px-3 py-2 text-gold" style="font-size: 0.85rem;">${ocasionP}</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <div class="mt-5">
-                                    <a href="/" class="btn btn-outline-dark rounded-pill px-4 py-2">Volver al inicio</a>
+                                    <a href="/" class="btn btn-metra-main px-5 py-3 rounded-pill shadow-sm">
+                                        Volver al inicio <i class="bi bi-arrow-right ms-2"></i>
+                                    </a>
                                 </div>
                             </div>
                         `;
