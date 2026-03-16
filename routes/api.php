@@ -169,10 +169,6 @@ Route::middleware([
         // CONFIGURACIÓN PAGO
         Route::put('/configuracion-pago', [ConfiguracionController::class , 'update']);
 
-
-
-
-
     
 });
 
@@ -230,11 +226,16 @@ Route::middleware([
     Route::patch('/reservaciones/{id}/completar', [ReservacionController::class , 'completar']);
     Route::patch('/reservaciones/{id}/cancelar', [ReservacionController::class , 'cancelarGerente']);
 
+    Route::get('/resenas', [ResenaController::class , 'index']);
+    Route::patch('/resenas/{id}/aprobar', [ResenaController::class , 'aprobar']);
+    Route::patch('/resenas/{id}/ocultar', [ResenaController::class , 'ocultar']);
 });
 
 // Renovación de suscripción — para que gerentes con sub
 // vencida también puedan renovar desde el panel (y desde el login sin token)
 Route::post('gerente/renovar-suscripcion', [RenovarSuscripcionController::class , 'store']);
+
+
 
 /* |------------------------------------------ | RUTAS STAFF (APP MOVIL) |------------------------------------------ */
 

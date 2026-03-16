@@ -76,6 +76,9 @@
             <a href="/admin/reservaciones" class="nav-link-admin {{ request()->is('admin/reservaciones') ? 'active' : '' }}">
                 <i class="bi bi-calendar3 me-3"></i>Reservaciones
             </a>
+            <a href="/admin/resenas" class="nav-link-admin {{ request()->is('admin/resenas') ? 'active' : '' }}">
+                <i class="bi bi-star-half me-3"></i>Reseñas
+            </a>
             <a href="/admin/marketing" class="nav-link-admin {{ request()->is('admin/marketing') ? 'active' : '' }}">
                 <i class="bi bi-megaphone me-3"></i>Eventos y Promos
             </a>

@@ -11,6 +11,7 @@ use App\Models\Zona;
 use App\Models\Horario;
 use App\Models\Mesa;
 use App\Helpers\ApiResponse;
+use App\Models\Resena;
 
 class PublicCafeteriaController extends Controller
 {
@@ -21,15 +22,15 @@ class PublicCafeteriaController extends Controller
     {
         $cafeterias = Cafeteria::where('estado', 'activa')
             ->select(
-                'id',
-                'slug',
-                'nombre',
-                'descripcion',
-                'calle',
-                'num_exterior',
-                'colonia',
-                'foto_url'
-            )
+            'id',
+            'slug',
+            'nombre',
+            'descripcion',
+            'calle',
+            'num_exterior',
+            'colonia',
+            'foto_url'
+        )
             ->get();
 
         return ApiResponse::success($cafeterias);
@@ -77,8 +78,8 @@ class PublicCafeteriaController extends Controller
         $promociones = Promocion::where('cafe_id', $cafeteria->id)
             ->where('activo', true)
             ->whereHas('ocasiones', function ($q) use ($ocasion) {
-                $q->where('ocasion_especials.id', $ocasion);
-            })
+            $q->where('ocasion_especials.id', $ocasion);
+        })
             ->orderBy('nombre_promocion')
             ->get();
 
@@ -94,7 +95,7 @@ class PublicCafeteriaController extends Controller
             ->where('activo', true)
             ->orderBy('nombre_zona')
             ->get(['id', 'nombre_zona']);
-            
+
         return ApiResponse::success($zonas);
     }
 
@@ -107,7 +108,7 @@ class PublicCafeteriaController extends Controller
             ->where('activo', true)
             ->orderBy('hora_apertura')
             ->get(['id', 'dia_semana', 'hora_apertura', 'hora_cierre']);
-            
+
         return ApiResponse::success($horarios);
     }
 
@@ -119,7 +120,7 @@ class PublicCafeteriaController extends Controller
         $maxCapacidad = Mesa::where('cafe_id', $cafeteria->id)
             ->where('activo', true)
             ->max('capacidad') ?? 1; // Default a 1 si no hay mesas activas
-            
+
         return ApiResponse::success(['max_capacidad' => $maxCapacidad]);
     }
 
@@ -134,5 +135,28 @@ class PublicCafeteriaController extends Controller
             ->get();
 
         return ApiResponse::success($promociones);
+    }
+
+    /**
+     * Ver reseñas
+     */
+    public function resenas(Cafeteria $cafeteria)
+    {
+        $resenas = \App\Models\Resena::where('cafe_id', $cafeteria->id)
+            ->where('estado', 'publicada')
+            ->latest()
+            ->limit(10)
+            ->get()
+            ->map(function ($r) {
+
+            return [
+            'calificacion' => $r->calificacion,
+            'comentario' => $r->comentario,
+            'fecha' => $r->created_at->format('d M Y')
+            ];
+
+        });
+
+        return ApiResponse::success($resenas, 'Reseñas');
     }
 }
