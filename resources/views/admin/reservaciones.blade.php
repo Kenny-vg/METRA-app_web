@@ -4,7 +4,7 @@
 @section('content')
     <header class="mb-4 border-bottom pb-4 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3" style="border-color: var(--border-light) !important;">
         <div>
-            <h2 class="fw-bold" style="color: var(--black-primary); font-family: 'Inter', sans-serif; letter-spacing: -1px;">Monitor Táctico</h2>
+            <h2 class="fw-bold" style="color: var(--black-primary); font-family: 'Inter', sans-serif; letter-spacing: -1px;">Monitor Tactico</h2>
             <p class="m-0" style="color: var(--text-muted); font-size: 0.95rem;">Dashboard de alto rendimiento en tiempo real.</p>
         </div>
     </header>
@@ -28,7 +28,7 @@
                     <div style="width: 40px; height: 40px; background: rgba(0,0,0,0.05); border-radius: 50%; color: var(--black-primary);" class="d-flex align-items-center justify-content-center me-3">
                         <i class="bi bi-clock-history fs-5"></i>
                     </div>
-                    <span class="text-muted fw-bold" style="letter-spacing: 0.5px; font-size: 0.85rem; text-transform: uppercase;">Próxima Reserva</span>
+                    <span class="text-muted fw-bold" style="letter-spacing: 0.5px; font-size: 0.85rem; text-transform: uppercase;">Proxima Reserva</span>
                 </div>
                 <h5 class="fw-bold m-0" style="color: var(--black-primary); font-size: 1.2rem;" id="statProxima">...</h5>
             </div>
@@ -48,7 +48,7 @@
             <div class="p-4 rounded-4 shadow-sm d-flex flex-column justify-content-center" style="background: linear-gradient(135deg, #111, #2a2a2a); border: 1px solid #000; height: 100%;">
                 <div class="d-flex justify-content-between align-items-center w-100">
                     <div>
-                        <span class="text-white-50 fw-bold d-block mb-1" style="letter-spacing: 0.5px; font-size: 0.8rem; text-transform: uppercase;">Selector de Día</span>
+                        <span class="text-white-50 fw-bold d-block mb-1" style="letter-spacing: 0.5px; font-size: 0.8rem; text-transform: uppercase;">Selector de Dia</span>
                         <div class="d-flex align-items-center" style="cursor: pointer;" onclick="document.getElementById('inputDate').showPicker()">
                             <h5 class="fw-bold m-0 text-white" id="dateDisplay" style="font-family: 'Inter', sans-serif;">Cargando...</h5>
                             <i class="bi bi-calendar-event ms-2 text-warning"></i>
@@ -67,15 +67,15 @@
     <!-- Leyenda de colores -->
     <div class="d-flex flex-wrap gap-3 mb-4 px-2" style="font-size: 0.85rem; font-weight: 600;">
         <span class="d-flex align-items-center text-muted"><i class="bi bi-circle-fill me-2 border border-secondary" style="color: #fff; border-radius: 50%;"></i> Programada (Futura)</span>
-        <span class="d-flex align-items-center text-muted"><i class="bi bi-circle-fill me-2 p-1" style="background: #fdf3d8; color: #d4af37; border-radius: 50%;"></i> Llegando (< 30 min)</span>
+        <span class="d-flex align-items-center text-muted"><i class="bi bi-circle-fill me-2 p-1" style="background: #fdf3d8; color: #d4af37; border-radius: 50%;"></i> Llegando (< 20 min)</span>
         <span class="d-flex align-items-center text-muted"><i class="bi bi-circle-fill me-2 p-1" style="background: #e8f5e9; color: #2e7d32; border-radius: 50%;"></i> En curso (Activa)</span>
         <span class="d-flex align-items-center text-muted"><i class="bi bi-circle-fill me-2 p-1" style="background: #f5f5f5; color: #9e9e9e; border-radius: 50%;"></i> Finalizada (Pasada)</span>
     </div>
 
-    <!-- Tabs Navegación -->
+    <!-- Tabs Navegacion -->
     <div class="d-flex gap-2 mb-4 px-2">
-        <button class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm" id="btn-modo-dia" onclick="cambiarModo('dia')" style="font-family: 'Inter', sans-serif;">Vista por Día</button>
-        <button class="btn btn-outline-dark rounded-pill px-4 fw-bold shadow-sm" id="btn-modo-futuras" onclick="cambiarModo('futuras')" style="font-family: 'Inter', sans-serif;">Próximas Reservas</button>
+        <button class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm" id="btn-modo-dia" onclick="cambiarModo('dia')" style="font-family: 'Inter', sans-serif;">Vista por Dia</button>
+        <button class="btn btn-outline-dark rounded-pill px-4 fw-bold shadow-sm" id="btn-modo-futuras" onclick="cambiarModo('futuras')" style="font-family: 'Inter', sans-serif;">Proximas Reservas</button>
     </div>
 
     <!-- Grid Layout -->
@@ -120,7 +120,7 @@
                      </div>
                  </div>
                  <div class="col-12 mt-3" id="m_comentarios_box">
-                     <p class="text-muted small mb-1 fw-bold">NOTAS/OCASIÓN</p>
+                     <p class="text-muted small mb-1 fw-bold">NOTAS/OCASIÃ“N</p>
                      <p class="fst-italic p-3 rounded-3" style="background: #fff8e1; border-left: 4px solid #d4af37;" id="m_comentarios">...</p>
                  </div>
              </div>
@@ -136,328 +136,324 @@
     
     <script>
         let currentDate = new Date();
-        // Variables globales para el modal
-        let reservasGlobales = [];
-        let modoVista = 'dia';
+        let modoVista   = 'dia';
 
-        function cambiarModo(modo) {
-            modoVista = modo;
-            if (modo === 'dia') {
-                document.getElementById('btn-modo-dia').classList.replace('btn-outline-dark', 'btn-dark');
-                document.getElementById('btn-modo-futuras').classList.replace('btn-dark', 'btn-outline-dark');
-                document.getElementById('panel-selector-dia').style.display = 'flex';
-                updateDateUI();
-            } else {
-                document.getElementById('btn-modo-futuras').classList.replace('btn-outline-dark', 'btn-dark');
-                document.getElementById('btn-modo-dia').classList.replace('btn-dark', 'btn-outline-dark');
-                document.getElementById('panel-selector-dia').style.display = 'none';
-                fetchReservaciones('', 'futuras');
-            }
+        // Master array: contiene TODAS las reservas de hoy + futuro (un solo fetch)
+        let todasLasReservas = [];
+        // Array visible actual (el que muestra el grid y usa el modal)
+        let reservasGlobales = [];
+
+        // ------------------------------------------------------------------
+        // Helpers de fecha/hora
+        // ------------------------------------------------------------------
+        function toIsoLocal(dateObj) {
+            const off = dateObj.getTimezoneOffset();
+            return new Date(dateObj.getTime() - off * 60000).toISOString().split('T')[0];
         }
 
         function formatDisplayDate(dateObj) {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const todayStr = new Date().toDateString();
-            const dateStr = dateObj.toDateString();
-            let finalStr = dateObj.toLocaleDateString('es-ES', options);
-            if(todayStr === dateStr) {
-                return 'HOY';
-            } else {
-                return finalStr.toUpperCase();
+            if (dateObj.toDateString() === todayStr) return 'HOY';
+            return dateObj.toLocaleDateString('es-ES',
+                { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+            ).toUpperCase();
+        }
+
+        /** Construye un Date real combinando la fecha de la reserva con su hora HH:MM:SS */
+        function buildDateTime(fechaStr, horaStr) {
+            // 'fechaStr' = "2026-03-17", 'horaStr' = "14:30:00"
+            return new Date(`${fechaStr}T${horaStr}`);
+        }
+
+        function calcularEstadoReserva(r) {
+            const now   = new Date();
+            const start = buildDateTime(r.fecha, r.hora_inicio);
+            const end   = r.hora_fin
+                ? buildDateTime(r.fecha, r.hora_fin)
+                : new Date(start.getTime() + 2 * 60 * 60 * 1000);
+            const veinte = new Date(start.getTime() - 20 * 60 * 1000);
+
+            if (end   <= now) return 'finalizada';
+            if (start <= now) return 'curso';
+            if (veinte <= now) return 'llegando';
+            return 'programada';
+        }
+
+        function getStatusStyling(estado) {
+            switch (estado) {
+                case 'curso':     return { bg:'#e8f5e9', border:'#81c784', text:'#2e7d32', shadow:'0 5px 15px rgba(46,125,50,0.1)',    badgeBg:'#2e7d32', badgeText:'#fff',    label:'En Curso'    };
+                case 'llegando':  return { bg:'#fdf3d8', border:'#f3ca63', text:'#b58500', shadow:'0 5px 15px rgba(212,175,55,0.15)',   badgeBg:'#d4af37', badgeText:'#fff',    label:'Por Llegar'  };
+                case 'finalizada':return { bg:'#f9f9f9', border:'#e0e0e0', text:'#9e9e9e', shadow:'none',                              badgeBg:'#e0e0e0', badgeText:'#757575', label:'Finalizada'  };
+                default:          return { bg:'#ffffff', border:'#e6e6e6', text:'#111',    shadow:'0 4px 10px rgba(0,0,0,0.03)',       badgeBg:'#f0f0f0', badgeText:'#555',    label:'Programada'  };
             }
         }
 
-        function parseTimeStringToDate(timeStr, dateObj) {
-            // Convierte "14:30:00" y la fecha actual a un objeto Date real para comparar
-            const [hours, minutes] = timeStr.split(':');
-            let d = new Date(dateObj.getTime());
-            d.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-            return d;
-        }
-
-        function calcularEstadoReserva(horaInicioStr, horaFinStr, dateObj) {
-            const now = new Date(); // Hora real actual
-            
-            // Creamos un Date que junte la fecha de la reserva con su hora de inicio real
-            const start = parseTimeStringToDate(horaInicioStr, dateObj);
-            
-            let end = null;
-            if(horaFinStr) {
-                end = parseTimeStringToDate(horaFinStr, dateObj);
-            } else {
-                end = new Date(start.getTime() + (2 * 60 * 60 * 1000));
-            }
-
-            const thirtyMinsBefore = new Date(start.getTime() - (30 * 60 * 1000));
-
-            // Si el fin de la reserva es estrictamente anterior al mismísimo momento actual (time real), ya pasó.
-            if (end < now) {
-                return 'finalizada'; 
-            }
-            if (now >= start && now <= end) {
-                return 'curso'; // Ya empezó
-            } else if (now >= thirtyMinsBefore && now < start) {
-                return 'llegando'; // Faltan menos de 30 mins
-            } else if (now > end) {
-                return 'finalizada'; // Ya pasó la hora de fin
-            } else {
-                return 'programada'; // Faltan más de 30 mins
-            }
-        }
-
-        function getStatusStyling(estadoStr) {
-            switch(estadoStr) {
-                case 'curso':
-                    return { bg: '#e8f5e9', border: '#81c784', text: '#2e7d32', shadow: '0 5px 15px rgba(46,125,50,0.1)', badgeBg: '#2e7d32', badgeText: '#fff', label: 'En Curso' };
-                case 'llegando':
-                    return { bg: '#fdf3d8', border: '#f3ca63', text: '#b58500', shadow: '0 5px 15px rgba(212,175,55,0.15)', badgeBg: '#d4af37', badgeText: '#fff', label: 'Por Llegar' };
-                case 'finalizada':
-                    return { bg: '#f9f9f9', border: '#e0e0e0', text: '#9e9e9e', shadow: 'none', badgeBg: '#e0e0e0', badgeText: '#757575', label: 'Finalizada' };
-                default: 
-                case 'programada':
-                    return { bg: '#ffffff', border: '#e6e6e6', text: '#111', shadow: '0 4px 10px rgba(0,0,0,0.03)', badgeBg: '#f0f0f0', badgeText: '#555', label: 'Programada' };
-            }
-        }
-
+        // ------------------------------------------------------------------
+        // Modal de detalles
+        // ------------------------------------------------------------------
         function abrirDetalles(idReserva) {
             const r = reservasGlobales.find(x => x.id === idReserva);
-            if(!r) return;
+            if (!r) return;
 
-            // Calcular el estado en tiempo real al abrir
-            const rsrvDate = new Date(r.fecha + 'T00:00:00');
-            const estadoActual = calcularEstadoReserva(r.hora_inicio, r.hora_fin, rsrvDate);
-            const estilos = getStatusStyling(estadoActual);
+            const estilos = getStatusStyling(calcularEstadoReserva(r));
 
-            document.getElementById('m_folio').textContent = r.folio || '#N/A';
+            document.getElementById('m_folio').textContent  = r.folio || '#N/A';
             document.getElementById('m_nombre').textContent = r.nombre_cliente;
-            
-            document.getElementById('m_estado_texto').innerHTML = `<i class="bi bi-circle-fill me-1" style="color: ${estilos.badgeBg};"></i> ${estilos.label}`;
-            
-            document.getElementById('m_hora').textContent = r.hora_inicio.substring(0,5) + ' hrs';
-            document.getElementById('m_pax').textContent = r.numero_personas + ' Personas';
+            document.getElementById('m_estado_texto').innerHTML =
+                `<i class="bi bi-circle-fill me-1" style="color:${estilos.badgeBg};"></i> ${estilos.label}`;
+            document.getElementById('m_hora').textContent = r.hora_inicio.substring(0, 5) + ' hrs';
+            document.getElementById('m_pax').textContent  = r.numero_personas + ' Personas';
             document.getElementById('m_telefono').textContent = r.telefono;
-            document.getElementById('m_email').textContent = r.email;
-            
+            document.getElementById('m_email').textContent    = r.email;
+
             let notas = [];
-            if(r.zona && r.zona.nombre_zona) notas.push('Zona: ' + r.zona.nombre_zona);
-            else if(r.zona_id) notas.push('Zona: Asignada');
-            
-            if(r.ocasion && r.ocasion.nombre) notas.push('Ocasión: ' + r.ocasion.nombre);
-            
-            if(r.comentarios) notas.push(r.comentarios);
-            
-            if(notas.length > 0) {
+            if (r.zona   && r.zona.nombre_zona)   notas.push('Zona: '    + r.zona.nombre_zona);
+            if (r.ocasion && r.ocasion.nombre)     notas.push('OcasiÃ³n: ' + r.ocasion.nombre);
+            if (r.comentarios)                     notas.push(r.comentarios);
+
+            if (notas.length > 0) {
                 document.getElementById('m_comentarios').textContent = notas.join(' | ');
                 document.getElementById('m_comentarios_box').style.display = 'block';
             } else {
                 document.getElementById('m_comentarios_box').style.display = 'none';
             }
 
-            const modal = new bootstrap.Modal(document.getElementById('modalReserva'));
-            modal.show();
+            new bootstrap.Modal(document.getElementById('modalReserva')).show();
         }
 
+        // ------------------------------------------------------------------
+        // Render de tarjetas
+        // ------------------------------------------------------------------
         function renderizarTarjetas(reservaciones) {
             const grid = document.getElementById('reservaciones-grid');
             reservasGlobales = reservaciones;
 
-            if(reservaciones.length === 0) {
+            if (reservaciones.length === 0) {
                 grid.innerHTML = `
                     <div class="col-12 text-center py-5">
-                        <h4 class="fw-bold" style="color: var(--black-primary); font-family: 'Inter', sans-serif;">Todo tranquilo por ahora.</h4>
-                        <p class="text-muted">¡Prepárate o descansa para el siguiente flujo de invitados!</p>
-                    </div>
-                `;
+                        <h4 class="fw-bold" style="color:var(--black-primary);font-family:'Inter',sans-serif;">Todo tranquilo por ahora.</h4>
+                        <p class="text-muted">Â¡Preparate o descansa para el siguiente flujo de invitados!</p>
+                    </div>`;
                 return;
             }
 
             let html = '';
-            
-            // Renderizamos por tarjeta suelta en un layout grid masonry-ish
             reservaciones.forEach(r => {
-                const rsrvDate = new Date(r.fecha + 'T00:00:00');
-                const estado = calcularEstadoReserva(r.hora_inicio, r.hora_fin, rsrvDate);
-                
-                // DEBUG: Imprimir en consola para diagnosticar
-                if (modoVista === 'futuras') {
-                    const debugEnd = r.hora_fin ? parseTimeStringToDate(r.hora_fin, rsrvDate) : new Date(parseTimeStringToDate(r.hora_inicio, rsrvDate).getTime() + (2*60*60*1000));
-                    console.log(`[DEBUG PRÓXIMAS] Reserva: ${r.nombre_cliente} | fecha: ${r.fecha} | hora: ${r.hora_inicio} | end: ${debugEnd.toString()} | now: ${new Date().toString()} | estado: ${estado}`);
-                }
+                const estado = calcularEstadoReserva(r);
+                // En modo futuras, excluir las completamente finalizadas
+                if (modoVista === 'futuras' && estado === 'finalizada') return;
 
-                // PRUEBA MAESTRA: Mostrar TODAS sin filtrar para confirmar que el JSON las trae
-                // (Descomenta el bloque de abajo una vez confirmado el diagnóstico)
-                // if (modoVista === 'futuras' && estado === 'finalizada') return;
-
-                const estilos = getStatusStyling(estado);
-                const opacidadBaja = estado === 'finalizada' ? 'opacity: 0.75;' : '';
-                const datePrefix = modoVista === 'futuras' ? rsrvDate.toLocaleDateString('es-ES', {month:'short', day:'numeric'}).toUpperCase() + ' - ' : '';
+                const estilos     = getStatusStyling(estado);
+                const opacidadBaja = estado === 'finalizada' ? 'opacity:0.75;' : '';
+                const rsrvDate    = new Date(r.fecha + 'T00:00:00');
+                const datePrefix  = modoVista === 'futuras'
+                    ? rsrvDate.toLocaleDateString('es-ES', { month:'short', day:'numeric' }).toUpperCase() + ' - '
+                    : '';
 
                 html += `
                     <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                        <div class="card h-100 position-relative" 
+                        <div class="card h-100 position-relative"
                              onclick="abrirDetalles(${r.id})"
-                             style="cursor: pointer; background: ${estilos.bg}; border: 1px solid ${estilos.border}; border-radius: 14px; box-shadow: ${estilos.shadow}; transition: transform 0.2s ease, box-shadow 0.2s ease; ${opacidadBaja}">
-                            
+                             style="cursor:pointer;background:${estilos.bg};border:1px solid ${estilos.border};border-radius:14px;box-shadow:${estilos.shadow};transition:transform .2s ease,box-shadow .2s ease;${opacidadBaja}">
                             <div class="card-body p-4 d-flex flex-column justify-content-between">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <div class="d-flex flex-column">
-                                        <span class="fw-bold fs-4" style="color: ${estilos.text}; letter-spacing: -1px; font-family: 'Inter', sans-serif;">
+                                        <span class="fw-bold fs-4" style="color:${estilos.text};letter-spacing:-1px;font-family:'Inter',sans-serif;">
                                             ${r.hora_inicio.substring(0,5)}
                                         </span>
-                                        <span class="badge mt-1" style="background: ${estilos.badgeBg}; color: ${estilos.badgeText}; font-size: 0.7rem; align-self: flex-start; padding: 4px 8px; border-radius: 6px;">
+                                        <span class="badge mt-1" style="background:${estilos.badgeBg};color:${estilos.badgeText};font-size:.7rem;align-self:flex-start;padding:4px 8px;border-radius:6px;">
                                             ${datePrefix}${estilos.label}
                                         </span>
                                     </div>
-                                    <div class="text-end">
-                                        <div style="background: rgba(255,255,255,0.8); border: 1px solid rgba(0,0,0,0.05); padding: 5px 12px; border-radius: 20px; color: ${estilos.text}; font-weight: bold; font-size: 0.9rem;">
-                                            <i class="bi bi-people-fill me-1"></i> ${r.numero_personas}
-                                        </div>
+                                    <div style="background:rgba(255,255,255,.8);border:1px solid rgba(0,0,0,.05);padding:5px 12px;border-radius:20px;color:${estilos.text};font-weight:bold;font-size:.9rem;">
+                                        <i class="bi bi-people-fill me-1"></i> ${r.numero_personas}
                                     </div>
                                 </div>
-                                
                                 <div>
-                                    <h5 class="fw-bold mb-1 text-truncate" style="color: ${estilos.text}; font-size: 1.1rem;" title="${r.nombre_cliente}">
+                                    <h5 class="fw-bold mb-1 text-truncate" style="color:${estilos.text};font-size:1.1rem;" title="${r.nombre_cliente}">
                                         ${r.nombre_cliente}
                                     </h5>
-                                    <p class="m-0 text-truncate" style="color: ${estilos.text}; opacity: 0.75; font-size: 0.85rem;">
-                                        <i class="bi bi-hash me-1"></i> ${r.folio || 'N/A'} 
+                                    <p class="m-0 text-truncate" style="color:${estilos.text};opacity:.75;font-size:.85rem;">
+                                        <i class="bi bi-hash me-1"></i> ${r.folio || 'N/A'}
                                         ${r.zona && r.zona.nombre_zona ? ' | <i class="bi bi-geo-alt-fill mx-1"></i> ' + r.zona.nombre_zona : ''}
                                     </p>
                                 </div>
                             </div>
-
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
 
-            grid.innerHTML = html;
+            grid.innerHTML = html || `
+                <div class="col-12 text-center py-5 text-muted">
+                    <i class="bi bi-calendar-check fs-1 d-block mb-2" style="opacity:.3;"></i>
+                    <p class="fw-bold">No hay reservas activas en esta vista.</p>
+                </div>`;
         }
 
-        async function fetchReservaciones(isoDateString, modo = 'dia') {
-            const grid = document.getElementById('reservaciones-grid');
-            grid.innerHTML = '<div class="col-12 text-center py-5"><div class="spinner-border text-muted"></div><p class="mt-2 text-muted fw-bold small">SINCRONIZANDO AGENDA...</p></div>';
+        // ------------------------------------------------------------------
+        // Calculo de metricas: Aforo y En Curso dependen de la vista
+        // Proxima Reserva sigue siendo global para el monitor tactico
+        // ------------------------------------------------------------------
+        function actualizarMetricas(reservasVisibles = []) {
+            const now = new Date();
+            const todayIso = toIsoLocal(now);
+
+            // 1. Aforo Esperado (de lo que se ve en pantalla)
+            const aforoEstados = ['programada', 'llegando'];
+            const totalAforo = reservasVisibles
+                .filter(r => aforoEstados.includes(calcularEstadoReserva(r)))
+                .reduce((sum, r) => sum + r.numero_personas, 0);
             
-            // Limpiar Headers visualmente
-            document.getElementById('statTotalPersonas').textContent = '...';
-            document.getElementById('statProxima').textContent = '...';
-            document.getElementById('statEnCurso').textContent = '...';
+            document.getElementById('statTotalPersonas').textContent = totalAforo;
 
-            try {
-                let url = `/api/gerente/reservaciones?t=${new Date().getTime()}`;
-                if(modo === 'futuras') {
-                    url += '&modo=futuras';
+            // 2. En Curso (de lo que se ve en pantalla)
+            const totalEnCurso = reservasVisibles
+                .filter(r => calcularEstadoReserva(r) === 'curso')
+                .reduce((sum, r) => sum + r.numero_personas, 0);
+            
+            document.getElementById('statEnCurso').textContent = totalEnCurso;
+
+            // 3. Proxima Reserva: BUSQUEDA GLOBAL (siempre la siguiente del monitor)
+            const pendientesGlobal = todasLasReservas
+                .filter(r => {
+                    const end = r.hora_fin
+                        ? buildDateTime(r.fecha, r.hora_fin)
+                        : new Date(buildDateTime(r.fecha, r.hora_inicio).getTime() + 2 * 60 * 60 * 1000);
+                    return end > now;
+                })
+                .sort((a, b) => buildDateTime(a.fecha, a.hora_inicio) - buildDateTime(b.fecha, b.hora_inicio));
+
+            if (pendientesGlobal.length === 0) {
+                document.getElementById('statProxima').textContent = 'Sin reservas futuras';
+            } else {
+                const prox       = pendientesGlobal[0];
+                const proxDate   = new Date(prox.fecha + 'T00:00:00');
+                const esHoy      = toIsoLocal(proxDate) === todayIso;
+                const estadoProx = calcularEstadoReserva(prox);
+                const nombre     = (prox.nombre_cliente || '').split(' ')[0];
+
+                if (esHoy) {
+                    const label = estadoProx === 'curso' ? 'En curso' : 'Siguiente';
+                    document.getElementById('statProxima').textContent =
+                        `${label}: ${nombre} a las ${prox.hora_inicio.substring(0, 5)}`;
                 } else {
-                    url += `&fecha=${isoDateString}`;
+                    const fechaLabel = proxDate.toLocaleDateString('es-ES',
+                        { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase();
+                    document.getElementById('statProxima').textContent =
+                        `${fechaLabel} - ${nombre} ${prox.hora_inicio.substring(0, 5)}`;
                 }
-
-                const token = localStorage.getItem('token');
-                const res = await fetch(url, { // cache-busting
-                    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-                });
-                
-                if(!res.ok) {
-                    if(res.status === 401 || res.status === 403) {
-                        window.location.href = '/login';
-                        return;
-                    }
-                    throw new Error('Error de red');
-                }
-
-                const json = await res.json();
-                let reservaciones = json.data || [];
-
-                // Envolver en try-catch para evitar que un dato mal formado rompa todo el grid
-                try {
-                    // Si estamos en modo futuras, ordenar secuencialmente (fecha + hora_inicio) de menor a mayor
-                    if (modoVista === 'futuras') {
-                        reservaciones.sort((a, b) => {
-                            // Obtenemos un pseudo timestamp uniendo fecha y hora: "2026-03-16T14:30:00"
-                            const tA = new Date(`${a.fecha}T${a.hora_inicio}`).getTime();
-                            const tB = new Date(`${b.fecha}T${b.hora_inicio}`).getTime();
-                            return tA - tB;
-                        });
-                    }
-                } catch (e) {
-                    console.warn("Fallo al ordenar las reservaciones futuras:", e);
-                }
-                
-                // Calcular Estadisticas
-                const isToday = (isoDateString === new Date().toISOString().split('T')[0]);
-                const totalPersonas = reservaciones.reduce((sum, r) => sum + r.numero_personas, 0);
-                document.getElementById('statTotalPersonas').textContent = totalPersonas;
-
-                // Calcular En Curso
-                const now = new Date();
-                const enCursoCount = reservaciones.filter(r => calcularEstadoReserva(r.hora_inicio, r.hora_fin, new Date(r.fecha + 'T00:00:00')) === 'curso').length;
-                document.getElementById('statEnCurso').textContent = enCursoCount;
-
-                if(reservaciones.length === 0) {
-                    document.getElementById('statProxima').textContent = '--';
-                } else {
-                    if(isToday) {
-                        // Buscar la mas cercana futura
-                        const futuras = reservaciones.filter(r => {
-                            const t = parseTimeStringToDate(r.hora_inicio, now);
-                            return t > now; // o iguales
-                        });
-                        
-                        if(futuras.length > 0) {
-                            const nombre = futuras[0].nombre_cliente.split(' ')[0]; // Primer nombre
-                            document.getElementById('statProxima').textContent = `Siguiente: ${nombre} a las ${futuras[0].hora_inicio.substring(0,5)}`;
-                        } else {
-                            document.getElementById('statProxima').textContent = 'Cierre de día';
-                        }
-                    } else {
-                        const nombre = reservaciones[0].nombre_cliente.split(' ')[0];
-                        document.getElementById('statProxima').textContent = `Siguiente: ${nombre} a las ${reservaciones[0].hora_inicio.substring(0,5)}`;
-                    }
-                }
-
-                renderizarTarjetas(reservaciones);
-
-            } catch(e) {
-                console.error(e);
-                grid.innerHTML = '<div class="col-12 text-center py-5 text-danger"><i class="bi bi-shield-exclamation fs-1"></i><p class="fw-bold mt-2">Error de conexión al obtener la agenda.</p></div>';
             }
         }
 
-        function updateDateUI() {
-            document.getElementById('dateDisplay').textContent = formatDisplayDate(currentDate);
-            // Format YYYY-MM-DD local
-            const offset = currentDate.getTimezoneOffset()
-            let isoDateObj = new Date(currentDate.getTime() - (offset*60*1000))
-            let isoString = isoDateObj.toISOString().split('T')[0];
-            document.getElementById('inputDate').value = isoString;
-            
-            // Lanzar Fetch
-            fetchReservaciones(isoString);
+        // ------------------------------------------------------------------
+        // Fetch maestro unico (?modo=todo -> hoy + futuro)
+        // ------------------------------------------------------------------
+        async function cargarMaestro(silencioso = false) {
+            if (!silencioso) {
+                document.getElementById('reservaciones-grid').innerHTML =
+                    '<div class="col-12 text-center py-5"><div class="spinner-border text-muted"></div>' +
+                    '<p class="mt-2 text-muted fw-bold small">SINCRONIZANDO AGENDA...</p></div>';
+                document.getElementById('statTotalPersonas').textContent = '...';
+                document.getElementById('statProxima').textContent       = '...';
+                document.getElementById('statEnCurso').textContent       = '...';
+            }
+
+            try {
+                const token     = localStorage.getItem('token');
+                const clientHoy = toIsoLocal(new Date()); // Fecha local del cliente (evita desfase UTC)
+                const res = await fetch(`/api/gerente/reservaciones?modo=todo&desde=${clientHoy}&t=${Date.now()}`, {
+                    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+                });
+
+                if (!res.ok) {
+                    if (res.status === 401 || res.status === 403) { window.location.href = '/login'; return; }
+                    throw new Error('Error de red');
+                }
+
+                todasLasReservas = (await res.json()).data || [];
+                aplicarVistaActual(); // Esto llamara a actualizarMetricas con la vista correcta
+
+            } catch (e) {
+                console.error(e);
+                if (!silencioso) {
+                    document.getElementById('reservaciones-grid').innerHTML =
+                        '<div class="col-12 text-center py-5 text-danger">' +
+                        '<i class="bi bi-shield-exclamation fs-1"></i>' +
+                        '<p class="fw-bold mt-2">Error de conexion al obtener la agenda.</p></div>';
+                }
+            }
         }
 
+        // ------------------------------------------------------------------
+        // Aplicar vista actual sobre el master array
+        // ------------------------------------------------------------------
+        function aplicarVistaActual() {
+            let vista;
+            if (modoVista === 'futuras') {
+                const now = new Date();
+                vista = todasLasReservas.filter(r => {
+                    const end = r.hora_fin
+                        ? buildDateTime(r.fecha, r.hora_fin)
+                        : new Date(buildDateTime(r.fecha, r.hora_inicio).getTime() + 2 * 60 * 60 * 1000);
+                    return end > now;
+                });
+            } else {
+                const isoSeleccionado = toIsoLocal(currentDate);
+                vista = todasLasReservas.filter(r => r.fecha === isoSeleccionado);
+            }
+            
+            actualizarMetricas(vista); // Ahora pasamos el filtrado para metricas dinamicas
+            renderizarTarjetas(vista);
+        }
+
+        // ------------------------------------------------------------------
+        // Cambio de modo (botones Vista por Dia / PrÃ³ximas)
+        // ------------------------------------------------------------------
+        function cambiarModo(modo) {
+            modoVista = modo;
+            if (modo === 'dia') {
+                document.getElementById('btn-modo-dia').classList.replace('btn-outline-dark', 'btn-dark');
+                document.getElementById('btn-modo-futuras').classList.replace('btn-dark', 'btn-outline-dark');
+                document.getElementById('panel-selector-dia').style.display = 'flex';
+            } else {
+                document.getElementById('btn-modo-futuras').classList.replace('btn-outline-dark', 'btn-dark');
+                document.getElementById('btn-modo-dia').classList.replace('btn-dark', 'btn-outline-dark');
+                document.getElementById('panel-selector-dia').style.display = 'none';
+            }
+            aplicarVistaActual();
+        }
+
+        // ------------------------------------------------------------------
+        // Selector de dia
+        // ------------------------------------------------------------------
+        function updateDateUI() {
+            document.getElementById('dateDisplay').textContent   = formatDisplayDate(currentDate);
+            document.getElementById('inputDate').value           = toIsoLocal(currentDate);
+            aplicarVistaActual(); // solo re-filtrar, sin re-fetch
+        }
+
+        // ------------------------------------------------------------------
+        // Bootstrap
+        // ------------------------------------------------------------------
         document.addEventListener('DOMContentLoaded', () => {
-            updateDateUI();
+            cargarMaestro(); // fetch inicial
 
             document.querySelectorAll('.btn-day-nav').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const offset = parseInt(btn.getAttribute('data-offset'));
-                    currentDate.setDate(currentDate.getDate() + offset);
+                    currentDate.setDate(currentDate.getDate() + parseInt(btn.getAttribute('data-offset')));
                     updateDateUI();
                 });
             });
 
-            document.getElementById('inputDate').addEventListener('change', (e) => {
-                if(e.target.value) {
-                    currentDate = new Date(e.target.value + 'T00:00:00'); // Evita timezone bug
+            document.getElementById('inputDate').addEventListener('change', e => {
+                if (e.target.value) {
+                    currentDate = new Date(e.target.value + 'T00:00:00');
                     updateDateUI();
                 }
             });
 
-            // Refresco Automatico de los estados en vivo (Cada 30 seg)
-            setInterval(() => {
-                if(reservasGlobales.length > 0) {
-                    renderizarTarjetas(reservasGlobales);
-                }
-            }, 30000);
+            // Re-fetch completo cada 60 s â†’ datos frescos + metricas actualizadas
+            setInterval(() => cargarMaestro(true), 60000);
         });
     </script>
 @endsection
