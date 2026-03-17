@@ -59,7 +59,7 @@ class ReservacionController extends Controller
             ? ['nombre' => $r->promocion->nombre_promocion, 'precio' => $r->promocion->precio]
             : null,
             'zona' => $r->zona
-            ? ['nombre' => $r->zona->nombre]
+            ? ['nombre' => $r->zona->nombre_zona]
             : null,
             'tipo' => $r->tipo,
             ];
@@ -273,7 +273,7 @@ class ReservacionController extends Controller
         'cafeteria' => $r->cafeteria ? ['nombre' => $r->cafeteria->nombre] : null,
         'ocasion' => $r->ocasionEspecial ? ['nombre' => $r->ocasionEspecial->nombre] : null,
         'promocion' => $r->promocion ? ['nombre' => $r->promocion->nombre_promocion, 'precio' => $r->promocion->precio] : null,
-        'zona' => $r->zona ? ['nombre' => $r->zona->nombre] : null,
+        'zona' => $r->zona ? ['nombre' => $r->zona->nombre_zona] : null,
         ]);
 
         return ApiResponse::success($reservas, 'Reservaciones del usuario');
@@ -416,7 +416,7 @@ class ReservacionController extends Controller
             ] : null,
             'ocasion' => $r->ocasionEspecial ? ['nombre' => $r->ocasionEspecial->nombre] : null,
             'promocion' => $r->promocion ? ['nombre' => $r->promocion->nombre_promocion, 'precio' => $r->promocion->precio] : null,
-            'zona' => $r->zona ? ['nombre' => $r->zona->nombre] : null,
+            'zona' => $r->zona ? ['nombre' => $r->zona->nombre_zona] : null,
         ]);
     }
 

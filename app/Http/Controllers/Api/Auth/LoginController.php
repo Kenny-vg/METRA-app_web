@@ -15,162 +15,160 @@ class LoginController extends Controller
     //
     public function login(Request $request)
     {
-    $request->validate([
-        'email'=>'required|email',
-        'password'=>'required'
-    ]);
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
 
-    $emailAComparar = strtolower(trim($request->email));
-    
-    // Al ser MySQL por defecto en BBDD ignorará upper/lower, 
-    // pero para tener la string limpia la forzamos
-    $user = User::where('email', $emailAComparar)->first();
+        $emailAComparar = strtolower(trim($request->email));
 
-    if(!$user || !Hash::check($request->password, $user->password)){
-        return ApiResponse::error('Credenciales incorrectas', 401);
-    }
+        $user = User::where('email', $emailAComparar)->first();
 
-    if(!$user->estado && $user->role === 'gerente'){
-
-    if($user->estatus_registro === 'rechazado'){
-        return ApiResponse::error(
-            'Tu registro ha sido rechazado. Contacta a soporte.',
-            403
-        );
-    }
-
-    if($user->estatus_registro === 'pendiente'){
-
-        $cafeteria = $user->cafeteria;
-
-        if(!$cafeteria){
-            return ApiResponse::error(
-                'No tienes una cafetería asociada.',
-                423
-            );
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return ApiResponse::error('Credenciales incorrectas', 401);
         }
 
-        $suscripcion = $cafeteria->suscripciones()
-            ->orderByDesc('id')
-            ->first();
+        if (!$user->estado && $user->role === 'gerente') {
 
-        if(!$suscripcion){
-            return ApiResponse::error(
-                'Debes subir tu comprobante para continuar.',
-                423
-            );
-        }
+            if ($user->estatus_registro === 'rechazado') {
+                return ApiResponse::error(
+                    'Tu registro ha sido rechazado. Contacta a soporte.',
+                    403
+                );
+            }
 
-        if(empty($suscripcion->comprobante_url) && empty($cafeteria->comprobante_url)){
-            return ApiResponse::error(
-                'Debes subir tu comprobante para continuar.',
-                423
-            );
-        }
+            if ($user->estatus_registro === 'pendiente') {
 
-        if($suscripcion->estado_pago === 'pendiente'){
-            return ApiResponse::error(
-                'Tu comprobante fue enviado. Espera la validación del superadmin.',
-                423
-            );
-        }
-    }
-}
+                $cafeteria = $user->cafeteria;
 
-    if(!$user->estado){
-        return ApiResponse::error('Usuario inactivo', 403);
-    }
+                if (!$cafeteria) {
+                    return ApiResponse::error(
+                        'No tienes una cafetería asociada.',
+                        423
+                    );
+                }
 
-    //bloquear acceso si la cafeteria no tiene suscripción activa
-    if(in_array($user->role,['gerente','personal'])){
+                $suscripcion = $cafeteria->suscripciones()
+                    ->orderByDesc('id')
+                    ->first();
 
-        $cafeteria = $user->cafeteria;
+                if (!$suscripcion) {
+                    return ApiResponse::error(
+                        'Debes subir tu comprobante para continuar.',
+                        423
+                    );
+                }
 
-        if(!$cafeteria){
-            return ApiResponse::error(
-                'No tienes una cafetería asociada.',
-                403
-            );
-        }
+                if (empty($suscripcion->comprobante_url) && empty($cafeteria->comprobante_url)) {
+                    return ApiResponse::error(
+                        'Debes subir tu comprobante para continuar.',
+                        423
+                    );
+                }
 
-        // Verificar si tienen una suscripción actualmente activa
-        $suscActiva = $cafeteria->suscripciones()
-            ->where('estado_pago', 'pagado')
-            ->where('fecha_inicio', '<=', now())
-            ->where('fecha_fin', '>=', now())
-            ->first();
-
-        if(!$suscActiva){
-            if($user->role === 'gerente'){
-                $tienePendiente = $cafeteria->suscripciones()
-                    ->where('estado_pago', 'pendiente')
-                    ->exists();
-
-                if ($tienePendiente) {
+                if ($suscripcion->estado_pago === 'pendiente') {
                     return ApiResponse::error(
                         'Tu comprobante fue enviado. Espera la validación del superadmin.',
                         423
                     );
                 }
+            }        }
 
-                return ApiResponse::error(
-                    'Tu cafetería no tiene una suscripción activa.',
-                    423
-                );
-            }
+        if (!$user->estado) {
+            return ApiResponse::error('Usuario inactivo', 403);
+        }
 
-            if($user->role === 'personal'){
+        //bloquear acceso si la cafeteria no tiene suscripción activa
+        if (in_array($user->role, ['gerente', 'personal'])) {
+
+            $cafeteria = $user->cafeteria;
+
+            if (!$cafeteria) {
                 return ApiResponse::error(
-                    'La cafetería no tiene una suscripción activa.',
+                    'No tienes una cafetería asociada.',
                     403
                 );
             }
-        }
-    }
 
-    $token = $user->createToken('metra_token')->plainTextToken;
-
-    // Datos extra para sidebar y banner de suscripción
-    $extraData = [];
-    if (in_array($user->role, ['gerente', 'personal'])) {
-        $cafeteria = $user->cafeteria;
-        if ($cafeteria) {
-            $extraData['nombre_cafeteria'] = $cafeteria->nombre;
+            // Verificar si tienen una suscripción actualmente activa
             $suscActiva = $cafeteria->suscripciones()
                 ->where('estado_pago', 'pagado')
                 ->where('fecha_inicio', '<=', now())
                 ->where('fecha_fin', '>=', now())
                 ->first();
-            if ($suscActiva && $suscActiva->fecha_fin) {
-                $extraData['dias_restantes'] = (int) now()->startOfDay()->diffInDays(
-                    Carbon::parse($suscActiva->fecha_fin)->startOfDay(),
-                    false
-                );
-                $extraData['fecha_fin_suscripcion'] = $suscActiva->fecha_fin;
-            } else {
-                $extraData['dias_restantes'] = null;
-                $extraData['fecha_fin_suscripcion'] = null;
+
+            if (!$suscActiva) {
+                if ($user->role === 'gerente') {
+                    $tienePendiente = $cafeteria->suscripciones()
+                        ->where('estado_pago', 'pendiente')
+                        ->exists();
+
+                    if ($tienePendiente) {
+                        return ApiResponse::error(
+                            'Tu comprobante fue enviado. Espera la validación del superadmin.',
+                            423
+                        );
+                    }
+
+                    return ApiResponse::error(
+                        'Tu cafetería no tiene una suscripción activa.',
+                        423
+                    );
+                }
+
+                if ($user->role === 'personal') {
+                    return ApiResponse::error(
+                        'La cafetería no tiene una suscripción activa.',
+                        403
+                    );
+                }
             }
         }
-    }
 
-    return ApiResponse::success([
-        'token'=>$token,
-        'usuario'=>array_merge([
-            'id'=>$user->id,
-            'name'=>$user->name,
-            'email'=>$user->email,
-            'role'=>$user->role,
-            'cafe_id'=>$user->cafe_id
-        ], $extraData)
-    ], 'Login correcto')->withCookie(cookie('metra_role', $user->role, 60*24));
+        $token = $user->createToken('metra_token')->plainTextToken;
+
+        // Datos extra para sidebar y banner de suscripción
+        $extraData = [];
+        if (in_array($user->role, ['gerente', 'personal'])) {
+            $cafeteria = $user->cafeteria;
+            if ($cafeteria) {
+                $extraData['nombre_cafeteria'] = $cafeteria->nombre;
+                $suscActiva = $cafeteria->suscripciones()
+                    ->where('estado_pago', 'pagado')
+                    ->where('fecha_inicio', '<=', now())
+                    ->where('fecha_fin', '>=', now())
+                    ->first();
+                if ($suscActiva && $suscActiva->fecha_fin) {
+                    $extraData['dias_restantes'] = (int)now()->startOfDay()->diffInDays(
+                        Carbon::parse($suscActiva->fecha_fin)->startOfDay(),
+                        false
+                    );
+                    $extraData['fecha_fin_suscripcion'] = $suscActiva->fecha_fin;
+                }
+                else {
+                    $extraData['dias_restantes'] = null;
+                    $extraData['fecha_fin_suscripcion'] = null;
+                }
+            }
+        }
+
+        return ApiResponse::success([
+            'token' => $token,
+            'usuario' => array_merge([
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'cafe_id' => $user->cafe_id
+            ], $extraData)
+        ], 'Login correcto')->withCookie(cookie('metra_role', $user->role, 60 * 24));
     }
 
     public function logout(Request $request)
     {
         $token = $request->user()->currentAccessToken();
 
-        if($token){
+        if ($token) {
             $token->delete();
         }
         return ApiResponse::success(null, 'Sesión cerrada')->withCookie(cookie()->forget('metra_role'));
