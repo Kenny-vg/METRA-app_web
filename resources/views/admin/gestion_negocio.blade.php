@@ -221,11 +221,15 @@
                         <div class="row g-3 mb-4">
                             <div class="col-6">
                                 <label class="form-label small fw-bold text-muted">APERTURA</label>
-                                <input type="time" id="horario-apertura" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" required>
+                                <input type="time" id="horario-apertura"
+                                       class="form-control border-0 shadow-sm rounded-3"
+                                       style="background: var(--off-white);" required>
                             </div>
                             <div class="col-6">
                                 <label class="form-label small fw-bold text-muted">CIERRE</label>
-                              <input type="time" id="horario-cierre" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" required>
+                                <input type="time" id="horario-cierre"
+                                       class="form-control border-0 shadow-sm rounded-3"
+                                       style="background: var(--off-white);" required>
                             </div>
                         </div>
                         <button type="submit" class="btn-admin-primary w-100 py-3 mt-3">Guardar Horario</button>
@@ -353,8 +357,7 @@
                     const badge = !z.activo ? `<span class="badge bg-secondary ms-2">Inactivo</span>` : '';
                     const actions = z.activo 
                         ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick="editZona(${z.id}, '${z.nombre_zona}')" title="Editar"><i class="bi bi-pencil"></i></button>
-                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteZona(${z.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>
-                           <button class="btn btn-sm btn-outline-danger rounded-circle ms-1" title="Eliminar" disabled><i class="bi bi-trash"></i></button>`
+                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteZona(${z.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>`
                         : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateZona(${z.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
 
                     tbody.innerHTML += `
@@ -510,8 +513,7 @@
                     const badge = !m.activo ? `<span class="badge bg-secondary ms-2">Inactiva</span>` : '';
                     const actions = m.activo
                         ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick='editMesa(${JSON.stringify(m)})' title="Editar"><i class="bi bi-pencil"></i></button>
-                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteMesa(${m.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>
-                           <button class="btn btn-sm btn-outline-danger rounded-circle ms-1" title="Eliminar" disabled><i class="bi bi-trash"></i></button>`
+                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteMesa(${m.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>`
                         : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateMesa(${m.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
 
                     tbody.innerHTML += `
@@ -675,25 +677,17 @@
                 const ordenDias = { "Lunes": 1, "Martes": 2, "Miercoles": 3, "Jueves": 4, "Viernes": 5, "Sabado": 6, "Domingo": 7 };
                 horarios.sort((a, b) => (ordenDias[a.dia_semana] || 99) - (ordenDias[b.dia_semana] || 99));
 
-                const formatTime12h = (time24) => {
-                    let [h, m] = time24.split(':');
-                    h = parseInt(h, 10);
-                    const ampm = h >= 12 ? 'p.m.' : 'a.m.';
-                    h = h % 12 || 12; // Convert 0 to 12
-                    return `${h.toString().padStart(2, '0')}:${m} ${ampm}`;
-                };
+                // Mostrar horas en formato 24h (HH:MM) directamente desde la BD
+                const formatTime24h = (time) => time ? time.substring(0, 5) : '--:--';
 
                 horarios.forEach(h => {
-                    const aperturaRaw = h.hora_apertura.substring(0, 5);
-                    const cierreRaw = h.hora_cierre.substring(0, 5);
-                    const apertura = formatTime12h(aperturaRaw);
-                    const cierre = formatTime12h(cierreRaw);
+                    const apertura = formatTime24h(h.hora_apertura);
+                    const cierre   = formatTime24h(h.hora_cierre);
                     const opacityClass = h.activo ? '' : 'opacity-50';
                     const badge = !h.activo ? `<span class="badge bg-secondary ms-2" style="font-size:0.7rem;">Inactivo</span>` : '';
                     const actions = h.activo
                         ? `<button class="btn btn-sm btn-outline-dark rounded-circle" onclick='editHorario(${JSON.stringify(h)})' title="Editar"><i class="bi bi-pencil"></i></button>
-                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteHorario(${h.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>
-                           <button class="btn btn-sm btn-outline-danger rounded-circle ms-1" title="Eliminar" disabled><i class="bi bi-trash"></i></button>`
+                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteHorario(${h.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>`
                         : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateHorario(${h.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
 
                     container.innerHTML += `
@@ -867,8 +861,7 @@
                         
                     const actions = isActivo
                         ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick='editStaff(${JSON.stringify(s)})' title="Editar"><i class="bi bi-pencil"></i></button>
-                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteStaff(${s.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>
-                           <button class="btn btn-sm btn-outline-danger rounded-circle ms-1" title="Eliminar" disabled><i class="bi bi-trash"></i></button>`
+                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteStaff(${s.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>`
                         : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateStaff(${s.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
 
                     tbody.innerHTML += `

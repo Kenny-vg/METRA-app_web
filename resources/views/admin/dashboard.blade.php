@@ -154,6 +154,8 @@
                     </div>
 
                     <form id="formRenovar" class="d-none">
+                        {{-- Campo oculto: email del gerente autenticado para el controlador --}}
+                        <input type="hidden" id="r-email" name="email" value="{{ auth()->user()->email ?? '' }}">
                         <div class="mb-3" id="caja-r-plan">
                             <label class="form-label small fw-bold">Selecciona tu nuevo plan</label>
                             <select id="r-plan" class="form-select border-0 shadow-sm rounded-3" style="background: var(--off-white);" required>
@@ -334,6 +336,9 @@
             const formData = new FormData();
             formData.append('comprobante', fileInput);
             if (planVal) formData.append('plan_id', planVal);
+            // Incluir email del gerente como respaldo para el controlador
+            const emailInput = document.getElementById('r-email');
+            if (emailInput && emailInput.value) formData.append('email', emailInput.value);
 
             try {
                 // Usar el endpoint dedicado de renovación (requiere auth)

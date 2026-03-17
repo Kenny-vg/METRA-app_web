@@ -71,7 +71,7 @@ class SuscripcionController extends Controller
             : now()->startOfDay();
 
         $fecha_fin = (clone $fecha_inicio)
-            ->addDays($plan->duracion_dias)->endOfDay();
+            ->addDays(max(0, $plan->duracion_dias - 1))->endOfDay();
 
         $suscripcion = Suscripcion::create([
             'cafe_id' => $data['cafe_id'],

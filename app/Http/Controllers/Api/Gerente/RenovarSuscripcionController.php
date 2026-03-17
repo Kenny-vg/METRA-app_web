@@ -21,15 +21,22 @@ class RenovarSuscripcionController extends Controller
     {
         $user = $request->user();
 
-        // 1. Obtener usuario por Email si no está autenticado (desde el Login)
+        // 1. Si la ruta no corre bajo auth:sanctum, intentar resolver el token manualmente
+        if (!$user) {
+            $user = auth('sanctum')->user();
+        }
+
+        // 2. Fallback: buscar usuario por email (flujo desde la pantalla de login cuando la sub está vencida)
         if (!$user) {
             $dataEmail = $request->validate([
-                'email' => 'required|email|exists:users,email'
+                'email' => 'nullable|email|exists:users,email'
             ], [
-                'email.required' => 'Es necesario enviar el correo electrónico para renovar la suscripción.',
                 'email.exists' => 'No se encontró una cuenta con este correo electrónico.'
             ]);
-            $user = \App\Models\User::where('email', $dataEmail['email'])->first();
+
+            if (!empty($dataEmail['email'])) {
+                $user = \App\Models\User::where('email', $dataEmail['email'])->first();
+            }
         }
 
         if (!$user || !in_array($user->role, ['gerente'])) {
@@ -61,7 +68,7 @@ class RenovarSuscripcionController extends Controller
         } else {
             $inicio = now()->startOfDay();
         }
-        $fin = $inicio->copy()->addDays($plan->duracion_dias)->endOfDay();
+        $fin = $inicio->copy()->addDays(max(0, $plan->duracion_dias - 1))->endOfDay();
 
         // Guardar el nuevo comprobante
         $path = $request->file('comprobante')->store('comprobantes');

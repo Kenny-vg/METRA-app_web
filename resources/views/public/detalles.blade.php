@@ -177,6 +177,18 @@
                                         <p class="mb-0 text-muted" style="font-size: 0.8rem;">15 minutos después del horario reservado.</p>
                                     </div>
                                 </div>
+
+                                {{-- Horario de hoy: se muestra si la cafetería tiene horario activo para este día --}}
+                                <div id="sidebar-horario-hoy-container" class="d-none align-items-center gap-3">
+                                    <div style="width: 36px; height: 36px; background: var(--off-white); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="bi bi-door-open-fill" style="color: var(--accent-gold);"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 fw-bold small">Horario de hoy</p>
+                                        <p class="mb-0 text-muted" id="sidebar-horario-hoy-texto" style="font-size: 0.8rem;"></p>
+                                    </div>
+                                </div>
+
                                 <div class="d-flex align-items-center gap-3">
                                     <div style="width: 36px; height: 36px; background: var(--off-white); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                         <i class="bi bi-envelope-fill" style="color: var(--accent-gold);"></i>
@@ -190,14 +202,12 @@
 
                             <!-- Disponibilidad de horarios -->
                             <hr style="opacity: 0.08;">
-                            <p class="small fw-bold text-uppercase mb-3" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.72rem;">Horarios disponibles hoy</p>
-                            <div class="d-flex flex-wrap gap-2 mb-4">
-                                <span class="badge rounded-pill px-3 py-2" style="background: var(--off-white); color: var(--black-primary); border: 1px solid var(--border-light); font-weight: 600; font-size: 0.8rem;">08:30 AM</span>
-                                <span class="badge rounded-pill px-3 py-2" style="background: var(--off-white); color: var(--black-primary); border: 1px solid var(--border-light); font-weight: 600; font-size: 0.8rem;">09:00 AM</span>
-                                <span class="badge rounded-pill px-3 py-2" style="background: var(--off-white); color: var(--black-primary); border: 1px solid var(--border-light); font-weight: 600; font-size: 0.8rem;">11:30 AM</span>
-                                <span class="badge rounded-pill px-3 py-2" style="background: var(--off-white); color: var(--black-primary); border: 1px solid var(--border-light); font-weight: 600; font-size: 0.8rem;">01:00 PM</span>
-                                <span class="badge rounded-pill px-3 py-2" style="background: var(--off-white); color: var(--black-primary); border: 1px solid var(--border-light); font-weight: 600; font-size: 0.8rem;">04:30 PM</span>
-                                <span class="badge rounded-pill px-3 py-2" style="background: var(--off-white); color: var(--black-primary); border: 1px solid var(--border-light); font-weight: 600; font-size: 0.8rem;">07:00 PM</span>
+                            <p class="small fw-bold text-uppercase mb-3" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.72rem;">Horarios de atención</p>
+                            <div id="horarios-slots-container" class="d-flex flex-wrap gap-2 mb-4">
+                                {{-- Slots cargados dinámicamente por JS desde la API --}}
+                                <span class="badge rounded-pill px-3 py-2" style="background: var(--off-white); color: var(--text-muted); border: 1px solid var(--border-light); font-size: 0.8rem;">
+                                    <span class="spinner-border spinner-border-sm me-1" style="width:.75rem;height:.75rem;"></span>Cargando...
+                                </span>
                             </div>
                             <small class="text-muted" style="font-size: 0.75rem;"><i class="bi bi-info-circle me-1"></i>Disponibilidad sujeta a cambios. Confirma al reservar.</small>
 
@@ -435,6 +445,50 @@
                     }
                 } catch (e) {
                     console.error("Error loading resenas", e);
+                }
+
+                // --- Horarios de Atención (informativo, no reservaciones) ---
+                try {
+                    const resHorarios = await fetch(`${API_URL}/cafeterias/${cafe.slug}/horarios`);
+                    if (resHorarios.ok) {
+                        const jsonHorarios = await resHorarios.json();
+                        const horariosList = (jsonHorarios.data || []).filter(h => h.activo !== false && h.activo !== 0);
+
+                        if (horariosList.length > 0) {
+                            const fmt24 = t => t ? t.substring(0, 5) : '--:--';
+
+                            // 1. Horario de hoy en el sidebar
+                            const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+                            const hoyNombre = diasSemana[new Date().getDay()];
+                            const horarioHoy = horariosList.find(h => h.dia_semana === hoyNombre);
+
+                            if (horarioHoy) {
+                                document.getElementById('sidebar-horario-hoy-texto').textContent =
+                                    `${fmt24(horarioHoy.hora_apertura)} \u2013 ${fmt24(horarioHoy.hora_cierre)}`;
+                                const cont = document.getElementById('sidebar-horario-hoy-container');
+                                cont.classList.remove('d-none');
+                                cont.classList.add('d-flex');
+                            }
+
+                            // 2. Todos los horarios como badges (Lun–Dom)
+                            const ordenDias = { Lunes:1, Martes:2, Miercoles:3, Jueves:4, Viernes:5, Sabado:6, Domingo:7 };
+                            horariosList.sort((a, b) => (ordenDias[a.dia_semana] || 99) - (ordenDias[b.dia_semana] || 99));
+
+                            const slotsContainer = document.getElementById('horarios-slots-container');
+                            slotsContainer.innerHTML = horariosList.map(h => `
+                                <span class="badge rounded-pill px-3 py-2"
+                                      style="background: var(--off-white); color: var(--black-primary); border: 1px solid var(--border-light); font-weight: 600; font-size: 0.8rem;">
+                                    ${h.dia_semana.substring(0,3)}: ${fmt24(h.hora_apertura)}–${fmt24(h.hora_cierre)}
+                                </span>
+                            `).join('');
+                        } else {
+                            // Sin horarios configurados: ocultar la sección
+                            document.getElementById('horarios-slots-container').closest('hr')?.nextElementSibling
+                                    && (document.getElementById('horarios-slots-container').parentElement.style.display = 'none');
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error loading horarios públicos', e);
                 }
 
             } catch(e) {

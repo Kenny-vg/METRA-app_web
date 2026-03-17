@@ -30,8 +30,8 @@ class AprobacionController extends Controller
         if ($suscripcion) {
             $plan = $suscripcion->plan;
             $duracion = $plan ? $plan->duracion_dias : 30;
-            $inicio = now();
-            $fin    = $inicio->copy()->addDays($duracion);
+            $inicio = now()->startOfDay();
+            $fin    = $inicio->copy()->addDays(max(0, $duracion - 1))->endOfDay();
 
             $suscripcion->update([
                 'estado_pago'      => 'pagado',

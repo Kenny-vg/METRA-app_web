@@ -152,7 +152,7 @@ class RegistroNegocioController extends Controller
             if ($suscripcion) {
                 if ($suscripcion->plan_id != $data['plan_id']) {
                     $inicio = now()->startOfDay();
-                    $fin = $inicio->copy()->addDays($plan->duracion_dias)->endOfDay();
+                    $fin = $inicio->copy()->addDays(max(0, $plan->duracion_dias - 1))->endOfDay();
 
                     $suscripcion->update([
                         'plan_id' => $plan->id,
@@ -165,7 +165,7 @@ class RegistroNegocioController extends Controller
             else {
                 // Fallback crucial: si el intento anterior falló antes de crear la suscripción, se crea ahora
                 $inicio = now()->startOfDay();
-                $fin = $inicio->copy()->addDays($plan->duracion_dias)->endOfDay();
+                $fin = $inicio->copy()->addDays(max(0, $plan->duracion_dias - 1))->endOfDay();
 
                 Suscripcion::create([
                     'cafe_id' => $cafeteria->id,
@@ -219,7 +219,7 @@ class RegistroNegocioController extends Controller
 
             // Crear suscripción pendiente
             $inicio = now()->startOfDay();
-            $fin = $inicio->copy()->addDays($plan->duracion_dias)->endOfDay();
+            $fin = $inicio->copy()->addDays(max(0, $plan->duracion_dias - 1))->endOfDay();
 
             Suscripcion::create([
                 'cafe_id' => $cafeteria->id,
