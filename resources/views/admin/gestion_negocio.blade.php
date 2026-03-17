@@ -355,7 +355,7 @@
                     const opacityClass = z.activo ? '' : 'opacity-50';
                     const bgClass = z.activo ? '' : 'table-secondary';
                     const badge = !z.activo ? `<span class="badge bg-secondary ms-2">Inactivo</span>` : '';
-                    const actions = z.activo 
+                        const actions = z.activo 
                         ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick="editZona(${z.id}, '${z.nombre_zona}')" title="Editar"><i class="bi bi-pencil"></i></button>
                            <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteZona(${z.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>`
                         : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateZona(${z.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;

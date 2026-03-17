@@ -31,7 +31,8 @@ return new class extends Migration
                 'pendiente',
                 'confirmada',
                 'cancelada',
-                'completada'
+                'completada',
+                'no_show'
             ])->default('pendiente');
 
             $table->enum('tipo', [
@@ -58,6 +59,11 @@ return new class extends Migration
             $table->foreignId('promocion_id')
                 ->nullable()
                 ->constrained('promocions')
+                ->nullOnDelete();
+
+            $table->foreignId('zona_id')
+                ->nullable()
+                ->constrained('zonas')
                 ->nullOnDelete();
 
             $table->timestamps();

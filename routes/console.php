@@ -1,25 +1,18 @@
 <?php
-# app/routes/console.php
-# php artisan send-mail
 
-use Illuminate\Support\Facades\Artisan;
-use Mailtrap\Helper\ResponseHelper;
-use Mailtrap\MailtrapClient;
-use Mailtrap\Mime\MailtrapEmail;
-use Symfony\Component\Mime\Address;
+use Illuminate\Support\Facades\Schedule;
+use Illuminate\Support\Facades\DB;
 
-Artisan::command('send-mail', function () {
-    $email = (new MailtrapEmail())
-        ->from(new Address('hello@demomailtrap.co', 'Mailtrap Test'))
-        ->to(new Address('a3524110014@alumno.uttehuacan.edu.mx'))
-        ->subject('You are awesome!')
-        ->category('Integration Test')
-        ->text('Congrats for sending test email with Mailtrap!')
-    ;
+Schedule::call(function () {
 
-    $response = MailtrapClient::initSendingEmails(
-        apiKey: '<e55bf9df74efd5dcd7441aedab0c448f>'
-    )->send($email);
+    //Marcar reservaciones pendientes como no show si ya pasaron más de 20 minutos de la hora de inicio
+    DB::table('reservaciones')
+        ->where('estado', 'pendiente')
+        ->whereRaw("
+            TIMESTAMP(fecha, hora_inicio) < NOW() - INTERVAL 20 MINUTE
+        ")
+        ->update([
+        'estado' => 'no_show'
+    ]);
 
-    var_dump(ResponseHelper::toArray($response));
-})->purpose('Send Mail');
+})->everyMinute();

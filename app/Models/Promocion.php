@@ -27,10 +27,14 @@ class Promocion extends Model
     public function ocasiones()
     {
         return $this->belongsToMany(
-            OcasionEspecial::class, 
+            OcasionEspecial::class ,
             'ocasion_promocion',
             'promocion_id',
             'ocasion_id'
         );
+    }
+    public function reservaciones()
+    {
+        return $this->hasMany(Reservacion::class);
     }
 }
