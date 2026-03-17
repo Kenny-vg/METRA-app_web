@@ -351,10 +351,9 @@
                     const opacityClass = z.activo ? '' : 'opacity-50';
                     const bgClass = z.activo ? '' : 'table-secondary';
                     const badge = !z.activo ? `<span class="badge bg-secondary ms-2">Inactivo</span>` : '';
-                    const actions = z.activo 
+                        const actions = z.activo 
                         ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick="editZona(${z.id}, '${z.nombre_zona}')" title="Editar"><i class="bi bi-pencil"></i></button>
-                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteZona(${z.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>
-                           <button class="btn btn-sm btn-outline-danger rounded-circle ms-1" title="Eliminar" disabled><i class="bi bi-trash"></i></button>`
+                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteZona(${z.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>`
                         : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateZona(${z.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
 
                     tbody.innerHTML += `
@@ -510,8 +509,7 @@
                     const badge = !m.activo ? `<span class="badge bg-secondary ms-2">Inactiva</span>` : '';
                     const actions = m.activo
                         ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick='editMesa(${JSON.stringify(m)})' title="Editar"><i class="bi bi-pencil"></i></button>
-                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteMesa(${m.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>
-                           <button class="btn btn-sm btn-outline-danger rounded-circle ms-1" title="Eliminar" disabled><i class="bi bi-trash"></i></button>`
+                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteMesa(${m.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>`
                         : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateMesa(${m.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
 
                     tbody.innerHTML += `
@@ -692,8 +690,7 @@
                     const badge = !h.activo ? `<span class="badge bg-secondary ms-2" style="font-size:0.7rem;">Inactivo</span>` : '';
                     const actions = h.activo
                         ? `<button class="btn btn-sm btn-outline-dark rounded-circle" onclick='editHorario(${JSON.stringify(h)})' title="Editar"><i class="bi bi-pencil"></i></button>
-                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteHorario(${h.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>
-                           <button class="btn btn-sm btn-outline-danger rounded-circle ms-1" title="Eliminar" disabled><i class="bi bi-trash"></i></button>`
+                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteHorario(${h.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>`
                         : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateHorario(${h.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
 
                     container.innerHTML += `
@@ -867,8 +864,7 @@
                         
                     const actions = isActivo
                         ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick='editStaff(${JSON.stringify(s)})' title="Editar"><i class="bi bi-pencil"></i></button>
-                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteStaff(${s.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>
-                           <button class="btn btn-sm btn-outline-danger rounded-circle ms-1" title="Eliminar" disabled><i class="bi bi-trash"></i></button>`
+                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteStaff(${s.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>`
                         : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateStaff(${s.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
 
                     tbody.innerHTML += `

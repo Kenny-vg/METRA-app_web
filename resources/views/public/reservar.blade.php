@@ -178,6 +178,11 @@
                     </span>
                     <h2 class="page-title mb-2">Reservación de Mesa</h2>
                     <p class="text-muted" style="font-size: 1.1rem; color: #444 !important;">Asegure su lugar completando los siguientes detalles.</p>
+                    <div class="mt-4">
+                        <a href="javascript:history.back()" class="btn btn-outline-dark rounded-pill px-4 py-2 small fw-bold" style="font-size: 0.85rem; border: 1px solid #d1c8b3;">
+                            <i class="bi bi-arrow-left me-2"></i>Volver
+                        </a>
+                    </div>
                 </div>
 
                 <div class="reserva-card">

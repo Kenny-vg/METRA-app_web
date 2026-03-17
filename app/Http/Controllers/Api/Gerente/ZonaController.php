@@ -91,4 +91,22 @@ class ZonaController extends Controller
 
         return ApiResponse::success(null, 'Zona y sus mesas desactivadas correctamente');
     }
+    /**
+     * REACTIVAR ZONA Y MESAS
+     */
+    public function activar(Request $request, $id)
+    {
+        $zona = Zona::findOrFail($id);
+        
+        $zona->update([
+            'activo' => true
+        ]);
+
+        $zona->mesas()->update([
+            'activo' => true
+        ]);
+
+        return ApiResponse::success($zona, 'Zona y sus mesas reactivadas correctamente');
+    }
+
 }
