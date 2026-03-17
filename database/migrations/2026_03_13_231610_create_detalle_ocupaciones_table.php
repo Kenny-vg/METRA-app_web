@@ -29,7 +29,8 @@ return new class extends Migration
             $table->enum('estado', [
                 'activa',
                 'finalizada',
-                'cancelada'
+                'cancelada',
+                'no_show'
             ])->default('activa');
 
             $table->foreignId('reservacion_id')
