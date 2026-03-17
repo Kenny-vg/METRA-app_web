@@ -59,11 +59,23 @@ class RenovarSuscripcionController extends Controller
             return ApiResponse::error('El plan seleccionado no está disponible.', 422);
         }
 
-        // Suscripción única: siempre actualizamos la fila existente o creamos una si mágicamente no existiera
-        $suscripcionActiva = $cafeteria->suscripciones()->first();
+        // Verificar si ya tiene una renovación pendiente
+        $tienePendiente = $cafeteria->suscripciones()
+            ->where('estado_pago', 'pendiente')
+            ->exists();
+
+        if ($tienePendiente) {
+            return ApiResponse::error('Ya tienes una renovación pendiente de aprobación.', 422);
+        }
 
         // Calcular fechas de la suscripción
-        if ($suscripcionActiva && $suscripcionActiva->estado_pago === 'pagado' && \Carbon\Carbon::parse($suscripcionActiva->fecha_fin)->isFuture()) {
+        $suscripcionActiva = $cafeteria->suscripciones()
+            ->where('estado_pago', 'pagado')
+            ->where('fecha_fin', '>', now())
+            ->latest('fecha_fin')
+            ->first();
+
+        if ($suscripcionActiva) {
             $inicio = \Carbon\Carbon::parse($suscripcionActiva->fecha_fin)->startOfDay()->addDay();
         } else {
             $inicio = now()->startOfDay();
@@ -73,22 +85,16 @@ class RenovarSuscripcionController extends Controller
         // Guardar el nuevo comprobante
         $path = $request->file('comprobante')->store('comprobantes');
 
-        if ($suscripcionActiva && $suscripcionActiva->comprobante_url) {
-            \Storage::delete($suscripcionActiva->comprobante_url);
-        }
-
-        $suscripcion = Suscripcion::updateOrCreate(
-            ['cafe_id' => $cafeteria->id],
-            [
-                'plan_id'         => $plan->id,
-                'user_id'         => $user->id,
-                'fecha_inicio'    => $inicio,
-                'fecha_fin'       => $fin,
-                'monto'           => $plan->precio,
-                'comprobante_url' => $path,
-                'estado_pago'     => 'pendiente',
-            ]
-        );
+        $suscripcion = Suscripcion::create([
+            'cafe_id'         => $cafeteria->id,
+            'plan_id'         => $plan->id,
+            'user_id'         => $user->id,
+            'fecha_inicio'    => $inicio,
+            'fecha_fin'       => $fin,
+            'monto'           => $plan->precio,
+            'comprobante_url' => $path,
+            'estado_pago'     => 'pendiente',
+        ]);
 
         return ApiResponse::success([
             'suscripcion_id' => $suscripcion->id,
