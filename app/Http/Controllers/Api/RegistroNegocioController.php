@@ -53,6 +53,23 @@ class RegistroNegocioController extends Controller
             }
         }
 
+        // Limpiar inputs de HTML (Protección XSS)
+        $request->merge([
+            'nombre'           => $request->filled('nombre') ? strip_tags($request->nombre) : null,
+            'descripcion'      => $request->filled('descripcion') ? strip_tags($request->descripcion) : null,
+            'calle'            => $request->filled('calle') ? strip_tags($request->calle) : null,
+            'num_exterior'     => $request->filled('num_exterior') ? strip_tags($request->num_exterior) : null,
+            'num_interior'     => $request->filled('num_interior') ? strip_tags($request->num_interior) : null,
+            'colonia'          => $request->filled('colonia') ? strip_tags($request->colonia) : null,
+            'ciudad'           => $request->filled('ciudad') ? strip_tags($request->ciudad) : null,
+            'estado_republica' => $request->filled('estado_republica') ? strip_tags($request->estado_republica) : null,
+            
+            // Si el nombre del gerente viene en un array
+            'gerente' => $request->has('gerente') && is_array($request->gerente) ? array_merge($request->gerente, [
+                'name' => isset($request->gerente['name']) ? strip_tags($request->gerente['name']) : null
+            ]) : $request->gerente
+        ]);
+
         $data = $request->validate([
         'nombre'           => 'required|string|max:100',
         'descripcion'      => 'nullable|string|max:255',
@@ -143,8 +160,8 @@ class RegistroNegocioController extends Controller
 
     if ($suscripcion) {
         if ($suscripcion->plan_id != $data['plan_id']) {
-            $inicio = now();
-            $fin = $inicio->copy()->addDays($plan->duracion_dias);
+            $inicio = now()->startOfDay();
+            $fin = $inicio->copy()->addDays($plan->duracion_dias)->endOfDay();
 
             $suscripcion->update([
                 'plan_id' => $plan->id,
@@ -155,8 +172,8 @@ class RegistroNegocioController extends Controller
         }
     } else {
         // Fallback crucial: si el intento anterior falló antes de crear la suscripción, se crea ahora
-        $inicio = now();
-        $fin = $inicio->copy()->addDays($plan->duracion_dias);
+        $inicio = now()->startOfDay();
+        $fin = $inicio->copy()->addDays($plan->duracion_dias)->endOfDay();
 
         Suscripcion::create([
             'cafe_id'      => $cafeteria->id,
@@ -209,8 +226,8 @@ class RegistroNegocioController extends Controller
         ]);
 
         // Crear suscripción pendiente
-        $inicio = now();
-        $fin = $inicio->copy()->addDays($plan->duracion_dias);
+        $inicio = now()->startOfDay();
+        $fin = $inicio->copy()->addDays($plan->duracion_dias)->endOfDay();
 
         Suscripcion::create([
             'cafe_id'      => $cafeteria->id,

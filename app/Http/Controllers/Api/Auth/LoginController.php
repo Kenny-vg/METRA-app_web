@@ -101,18 +101,30 @@ class LoginController extends Controller
             ->first();
 
         if(!$suscActiva){
-
             if($user->role === 'gerente'){
+                $tienePendiente = $cafeteria->suscripciones()
+                    ->where('estado_pago', 'pendiente')
+                    ->exists();
+
+                if ($tienePendiente) {
+                    return ApiResponse::error(
+                        'Tu comprobante fue enviado. Espera la validación del superadmin.',
+                        423
+                    );
+                }
+
                 return ApiResponse::error(
                     'Tu cafetería no tiene una suscripción activa.',
                     423
                 );
             }
 
-            return ApiResponse::error(
-                'La cafetería no tiene una suscripción activa.',
-                403
-            );
+            if($user->role === 'personal'){
+                return ApiResponse::error(
+                    'La cafetería no tiene una suscripción activa.',
+                    403
+                );
+            }
         }
     }
 

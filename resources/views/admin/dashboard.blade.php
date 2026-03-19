@@ -147,7 +147,13 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4 pt-0">
-                    <form id="formRenovar">
+                    <div id="modal-mensaje-revisar" class="d-none text-center p-4">
+                        <h5 class="fw-bold fs-4 text-warning mb-3"><i class="bi bi-clock-history"></i></h5>
+                        <h5 class="fw-bold">¡Pago en proceso!</h5>
+                        <p class="text-muted">Tu comprobante ha sido recibido y está pendiente de validación por el administrador. Por favor, espera a que tu acceso sea reactivado.</p>
+                    </div>
+
+                    <form id="formRenovar" class="d-none">
                         <div class="mb-3" id="caja-r-plan">
                             <label class="form-label small fw-bold">Selecciona tu nuevo plan</label>
                             <select id="r-plan" class="form-select border-0 shadow-sm rounded-3" style="background: var(--off-white);" required>
@@ -158,7 +164,6 @@
                             <label class="form-label small fw-bold">Comprobante de Pago (PDF, JPG, PNG)</label>
                             <input type="file" id="r-comprobante" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" accept=".pdf,.jpg,.jpeg,.png" required>
                         </div>
-                        <!-- Alert removed manually to use SweetAlert instead -->
                         <button type="submit" id="btn-submit-renovar" class="btn-admin-primary w-100 py-2">Enviar Renovación</button>
                     </form>
                 </div>
@@ -207,8 +212,10 @@
                 container.innerHTML = `
                     <div class="card border-0 p-4 premium-card text-center">
                         <p class="text-muted m-0">No tienes una suscripción activa.</p>
-                        <button class="btn-admin-primary mt-3 px-4" onclick="abrirModalRenovar()"><i class="bi bi-arrow-repeat me-2"></i>Renovar Suscripción</button>
+                        <button class="btn-admin-primary mt-3 px-4" onclick="abrirModalRenovar('${cafe ? cafe.estado : ''}')"><i class="bi bi-arrow-repeat me-2"></i>Ver Estatus</button>
                     </div>`;
+                // Auto-open modal upon loading dashboard to lock the user view naturally
+                abrirModalRenovar(cafe ? cafe.estado : '');
                 return;
             }
 
@@ -238,7 +245,8 @@
                 alertContainer.innerHTML = `
                     <div class="alert alert-danger border-0 rounded-3 mb-4 d-flex align-items-center fw-bold shadow-sm" style="background-color: #ffebee; color: #c62828;">
                         <i class="bi bi-clock-history me-3 fs-3"></i>
-                        Tu suscripción vence en ${diasRestantes} días. Por favor, renueva para evitar la suspensión del servicio.
+                        <div>Tu suscripción vence en ${diasRestantes} días. Por favor, renueva para evitar la suspensión del servicio.</div>
+                        <button class="btn btn-sm btn-danger ms-auto px-3" onclick="abrirModalRenovar('${cafe.estado}')">Renovar ahora</button>
                     </div>`;
             }
 
@@ -270,27 +278,23 @@
 
         async function abrirModalRenovar(estado = '') {
             const modal = new bootstrap.Modal(document.getElementById('modalRenovar'));
-            const isRevision = estado === 'en_revision';
+            const isPendiente = estado === 'pendiente' || estado === 'en_revision';
             
-            document.getElementById('titulo-modal-renovar').innerHTML = isRevision 
+            document.getElementById('titulo-modal-renovar').innerHTML = isPendiente 
                 ? '<i class="bi bi-receipt me-2"></i>Actualizar Comprobante' 
                 : '<i class="bi bi-arrow-repeat me-2"></i>Renovar Suscripción';
                 
+            const divRevisar = document.getElementById('modal-mensaje-revisar');
+            const formRenovar = document.getElementById('formRenovar');
             const selectPlan = document.getElementById('r-plan');
-            const cajaPlan = document.getElementById('caja-r-plan');
-            if (isRevision) {
-                cajaPlan.classList.add('d-none');
-                selectPlan.removeAttribute('required');
-            } else {
-                cajaPlan.classList.remove('d-none');
-                selectPlan.setAttribute('required', 'true');
-            }
-            
-            document.getElementById('btn-submit-renovar').innerHTML = isRevision ? 'Subir Nuevo Comprobante' : 'Enviar Renovación';
 
-            modal.show();
-            
-            if (!isRevision) {
+            if (isPendiente) {
+                if(divRevisar) divRevisar.classList.remove('d-none');
+                if(formRenovar) formRenovar.classList.add('d-none');
+            } else {
+                if(divRevisar) divRevisar.classList.add('d-none');
+                if(formRenovar) formRenovar.classList.remove('d-none');
+
                 try {
                     const res = await fetch(`${API}/planes-publicos`, { headers: authHeaders() });
                     const json = await res.json();
@@ -303,6 +307,8 @@
                     Swal.fire({ title: 'Error', text: 'No se pudieron cargar los planes de renovación. Revisa tu conexión.', icon: 'error', confirmButtonColor: '#382C26' });
                 }
             }
+
+            modal.show();
         }
 
         document.getElementById('formRenovar').addEventListener('submit', async (e) => {

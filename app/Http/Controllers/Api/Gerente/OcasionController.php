@@ -30,6 +30,12 @@ class OcasionController extends Controller
     {
         $cafeId = $request->user()->cafe_id;
 
+        // Limpiar inputs de HTML (Protección XSS)
+        $request->merge([
+            'nombre'      => $request->filled('nombre') ? strip_tags($request->nombre) : null,
+            'descripcion' => $request->filled('descripcion') ? strip_tags($request->descripcion) : null,
+        ]);
+
         $request->validate([
             'nombre' => [
                 'required',
@@ -57,6 +63,12 @@ class OcasionController extends Controller
     public function update(Request $request, OcasionEspecial $ocasion)
     {
         $cafeId = $request->user()->cafe_id;
+
+        // Limpiar inputs de HTML (Protección XSS)
+        $request->merge([
+            'nombre'      => $request->filled('nombre') ? strip_tags($request->nombre) : null,
+            'descripcion' => $request->filled('descripcion') ? strip_tags($request->descripcion) : null,
+        ]);
 
         $request->validate([
             'nombre' => [

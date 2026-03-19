@@ -164,8 +164,8 @@ async function cargarDashboard() {
         const enRevision = jsonSols.data || [];
 
         // Stats
-        const activas    = todos.filter(c => c.estado === 'activa').length;
-        const pendientes = todos.filter(c => c.estado === 'pendiente').length;
+        const activas    = todos.filter(c => c.estado_dinamico === 'activa').length;
+        const pendientes = todos.filter(c => c.estado_dinamico === 'pendiente').length;
         const revision   = enRevision.length;
 
         document.getElementById('stat-total').textContent    = todos.length;
@@ -204,10 +204,11 @@ function badgeEstado(estado) {
         'pendiente':  'badge rounded-pill bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2',
         'en_revision':'badge rounded-pill bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2',
         'suspendida': 'badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2',
+        'vencida':    'badge rounded-pill bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2',
     };
     const labels = {
         'activa':'● Activa','pendiente':'● Pendiente',
-        'en_revision':'● En Revisión','suspendida':'● Suspendida',
+        'en_revision':'● En Revisión','suspendida':'● Suspendida','vencida':'● Vencida'
     };
     return `<span class="${map[estado] || 'badge bg-light text-dark'}">${labels[estado] || estado}</span>`;
 }
@@ -271,9 +272,9 @@ function renderTablaTodos(cafeterias) {
             <td class="fw-bold">${c.nombre}</td>
             <td>${gerente}</td>
             <td>${plan}</td>
-            <td>${badgeEstado(c.estado)}</td>
+            <td>${badgeEstado(c.estado_dinamico)}</td>
             <td class="text-end">
-                ${c.estado === 'en_revision'
+                ${c.estado_dinamico === 'en_revision'
                     ? `<button type="button" class="btn btn-sm btn-success rounded-pill px-3 me-1" onclick="accionSolicitud(${c.id},'aprobar')">
                            <i class="bi bi-check2 me-1"></i>Aprobar
                        </button>
@@ -281,8 +282,8 @@ function renderTablaTodos(cafeterias) {
                            <i class="bi bi-x me-1"></i>Rechazar
                        </button>`
                     : `<button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3"
-                              onclick="accionSolicitud(${c.id},'${c.estado === 'activa' ? 'suspender' : 'aprobar'}')">
-                           ${c.estado === 'activa' ? 'Suspender' : 'Activar'}
+                              onclick="accionSolicitud(${c.id},'${c.estado_dinamico === 'activa' ? 'suspender' : 'aprobar'}')">
+                           ${c.estado_dinamico === 'activa' ? 'Suspender' : 'Activar'}
                        </button>`
                 }
             </td>
@@ -297,7 +298,7 @@ window.filtrarTabla = function(estado, shouldScroll = false) {
     if (estado === 'todos') {
         renderTablaTodos(window.todosData);
     } else {
-        renderTablaTodos(window.todosData.filter(c => c.estado === estado));
+        renderTablaTodos(window.todosData.filter(c => c.estado_dinamico === estado));
     }
     
     if (shouldScroll) {
@@ -518,8 +519,8 @@ async function refreshDashboardSilently() {
         const todos = jsonCafes.data || [];
         const enRevision = jsonSols.data || [];
 
-        const activas    = todos.filter(c => c.estado === 'activa').length;
-        const pendientes = todos.filter(c => c.estado === 'pendiente').length;
+        const activas    = todos.filter(c => c.estado_dinamico === 'activa').length;
+        const pendientes = todos.filter(c => c.estado_dinamico === 'pendiente').length;
         const revision   = enRevision.length;
 
         document.getElementById('stat-total').textContent    = todos.length;

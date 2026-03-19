@@ -281,12 +281,8 @@ Route::middleware([
 });
 
 // Renovación de suscripción — para que gerentes con sub
-// vencida también puedan renovar desde el panel
-Route::middleware(['auth:sanctum', 'role:gerente'])
-    ->prefix('gerente')
-    ->group(function () {
-        Route::post('renovar-suscripcion', [RenovarSuscripcionController::class, 'store']);
-    });
+// vencida también puedan renovar desde el panel (y desde el login sin token)
+Route::post('gerente/renovar-suscripcion', [RenovarSuscripcionController::class, 'store']);
 
 /*
 |------------------------------------------

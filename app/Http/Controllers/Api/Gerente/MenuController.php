@@ -27,6 +27,11 @@ class MenuController extends Controller
     {
         $cafeId = $request->user()->cafe_id;
 
+        $request->merge([
+            'nombre_producto' => $request->nombre_producto ? strip_tags($request->nombre_producto) : null,
+            'descripcion' => $request->descripcion ? strip_tags($request->descripcion) : null,
+        ]);
+
         $request->validate([
             'nombre_producto' => [
                 'required',
@@ -58,6 +63,11 @@ class MenuController extends Controller
     public function update(Request $request, Menu $menu)
     {
         $cafeId = $request->user()->cafe_id;
+
+        $request->merge([
+            'nombre_producto' => $request->nombre_producto ? strip_tags($request->nombre_producto) : null,
+            'descripcion' => $request->descripcion ? strip_tags($request->descripcion) : null,
+        ]);
 
         $request->validate([
             'nombre_producto' => [

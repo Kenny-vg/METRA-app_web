@@ -43,6 +43,11 @@ class PromocionController extends Controller
             'ocasiones.min' => 'Debes elegir al menos una ocasión.'
         ];
 
+        $request->merge([
+            'nombre_promocion' => $request->nombre_promocion ? strip_tags($request->nombre_promocion) : null,
+            'descripcion' => $request->descripcion ? strip_tags($request->descripcion) : null,
+        ]);
+
         $request->validate([
             'nombre_promocion'=>[
                 'required',
@@ -87,6 +92,11 @@ class PromocionController extends Controller
             'ocasiones.array' => 'El formato de las ocasiones no es válido.',
             'ocasiones.min' => 'Debes elegir al menos una ocasión.'
         ];
+
+        $request->merge([
+            'nombre_promocion' => $request->nombre_promocion ? strip_tags($request->nombre_promocion) : null,
+            'descripcion' => $request->descripcion ? strip_tags($request->descripcion) : null,
+        ]);
 
         $request->validate([
             'nombre_promocion'=>[

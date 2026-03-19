@@ -395,6 +395,25 @@ document.addEventListener('DOMContentLoaded', function() {
                                 confirmButtonText: 'Entendido'
                             });
                         } 
+                    // 4. Suscripción Vencida
+                        else if (errorMsg === 'Tu cafetería no tiene una suscripción activa.' || msgLower.includes('no tiene una suscripción activa')) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Atención',
+                                text: errorMsg,
+                                showCancelButton: true,
+                                confirmButtonText: 'Renovar Suscripción',
+                                cancelButtonText: 'Entendido',
+                                confirmButtonColor: '#c62828',
+                                cancelButtonColor: '#382C26'
+                            }).then((result) => {
+                                if(result.isConfirmed) {
+                                    abrirModalRenovar();
+                                    // Save email for potential backend use when user doesn't have token
+                                    window.tempLoginEmail = email;
+                                }
+                            });
+                        }
                         // Fallback para otros 423
                         else {
                             Swal.fire({
@@ -450,7 +469,158 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+window.abrirModalRenovar = async function(estado = '') {
+    const modalElement = document.getElementById('modalRenovar');
+    if (!modalElement) {
+        console.error('Modal Renovar no encontrado en el DOM');
+        return;
+    }
+    const modal = new bootstrap.Modal(modalElement);
+    const isRevision = estado === 'en_revision';
+    
+    document.getElementById('titulo-modal-renovar').innerHTML = isRevision 
+        ? '<i class="bi bi-receipt me-2"></i>Actualizar Comprobante' 
+        : '<i class="bi bi-arrow-repeat me-2"></i>Renovar Suscripción';
+        
+    const selectPlan = document.getElementById('r-plan');
+    const cajaPlan = document.getElementById('caja-r-plan');
+    if (isRevision) {
+        cajaPlan.classList.add('d-none');
+        selectPlan.removeAttribute('required');
+    } else {
+        cajaPlan.classList.remove('d-none');
+        selectPlan.setAttribute('required', 'true');
+    }
+    
+    document.getElementById('btn-submit-renovar').innerHTML = isRevision ? 'Subir Nuevo Comprobante' : 'Enviar Renovación';
+
+    modal.show();
+    
+    if (!isRevision) {
+        try {
+            const API_URL = "{{ url('/api') }}";
+            const res = await fetch(`${API_URL}/planes-publicos`, { headers: { 'Accept': 'application/json' } });
+            const json = await res.json();
+            if (res.ok) {
+                selectPlan.innerHTML = '<option value="">Selecciona un plan...</option>' + 
+                    json.data.map(p => `<option value="${p.id}">${p.nombre_plan} ($${p.precio})</option>`).join('');
+            }
+        } catch (e) {
+            console.error('Error cargando planes modal', e);
+            Swal.fire({ title: 'Error', text: 'No se pudieron cargar los planes de renovación. Revisa tu conexión.', icon: 'error', confirmButtonColor: '#382C26' });
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const formRenovar = document.getElementById('formRenovar');
+    if (formRenovar) {
+        formRenovar.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const planVal   = document.getElementById('r-plan').value;
+            const fileInput = document.getElementById('r-comprobante').files[0];
+            const selectReq = document.getElementById('r-plan').hasAttribute('required');
+
+            if ((selectReq && !planVal) || !fileInput) {
+                Swal.fire({ title: 'Atención', text: 'Completa todos los campos requeridos.', icon: 'warning', confirmButtonColor: '#382C26' });
+                return;
+            }
+            if (fileInput.size > 5 * 1024 * 1024) {
+                Swal.fire({ title: 'Atención', text: 'El comprobante no debe superar los 5 MB.', icon: 'warning', confirmButtonColor: '#382C26' });
+                return;
+            }
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
+            submitBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('comprobante', fileInput);
+            if (planVal) formData.append('plan_id', planVal);
+
+            // Dado que el usuario no ha iniciado sesión, adjuntamos el email temporal que intentó usar
+            if (window.tempLoginEmail) formData.append('email', window.tempLoginEmail);
+
+            try {
+                const API_URL = "{{ url('/api') }}";
+                let authToken = localStorage.getItem('token') || '';
+                
+                // Usar el endpoint de renovación
+                const res = await fetch(`${API_URL}/gerente/renovar-suscripcion`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${authToken}`, 'Accept': 'application/json' },
+                    body: formData
+                });
+
+                const json = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(json.message || 'Error al enviar la solicitud.');
+                }
+
+                bootstrap.Modal.getInstance(document.getElementById('modalRenovar')).hide();
+
+                Swal.fire({
+                    title: '¡Solicitud Enviada!',
+                    text: json.message || 'Tu comprobante está en revisión por el administrador.',
+                    icon: 'success',
+                    confirmButtonColor: '#212529'
+                });
+
+            } catch(err) {
+                Swal.fire({ title: 'Error', text: err.message, icon: 'error', confirmButtonColor: '#382C26' });
+            } finally {
+                submitBtn.innerHTML = 'Enviar Renovación';
+                submitBtn.disabled = false;
+            }
+        });
+    }
+});
 </script>
+
+    <!-- Modal Renovar Suscripción (Copy from Dashboard) -->
+    <div class="modal fade" id="modalRenovar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow">
+                <div class="modal-header border-0 p-4">
+                    <h5 class="fw-bold m-0" id="titulo-modal-renovar"><i class="bi bi-arrow-repeat me-2"></i>Renovar Suscripción</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 pt-0">
+                    @php
+                        $cafeteria = auth()->check() && auth()->user() ? auth()->user()->cafeteria : null;
+                        $isPendiente = $cafeteria ? $cafeteria->suscripciones()->where('estado_pago', 'pendiente')->exists() : false;
+                    @endphp
+                    @if($isPendiente)
+                        <div class="text-center p-4">
+                            <h5 class="fw-bold fs-4 text-warning mb-3"><i class="bi bi-clock-history"></i></h5>
+                            <h5 class="fw-bold">¡Pago en proceso!</h5>
+                            <p class="text-muted">Tu comprobante ha sido recibido y está pendiente de validación por el administrador. Por favor, espera a que tu acceso sea reactivado.</p>
+                        </div>
+                    @else
+                        <form id="formRenovar">
+                            <div class="mb-3" id="caja-r-plan">
+                                <label class="form-label small fw-bold">Selecciona tu nuevo plan</label>
+                                <select id="r-plan" class="form-select border-0 shadow-sm rounded-3" style="background: var(--off-white);" required>
+                                    <option value="">Cargando planes...</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold">Comprobante de Pago (PDF, JPG, PNG)</label>
+                                <input type="file" id="r-comprobante" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" accept=".pdf,.jpg,.jpeg,.png" required>
+                            </div>
+                            <button type="submit" id="btn-submit-renovar" class="btn-metra-main w-100 py-3 mt-2" style="border-radius: 8px; font-size: 1.05rem; letter-spacing: 0.5px;">Enviar Renovación</button>
+                        </form>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

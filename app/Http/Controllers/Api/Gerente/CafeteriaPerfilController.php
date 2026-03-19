@@ -33,7 +33,12 @@ class CafeteriaPerfilController extends Controller
     //Actualizar mi cafetería
     public function update(Request $request)
     {
-
+        $camposTexto = ['nombre', 'descripcion', 'calle', 'num_exterior', 'num_interior', 'colonia', 'estado_republica', 'municipio'];
+        foreach($camposTexto as $campo){
+            if($request->has($campo) && !empty($request->$campo)){
+                $request->merge([$campo => strip_tags($request->$campo)]);
+            }
+        }
            
         $cafeteria=$request->user()->cafeteria;
 

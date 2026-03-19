@@ -144,15 +144,24 @@ function renderTabla(suscripciones) {
         
         let badgePlan = `<span class="badge rounded-pill px-3 py-2" style="background: #FFF8E1; color: #FFA000; border: 1px solid #FFE082;">${plan}</span>`;
         
-        // Lógica de Estado Mejorada
+        // Lógica de Estado Mejorada (evaluando fecha en HTML)
         let badgeEstado = '';
-        if(s.estado_pago === 'pagado') {
-            badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7;">● Pagado</span>`;
-        } else if(s.estado_pago === 'cancelado') {
-            badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A;">● Cancelado</span>`;
-        } else {
-            // Pendiente u otros
-            badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #FFF8E1; color: #FFA000; border: 1px solid #FFE082;">● Pendiente</span>`;
+        const fParts = s.fecha_fin.split(' ')[0].split('-');
+        const fFinDate = new Date(fParts[0], fParts[1] - 1, fParts[2]);
+        fFinDate.setHours(23, 59, 59, 999);
+        const isVencida = new Date() > fFinDate;
+
+        if (s.estado_pago === 'pendiente') {
+            badgeEstado = `<span class="badge rounded-pill px-3 py-2 d-inline-flex align-items-center" style="background: #FFF8E1; color: #FFA000; border: 1px solid #FFE082;">● Pendiente</span>`;
+            if (s.comprobante_url) {
+                badgeEstado += ` <button type="button" class="btn btn-sm btn-link p-0 ms-2 text-primary align-baseline" onclick="verComprobanteSub(${s.id})" title="Ver Comprobante" data-bs-toggle="tooltip"><i class="bi bi-receipt fs-5"></i></button>`;
+            }
+        } else if (isVencida) {
+            badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A;">● Vencida</span>`;
+        } else if (s.estado_pago === 'pagado') {
+            badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7;">● Pagada</span>`;
+        } else if (s.estado_pago === 'cancelado') {
+            badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #F5F5F5; color: #757575; border: 1px solid #E0E0E0;">● Cancelada</span>`;
         }
 
         return `<tr class="${s.estado_pago === 'cancelado' ? 'opacity-75' : ''}">
@@ -170,9 +179,9 @@ function renderTabla(suscripciones) {
                           // Registro inicial pendiente de aprobar
                           (s.cafeteria?.estado === 'en_revision')
                             ? `<span class="btn btn-sm btn-outline-warning rounded-pill px-3 disabled" style="width: 110px; opacity: 0.8; pointer-events: none; border-color: #ffc107; color: #ffc107;">Pendiente</span>`
-                          // Renovación pendiente de cafetería activa → botón Aprobar
-                          : (s.estado_pago === 'pendiente' && s.cafeteria?.estado === 'activa')
-                            ? `<button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3" style="width: 130px;" onclick="aprobarRenovacion(${s.id})"><i class="bi bi-check-circle me-1"></i>Aprobar Renov.</button>`
+                          // Cualquier suscripción pendiente (renovación o vencida) → botón Aprobar Pago
+                          : (s.estado_pago === 'pendiente')
+                            ? `<button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3" style="width: 130px;" onclick="aprobarRenovacion(${s.id})"><i class="bi bi-check-circle me-1"></i>Aprobar Pago</button>`
                           // Sin suscripción activa -> suspendida o cancelada
                           : (s.estado_pago !== 'cancelado' && s.cafeteria?.estado !== 'suspendida'
                             ? `<button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" style="width: 110px;" onclick="cambiarEstado(${s.cafe_id}, 'suspendida')">Suspender</button>`
@@ -388,13 +397,18 @@ async function verHistorial(cafeteriaId, nombre) {
             
             let badgePlan = `<span class="badge bg-light text-dark border">${plan}</span>`;
             
+            const fParts = s.fecha_fin.split(' ')[0].split('-');
+            const fFinDate = new Date(fParts[0], fParts[1] - 1, fParts[2]);
+            fFinDate.setHours(23, 59, 59, 999);
+            const isVencida = new Date() > fFinDate;
+
             let badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7;">● Pagado</span>`;
             if (s.estado_pago === 'pendiente') {
                 badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #FFF8E1; color: #FFA000; border: 1px solid #FFE082;">● Pendiente</span>`;
-            } else if (s.estado_pago === 'vencido') {
-                badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A;">● Vencido</span>`;
+            } else if (isVencida) {
+                badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A;">● Vencida</span>`;
             } else if (s.estado_pago === 'cancelado') {
-                badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #F5F5F5; color: #757575; border: 1px solid #E0E0E0;">● Cancelado</span>`;
+                badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #F5F5F5; color: #757575; border: 1px solid #E0E0E0;">● Cancelada</span>`;
             }
 
             let btnComprobante = s.comprobante_url 

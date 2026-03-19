@@ -24,6 +24,8 @@ class Cafeteria extends Model
         'comprobante_url',
     ];
 
+    protected $appends = ['estado_dinamico'];
+
     // Gerente/dueño que registró la cafetería
     public function gerente()
     {
@@ -66,5 +68,37 @@ class Cafeteria extends Model
         return $value
             ? asset('storage/' . $value)
             : null;
-}
+    }
+
+    public function getEstadoDinamicoAttribute()
+    {
+        return $this->getEstadoAttribute($this->attributes['estado'] ?? 'activa');
+    }
+
+    public function getEstadoAttribute($value)
+    {
+        // Solo sobreescribimos si el estado en base de datos es activa y la suscripcion ya venció
+        if ($value === 'activa') {
+            // Evaluamos primero si tiene pago pendiente de validación
+            $tienePendiente = $this->suscripciones()
+                ->where('estado_pago', 'pendiente')
+                ->exists();
+                
+            if ($tienePendiente) {
+                return 'pendiente';
+            }
+            
+            // Buscamos si tiene ALGUNA suscripción pagada y activa el día de hoy
+            $tieneActiva = $this->suscripciones()
+                ->where('estado_pago', 'pagado')
+                ->where('fecha_inicio', '<=', now()->endOfDay())
+                ->where('fecha_fin', '>=', now()->startOfDay())
+                ->exists();
+                
+            if (!$tieneActiva) {
+                return 'vencida';
+            }
+        }
+        return $value;
+    }
 }

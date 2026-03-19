@@ -67,11 +67,11 @@ class SuscripcionController extends Controller
         }
 
         $fecha_inicio = $activa
-            ?Carbon::parse($activa->fecha_fin)
-            : now();
+            ? Carbon::parse($activa->fecha_fin)->startOfDay()->addDay()
+            : now()->startOfDay();
 
         $fecha_fin = (clone $fecha_inicio)
-            ->addDays($plan->duracion_dias);
+            ->addDays($plan->duracion_dias)->endOfDay();
 
         $suscripcion = Suscripcion::create([
             'cafe_id' => $data['cafe_id'],

@@ -19,7 +19,23 @@ class RenovarSuscripcionController extends Controller
      */
     public function store(Request $request)
     {
-        $user      = $request->user();
+        $user = $request->user();
+
+        // 1. Obtener usuario por Email si no está autenticado (desde el Login)
+        if (!$user) {
+            $dataEmail = $request->validate([
+                'email' => 'required|email|exists:users,email'
+            ], [
+                'email.required' => 'Es necesario enviar el correo electrónico para renovar la suscripción.',
+                'email.exists' => 'No se encontró una cuenta con este correo electrónico.'
+            ]);
+            $user = \App\Models\User::where('email', $dataEmail['email'])->first();
+        }
+
+        if (!$user || !in_array($user->role, ['gerente'])) {
+            return ApiResponse::error('Usuario no válido para renovación.', 403);
+        }
+
         $cafeteria = $user->cafeteria;
 
         if (!$cafeteria) {
@@ -36,62 +52,43 @@ class RenovarSuscripcionController extends Controller
             return ApiResponse::error('El plan seleccionado no está disponible.', 422);
         }
 
-        // Suscripción activa actual (con pagado)
-        $suscripcionActiva = $cafeteria->suscripciones()
-            ->where('estado_pago', 'pagado')
-            ->where('fecha_fin', '>', now())
-            ->latest('fecha_fin')
-            ->first();
+        // Suscripción única: siempre actualizamos la fila existente o creamos una si mágicamente no existiera
+        $suscripcionActiva = $cafeteria->suscripciones()->first();
 
-        // Calcular fechas de la NUEVA suscripción
-        $inicio = $suscripcionActiva
-            ? \Carbon\Carbon::parse($suscripcionActiva->fecha_fin)->addDay()
-            : now();
-        $fin = $inicio->copy()->addDays($plan->duracion_dias);
+        // Calcular fechas de la suscripción
+        if ($suscripcionActiva && $suscripcionActiva->estado_pago === 'pagado' && \Carbon\Carbon::parse($suscripcionActiva->fecha_fin)->isFuture()) {
+            $inicio = \Carbon\Carbon::parse($suscripcionActiva->fecha_fin)->startOfDay()->addDay();
+        } else {
+            $inicio = now()->startOfDay();
+        }
+        $fin = $inicio->copy()->addDays($plan->duracion_dias)->endOfDay();
 
         // Guardar el nuevo comprobante
         $path = $request->file('comprobante')->store('comprobantes');
 
-        // Buscar si ya existe una renovación PENDIENTE futura (para no crear duplicados)
-        $pendienteExistente = $cafeteria->suscripciones()
-            ->where('estado_pago', 'pendiente')
-            ->where('fecha_inicio', '>', now())   // solo registros de renovación (futuros)
-            ->latest()
-            ->first();
+        if ($suscripcionActiva && $suscripcionActiva->comprobante_url) {
+            \Storage::delete($suscripcionActiva->comprobante_url);
+        }
 
-        if ($pendienteExistente) {
-            // Reemplazar la solicitud anterior
-            if ($pendienteExistente->comprobante_url) {
-                \Storage::delete($pendienteExistente->comprobante_url);
-            }
-            $pendienteExistente->update([
-                'plan_id'         => $plan->id,
-                'fecha_inicio'    => $inicio,
-                'fecha_fin'       => $fin,
-                'monto'           => $plan->precio,
-                'comprobante_url' => $path,
-                'estado_pago'     => 'pendiente',
-            ]);
-            $suscripcion = $pendienteExistente;
-        } else {
-            $suscripcion = \App\Models\Suscripcion::create([
-                'cafe_id'         => $cafeteria->id,
+        $suscripcion = Suscripcion::updateOrCreate(
+            ['cafe_id' => $cafeteria->id],
+            [
                 'plan_id'         => $plan->id,
                 'user_id'         => $user->id,
                 'fecha_inicio'    => $inicio,
                 'fecha_fin'       => $fin,
-                'estado_pago'     => 'pendiente',
                 'monto'           => $plan->precio,
                 'comprobante_url' => $path,
-            ]);
-        }
+                'estado_pago'     => 'pendiente',
+            ]
+        );
 
         return ApiResponse::success([
             'suscripcion_id' => $suscripcion->id,
             'plan'           => $plan->nombre_plan,
             'fecha_inicio'   => $inicio->toDateString(),
             'fecha_fin'      => $fin->toDateString(),
-        ], 'Solicitud de renovación enviada correctamente. El equipo de METRA la revisará pronto.');
+        ], '¡Recibido! Espera a que el Superadmin te apruebe.');
     }
 
 }
