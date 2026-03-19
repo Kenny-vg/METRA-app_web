@@ -34,14 +34,16 @@ class ReservacionController extends Controller
             // de zona horaria (el servidor UTC puede estar un día adelante del cliente).
             $desde = $request->query('desde', now()->toDateString());
             $query->where('fecha', '>=', $desde)
-                  ->orderBy('fecha')
-                  ->orderBy('hora_inicio');
-        } elseif ($modo === 'futuras') {
+                ->orderBy('fecha')
+                ->orderBy('hora_inicio');
+        }
+        elseif ($modo === 'futuras') {
             // Desde mañana en adelante (se mantiene por compatibilidad)
             $query->where('fecha', '>', now()->toDateString())
-                  ->orderBy('fecha')
-                  ->orderBy('hora_inicio');
-        } else {
+                ->orderBy('fecha')
+                ->orderBy('hora_inicio');
+        }
+        else {
             // Por fecha específica (default: hoy)
             $fecha = $request->query('fecha', now()->toDateString());
             $query->where('fecha', $fecha)->orderBy('hora_inicio');
@@ -360,17 +362,17 @@ class ReservacionController extends Controller
         return ($personasReservadas + $personas) <= $capacidadTotal;
     }
 
-    /**
-     * Marcar reservación como completada
-     */
     public function completar($id)
     {
         $reservacion = Reservacion::findOrFail($id);
 
         $inicio = Carbon::parse($reservacion->fecha . ' ' . $reservacion->hora_inicio);
 
-        if ($inicio->isFuture()) {
-            return ApiResponse::error('La reservación aún no inicia');
+        // Permitir llegada 30 minutos antes
+        $horaPermitida = $inicio->copy()->subMinutes(30);
+
+        if (now()->lt($horaPermitida)) {
+            return ApiResponse::error('Aún no puedes marcar la llegada del cliente');
         }
 
         if (!in_array($reservacion->estado, ['pendiente', 'confirmada'])) {
