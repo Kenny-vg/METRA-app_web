@@ -73,7 +73,7 @@ class ReservacionController extends Controller
      */
     public function show($id)
     {
-        $reservacion = Reservacion::with(['ocasionEspecial', 'promocion', 'zona'])
+        $reservacion = Reservacion::with(['cafeteria', 'ocasionEspecial', 'promocion', 'zona'])
             ->findOrFail($id);
 
         return ApiResponse::success($reservacion, 'Detalle de reservación');
@@ -235,7 +235,7 @@ class ReservacionController extends Controller
                     ->send(new ReservaConfirmada($reservacion));
             }
 
-            $reservacion->load(['cafeteria', 'ocasionEspecial', 'zona']);
+            $reservacion->load(['cafeteria', 'ocasionEspecial', 'zona', 'promocion']);
 
             return ApiResponse::success(
                 $reservacion,
@@ -264,6 +264,7 @@ class ReservacionController extends Controller
             ->map(fn($r) => [
         'id' => $r->id,
         'folio' => $r->folio,
+        'nombre_cliente' => $r->nombre_cliente,
         'fecha' => $r->fecha,
         'hora_inicio' => $r->hora_inicio,
         'hora_fin' => $r->hora_fin,
@@ -370,6 +371,8 @@ class ReservacionController extends Controller
 
         $reservacion->estado = 'completada';
         $reservacion->save();
+
+        $reservacion->load(['cafeteria', 'ocasionEspecial', 'zona', 'promocion']);
 
         return ApiResponse::success(
             $reservacion,
