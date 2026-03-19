@@ -26,17 +26,25 @@ class ReservacionController extends Controller
         $modo = $request->query('modo', 'dia');
 
         $query = Reservacion::with(['ocasionEspecial', 'promocion', 'zona'])
-            ->where('estado', '!=', 'cancelada')
-            ->orderBy('hora_inicio');
+            ->where('estado', '!=', 'cancelada');
 
-        if ($modo === 'futuras') {
-            // Todas las reservaciones desde mañana en adelante
-            $query->where('fecha', '>', now()->toDateString());
-        }
-        else {
+        if ($modo === 'todo') {
+            // Hoy + todo el futuro en un solo payload para filtrado en frontend.
+            // Se usa el parámetro 'desde' enviado por el cliente para evitar desfases
+            // de zona horaria (el servidor UTC puede estar un día adelante del cliente).
+            $desde = $request->query('desde', now()->toDateString());
+            $query->where('fecha', '>=', $desde)
+                  ->orderBy('fecha')
+                  ->orderBy('hora_inicio');
+        } elseif ($modo === 'futuras') {
+            // Desde mañana en adelante (se mantiene por compatibilidad)
+            $query->where('fecha', '>', now()->toDateString())
+                  ->orderBy('fecha')
+                  ->orderBy('hora_inicio');
+        } else {
             // Por fecha específica (default: hoy)
             $fecha = $request->query('fecha', now()->toDateString());
-            $query->where('fecha', $fecha);
+            $query->where('fecha', $fecha)->orderBy('hora_inicio');
         }
 
         $reservaciones = $query->get()->map(function ($r) {
