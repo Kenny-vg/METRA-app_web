@@ -16,13 +16,13 @@ class AprobacionController extends Controller
     public function aprobar(Cafeteria $cafeteria)
     {
         $cafeteria->update([
-            'estado'=>'activa'
+            'estado' => 'activa'
         ]);
 
         //activar gerente
         optional($cafeteria->gerente)->update([
-            'estado'=>1, //true
-            'estatus_registro'=>'aprobado'
+            'estado' => 1, //true
+            'estatus_registro' => 'aprobado'
         ]);
 
         //marcar pago validado y resetear fechas desde hoy
@@ -31,12 +31,12 @@ class AprobacionController extends Controller
             $plan = $suscripcion->plan;
             $duracion = $plan ? $plan->duracion_dias : 30;
             $inicio = now()->startOfDay();
-            $fin    = $inicio->copy()->addDays(max(0, $duracion - 1))->endOfDay();
+            $fin = $inicio->copy()->addDays(max(0, $duracion - 1))->endOfDay();
 
             $suscripcion->update([
-                'estado_pago'      => 'pagado',
-                'fecha_inicio'     => $inicio,
-                'fecha_fin'        => $fin,
+                'estado_pago' => 'pagado',
+                'fecha_inicio' => $inicio,
+                'fecha_fin' => $fin,
                 'fecha_validacion' => now(),
             ]);
         }
@@ -46,18 +46,19 @@ class AprobacionController extends Controller
                 $loginUrl = env('FRONTEND_URL', url('/')) . '/login';
 
                 Mail::to($cafeteria->gerente->email)
-                    ->queue(new CuentaActivadaMail($loginUrl));
+                    ->send(new CuentaActivadaMail($loginUrl));
 
-            } catch (\Throwable $e) {
-                \Log::error("Error enviando mail: ".$e->getMessage());
+            }
+            catch (\Throwable $e) {
+                \Log::error("Error enviando mail: " . $e->getMessage());
             }
         }
 
         return ApiResponse::success(
             $cafeteria->fresh()->load([
-                'gerente',
-                'suscripciones.plan'
-            ]),
+            'gerente',
+            'suscripciones.plan'
+        ]),
             'Cafetería aprobada correctamente'
         );
     }
@@ -66,27 +67,28 @@ class AprobacionController extends Controller
     public function rechazar(Cafeteria $cafeteria)
     {
         $cafeteria->update([
-            'estado'=>'suspendida'
+            'estado' => 'suspendida'
         ]);
 
         //desactivar gerente
         optional($cafeteria->gerente)->update([
-            'estado'=>0, //false
-            'estatus_registro'=>'rechazado'
+            'estado' => 0, //false
+            'estatus_registro' => 'rechazado'
         ]);
 
         //cancelar suscripcion
         optional($cafeteria->suscripcionActual)->update([
-            'estado_pago'=>'cancelado'
+            'estado_pago' => 'cancelado'
         ]);
 
         // Notificar al gerente
         if ($cafeteria->gerente) {
             try {
                 Mail::to($cafeteria->gerente->email)
-                    ->queue(new CuentaRechazadaMail());
-            } catch (\Throwable $e) {
-                \Log::error("Error enviando mail de rechazo: ".$e->getMessage());
+                    ->send(new CuentaRechazadaMail());
+            }
+            catch (\Throwable $e) {
+                \Log::error("Error enviando mail de rechazo: " . $e->getMessage());
             }
         }
 
