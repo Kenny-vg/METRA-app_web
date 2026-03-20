@@ -50,29 +50,7 @@ class ReservacionController extends Controller
         }
 
         $reservaciones = $query->get()->map(function ($r) {
-            return [
-            'id' => $r->id,
-            'folio' => $r->folio,
-            'nombre_cliente' => $r->nombre_cliente,
-            'telefono' => $r->telefono,
-            'email' => $r->email,
-            'fecha' => $r->fecha,
-            'hora_inicio' => $r->hora_inicio,
-            'hora_fin' => $r->hora_fin,
-            'numero_personas' => $r->numero_personas,
-            'estado' => $r->estado,
-            'comentarios' => $r->comentarios,
-            'ocasion' => $r->ocasionEspecial
-            ? ['nombre' => $r->ocasionEspecial->nombre]
-            : null,
-            'promocion' => $r->promocion
-            ? ['nombre' => $r->promocion->nombre_promocion, 'precio' => $r->promocion->precio]
-            : null,
-            'zona' => $r->zona
-            ? ['nombre' => $r->zona->nombre_zona]
-            : null,
-            'tipo' => $r->tipo,
-            ];
+            return $this->formatReservacion($r);
         });
 
         return ApiResponse::success($reservaciones, 'Reservaciones');
@@ -86,7 +64,7 @@ class ReservacionController extends Controller
         $reservacion = Reservacion::with(['cafeteria', 'ocasionEspecial', 'promocion', 'zona'])
             ->findOrFail($id);
 
-        return ApiResponse::success($reservacion, 'Detalle de reservación');
+        return ApiResponse::success($this->formatReservacion($reservacion), 'Detalle de reservación');
     }
 
     /**
@@ -240,15 +218,20 @@ class ReservacionController extends Controller
                 'estado' => 'pendiente'
             ]);
 
-            if ($reservacion->email) {
-                Mail::to($reservacion->email)
-                    ->send(new ReservaConfirmada($reservacion));
+            try {
+                if ($reservacion->email) {
+                    Mail::to($reservacion->email)
+                        ->send(new ReservaConfirmada($reservacion));
+                }
+            } catch (\Exception $e) {
+                // Previene rollback si el servidor SMTP falla
+                \Illuminate\Support\Facades\Log::error('SMTP/Email Error en reservación: ' . $e->getMessage());
             }
 
             $reservacion->load(['cafeteria', 'ocasionEspecial', 'zona', 'promocion']);
 
             return ApiResponse::success(
-                $reservacion,
+                $this->formatReservacion($reservacion),
                 'Reservación creada correctamente'
             );
 
@@ -271,21 +254,7 @@ class ReservacionController extends Controller
             ->where('user_id', auth()->id())
             ->latest('fecha')
             ->get()
-            ->map(fn($r) => [
-        'id' => $r->id,
-        'folio' => $r->folio,
-        'nombre_cliente' => $r->nombre_cliente,
-        'fecha' => $r->fecha,
-        'hora_inicio' => $r->hora_inicio,
-        'hora_fin' => $r->hora_fin,
-        'numero_personas' => $r->numero_personas,
-        'estado' => $r->estado,
-        'comentarios' => $r->comentarios,
-        'cafeteria' => $r->cafeteria ? ['nombre' => $r->cafeteria->nombre] : null,
-        'ocasion' => $r->ocasionEspecial ? ['nombre' => $r->ocasionEspecial->nombre] : null,
-        'promocion' => $r->promocion ? ['nombre' => $r->promocion->nombre_promocion, 'precio' => $r->promocion->precio] : null,
-        'zona' => $r->zona ? ['nombre' => $r->zona->nombre_zona] : null,
-        ]);
+            ->map(fn($r) => $this->formatReservacion($r));
 
         return ApiResponse::success($reservas, 'Reservaciones del usuario');
     }
@@ -385,7 +354,7 @@ class ReservacionController extends Controller
         $reservacion->load(['cafeteria', 'ocasionEspecial', 'zona', 'promocion']);
 
         return ApiResponse::success(
-            $reservacion,
+            $this->formatReservacion($reservacion),
             'Cliente marcado como llegado'
         );
     }
@@ -411,26 +380,7 @@ class ReservacionController extends Controller
             ->with(['cafeteria:id,nombre,calle,colonia,ciudad', 'zona', 'promocion', 'ocasionEspecial'])
             ->firstOrFail();
 
-        return ApiResponse::success([
-            'id' => $r->id,
-            'folio' => $r->folio,
-            'nombre_cliente' => $r->nombre_cliente,
-            'fecha' => $r->fecha,
-            'hora_inicio' => $r->hora_inicio,
-            'hora_fin' => $r->hora_fin,
-            'numero_personas' => $r->numero_personas,
-            'estado' => $r->estado,
-            'comentarios' => $r->comentarios,
-            'cafeteria' => $r->cafeteria ? [
-                'nombre' => $r->cafeteria->nombre,
-                'calle' => $r->cafeteria->calle,
-                'colonia' => $r->cafeteria->colonia,
-                'ciudad' => $r->cafeteria->ciudad,
-            ] : null,
-            'ocasion' => $r->ocasionEspecial ? ['nombre' => $r->ocasionEspecial->nombre] : null,
-            'promocion' => $r->promocion ? ['nombre' => $r->promocion->nombre_promocion, 'precio' => $r->promocion->precio] : null,
-            'zona' => $r->zona ? ['nombre' => $r->zona->nombre_zona] : null,
-        ]);
+        return ApiResponse::success($this->formatReservacion($r));
     }
 
 
@@ -481,4 +431,33 @@ class ReservacionController extends Controller
         );
     }
 
+    /**
+     * Formatear reservación para respuestas JSON consistentes
+     */
+    private function formatReservacion($r)
+    {
+        return [
+            'id' => $r->id,
+            'folio' => $r->folio,
+            'nombre_cliente' => $r->nombre_cliente,
+            'telefono' => $r->telefono,
+            'email' => $r->email,
+            'fecha' => $r->fecha,
+            'hora_inicio' => $r->hora_inicio,
+            'hora_fin' => $r->hora_fin,
+            'numero_personas' => $r->numero_personas,
+            'estado' => $r->estado,
+            'comentarios' => $r->comentarios,
+            'cafeteria' => $r->relationLoaded('cafeteria') && $r->cafeteria ? [
+                'nombre' => $r->cafeteria->nombre,
+                'calle' => $r->cafeteria->calle ?? null,
+                'colonia' => $r->cafeteria->colonia ?? null,
+                'ciudad' => $r->cafeteria->ciudad ?? null,
+            ] : null,
+            'ocasion' => $r->relationLoaded('ocasionEspecial') && $r->ocasionEspecial ? ['nombre' => $r->ocasionEspecial->nombre] : null,
+            'promocion' => $r->relationLoaded('promocion') && $r->promocion ? ['nombre' => $r->promocion->nombre_promocion, 'precio' => $r->promocion->precio] : null,
+            'zona' => $r->relationLoaded('zona') && $r->zona ? ['nombre' => $r->zona->nombre_zona] : null,
+            'tipo' => $r->tipo ?? null,
+        ];
+    }
 }
