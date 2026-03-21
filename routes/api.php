@@ -223,7 +223,7 @@ Route::middleware([
     Route::patch('ocasiones/{id}/activar', [OcasionController::class , 'activar']);
     Route::patch('staff/{id}/activar', [StaffController::class , 'activar']);
 
-    Route::patch('/reservaciones/{id}/completar', [ReservacionController::class , 'completar']);
+    Route::patch('/reservaciones/{id}/checkin', [ReservacionController::class , 'checkin']);
     Route::patch('/reservaciones/{id}/cancelar', [ReservacionController::class , 'cancelarGerente']);
 
     Route::get('/resenas', [ResenaController::class , 'index']);
@@ -254,6 +254,6 @@ Route::middleware([
     Route::get('/ocupaciones', [OcupacionController::class , 'index']);
     Route::post('/ocupaciones', [OcupacionController::class , 'store']);
     Route::patch('/ocupaciones/{id}/finalizar', [OcupacionController::class , 'finalizar']);
-    Route::patch('/reservaciones/{id}/completar', [ReservacionController::class , 'completar']);
+    Route::patch('/reservaciones/{id}/checkin', [ReservacionController::class , 'checkin']); // renamed from completar
     Route::get('/mesas-estado', [OcupacionController::class , 'estadoMesas']);
 });
