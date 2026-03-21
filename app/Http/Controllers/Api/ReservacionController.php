@@ -26,7 +26,7 @@ class ReservacionController extends Controller
         $modo = $request->query('modo', 'dia');
 
         $query = Reservacion::with(['ocasionEspecial', 'promocion', 'zona'])
-            ->where('estado', '!=', 'cancelada');
+            ->whereIn('estado', ['pendiente', 'en_curso']);
 
         if ($modo === 'todo') {
             // Hoy + todo el futuro en un solo payload para filtrado en frontend.
@@ -186,7 +186,7 @@ class ReservacionController extends Controller
                 }
             }
             )
-                ->where('estado', '!=', 'cancelada')
+                ->whereIn('estado', ['pendiente', 'en_curso'])
                 ->exists();
 
             if ($duplicada) {
@@ -223,7 +223,8 @@ class ReservacionController extends Controller
                     Mail::to($reservacion->email)
                         ->send(new ReservaConfirmada($reservacion));
                 }
-            } catch (\Exception $e) {
+            }
+            catch (\Exception $e) {
                 // Previene rollback si el servidor SMTP falla
                 \Illuminate\Support\Facades\Log::error('SMTP/Email Error en reservación: ' . $e->getMessage());
             }
@@ -272,8 +273,8 @@ class ReservacionController extends Controller
             return ApiResponse::error('No autorizado', 403);
         }
 
-        if ($reservacion->estado === 'completada') {
-            return ApiResponse::error('No se puede cancelar una reservación completada');
+        if (in_array($reservacion->estado, ['en_curso', 'finalizada'])) {
+            return ApiResponse::error('No se puede cancelar una reservación en curso o finalizada');
         }
 
         $inicio = Carbon::parse($reservacion->fecha . ' ' . $reservacion->hora_inicio);
@@ -324,14 +325,14 @@ class ReservacionController extends Controller
                 ->where('hora_fin', '>', $inicio);
 
         })
-            ->where('estado', '!=', 'cancelada')
+            ->whereIn('estado', ['pendiente', 'en_curso'])
             ->sum('numero_personas');
 
 
         return ($personasReservadas + $personas) <= $capacidadTotal;
     }
 
-    public function completar($id)
+    public function checkin($id)
     {
         $reservacion = Reservacion::findOrFail($id);
 
@@ -344,12 +345,14 @@ class ReservacionController extends Controller
             return ApiResponse::error('Aún no puedes marcar la llegada del cliente');
         }
 
-        if (!in_array($reservacion->estado, ['pendiente', 'confirmada'])) {
-            return ApiResponse::error('Solo reservaciones pendientes o confirmadas pueden completarse');
+        if ($reservacion->estado !== 'pendiente') {
+            return ApiResponse::error('Solo reservaciones pendientes pueden marcarse como llegada');
         }
 
-        $reservacion->estado = 'completada';
-        $reservacion->save();
+        $reservacion->update([
+            'estado' => 'en_curso',
+            'fecha_checkin' => now()
+        ]);
 
         $reservacion->load(['cafeteria', 'ocasionEspecial', 'zona', 'promocion']);
 
@@ -397,8 +400,8 @@ class ReservacionController extends Controller
             return ApiResponse::error('Esta reservación ya fue cancelada.', 409);
         }
 
-        if ($r->estado === 'completada') {
-            return ApiResponse::error('No se puede cancelar una reservación completada.', 409);
+        if (in_array($r->estado, ['en_curso', 'finalizada'])) {
+            return ApiResponse::error('No se puede cancelar una reservación en curso o finalizada.', 409);
         }
 
         $inicio = Carbon::parse($r->fecha . ' ' . $r->hora_inicio);
@@ -418,8 +421,8 @@ class ReservacionController extends Controller
     {
         $reservacion = Reservacion::findOrFail($id);
 
-        if ($reservacion->estado === 'completada') {
-            return ApiResponse::error('No se puede cancelar una reservación completada');
+        if (in_array($reservacion->estado, ['en_curso', 'finalizada'])) {
+            return ApiResponse::error('No se puede cancelar una reservación en curso o finalizada');
         }
 
         $reservacion->estado = 'cancelada';
@@ -448,6 +451,8 @@ class ReservacionController extends Controller
             'numero_personas' => $r->numero_personas,
             'estado' => $r->estado,
             'comentarios' => $r->comentarios,
+            'fecha_checkin' => $r->fecha_checkin,
+            'fecha_checkout' => $r->fecha_checkout,
             'cafeteria' => $r->relationLoaded('cafeteria') && $r->cafeteria ? [
                 'nombre' => $r->cafeteria->nombre,
                 'calle' => $r->cafeteria->calle ?? null,

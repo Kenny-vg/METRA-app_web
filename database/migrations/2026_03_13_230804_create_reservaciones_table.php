@@ -25,14 +25,17 @@ return new class extends Migration
             $table->time('hora_inicio');
             $table->time('hora_fin');
 
+            $table->dateTime('fecha_checkin')->nullable();
+            $table->dateTime('fecha_checkout')->nullable();
+
             $table->integer('numero_personas');
 
             $table->enum('estado', [
                 'pendiente',
-                'confirmada',
-                'cancelada',
-                'completada',
-                'no_show'
+                'en_curso',
+                'finalizada',
+                'no_show',
+                'cancelada'
             ])->default('pendiente');
 
             $table->enum('tipo', [

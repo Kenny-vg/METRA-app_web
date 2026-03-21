@@ -187,7 +187,6 @@
 
                 <div class="reserva-card">
                     <form id="reserva-form" novalidate>
-                        <input type="hidden" id="cafe_slug" value="{{ $slug }}">
                         <input type="hidden" id="cafe_id" value="">
 
                         <div id="general-error" class="alert alert-danger d-none mb-4" style="border-radius: 10px; font-weight: 500;"></div>
@@ -304,13 +303,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
+    <script src="/js/metra-utils.js"></script>
     <script>
         function getToken() {
             return localStorage.getItem('token');
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const cafeSlug = document.getElementById('cafe_slug').value;
+            const cafeSlug = getSlugFromUrl();
             const fechaInput = document.getElementById('fecha-select');
             const horaSelect = document.getElementById('hora-select');
             const horaSpinner = document.getElementById('hora-spinner');

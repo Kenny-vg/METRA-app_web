@@ -66,10 +66,11 @@
 
     <!-- Leyenda de colores -->
     <div class="d-flex flex-wrap gap-3 mb-4 px-2" style="font-size: 0.85rem; font-weight: 600;">
-        <span class="d-flex align-items-center text-muted"><i class="bi bi-circle-fill me-2 border border-secondary" style="color: #fff; border-radius: 50%;"></i> Programada (Futura)</span>
-        <span class="d-flex align-items-center text-muted"><i class="bi bi-circle-fill me-2 p-1" style="background: #fdf3d8; color: #d4af37; border-radius: 50%;"></i> Llegando (< 20 min)</span>
-        <span class="d-flex align-items-center text-muted"><i class="bi bi-circle-fill me-2 p-1" style="background: #e8f5e9; color: #2e7d32; border-radius: 50%;"></i> En curso (Activa)</span>
-        <span class="d-flex align-items-center text-muted"><i class="bi bi-circle-fill me-2 p-1" style="background: #f5f5f5; color: #9e9e9e; border-radius: 50%;"></i> Finalizada (Pasada)</span>
+        <span class="d-flex align-items-center text-muted"><i class="bi bi-circle-fill me-2 border border-secondary" style="color: #fff; border-radius: 50%;"></i> Pendiente</span>
+        <span class="d-flex align-items-center text-muted"><i class="bi bi-circle-fill me-2 p-1" style="background: #e8f5e9; color: #2e7d32; border-radius: 50%;"></i> En curso</span>
+        <span class="d-flex align-items-center text-muted"><i class="bi bi-circle-fill me-2 p-1" style="background: #f5f5f5; color: #9e9e9e; border-radius: 50%;"></i> Finalizada</span>
+        <span class="d-flex align-items-center text-muted"><i class="bi bi-circle-fill me-2 p-1" style="background: #fce4e4; color: #c62828; border-radius: 50%;"></i> No Show</span>
+        <span class="d-flex align-items-center text-muted"><i class="bi bi-circle-fill me-2 p-1" style="background: #ffebee; color: #d32f2f; border-radius: 50%;"></i> Cancelada</span>
     </div>
 
     <!-- Tabs Navegacion -->
@@ -166,25 +167,17 @@
         }
 
         function calcularEstadoReserva(r) {
-            const now   = new Date();
-            const start = buildDateTime(r.fecha, r.hora_inicio);
-            const end   = r.hora_fin
-                ? buildDateTime(r.fecha, r.hora_fin)
-                : new Date(start.getTime() + 2 * 60 * 60 * 1000);
-            const veinte = new Date(start.getTime() - 20 * 60 * 1000);
-
-            if (end   <= now) return 'finalizada';
-            if (start <= now) return 'curso';
-            if (veinte <= now) return 'llegando';
-            return 'programada';
+            return r.estado || 'pendiente';
         }
 
         function getStatusStyling(estado) {
             switch (estado) {
-                case 'curso':     return { bg:'#e8f5e9', border:'#81c784', text:'#2e7d32', shadow:'0 5px 15px rgba(46,125,50,0.1)',    badgeBg:'#2e7d32', badgeText:'#fff',    label:'En Curso'    };
-                case 'llegando':  return { bg:'#fdf3d8', border:'#f3ca63', text:'#b58500', shadow:'0 5px 15px rgba(212,175,55,0.15)',   badgeBg:'#d4af37', badgeText:'#fff',    label:'Por Llegar'  };
+                case 'en_curso':  return { bg:'#e8f5e9', border:'#81c784', text:'#2e7d32', shadow:'0 5px 15px rgba(46,125,50,0.1)',    badgeBg:'#2e7d32', badgeText:'#fff',    label:'En Curso'    };
+                case 'pendiente': return { bg:'#ffffff', border:'#e6e6e6', text:'#111',    shadow:'0 4px 10px rgba(0,0,0,0.03)',       badgeBg:'#f0f0f0', badgeText:'#555',    label:'Pendiente'  };
                 case 'finalizada':return { bg:'#f9f9f9', border:'#e0e0e0', text:'#9e9e9e', shadow:'none',                              badgeBg:'#e0e0e0', badgeText:'#757575', label:'Finalizada'  };
-                default:          return { bg:'#ffffff', border:'#e6e6e6', text:'#111',    shadow:'0 4px 10px rgba(0,0,0,0.03)',       badgeBg:'#f0f0f0', badgeText:'#555',    label:'Programada'  };
+                case 'no_show':   return { bg:'#fce4e4', border:'#f5c6c6', text:'#c62828', shadow:'none',                              badgeBg:'#c62828', badgeText:'#fff',    label:'No Show'  };
+                case 'cancelada': return { bg:'#ffebee', border:'#ffcdd2', text:'#d32f2f', shadow:'none',                              badgeBg:'#d32f2f', badgeText:'#fff',    label:'Cancelada'  };
+                default:          return { bg:'#ffffff', border:'#e6e6e6', text:'#111',    shadow:'0 4px 10px rgba(0,0,0,0.03)',       badgeBg:'#f0f0f0', badgeText:'#555',    label:'Pendiente'  };
             }
         }
 
@@ -299,7 +292,7 @@
             const todayIso = toIsoLocal(now);
 
             // 1. Aforo Esperado (de lo que se ve en pantalla)
-            const aforoEstados = ['programada', 'llegando'];
+            const aforoEstados = ['pendiente'];
             const totalAforo = reservasVisibles
                 .filter(r => aforoEstados.includes(calcularEstadoReserva(r)))
                 .reduce((sum, r) => sum + r.numero_personas, 0);
@@ -308,7 +301,7 @@
 
             // 2. En Curso (de lo que se ve en pantalla)
             const totalEnCurso = reservasVisibles
-                .filter(r => calcularEstadoReserva(r) === 'curso')
+                .filter(r => calcularEstadoReserva(r) === 'en_curso')
                 .reduce((sum, r) => sum + r.numero_personas, 0);
             
             document.getElementById('statEnCurso').textContent = totalEnCurso;
@@ -333,7 +326,7 @@
                 const nombre     = (prox.nombre_cliente || '').split(' ')[0];
 
                 if (esHoy) {
-                    const label = estadoProx === 'curso' ? 'En curso' : 'Siguiente';
+                    const label = estadoProx === 'en_curso' ? 'En curso' : 'Siguiente';
                     document.getElementById('statProxima').textContent =
                         `${label}: ${nombre} a las ${prox.hora_inicio.substring(0, 5)}`;
                 } else {
