@@ -237,7 +237,7 @@
                     document.getElementById('overlay-foto').classList.add('d-none');
                     document.getElementById('label-foto').classList.add('d-none');
                 }
-                
+
             } catch (e) {
                 console.error('Error cargando perfil:', e);
             }

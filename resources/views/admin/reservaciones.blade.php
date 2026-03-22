@@ -7,6 +7,9 @@
             <h2 class="fw-bold" style="color: var(--black-primary); font-family: 'Inter', sans-serif; letter-spacing: -1px;">Monitor Tactico</h2>
             <p class="m-0" style="color: var(--text-muted); font-size: 0.95rem;">Dashboard de alto rendimiento en tiempo real.</p>
         </div>
+        <button class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center" onclick="abrirModalConfigReservas()" style="background: var(--black-primary); font-family: 'Inter', sans-serif;">
+            <i class="bi bi-gear-fill me-2" style="color: var(--accent-gold);"></i> Configuración
+        </button>
     </header>
 
     <!-- Header Stats (Hoy de un vistazo) -->
@@ -128,6 +131,66 @@
           </div>
           <div class="modal-footer border-0 p-4 pt-0">
             <button type="button" class="btn text-white w-100 fw-bold py-2 rounded-3 shadow-sm" style="background: #111;" data-bs-dismiss="modal">CERRAR DETALLES</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Configuración de Reservas -->
+    <div class="modal fade" id="modalConfigReservas" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border: none; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
+          <div class="modal-header border-bottom flex-column align-items-start" style="background: var(--off-white); border-radius: 16px 16px 0 0; padding: 1.5rem 2rem;">
+            <button type="button" class="btn-close ms-auto position-absolute" style="top: 15px; right: 15px;" data-bs-dismiss="modal" aria-label="Close"></button>
+            <h4 class="modal-title fw-bold m-0" style="font-family: 'Inter', sans-serif; color: var(--black-primary);"><i class="bi bi-gear-fill me-2" style="color: var(--accent-gold);"></i>Configuración de Reservas</h4>
+          </div>
+          <div class="modal-body p-4 text-start">
+             <form id="formConfigReservas">
+                <div id="configWarning" class="alert alert-warning border-0 rounded-3 mb-4 d-none align-items-center" style="background: #fff8e1; color: #b78a00;">
+                    <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                    <span class="fw-bold small">Tienes cambios sin guardar</span>
+                </div>
+
+                <div class="mb-4">
+                    <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Duración promedio por mesa</label>
+                    <select class="form-select border-0 shadow-sm rounded-3 p-3 fw-bold" id="conf_duracion" style="background: var(--off-white); color: var(--black-primary);" required onchange="marcarCambiosConfig()">
+                        <option value="60">60 minutos</option>
+                        <option value="90">90 minutos</option>
+                        <option value="120">120 minutos</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Intervalos de agendamiento</label>
+                    <select class="form-select border-0 shadow-sm rounded-3 p-3 fw-bold" id="conf_intervalo" style="background: var(--off-white); color: var(--black-primary);" required onchange="marcarCambiosConfig()">
+                        <option value="15">Cada 15 minutos</option>
+                        <option value="30">Cada 30 minutos</option>
+                        <option value="45">Cada 45 minutos</option>
+                        <option value="60">Cada 60 minutos</option>
+                    </select>
+                </div>
+
+                <div class="mb-2 mt-4 pt-2 border-top">
+                    <label class="small fw-bold mb-2 text-uppercase text-muted mt-3" style="letter-spacing: 1px; font-size: 0.7rem;">Porcentaje de reservas</label>
+                    <p class="small text-muted mb-3">Capacidad dedicada a reservas vs. clientes sin reserva (walk-ins).</p>
+                    
+                    <div class="d-flex align-items-center mb-2">
+                        <input type="range" class="form-range" id="conf_porcentaje" min="0" max="100" step="1" value="50" style="flex: 1;" oninput="updatePorcentajeModalUI(this.value); marcarCambiosConfig();">
+                        <div class="ms-4 text-center" style="min-width: 70px; background: var(--off-white); padding: 8px; border-radius: 10px;">
+                            <span id="conf_porcentaje_txt" class="fw-bold fs-5" style="color: var(--black-primary);">50%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="alert border-0 rounded-3 p-3 mt-3 d-flex align-items-center" style="background: rgba(212, 175, 55, 0.08); border-left: 4px solid var(--accent-gold) !important;">
+                        <i class="bi bi-info-circle-fill me-3 fs-5" style="color: var(--accent-gold);"></i>
+                        <span class="small fw-bold text-dark" id="txtDinamicoConfigPorcentaje">Balance entre reservas y walk-ins</span>
+                    </div>
+                </div>
+             </form>
+          </div>
+          <div class="modal-footer border-0 p-4 pt-0 d-flex gap-2">
+            <button type="button" class="btn text-muted fw-bold py-2 rounded-3 shadow-sm px-4" style="background: var(--off-white);" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" id="btnGuardarConfigReservas" class="btn fw-bold py-2 px-4 rounded-3 shadow-sm flex-grow-1" style="background: var(--accent-gold); color: var(--black-primary);" onclick="guardarConfigReservas()">Guardar Cambios <i class="bi bi-check-circle ms-1"></i></button>
           </div>
         </div>
       </div>
@@ -309,6 +372,7 @@
             // 3. Proxima Reserva: BUSQUEDA GLOBAL (siempre la siguiente del monitor)
             const pendientesGlobal = todasLasReservas
                 .filter(r => {
+                    if (calcularEstadoReserva(r) !== 'pendiente') return false;
                     const end = r.hora_fin
                         ? buildDateTime(r.fecha, r.hora_fin)
                         : new Date(buildDateTime(r.fecha, r.hora_inicio).getTime() + 2 * 60 * 60 * 1000);
@@ -378,6 +442,117 @@
         }
 
         // ------------------------------------------------------------------
+        // Configuracion Modal Logica
+        // ------------------------------------------------------------------
+        let cafeConfigId = null;
+        let configModificada = false;
+
+        async function abrirModalConfigReservas() {
+            try {
+                const token = localStorage.getItem('token');
+                if(!token) return;
+                
+                const btn = document.querySelector('button[onclick="abrirModalConfigReservas()"]');
+                const prev = btn.innerHTML;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+                btn.disabled = true;
+
+                const res = await fetch(`/api/gerente/mi-cafeteria`, {
+                    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+                });
+                
+                btn.innerHTML = prev;
+                btn.disabled = false;
+
+                if(res.ok) {
+                    const json = await res.json();
+                    const cafe = json.data || json;
+                    cafeConfigId = cafe.id;
+                    
+                    document.getElementById('conf_duracion').value = cafe.duracion_reserva_min || 90;
+                    document.getElementById('conf_intervalo').value = cafe.intervalo_reserva_min || 30;
+                    
+                    const pct = cafe.porcentaje_reservas !== null && cafe.porcentaje_reservas !== undefined ? cafe.porcentaje_reservas : 50;
+                    document.getElementById('conf_porcentaje').value = pct;
+                    updatePorcentajeModalUI(pct);
+                    
+                    configModificada = false;
+                    document.getElementById('configWarning').classList.add('d-none');
+                    document.getElementById('configWarning').classList.remove('d-flex');
+
+                    new bootstrap.Modal(document.getElementById('modalConfigReservas')).show();
+                }
+            } catch(e) { console.error('Error al abrir configuracion:', e); }
+        }
+
+        function updatePorcentajeModalUI(val) {
+            document.getElementById('conf_porcentaje_txt').innerText = val + '%';
+            
+            const msj = document.getElementById('txtDinamicoConfigPorcentaje');
+            
+            if (val <= 30) {
+                msj.innerText = "Más espacio para clientes sin reserva";
+            } else if (val <= 70) {
+                msj.innerText = "Balance entre reservas y walk-ins";
+            } else {
+                msj.innerText = "Alta prioridad a reservas";
+            }
+        }
+
+        function marcarCambiosConfig() {
+            if(!configModificada) {
+                configModificada = true;
+                const warn = document.getElementById('configWarning');
+                warn.classList.remove('d-none');
+                warn.classList.add('d-flex');
+            }
+        }
+
+        async function guardarConfigReservas() {
+            try {
+                const token = localStorage.getItem('token');
+                const btn = document.getElementById('btnGuardarConfigReservas');
+                const prev = btn.innerHTML;
+                
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+                btn.disabled = true;
+
+                // El update de la cafeteria usa FormData por el soporte a multimedia en otras ramas, aunque aqui sea config pura
+                const formData = new FormData();
+                formData.append('_method', 'PUT');
+                formData.append('duracion_reserva_min', document.getElementById('conf_duracion').value);
+                formData.append('intervalo_reserva_min', document.getElementById('conf_intervalo').value);
+                formData.append('porcentaje_reservas', document.getElementById('conf_porcentaje').value);
+
+                const res = await fetch(`/api/gerente/mi-cafeteria`, {
+                    method: 'POST', 
+                    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
+                    body: formData
+                });
+                
+                btn.innerHTML = prev;
+                btn.disabled = false;
+
+                if(res.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('modalConfigReservas')).hide();
+                    
+                    Swal.fire({
+                        title: '¡Guardado!',
+                        text: 'Configuración de reservas actualizada correctamente',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    const json = await res.json();
+                    throw new Error(json.message || 'Error al guardar');
+                }
+            } catch(e) {
+                Swal.fire('Error', e.message, 'error');
+            }
+        }
+
+        // ------------------------------------------------------------------
         // Aplicar vista actual sobre el master array
         // ------------------------------------------------------------------
         function aplicarVistaActual() {
@@ -429,6 +604,7 @@
         // Bootstrap
         // ------------------------------------------------------------------
         document.addEventListener('DOMContentLoaded', () => {
+            updateDateUI();
             cargarMaestro(); // fetch inicial
 
             document.querySelectorAll('.btn-day-nav').forEach(btn => {

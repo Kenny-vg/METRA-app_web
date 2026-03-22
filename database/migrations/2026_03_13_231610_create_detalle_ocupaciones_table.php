@@ -22,6 +22,7 @@ return new class extends Migration
 
             $table->enum('tipo', ['reservacion', 'walkin'])->default('walkin');
             $table->string('comentarios', 255)->nullable();
+            $table->string('token_resena')->nullable();
 
             $table->dateTime('hora_entrada')->nullable();
             $table->dateTime('hora_salida')->nullable();

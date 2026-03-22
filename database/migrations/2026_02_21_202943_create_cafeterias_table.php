@@ -28,6 +28,8 @@ return new class extends Migration
 
             $table->string('telefono')->nullable();
 
+            $table->integer('porcentaje_reservas')->default(50);
+
             $table->integer('duracion_reserva_min')->default(90);
             $table->integer('intervalo_reserva_min')->default(30);
 

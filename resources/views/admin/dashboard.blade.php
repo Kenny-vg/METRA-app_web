@@ -74,9 +74,9 @@
                         <i class="bi bi-clock-history fs-5"></i>
                     </div>
                 </div>
-                <h3 class="fw-bold mb-1 position-relative z-1" style="color: var(--white-pure); font-size: 2.2rem; letter-spacing: -1px;">08:00<span class="fs-5 fw-normal" style="color: rgba(255,255,255,0.6);">PM</span></h3>
+                <h3 id="dash_proxima_hora" class="fw-bold mb-1 position-relative z-1" style="color: var(--white-pure); font-size: 2.2rem; letter-spacing: -1px;">--:--</h3>
                 <div class="d-flex align-items-center mt-2 position-relative z-1">
-                    <span class="small" style="color: var(--accent-gold); font-size: 0.75rem; font-weight: 600;">Mesa VIP Preparada</span>
+                    <span id="dash_proxima_nombre" class="small" style="color: var(--accent-gold); font-size: 0.75rem; font-weight: 600;">-</span>
                 </div>
             </div>
         </div>
@@ -105,32 +105,8 @@
                     <a href="/admin/reservaciones" class="small fw-bold text-decoration-none" style="color: var(--text-muted);">Ver todo →</a>
                 </div>
 
-                <div class="d-flex flex-column gap-3 overflow-auto pe-2" style="max-height: 400px;">
-                    
-                    <div class="d-flex justify-content-between align-items-center p-3 rounded-3" style="border: 1px solid var(--border-light); background: var(--off-white); transition: all 0.2s; cursor: pointer;" onmouseover="this.style.background='var(--white-pure)'" onmouseout="this.style.background='var(--off-white)'">
-                        <div>
-                            <span class="fw-bold d-block" style="color: var(--black-primary);">Mariana Sánchez</span>
-                            <small style="color: var(--text-muted); font-size: 0.8rem;"><i class="bi bi-clock me-1"></i>20:30 PM &nbsp;•&nbsp; 4 pax</small>
-                        </div>
-                        <span class="badge badge-status badge-status-active">Confirmada</span>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center p-3 rounded-3" style="border: 1px solid var(--border-light); background: transparent; transition: all 0.2s; cursor: pointer;" onmouseover="this.style.background='var(--off-white)'" onmouseout="this.style.background='transparent'">
-                        <div>
-                            <span class="fw-bold d-block" style="color: var(--black-primary);">Juan Pablo Montes</span>
-                            <small style="color: var(--text-muted); font-size: 0.8rem;"><i class="bi bi-clock me-1"></i>21:00 PM &nbsp;•&nbsp; 2 pax</small>
-                        </div>
-                        <span class="badge badge-status badge-status-pending">Pendiente</span>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center p-3 rounded-3" style="border: 1px solid var(--border-light); background: var(--off-white); transition: all 0.2s; cursor: pointer;" onmouseover="this.style.background='var(--white-pure)'" onmouseout="this.style.background='var(--off-white)'">
-                        <div>
-                            <span class="fw-bold d-block" style="color: var(--black-primary);">Roberto Gómez</span>
-                            <small style="color: var(--text-muted); font-size: 0.8rem;"><i class="bi bi-clock me-1"></i>21:15 PM &nbsp;•&nbsp; 6 pax</small>
-                        </div>
-                        <span class="badge badge-status badge-status-active">Confirmada</span>
-                    </div>
-
+                <div id="dash_panel_llegadas" class="d-flex flex-column gap-3 overflow-auto pe-2" style="max-height: 400px;">
+                    <p class="text-muted text-center mt-3">Cargando llegadas...</p>
                 </div>
             </div>
         </div>
@@ -390,9 +366,65 @@
         });
 
 
+        async function cargarLlegadas() {
+            try {
+                const off = new Date().getTimezoneOffset();
+                const hoyIso = new Date(Date.now() - off * 60000).toISOString().split('T')[0];
+
+                const resR = await fetch(`${API}/gerente/reservaciones?modo=todo&desde=${hoyIso}`, { headers: authHeaders() });
+                if(resR.ok) {
+                    const reservas = (await resR.json()).data || [];
+                    const reservasHoy = reservas.filter(r => r.fecha === hoyIso);
+
+                    const now = new Date();
+                    const pendientes = reservas.filter(r => {
+                        const rsrvTime = new Date(`${r.fecha}T${r.hora_inicio}`);
+                        // Consideramos pendientes a las que estan en estado=pendiente (que van a llegar)
+                        return r.estado === 'pendiente' && rsrvTime >= now;
+                    }).sort((a,b) => new Date(`${a.fecha}T${a.hora_inicio}`) - new Date(`${b.fecha}T${b.hora_inicio}`));
+
+                    if (pendientes.length > 0) {
+                        const pr = pendientes[0];
+                        document.getElementById('dash_proxima_hora').innerHTML = `${pr.hora_inicio.substring(0,5)}<span class="fs-5 fw-normal" style="color: rgba(255,255,255,0.6);">Hrs</span>`;
+                        document.getElementById('dash_proxima_nombre').textContent = `${pr.nombre_cliente} | ${pr.numero_personas} Pax`;
+                    } else {
+                        document.getElementById('dash_proxima_hora').innerHTML = `--:--`;
+                        document.getElementById('dash_proxima_nombre').textContent = `Sin próximas llegadas`;
+                    }
+
+                    const llegadasPanel = document.getElementById('dash_panel_llegadas');
+                    const proximasMostrar = reservasHoy
+                        .filter(r => ['pendiente', 'en_curso'].includes(r.estado))
+                        .sort((a,b) => new Date(`${a.fecha}T${a.hora_inicio}`) - new Date(`${b.fecha}T${b.hora_inicio}`))
+                        .slice(0, 4);
+                    
+                    if (proximasMostrar.length > 0) {
+                        llegadasPanel.innerHTML = proximasMostrar.map(r => {
+                            const badge = r.estado === 'en_curso' 
+                                ? `<span class="badge" style="background: rgba(46,125,50,0.2); color: #2e7d32; border: 1px solid rgba(46,125,50,0.4);">En Curso</span>`
+                                : `<span class="badge" style="background: rgba(212,175,55,0.2); color: #B38600; border: 1px solid rgba(212,175,55,0.4);">Pendiente</span>`;
+                            
+                            return `
+                            <div class="d-flex justify-content-between align-items-center p-3 rounded-3 mb-2" style="border: 1px solid var(--border-light); background: var(--off-white); transition: all 0.2s;">
+                                <div>
+                                    <span class="fw-bold d-block" style="color: var(--black-primary);">${r.nombre_cliente}</span>
+                                    <small style="color: var(--text-muted); font-size: 0.8rem;"><i class="bi bi-clock me-1"></i>${r.hora_inicio.substring(0,5)} &nbsp;•&nbsp; ${r.numero_personas} pax</small>
+                                </div>
+                                ${badge}
+                            </div>
+                        `}).join('');
+                    } else {
+                        llegadasPanel.innerHTML = '<p class="text-muted text-center mt-3 fw-bold">No hay llegadas pendientes hoy.</p>';
+                    }
+                }
+            } catch(e) { console.error('Error al cargar llegadas:', e); }
+        }
+
         // Init
         if(authToken) {
             cargarDashboard();
+            cargarLlegadas();
+            setInterval(cargarLlegadas, 60000); // 1 minuto
         }
     </script>
 @endsection
