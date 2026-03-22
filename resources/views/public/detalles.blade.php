@@ -230,6 +230,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/metra-utils.js"></script>
     <script>
+        window.escapeHTML = function(str) {
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        };
+
         document.addEventListener('DOMContentLoaded', async () => {
             const cafeSlug = getSlugFromUrl();
             const API_URL = "{{ url('/api') }}";
@@ -300,8 +305,8 @@
                                 menuContainer.innerHTML += `
                                     <div class="col-6 col-md-4 text-center mb-3">
                                         <div style="width: 100%; height: 120px; border-radius: 12px; background-image: url('${img}'); background-size: cover; background-position: center; border: 1px solid var(--border-light);" class="mb-2 shadow-sm"></div>
-                                        <p class="small fw-bold mb-0 text-truncate" style="color: var(--black-primary);" title="${item.nombre_producto}">${item.nombre_producto}</p>
-                                        <p class="text-muted small text-truncate" style="font-size: 0.75rem;" title="${item.descripcion || ''}">${item.descripcion ? item.descripcion : ' '}</p>
+                                        <p class="small fw-bold mb-0 text-truncate" style="color: var(--black-primary);" title="${escapeHTML(item.nombre_producto)}">${escapeHTML(item.nombre_producto)}</p>
+                                        <p class="text-muted small text-truncate" style="font-size: 0.75rem;" title="${escapeHTML(item.descripcion || '')}">${escapeHTML(item.descripcion ? item.descripcion : ' ')}</p>
                                     </div>
                                 `;
                             });
@@ -341,7 +346,7 @@
                                 document.getElementById('ocasiones-filtros-container').classList.remove('d-none');
                                 const container = document.getElementById('ocasiones-filtros-container');
                                 ocasiones.forEach(o => {
-                                    container.innerHTML += `<button id="btn-ocasion-${o.id}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill btn-filtro-ocasion fw-medium" onclick="filtrarPromos(${o.id})">${o.nombre}</button>`;
+                                    container.innerHTML += `<button id="btn-ocasion-${o.id}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill btn-filtro-ocasion fw-medium" onclick="filtrarPromos(${o.id})">${escapeHTML(o.nombre)}</button>`;
                                 });
                             }
                         }
@@ -378,12 +383,12 @@
                                             <div class="p-4 rounded-4 h-100 d-flex flex-column shadow-sm" style="background: var(--off-white); border: 1px solid rgba(212,175,55,0.3); position: relative; overflow: hidden;">
                                                 <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent-gold);"></div>
                                                 <div class="d-flex justify-content-between align-items-start mb-3 ms-2">
-                                                    <h5 class="fw-bold mb-0" style="color: var(--black-primary); letter-spacing: -0.5px;">${p.nombre_promocion}</h5>
+                                                    <h5 class="fw-bold mb-0" style="color: var(--black-primary); letter-spacing: -0.5px;">${escapeHTML(p.nombre_promocion)}</h5>
                                                     <span class="badge rounded-pill" style="background: rgba(212,175,55,0.12); color: var(--accent-gold); border: 1px solid rgba(212,175,55,0.3); font-size: 0.7rem; letter-spacing: 0.5px; text-transform: uppercase;">
                                                         <i class="bi bi-star-fill me-1"></i>Disponible
                                                     </span>
                                                 </div>
-                                                <p class="text-muted small mb-4 ms-2 flex-grow-1" style="line-height: 1.5;">${p.descripcion || 'Pregunta a tu mesero por los detalles.'}</p>
+                                                <p class="text-muted small mb-4 ms-2 flex-grow-1" style="line-height: 1.5;">${escapeHTML(p.descripcion || 'Pregunta a tu mesero por los detalles.')}</p>
                                                 <div class="mt-auto ms-2 pt-3 border-top" style="border-color: rgba(0,0,0,0.05) !important;">
                                                     <span class="fs-4 fw-bold" style="color: var(--accent-gold);">${formattedPrice}</span>
                                                 </div>
@@ -430,7 +435,7 @@
                                                 <div class="small fw-bold text-muted">${r.fecha}</div>
                                                 <div>${starsHtml}</div>
                                             </div>
-                                            <p class="mb-0 text-muted" style="line-height: 1.5; font-size: 0.95rem;">"${r.comentario || 'Excelente servicio.'}"</p>
+                                            <p class="mb-0 text-muted" style="line-height: 1.5; font-size: 0.95rem;">"${escapeHTML(r.comentario || 'Excelente servicio.')}"</p>
                                         </div>
                                     </div>
                                 `;

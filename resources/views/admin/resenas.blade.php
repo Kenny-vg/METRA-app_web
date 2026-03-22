@@ -122,7 +122,7 @@
                                     <div>${renderStars(r.calificacion)}</div>
                                     ${getEstadoBadge(r.estado)}
                                 </div>
-                                <p class="text-muted flex-grow-1" style="line-height: 1.6; font-size: 0.95rem;">"${r.comentario || '<em>Sin comentario</em>'}"</p>
+                                <p class="text-muted flex-grow-1" style="line-height: 1.6; font-size: 0.95rem;">"${r.comentario ? escapeHTML(r.comentario) : '<em>Sin comentario</em>'}"</p>
                                 <div class="d-flex justify-content-between align-items-center mt-auto pt-3" style="border-top: 1px solid var(--border-light);">
                                     <small class="text-muted fw-bold"><i class="bi bi-calendar3 me-1"></i>${fecha}</small>
                                     <div class="d-flex gap-2">

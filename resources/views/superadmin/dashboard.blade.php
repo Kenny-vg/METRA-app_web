@@ -232,15 +232,15 @@ function renderTablaRevision(cafeterias) {
         </thead>
         <tbody>
             ${cafeterias.map(c => {
-                const gerente = c.gerente ? `${c.gerente.name}<br><small class="text-muted">${c.gerente.email}</small>` : '—';
-                const plan    = c.suscripcion_actual?.plan?.nombre_plan || c.ultima_suscripcion?.plan?.nombre_plan || '—';
+                const gerente = c.gerente ? `${escapeHTML(c.gerente.name)}<br><small class="text-muted">${escapeHTML(c.gerente.email)}</small>` : '—';
+                const plan    = escapeHTML(c.suscripcion_actual?.plan?.nombre_plan || c.ultima_suscripcion?.plan?.nombre_plan || '—');
                 const comp    = c.comprobante_url
                     ? `<button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="verComprobante(${c.id})">
                         <i class="bi bi-receipt me-1"></i>Ver
                        </button>`
                     : '<span class="text-muted small">No subido</span>';
                 return `<tr>
-                    <td class="fw-bold">${c.nombre}</td>
+                    <td class="fw-bold">${escapeHTML(c.nombre)}</td>
                     <td>${gerente}</td>
                     <td>${plan}</td>
                     <td>${comp}</td>
@@ -266,10 +266,10 @@ function renderTablaTodos(cafeterias) {
         return;
     }
     tbody.innerHTML = cafeterias.map(c => {
-        const gerente = c.gerente ? c.gerente.name : '—';
-        const plan    = c.suscripcion_actual?.plan?.nombre_plan || c.ultima_suscripcion?.plan?.nombre_plan || '—';
+        const gerente = c.gerente ? escapeHTML(c.gerente.name) : '—';
+        const plan    = escapeHTML(c.suscripcion_actual?.plan?.nombre_plan || c.ultima_suscripcion?.plan?.nombre_plan || '—');
         return `<tr>
-            <td class="fw-bold">${c.nombre}</td>
+            <td class="fw-bold">${escapeHTML(c.nombre)}</td>
             <td>${gerente}</td>
             <td>${plan}</td>
             <td>${badgeEstado(c.estado_dinamico)}</td>

@@ -352,6 +352,16 @@
     </section>
 
     <script>
+    window.escapeHTML = function(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    };
+
     async function cargarCafeterias() {
         try {
             const API_URL = "{{ url('/api') }}";
@@ -379,11 +389,11 @@
                             }
                             <div class="card-body p-4">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h5 class="fw-bold mb-0 text-dark">${cafe.nombre}</h5>
+                                    <h5 class="fw-bold mb-0 text-dark">${escapeHTML(cafe.nombre)}</h5>
                                     <span class="badge rounded-pill ms-2" style="background: rgba(25,135,84,0.1); color: #198754; border: 1px solid rgba(25,135,84,0.2); font-size: 0.7rem; flex-shrink: 0;">Activa</span>
                                 </div>
-                                <p class="text-muted small mb-3">${cafe.descripcion || 'Sistema de reservas METRA activo.'}</p>
-                                ${cafe.calle ? `<p class="small mb-0" style="color: var(--text-muted);"><i class="bi bi-geo-alt-fill me-1" style="color: var(--accent-gold);"></i>${cafe.calle}${cafe.num_exterior ? ' ' + cafe.num_exterior : ''}${cafe.colonia ? ', ' + cafe.colonia : ''}</p>` : ''}
+                                <p class="text-muted small mb-3">${escapeHTML(cafe.descripcion || 'Sistema de reservas METRA activo.')}</p>
+                                ${cafe.calle ? `<p class="small mb-0" style="color: var(--text-muted);"><i class="bi bi-geo-alt-fill me-1" style="color: var(--accent-gold);"></i>${escapeHTML(cafe.calle)}${escapeHTML(cafe.num_exterior ? ' ' + cafe.num_exterior : '')}${escapeHTML(cafe.colonia ? ', ' + cafe.colonia : '')}</p>` : ''}
                             </div>
                             <div class="card-footer bg-white border-0 px-4 pb-4">
                                 <span class="btn btn-sm fw-bold w-100 rounded-pill" style="background: var(--black-primary); color: #fff;">

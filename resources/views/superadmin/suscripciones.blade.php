@@ -161,8 +161,8 @@ async function cargarPendientes() {
             seccion.classList.remove('d-none');
             
             contenedor.innerHTML = pendientes.map(p => {
-                const cafeNombre = p.cafeteria?.nombre || 'Cafetería Desconocida';
-                const planNombre = p.plan?.nombre_plan || 'Plan';
+                const cafeNombre = escapeHTML(p.cafeteria?.nombre || 'Cafetería Desconocida');
+                const planNombre = escapeHTML(p.plan?.nombre_plan || 'Plan');
                 const monto = p.monto ? `$${parseFloat(p.monto).toFixed(2)}` : 'N/A';
                 // Fecha desde la tabla de suscripción principal que acaba de ser actualizada
                 const fechaSolicitud = p.updated_at ? new Date(p.updated_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Reciente';
@@ -205,9 +205,9 @@ function renderTabla(suscripciones) {
     }
     
     tbody.innerHTML = suscripciones.map(s => {
-        const cafe = s.cafeteria?.nombre || '—';
-        const safeName = cafe.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
-        const plan = s.plan?.nombre_plan || '—';
+        const cafe = escapeHTML(s.cafeteria?.nombre || '—');
+        const safeName = cafe;
+        const plan = escapeHTML(s.plan?.nombre_plan || '—');
         const monto = s.monto ? `$${parseFloat(s.monto).toFixed(2)}` : '—';
         // Parseo robusto de la fecha de fin para evitar errores con formatos ISO (p.ej. 2026-03-10T23:59:59.000Z)
         const fFinDate = s.fecha_fin ? new Date(s.fecha_fin) : null;
@@ -324,15 +324,15 @@ async function verDetalle(cafeteriaId) {
         }
 
         const c = json.data;
-        const gerente = c.gerente ? c.gerente.name + ' (' + c.gerente.email + ')' : 'Sin gerente';
-        const plan = c.suscripcion_actual?.plan?.nombre_plan || 'Sin plan';
+        const gerente = c.gerente ? escapeHTML(c.gerente.name) + ' (' + escapeHTML(c.gerente.email) + ')' : 'Sin gerente';
+        const plan = escapeHTML(c.suscripcion_actual?.plan?.nombre_plan || 'Sin plan');
         
         body.innerHTML = `
             <div class="text-start">
                 <div class="card border-0 bg-light rounded-4 mb-3">
                     <div class="card-body p-4">
                         <h6 class="text-muted small text-uppercase fw-bold mb-3" style="letter-spacing: 0.5px;">Información del Negocio</h6>
-                        <div class="d-flex justify-content-between mb-2"><span class="text-muted">Nombre</span><span class="fw-bold text-dark">${c.nombre}</span></div>
+                        <div class="d-flex justify-content-between mb-2"><span class="text-muted">Nombre</span><span class="fw-bold text-dark">${escapeHTML(c.nombre)}</span></div>
                         <div class="d-flex justify-content-between mb-2"><span class="text-muted">Estado</span><span class="badge bg-secondary rounded-pill">${c.estado}</span></div>
                         <div class="d-flex justify-content-between"><span class="text-muted">Gerente</span><span class="fw-bold">${gerente}</span></div>
                     </div>
@@ -462,7 +462,7 @@ async function verHistorial(cafeteriaId, nombre) {
         }
 
         tbody.innerHTML = historial.map(s => {
-            const plan = s.plan?.nombre_plan || '—';
+            const plan = escapeHTML(s.plan?.nombre_plan || '—');
             const monto = s.monto ? `$${parseFloat(s.monto).toFixed(2)}` : '—';
             
             const fFinDate = s.fecha_fin ? new Date(s.fecha_fin) : null;

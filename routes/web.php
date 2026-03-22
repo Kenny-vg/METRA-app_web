@@ -105,36 +105,38 @@ Route::get('/staff-app', function () {
 
 
 // --- ZONA GERENTE (ADMIN) ---
-Route::middleware(['check.web.role:gerente'])->group(function () {
-    Route::get('/admin/dashboard', function () {
+// Las rutas web ya no están protegidas por middleware de sesión/cookies.
+// El Frontend (JS) expulsará al usuario si no tiene el token local.
+Route::prefix('admin')->group(function () {
+    Route::get('/dashboard', function () {
         return view('admin.dashboard');
     });
 
-    Route::get('/admin/gestion_negocio', function () {
+    Route::get('/gestion_negocio', function () {
         return view('admin.gestion_negocio');
     });
 
-    Route::get('/admin/carta', function () {
+    Route::get('/carta', function () {
         return view('admin.carta');
     });
 
-    Route::get('/admin/reservaciones', function () {
+    Route::get('/reservaciones', function () {
         return view('admin.reservaciones');
     });
 
-    Route::get('/admin/reportes', function () {
+    Route::get('/reportes', function () {
         return view('admin.reportes');
     });
 
-    Route::get('/admin/perfil', function () {
+    Route::get('/perfil', function () {
         return view('admin.perfil');
     });
 
-    Route::get('/admin/marketing', function () {
+    Route::get('/marketing', function () {
         return view('admin.marketing');
     });
 
-    Route::get('/admin/resenas', function () {
+    Route::get('/resenas', function () {
         return view('admin.resenas');
     });
 });
@@ -142,24 +144,24 @@ Route::middleware(['check.web.role:gerente'])->group(function () {
 
 
 // --- ZONA SUPERADMIN ---
-Route::middleware(['check.web.role:superadmin'])->group(function () {
-    Route::get('/superadmin/dashboard', function () {
+Route::prefix('superadmin')->group(function () {
+    Route::get('/dashboard', function () {
         return view('superadmin.dashboard');
     });
 
-    Route::get('/superadmin/suscripciones', function () {
+    Route::get('/suscripciones', function () {
         return view('superadmin.suscripciones');
     });
 
-    Route::get('/superadmin/planes', function () {
+    Route::get('/planes', function () {
         return view('superadmin.planes');
     });
 
-    Route::get('/superadmin/ajustes', function () {
+    Route::get('/ajustes', function () {
         return view('superadmin.ajustes');
     });
 
-    Route::post('/superadmin/guardar-ajustes', function () {
+    Route::post('/guardar-ajustes', function () {
         return redirect('/superadmin/ajustes')->with('success', 'Ajustes guardados correctamente.');
     });
 });

@@ -252,7 +252,7 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div>
                             <span class="small fw-bold text-uppercase" style="color: var(--accent-gold); letter-spacing: 1px; font-size: 0.75rem;">Suscripción Actual</span>
-                            <h3 class="fw-bold mb-1 mt-1 text-white">${plan ? plan.nombre_plan : 'Plan Desconocido'}</h3>
+                            <h3 class="fw-bold mb-1 mt-1 text-white">${escapeHTML(plan ? plan.nombre_plan : 'Plan Desconocido')}</h3>
                             <div class="small" style="color: rgba(255,255,255,0.7);">
                                 <div>Válida hasta: <strong>${fechaFin.toLocaleDateString('es-ES')}</strong></div>
                                 ${diasRestantes > 0 ? `<div>Tiempo restante: <strong>${diasRestantes} días</strong></div>` : `<div class="text-danger fw-bold">Suscripción Expirada</div>`}
@@ -407,7 +407,7 @@
                             return `
                             <div class="d-flex justify-content-between align-items-center p-3 rounded-3 mb-2" style="border: 1px solid var(--border-light); background: var(--off-white); transition: all 0.2s;">
                                 <div>
-                                    <span class="fw-bold d-block" style="color: var(--black-primary);">${r.nombre_cliente}</span>
+                                    <span class="fw-bold d-block" style="color: var(--black-primary);">${escapeHTML(r.nombre_cliente)}</span>
                                     <small style="color: var(--text-muted); font-size: 0.8rem;"><i class="bi bi-clock me-1"></i>${r.hora_inicio.substring(0,5)} &nbsp;•&nbsp; ${r.numero_personas} pax</small>
                                 </div>
                                 ${badge}

@@ -127,7 +127,7 @@ function renderReservaciones(reservas) {
                                 <span class="badge rounded-pill" style="background: ${badge.bg}; color: ${badge.color}; border: 1px solid ${badge.border}; padding: 5px 12px; font-weight: 700; font-size: 0.7rem; letter-spacing: 0.5px;">${badge.label}</span>
                                 <span class="small fw-bold" style="color: var(--text-muted); letter-spacing: 1px; font-family: monospace;">${r.folio}</span>
                             </div>
-                            <h6 class="fw-bold mb-1" style="color: var(--black-primary);">${r.cafeteria ? r.cafeteria.nombre : '—'}</h6>
+                            <h6 class="fw-bold mb-1" style="color: var(--black-primary);">${escapeHTML(r.cafeteria ? r.cafeteria.nombre : '—')}</h6>
                             <p class="m-0 small" style="color: var(--text-muted);">
                                 <i class="bi bi-clock me-1"></i>${r.hora_inicio.substring(0,5)} hrs
                                 &nbsp;•&nbsp;

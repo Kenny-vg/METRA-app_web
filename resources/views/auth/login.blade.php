@@ -286,12 +286,21 @@ document.addEventListener('DOMContentLoaded', function() {
             try { 
                 localStorage.clear(); 
                 sessionStorage.clear(); 
-                // Clear the cookie as well
                 document.cookie = 'metra_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
             } catch (err) {}
 
-            const email = loginForm.querySelector('input[name="email"]').value;
-            const password = loginForm.querySelector('input[name="password"]').value;
+            const emailInput = loginForm.querySelector('input[name="email"]');
+            const passwordInput = loginForm.querySelector('input[name="password"]');
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+
+            // Feedback visual de carga
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Validando...';
+
+            let isRateLimited = false;
 
             try {
                 const API_URL = "{{ url('/api') }}";
@@ -304,9 +313,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: JSON.stringify({ email, password })
                 });
 
-                console.log('STATUS:', response.status);
-                const raw = await response.clone().json();
-                console.log('BODY:', raw);
+                // Caso: 429 Too Many Requests (Rate Limiting)
+                if (response.status === 429) {
+                    isRateLimited = true;
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Demasiados intentos',
+                        text: 'Por seguridad, hemos bloqueado temporalmente el acceso. Por favor, intenta de nuevo en 1 minuto.',
+                        confirmButtonColor: '#382C26',
+                        confirmButtonText: 'Entendido'
+                    });
+                    
+                    let timeLeft = 60;
+                    submitBtn.innerHTML = `<i class="bi bi-lock-fill me-2"></i>Espera ${timeLeft}s`;
+                    const interval = setInterval(() => {
+                        timeLeft--;
+                        submitBtn.innerHTML = `<i class="bi bi-lock-fill me-2"></i>Espera ${timeLeft}s`;
+                        if (timeLeft <= 0) {
+                            clearInterval(interval);
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalBtnText;
+                            isRateLimited = false;
+                        }
+                    }, 1000);
+                    return; // Detener ejecución para mantener el botón bloqueado
+                }
 
                 if (response.ok) {
                     const result = await response.json();
@@ -314,7 +345,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         localStorage.setItem('token', result.data.token);
                         sessionStorage.setItem('token', result.data.token);
                         
-                        // Set cookie for web routes protection
                         const role = result.data.usuario.role;
                         document.cookie = `metra_role=${role}; path=/; max-age=86400`;
 
@@ -330,6 +360,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (result.data.usuario?.cafe_id) {
                             localStorage.setItem('cafe_id', result.data.usuario.cafe_id);
                         }
+                        
+                        submitBtn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Redirigiendo...';
+                        
                         if(role === 'superadmin') window.location.href = '/superadmin/dashboard';
                         else if(role === 'gerente') window.location.href = '/admin/dashboard';
                         else if(role === 'personal') window.location.href = '/staff-app';
@@ -340,33 +373,40 @@ document.addEventListener('DOMContentLoaded', function() {
                     const errorMsg = errorData.message || '';
                     const msgLower = errorMsg.toLowerCase();
 
-                    // Caso 1: Rechazado o Inactivo (Status 403 o mensaje con palabras clave)
-                    if (response.status === 403 || msgLower.includes('rechazado') || msgLower.includes('soporte') || msgLower.includes('inactivo')) {
+                    // Caso: 401 Credenciales incorrectas
+                    if (response.status === 401) {
+                         Swal.fire({
+                             icon: 'error',
+                             title: 'Credenciales Incorrectas',
+                             text: errorMsg || 'Tu correo o contraseña son inválidos.',
+                             confirmButtonColor: '#382C26',
+                             confirmButtonText: 'Reintentar'
+                         });
+                         passwordInput.value = ''; // Limpiar contraseña por seguridad
+                    }
+                    // Caso: 403 Rechazado o Inactivo
+                    else if (response.status === 403) {
                         if (msgLower.includes('inactivo')) {
                             Swal.fire({
                                 icon: 'info',
-                                title: 'Cuenta en revisión',
-                                text: 'Tu cuenta está pendiente de aprobación.',
+                                title: 'Cuenta inactiva',
+                                text: errorMsg || 'Tu cuenta está pendiente de aprobación o ha sido inhabilitada.',
                                 confirmButtonColor: '#382C26',
                                 confirmButtonText: 'Entendido'
                             });
-                            return;
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Acceso Denegado',
+                                text: errorMsg || 'Tu registro ha sido rechazado. Por favor contacta a soporte.',
+                                confirmButtonColor: '#D32F2F',
+                                confirmButtonText: 'Entendido'
+                            });
                         }
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Registro Rechazado',
-                            text: errorMsg || 'Tu registro ha sido rechazado. Por favor contacta a soporte.',
-                            confirmButtonColor: '#D32F2F',
-                            confirmButtonText: 'Entendido'
-                        });
-                        return;
                     }
-
-                    // Caso 2: Pendiente / Revisión (Status 423)
-                    if (response.status === 423) {
-                        // 1. Mostrar pantalla de subir comprobante
-                        if (errorMsg === 'Debes subir tu comprobante para continuar.' || msgLower.includes('subir tu comprobante')) {
+                    // Caso: 423 Pendiente / Suscripción Vencida
+                    else if (response.status === 423) {
+                        if (msgLower.includes('subir tu comprobante')) {
                             Swal.fire({
                                 icon: 'info',
                                 title: 'Comprobante requerido',
@@ -376,13 +416,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 cancelButtonText: 'Cancelar',
                                 confirmButtonColor: '#382C26'
                             }).then((result) => {
-                                if(result.isConfirmed) {
-                                    continuarSubida(email);
-                                }
+                                if(result.isConfirmed) continuarSubida(email);
                             });
-                        } 
-                        // 2. Mostrar pantalla de "Solicitud en revisión"
-                        else if (errorMsg === 'Tu comprobante fue enviado. Espera la validación del superadmin.' || msgLower.includes('espera la validación')) {
+                        } else if (msgLower.includes('espera la validación')) {
                             Swal.fire({
                                 icon: 'info',
                                 title: 'Solicitud en revisión',
@@ -390,22 +426,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                 confirmButtonColor: '#382C26',
                                 confirmButtonText: 'Entendido'
                             });
-                        } 
-                        // 3. Mostrar pantalla de estado pendiente
-                        else if (errorMsg === 'Tu cuenta está en revisión.' || msgLower.includes('cuenta está en revisión')) {
-                            Swal.fire({
-                                icon: 'info',
-                                title: 'Cuenta en revisión',
-                                text: errorMsg,
-                                confirmButtonColor: '#382C26',
-                                confirmButtonText: 'Entendido'
-                            });
-                        } 
-                    // 4. Suscripción Vencida
-                        else if (errorMsg === 'Tu cafetería no tiene una suscripción activa.' || msgLower.includes('no tiene una suscripción activa')) {
+                        } else if (msgLower.includes('no tiene una suscripción activa')) {
                             Swal.fire({
                                 icon: 'warning',
-                                title: 'Atención',
+                                title: 'Suscripción inactiva',
                                 text: errorMsg,
                                 showCancelButton: true,
                                 confirmButtonText: 'Renovar Suscripción',
@@ -415,51 +439,38 @@ document.addEventListener('DOMContentLoaded', function() {
                             }).then((result) => {
                                 if(result.isConfirmed) {
                                     abrirModalRenovar();
-                                    // Save email for potential backend use when user doesn't have token
                                     window.tempLoginEmail = email;
                                 }
                             });
-                        }
-                        // Fallback para otros 423
-                        else {
+                        } else {
                             Swal.fire({
                                 icon: 'info',
                                 title: 'Atención',
-                                text: errorMsg || 'Acción requerida.',
+                                text: errorMsg || 'Acceso restringido por suscripción o estado.',
                                 confirmButtonColor: '#382C26',
                                 confirmButtonText: 'Entendido'
                             });
                         }
-                        return; // Detiene la ejecución normal
+                    }
+                    // Errores Genéricos y de Validación Laravel (422, 500)
+                    else {
+                        let displayMsg = errorData.message || 'Credenciales inválidas o error de servidor.';
+                        if (errorData.errors) {
+                            displayMsg = `<ul class="text-start mb-0" style="color: #D32F2F;">`;
+                            Object.values(errorData.errors).forEach(errArray => {
+                                errArray.forEach(err => { displayMsg += `<li>${err}</li>`; });
+                            });
+                            displayMsg += `</ul>`;
+                            Swal.fire({ icon: 'error', title: 'Error', html: displayMsg, confirmButtonColor: '#382C26' });
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Error', text: displayMsg, confirmButtonColor: '#382C26' });
+                        }
                     }
 
-
-                    // Si no es ninguno de los anteriores, mostrar error genérico o de validación
-                    let displayMsg = errorData.message || 'Credenciales inválidas.';
-                    
-                    if (errorData.errors) {
-                        displayMsg = `<ul class="text-start mb-0" style="color: #D32F2F;">`;
-                        Object.values(errorData.errors).forEach(errArray => {
-                            errArray.forEach(err => {
-                                displayMsg += `<li>${err}</li>`;
-                            });
-                        });
-                        displayMsg += `</ul>`;
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Acceso Denegado',
-                            html: displayMsg,
-                            confirmButtonColor: '#382C26',
-                            confirmButtonText: 'Aceptar'
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Acceso Denegado',
-                            text: displayMsg,
-                            confirmButtonColor: '#382C26',
-                            confirmButtonText: 'Aceptar'
-                        });
+                    // Reactivar botón si falló (y no es RateLimit)
+                    if (!isRateLimited) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalBtnText;
                     }
                 }
             } catch (error) {
@@ -467,10 +478,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error de Conexión',
-                    text: 'Fallo de conexión al servidor.',
+                    text: 'Fallo de conexión al servidor. Revisa tu internet.',
                     confirmButtonColor: '#382C26',
                     confirmButtonText: 'Entendido'
                 });
+                
+                if (!isRateLimited) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
             }
         });
     }

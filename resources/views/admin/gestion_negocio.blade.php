@@ -139,6 +139,61 @@
         </div>
     </div>
 
+    <!-- Plantillas para Renderizado Estructural -->
+    <template id="zona-template">
+        <tr class="js-row">
+            <td class="fw-bold" style="color: var(--black-primary);">
+                <span class="js-nombre"></span>
+                <span class="badge bg-secondary ms-2 js-badge" style="display:none;">Inactivo</span>
+            </td>
+            <td class="text-end js-actions"></td>
+        </tr>
+    </template>
+
+    <template id="mesa-template">
+        <tr class="js-row">
+            <td class="fw-bold" style="color: var(--black-primary);">
+                <div class="d-inline-flex align-items-center justify-content-center text-white rounded-circle me-2 shadow-sm js-numero" style="background: var(--black-primary); width: 25px; height: 25px; font-size: 0.75rem;"></div>
+                <span class="badge bg-secondary ms-2 js-badge" style="display:none;">Inactiva</span>
+            </td>
+            <td><span class="badge js-zona" style="background: var(--off-white); border: 1px solid var(--border-light); color: var(--text-main);"></span></td>
+            <td class="text-muted"><span class="js-capacidad"></span> Personas</td>
+            <td class="text-end js-actions"></td>
+        </tr>
+    </template>
+
+    <template id="horario-template">
+        <div class="col-md-6 col-lg-4">
+            <div class="p-3 rounded-4 d-flex justify-content-between align-items-center h-100 js-card" style="background: var(--off-white); border: 1px solid var(--border-light);">
+                <div>
+                    <span class="fw-bold d-block mb-1" style="color: var(--black-primary); font-size: 1.05rem;">
+                        <span class="js-dia"></span>
+                        <span class="badge bg-secondary ms-2 js-badge" style="font-size:0.7rem; display:none;">Inactivo</span>
+                    </span>
+                    <span class="small d-block text-muted"><i class="bi bi-clock me-1"></i> <span class="js-horas"></span></span>
+                </div>
+                <div class="d-flex gap-2 js-actions"></div>
+            </div>
+        </div>
+    </template>
+
+    <template id="staff-template">
+        <tr class="js-row">
+            <td class="fw-bold" style="color: var(--black-primary);">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center me-3 js-inicial" style="width: 35px; height: 35px; font-size: 14px;"></div>
+                    <span class="js-nombre"></span>
+                </div>
+            </td>
+            <td class="text-muted align-middle js-email"></td>
+            <td class="align-middle js-badge-container">
+                <span class="badge bg-success js-badge-activo" style="font-size:0.75rem; display:none;">Activo</span>
+                <span class="badge bg-secondary js-badge-inactivo" style="font-size:0.75rem; display:none;">Inactivo</span>
+            </td>
+            <td class="text-end align-middle js-actions"></td>
+        </tr>
+    </template>
+
     <!-- Modals -->
     <div class="modal fade" id="modalZona" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -351,27 +406,57 @@
                 const selectZona = document.getElementById('mesa-zona-id');
                 selectZona.innerHTML = '<option value="">Seleccione zona...</option>';
 
-                zonas.forEach(z => {
-                    const opacityClass = z.activo ? '' : 'opacity-50';
-                    const bgClass = z.activo ? '' : 'table-secondary';
-                    const badge = !z.activo ? `<span class="badge bg-secondary ms-2">Inactivo</span>` : '';
-                        const actions = z.activo 
-                        ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick="editZona(${z.id}, '${z.nombre_zona}')" title="Editar"><i class="bi bi-pencil"></i></button>
-                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteZona(${z.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>`
-                        : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateZona(${z.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
+                const template = document.getElementById('zona-template');
+                const fragment = document.createDocumentFragment();
 
-                    tbody.innerHTML += `
-                        <tr class="${bgClass} ${opacityClass}">
-                            <td class="fw-bold" style="color: var(--black-primary);">${z.nombre_zona} ${badge}</td>
-                            <td class="text-end">
-                                ${actions}
-                            </td>
-                        </tr>
-                    `;
-                    if(z.activo) {
-                        selectZona.innerHTML += `<option value="${z.id}">${z.nombre_zona}</option>`;
+                zonas.forEach(z => {
+                    const clone = template.content.cloneNode(true);
+                    const row = clone.querySelector('.js-row');
+
+                    if (!z.activo) {
+                        row.classList.add('table-secondary', 'opacity-50');
+                        clone.querySelector('.js-badge').style.display = 'inline-block';
                     }
+
+                    clone.querySelector('.js-nombre').textContent = z.nombre_zona;
+
+                    const actionsCol = clone.querySelector('.js-actions');
+                    if (z.activo) {
+                        const btnEdit = document.createElement('button');
+                        btnEdit.className = 'btn btn-sm btn-outline-dark rounded-circle me-1';
+                        btnEdit.title = 'Editar';
+                        btnEdit.innerHTML = '<i class="bi bi-pencil"></i>';
+                        btnEdit.addEventListener('click', () => editZona(z.id, z.nombre_zona));
+
+                        const btnDelete = document.createElement('button');
+                        btnDelete.className = 'btn btn-sm btn-outline-primary rounded-circle';
+                        btnDelete.title = 'Desactivar';
+                        btnDelete.innerHTML = '<i class="bi bi-x-circle"></i>';
+                        btnDelete.addEventListener('click', () => deleteZona(z.id));
+
+                        actionsCol.appendChild(btnEdit);
+                        actionsCol.appendChild(btnDelete);
+                    } else {
+                        const btnReactivate = document.createElement('button');
+                        btnReactivate.className = 'btn btn-sm btn-success rounded-pill px-3 shadow-sm';
+                        btnReactivate.title = 'Reactivar';
+                        btnReactivate.innerHTML = '<i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar';
+                        btnReactivate.addEventListener('click', () => reactivateZona(z.id));
+
+                        actionsCol.appendChild(btnReactivate);
+                    }
+
+                    if(z.activo) {
+                        const opt = document.createElement('option');
+                        opt.value = z.id;
+                        opt.textContent = z.nombre_zona;
+                        selectZona.appendChild(opt);
+                    }
+
+                    fragment.appendChild(clone);
                 });
+                
+                tbody.appendChild(fragment);
             } catch (error) {
                 console.error(error);
                 document.getElementById('tabla-zonas-body').innerHTML = '<tr><td colspan="2" class="text-danger text-center py-4">Error de conexión al cargar zonas.</td></tr>';
@@ -506,32 +591,52 @@
                 const tbody = document.getElementById('tabla-mesas-body');
                 tbody.innerHTML = '';
 
-                mesas.forEach(m => {
-                    const zonaNombre = m.zona ? m.zona.nombre_zona : 'N/A';
-                    const opacityClass = m.activo ? '' : 'opacity-50';
-                    const bgClass = m.activo ? '' : 'table-secondary';
-                    const badge = !m.activo ? `<span class="badge bg-secondary ms-2">Inactiva</span>` : '';
-                    const actions = m.activo
-                        ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick='editMesa(${JSON.stringify(m)})' title="Editar"><i class="bi bi-pencil"></i></button>
-                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteMesa(${m.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>`
-                        : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateMesa(${m.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
+                const template = document.getElementById('mesa-template');
+                const fragment = document.createDocumentFragment();
 
-                    tbody.innerHTML += `
-                        <tr class="${bgClass} ${opacityClass}">
-                            <td class="fw-bold" style="color: var(--black-primary);">
-                                <div class="d-inline-flex align-items-center justify-content-center text-white rounded-circle me-2 shadow-sm" style="background: var(--black-primary); width: 25px; height: 25px; font-size: 0.75rem;">
-                                    ${m.numero_mesa}
-                                </div>
-                                ${badge}
-                            </td>
-                            <td><span class="badge" style="background: var(--off-white); border: 1px solid var(--border-light); color: var(--text-main);">${zonaNombre}</span></td>
-                            <td class="text-muted">${m.capacidad} Personas</td>
-                            <td class="text-end">
-                                ${actions}
-                            </td>
-                        </tr>
-                    `;
+                mesas.forEach(m => {
+                    const clone = template.content.cloneNode(true);
+                    const row = clone.querySelector('.js-row');
+
+                    if (!m.activo) {
+                        row.classList.add('table-secondary', 'opacity-50');
+                        clone.querySelector('.js-badge').style.display = 'inline-block';
+                    }
+
+                    clone.querySelector('.js-numero').textContent = m.numero_mesa;
+                    clone.querySelector('.js-zona').textContent = m.zona ? m.zona.nombre_zona : 'N/A';
+                    clone.querySelector('.js-capacidad').textContent = m.capacidad;
+
+                    const actionsCol = clone.querySelector('.js-actions');
+                    if (m.activo) {
+                        const btnEdit = document.createElement('button');
+                        btnEdit.className = 'btn btn-sm btn-outline-dark rounded-circle me-1';
+                        btnEdit.title = 'Editar';
+                        btnEdit.innerHTML = '<i class="bi bi-pencil"></i>';
+                        btnEdit.addEventListener('click', () => editMesa(m));
+
+                        const btnDelete = document.createElement('button');
+                        btnDelete.className = 'btn btn-sm btn-outline-primary rounded-circle';
+                        btnDelete.title = 'Desactivar';
+                        btnDelete.innerHTML = '<i class="bi bi-x-circle"></i>';
+                        btnDelete.addEventListener('click', () => deleteMesa(m.id));
+
+                        actionsCol.appendChild(btnEdit);
+                        actionsCol.appendChild(btnDelete);
+                    } else {
+                        const btnReactivate = document.createElement('button');
+                        btnReactivate.className = 'btn btn-sm btn-success rounded-pill px-3 shadow-sm';
+                        btnReactivate.title = 'Reactivar';
+                        btnReactivate.innerHTML = '<i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar';
+                        btnReactivate.addEventListener('click', () => reactivateMesa(m.id));
+
+                        actionsCol.appendChild(btnReactivate);
+                    }
+
+                    fragment.appendChild(clone);
                 });
+                
+                tbody.appendChild(fragment);
             } catch (error) {
                 console.error(error);
                 document.getElementById('tabla-mesas-body').innerHTML = '<tr><td colspan="4" class="text-danger text-center py-4">Error de conexión al cargar mesas.</td></tr>';
@@ -680,30 +785,51 @@
                 // Mostrar horas en formato 24h (HH:MM) directamente desde la BD
                 const formatTime24h = (time) => time ? time.substring(0, 5) : '--:--';
 
-                horarios.forEach(h => {
-                    const apertura = formatTime24h(h.hora_apertura);
-                    const cierre   = formatTime24h(h.hora_cierre);
-                    const opacityClass = h.activo ? '' : 'opacity-50';
-                    const badge = !h.activo ? `<span class="badge bg-secondary ms-2" style="font-size:0.7rem;">Inactivo</span>` : '';
-                    const actions = h.activo
-                        ? `<button class="btn btn-sm btn-outline-dark rounded-circle" onclick='editHorario(${JSON.stringify(h)})' title="Editar"><i class="bi bi-pencil"></i></button>
-                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteHorario(${h.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>`
-                        : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateHorario(${h.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
+                const template = document.getElementById('horario-template');
+                const fragment = document.createDocumentFragment();
 
-                    container.innerHTML += `
-                        <div class="col-md-6 col-lg-4">
-                            <div class="p-3 rounded-4 d-flex justify-content-between align-items-center h-100 ${opacityClass}" style="background: var(--off-white); border: 1px solid var(--border-light);">
-                                <div>
-                                    <span class="fw-bold d-block mb-1" style="color: var(--black-primary); font-size: 1.05rem;">${h.dia_semana} ${badge}</span>
-                                    <span class="small d-block text-muted"><i class="bi bi-clock me-1"></i> ${apertura} - ${cierre}</span>
-                                </div>
-                                <div class="d-flex gap-2">
-                                    ${actions}
-                                </div>
-                            </div>
-                        </div>
-                    `;
+                horarios.forEach(h => {
+                    const clone = template.content.cloneNode(true);
+                    const card = clone.querySelector('.js-card');
+
+                    if (!h.activo) {
+                        card.classList.add('opacity-50');
+                        clone.querySelector('.js-badge').style.display = 'inline-block';
+                    }
+
+                    clone.querySelector('.js-dia').textContent = h.dia_semana;
+                    clone.querySelector('.js-horas').textContent = `${formatTime24h(h.hora_apertura)} - ${formatTime24h(h.hora_cierre)}`;
+
+                    const actionsCol = clone.querySelector('.js-actions');
+                    if (h.activo) {
+                        const btnEdit = document.createElement('button');
+                        btnEdit.className = 'btn btn-sm btn-outline-dark rounded-circle';
+                        btnEdit.title = 'Editar';
+                        btnEdit.innerHTML = '<i class="bi bi-pencil"></i>';
+                        btnEdit.addEventListener('click', () => editHorario(h));
+
+                        const btnDelete = document.createElement('button');
+                        btnDelete.className = 'btn btn-sm btn-outline-primary rounded-circle';
+                        btnDelete.title = 'Desactivar';
+                        btnDelete.innerHTML = '<i class="bi bi-x-circle"></i>';
+                        btnDelete.addEventListener('click', () => deleteHorario(h.id));
+
+                        actionsCol.appendChild(btnEdit);
+                        actionsCol.appendChild(btnDelete);
+                    } else {
+                        const btnReactivate = document.createElement('button');
+                        btnReactivate.className = 'btn btn-sm btn-success rounded-pill px-3 shadow-sm';
+                        btnReactivate.title = 'Reactivar';
+                        btnReactivate.innerHTML = '<i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar';
+                        btnReactivate.addEventListener('click', () => reactivateHorario(h.id));
+
+                        actionsCol.appendChild(btnReactivate);
+                    }
+
+                    fragment.appendChild(clone);
                 });
+                
+                container.appendChild(fragment);
             } catch (error) {
                 console.error(error);
                 document.getElementById('horarios-container').innerHTML = '<div class="col-12 text-center text-danger py-4">Error de conexión al cargar horarios.</div>';
@@ -850,38 +976,56 @@
                     return;
                 }
 
-                staff.forEach(s => {
-                    // El estatus viene en el campo `estado`
-                    const isActivo = s.estado === true || s.estado === 1 || s.estado === '1' || s.estado === 'true';
-                    const opacityClass = isActivo ? '' : 'opacity-50';
-                    const bgClass = isActivo ? '' : 'table-secondary';
-                    const badge = isActivo 
-                        ? `<span class="badge bg-success" style="font-size:0.75rem;">Activo</span>` 
-                        : `<span class="badge bg-secondary" style="font-size:0.75rem;">Inactivo</span>`;
-                        
-                    const actions = isActivo
-                        ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick='editStaff(${JSON.stringify(s)})' title="Editar"><i class="bi bi-pencil"></i></button>
-                           <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteStaff(${s.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>`
-                        : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateStaff(${s.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
+                const template = document.getElementById('staff-template');
+                const fragment = document.createDocumentFragment();
 
-                    tbody.innerHTML += `
-                        <tr class="${bgClass} ${opacityClass}">
-                            <td class="fw-bold" style="color: var(--black-primary);">
-                                <div class="d-flex align-items-center">
-                                    <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center me-3" style="width: 35px; height: 35px; font-size: 14px;">
-                                        ${s.name.charAt(0).toUpperCase()}
-                                    </div>
-                                    ${s.name}
-                                </div>
-                            </td>
-                            <td class="text-muted align-middle">${s.email}</td>
-                            <td class="align-middle">${badge}</td>
-                            <td class="text-end align-middle">
-                                ${actions}
-                            </td>
-                        </tr>
-                    `;
+                staff.forEach(s => {
+                    const isActivo = s.estado === true || s.estado === 1 || s.estado === '1' || s.estado === 'true';
+                    
+                    const clone = template.content.cloneNode(true);
+                    const row = clone.querySelector('.js-row');
+
+                    if (!isActivo) {
+                        row.classList.add('table-secondary', 'opacity-50');
+                        clone.querySelector('.js-badge-inactivo').style.display = 'inline-block';
+                    } else {
+                        clone.querySelector('.js-badge-activo').style.display = 'inline-block';
+                    }
+
+                    clone.querySelector('.js-inicial').textContent = s.name.charAt(0).toUpperCase();
+                    clone.querySelector('.js-nombre').textContent = s.name;
+                    clone.querySelector('.js-email').textContent = s.email;
+
+                    const actionsCol = clone.querySelector('.js-actions');
+                    if (isActivo) {
+                        const btnEdit = document.createElement('button');
+                        btnEdit.className = 'btn btn-sm btn-outline-dark rounded-circle me-1';
+                        btnEdit.title = 'Editar';
+                        btnEdit.innerHTML = '<i class="bi bi-pencil"></i>';
+                        btnEdit.addEventListener('click', () => editStaff(s));
+
+                        const btnDelete = document.createElement('button');
+                        btnDelete.className = 'btn btn-sm btn-outline-primary rounded-circle';
+                        btnDelete.title = 'Desactivar';
+                        btnDelete.innerHTML = '<i class="bi bi-x-circle"></i>';
+                        btnDelete.addEventListener('click', () => deleteStaff(s.id));
+
+                        actionsCol.appendChild(btnEdit);
+                        actionsCol.appendChild(btnDelete);
+                    } else {
+                        const btnReactivate = document.createElement('button');
+                        btnReactivate.className = 'btn btn-sm btn-success rounded-pill px-3 shadow-sm';
+                        btnReactivate.title = 'Reactivar';
+                        btnReactivate.innerHTML = '<i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar';
+                        btnReactivate.addEventListener('click', () => reactivateStaff(s.id));
+
+                        actionsCol.appendChild(btnReactivate);
+                    }
+
+                    fragment.appendChild(clone);
                 });
+                
+                tbody.appendChild(fragment);
             } catch (error) {
                 console.error(error);
                 document.getElementById('tabla-staff-body').innerHTML = '<tr><td colspan="4" class="text-danger text-center py-4">Error de conexión al cargar el personal.</td></tr>';

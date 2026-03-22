@@ -106,6 +106,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        window.escapeHTML = function(str) {
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag] || tag));
+        };
+
         // Data in sidebar
         const nombreCafe = localStorage.getItem('nombre_cafeteria');
         if (nombreCafe) {

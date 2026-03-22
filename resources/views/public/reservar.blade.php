@@ -305,6 +305,11 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
     <script src="/js/metra-utils.js"></script>
     <script>
+        window.escapeHTML = function(str) {
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        };
+
         function getToken() {
             return localStorage.getItem('token');
         }
@@ -445,13 +450,13 @@
                 const resO = await fetch(getApiUrl('ocasiones'));
                 if(resO.ok){
                     const jsonO = await resO.json();
-                    jsonO.data.forEach(o => { ocasionSelect.innerHTML += `<option value="${o.id}">${o.nombre}</option>`});
+                    jsonO.data.forEach(o => { ocasionSelect.innerHTML += `<option value="${o.id}">${escapeHTML(o.nombre)}</option>`});
                 }
 
                 const resZ = await fetch(getApiUrl('zonas'));
                 if(resZ.ok){
                     const jsonZ = await resZ.json();
-                    jsonZ.data.forEach(z => { zonaSelect.innerHTML += `<option value="${z.id}">${z.nombre_zona}</option>`});
+                    jsonZ.data.forEach(z => { zonaSelect.innerHTML += `<option value="${z.id}">${escapeHTML(z.nombre_zona)}</option>`});
                 }
 
                 // 4. Limpieza: Se ha eliminado el pre-llenado asumiendo perfiles de usuario/gerente,
@@ -600,7 +605,7 @@
                     promos.forEach(p => {
                         const isFree = parseFloat(p.precio) === 0;
                         const dP = isFree ? 'Cortesía' : `$${p.precio}`;
-                        ht += `<div class="col-12 col-md-6"><input type="radio" name="promo" id="promo-${p.id}" value="${p.id}" class="btn-check" onchange="document.getElementById('promocion_id').value='${p.id}';"><label class="card h-100 p-4 w-100 promo-label" for="promo-${p.id}"><div class="d-flex justify-content-between mb-3"><span class="badge" style="background: rgba(212,175,55,0.1); color: #d4af37; border: 1px solid rgba(212,175,55,0.2); font-size: 0.8rem; letter-spacing: 0.5px;">${dP}</span></div><h6 class="fw-bold mb-2" style="font-size:1.05rem; color:#1e293b;">${p.nombre_promocion}</h6><p class="small text-muted mb-0" style="font-size: 0.85rem; line-height: 1.4;">${p.descripcion||''}</p></label></div>`;
+                        ht += `<div class="col-12 col-md-6"><input type="radio" name="promo" id="promo-${p.id}" value="${p.id}" class="btn-check" onchange="document.getElementById('promocion_id').value='${p.id}';"><label class="card h-100 p-4 w-100 promo-label" for="promo-${p.id}"><div class="d-flex justify-content-between mb-3"><span class="badge" style="background: rgba(212,175,55,0.1); color: #d4af37; border: 1px solid rgba(212,175,55,0.2); font-size: 0.8rem; letter-spacing: 0.5px;">${dP}</span></div><h6 class="fw-bold mb-2" style="font-size:1.05rem; color:#1e293b;">${escapeHTML(p.nombre_promocion)}</h6><p class="small text-muted mb-0" style="font-size: 0.85rem; line-height: 1.4;">${escapeHTML(p.descripcion||'')}</p></label></div>`;
                     });
                     
                     ht += '</div><input type="hidden" id="promocion_id" value="">';
@@ -674,9 +679,9 @@
                     if(res.ok && json.success) {
                         // Mostrar pantalla de confirmación tal como se pidió
                         const rsv = json.data;
-                        const cafeNombre = rsv.cafeteria ? rsv.cafeteria.nombre : 'La Cafetería';
-                        const zonaP = rsv.zona ? rsv.zona.nombre_zona : 'Área General';
-                        const ocasionP = rsv.ocasion_especial ? rsv.ocasion_especial.nombre : 'Sin Ocasión Especial';
+                        const cafeNombre = escapeHTML(rsv.cafeteria ? rsv.cafeteria.nombre : 'La Cafetería');
+                        const zonaP = escapeHTML(rsv.zona ? rsv.zona.nombre_zona : 'Área General');
+                        const ocasionP = escapeHTML(rsv.ocasion_especial ? rsv.ocasion_especial.nombre : 'Sin Ocasión Especial');
                         
                         document.querySelector('.reserva-card').innerHTML = `
                             <div class="text-center py-5 px-3">

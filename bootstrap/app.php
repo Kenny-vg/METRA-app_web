@@ -18,7 +18,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role'=>\App\Http\Middleware\RoleMiddleware::class,
             'check.suscripcion' => \App\Http\Middleware\CheckSuscripcionActiva::class,
-            'check.web.role' => \App\Http\Middleware\CheckWebRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

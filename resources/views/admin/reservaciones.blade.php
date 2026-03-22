@@ -92,6 +92,29 @@
         </div>
     </div>
 
+    <!-- Plantilla para Tarjeta de Reserva -->
+    <template id="reserva-template">
+        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+            <div class="card h-100 position-relative js-card" style="cursor:pointer; border-radius:14px; transition:transform .2s ease,box-shadow .2s ease;">
+                <div class="card-body p-4 d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="d-flex flex-column">
+                            <span class="fw-bold fs-4 js-hora" style="letter-spacing:-1px;font-family:'Inter',sans-serif;"></span>
+                            <span class="badge mt-1 js-badge" style="align-self:flex-start;padding:4px 8px;border-radius:6px;"></span>
+                        </div>
+                        <div class="js-personas-wrapper" style="background:rgba(255,255,255,.8);border:1px solid rgba(0,0,0,.05);padding:5px 12px;border-radius:20px;font-weight:bold;font-size:.9rem;">
+                            <i class="bi bi-people-fill me-1"></i> <span class="js-personas"></span>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1 text-truncate js-nombre" style="font-size:1.1rem;"></h5>
+                        <p class="m-0 text-truncate js-detalles" style="opacity:.75;font-size:.85rem;"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
     <!-- Modal Detalles de Reserva -->
     <div class="modal fade" id="modalReserva" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
@@ -284,66 +307,73 @@
             const grid = document.getElementById('reservaciones-grid');
             reservasGlobales = reservaciones;
 
-            if (reservaciones.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-12 text-center py-5">
-                        <h4 class="fw-bold" style="color:var(--black-primary);font-family:'Inter',sans-serif;">Todo tranquilo por ahora.</h4>
-                        <p class="text-muted">¡Preparate o descansa para el siguiente flujo de invitados!</p>
-                    </div>`;
-                return;
-            }
+            grid.innerHTML = '';
 
-            let html = '';
+            let reservasMostradas = 0;
+            const template = document.getElementById('reserva-template');
+            const fragment = document.createDocumentFragment();
+
             reservaciones.forEach(r => {
                 const estado = calcularEstadoReserva(r);
                 // En modo futuras, excluir las completamente finalizadas
                 if (modoVista === 'futuras' && estado === 'finalizada') return;
+                
+                reservasMostradas++;
 
                 const estilos     = getStatusStyling(estado);
-                const opacidadBaja = estado === 'finalizada' ? 'opacity:0.75;' : '';
+                const opacidadBaja = estado === 'finalizada' ? '0.75' : '1';
                 const rsrvDate    = new Date(r.fecha + 'T00:00:00');
                 const datePrefix  = modoVista === 'futuras'
                     ? rsrvDate.toLocaleDateString('es-ES', { month:'short', day:'numeric' }).toUpperCase() + ' - '
                     : '';
 
-                html += `
-                    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                        <div class="card h-100 position-relative"
-                             onclick="abrirDetalles(${r.id})"
-                             style="cursor:pointer;background:${estilos.bg};border:1px solid ${estilos.border};border-radius:14px;box-shadow:${estilos.shadow};transition:transform .2s ease,box-shadow .2s ease;${opacidadBaja}">
-                            <div class="card-body p-4 d-flex flex-column justify-content-between">
-                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <div class="d-flex flex-column">
-                                        <span class="fw-bold fs-4" style="color:${estilos.text};letter-spacing:-1px;font-family:'Inter',sans-serif;">
-                                            ${r.hora_inicio.substring(0,5)}
-                                        </span>
-                                        <span class="badge mt-1" style="background:${estilos.badgeBg};color:${estilos.badgeText};font-size:.7rem;align-self:flex-start;padding:4px 8px;border-radius:6px;">
-                                            ${datePrefix}${estilos.label}
-                                        </span>
-                                    </div>
-                                    <div style="background:rgba(255,255,255,.8);border:1px solid rgba(0,0,0,.05);padding:5px 12px;border-radius:20px;color:${estilos.text};font-weight:bold;font-size:.9rem;">
-                                        <i class="bi bi-people-fill me-1"></i> ${r.numero_personas}
-                                    </div>
-                                </div>
-                                <div>
-                                    <h5 class="fw-bold mb-1 text-truncate" style="color:${estilos.text};font-size:1.1rem;" title="${r.nombre_cliente}">
-                                        ${r.nombre_cliente}
-                                    </h5>
-                                    <p class="m-0 text-truncate" style="color:${estilos.text};opacity:.75;font-size:.85rem;">
-                                        <i class="bi bi-hash me-1"></i> ${r.folio || 'N/A'}
-                                        ${r.zona && r.zona.nombre_zona ? ' | <i class="bi bi-geo-alt-fill mx-1"></i> ' + r.zona.nombre_zona : ''}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
+                const clone = template.content.cloneNode(true);
+                const card = clone.querySelector('.js-card');
+                
+                card.style.background = estilos.bg;
+                card.style.border = `1px solid ${estilos.border}`;
+                card.style.boxShadow = estilos.shadow;
+                card.style.opacity = opacidadBaja;
+                card.addEventListener('click', () => abrirDetalles(r.id));
+
+                const horaElem = clone.querySelector('.js-hora');
+                horaElem.textContent = r.hora_inicio.substring(0,5);
+                horaElem.style.color = estilos.text;
+
+                const badge = clone.querySelector('.js-badge');
+                badge.textContent = datePrefix + estilos.label;
+                badge.style.background = estilos.badgeBg;
+                badge.style.color = estilos.badgeText;
+
+                const pw = clone.querySelector('.js-personas-wrapper');
+                pw.style.color = estilos.text;
+                clone.querySelector('.js-personas').textContent = r.numero_personas;
+
+                const nombreElem = clone.querySelector('.js-nombre');
+                nombreElem.textContent = r.nombre_cliente;
+                nombreElem.title = r.nombre_cliente;
+                nombreElem.style.color = estilos.text;
+
+                const detallesElem = clone.querySelector('.js-detalles');
+                detallesElem.style.color = estilos.text;
+                let detallesHtml = `<i class="bi bi-hash me-1"></i> ${escapeHTML(r.folio || 'N/A')}`;
+                if (r.zona && r.zona.nombre_zona) {
+                    detallesHtml += ` | <i class="bi bi-geo-alt-fill mx-1"></i> ${escapeHTML(r.zona.nombre_zona)}`;
+                }
+                detallesElem.innerHTML = detallesHtml;
+
+                fragment.appendChild(clone);
             });
 
-            grid.innerHTML = html || `
-                <div class="col-12 text-center py-5 text-muted">
-                    <i class="bi bi-calendar-check fs-1 d-block mb-2" style="opacity:.3;"></i>
-                    <p class="fw-bold">No hay reservas activas en esta vista.</p>
-                </div>`;
+            if (reservasMostradas === 0) {
+                 grid.innerHTML = `
+                    <div class="col-12 text-center py-5 text-muted">
+                        <i class="bi bi-calendar-check fs-1 d-block mb-2" style="opacity:.3;"></i>
+                        <p class="fw-bold">No hay reservas activas en esta vista.</p>
+                    </div>`;
+            } else {
+                grid.appendChild(fragment);
+            }
         }
 
         // ------------------------------------------------------------------

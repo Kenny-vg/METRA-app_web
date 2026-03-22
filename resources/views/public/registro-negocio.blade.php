@@ -386,6 +386,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    window.escapeHTML = function(str) {
+        if (str === null || str === undefined) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    };
+
     const API_BASE = "{{ url('/api') }}";
     let selectedPlanId = null;
     let registeredCafeteriaId = null;
@@ -523,11 +528,11 @@
             <div class="col-md-6 col-lg-4">
                 <div class="plan-card ${featured ? 'featured' : ''}">
                     ${featured ? '<div class="plan-badge-featured"><i class="bi bi-star-fill me-1"></i> Recomendado</div>' : ''}
-                    <h4 class="fw-bold" style="color: var(--black-primary); text-transform: uppercase; font-size:1.1rem; letter-spacing:1px">${plan.nombre_plan}</h4>
+                    <h4 class="fw-bold" style="color: var(--black-primary); text-transform: uppercase; font-size:1.1rem; letter-spacing:1px">${escapeHTML(plan.nombre_plan)}</h4>
                     <div class="plan-price mt-3 mb-2">
                         ${formatterMXN.format(plan.precio)} MXN<sub class="text-muted"> / mes</sub>
                     </div>
-                    ${plan.descripcion ? `<p class="text-muted small mt-3 mb-0">${plan.descripcion}</p>` : ''}
+                    ${plan.descripcion ? `<p class="text-muted small mt-3 mb-0">${escapeHTML(plan.descripcion)}</p>` : ''}
                     <hr style="border-color: rgba(56,44,38,0.1); margin: 25px 0;">
                     <div class="d-flex flex-column gap-2 mb-4">
                         <div class="plan-feature"><i class="bi bi-check-circle-fill"></i> ${plan.max_reservas_mes} reservas mensuales</div>
@@ -547,7 +552,7 @@
         document.getElementById('plan-selector').innerHTML = planes.map(plan => `
             <div class="plan-option d-flex justify-content-between align-items-center" id="po-${plan.id}" onclick="window.selectPlan(${plan.id})">
                 <div>
-                    <div class="fw-bold" style="color: var(--black-primary);">${plan.nombre_plan}</div>
+                    <div class="fw-bold" style="color: var(--black-primary);">${escapeHTML(plan.nombre_plan)}</div>
                     <div class="text-muted small">${plan.max_reservas_mes} reservas · ${plan.max_usuarios_admin} usuarios</div>
                 </div>
                 <div class="fw-bold fs-5" style="color: var(--accent-gold);">${formatterMXN.format(plan.precio)} MXN</div>
@@ -814,7 +819,7 @@
             rd.onload = e => {
                 p.innerHTML = `
                     <img src="${e.target.result}" style="max-width: 100%; max-height: 250px; object-fit: contain; border-radius: 8px; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                    <div class="small text-muted mt-3 fw-semibold">${f.name}</div>
+                    <div class="small text-muted mt-3 fw-semibold">${escapeHTML(f.name)}</div>
                     <div class="mt-3">
                         <button class="btn btn-sm btn-outline-danger me-2 shadow-sm rounded-pill px-3" onclick="rmFile()"><i class="bi bi-trash"></i> Eliminar</button>
                         <button class="btn btn-sm btn-outline-primary shadow-sm rounded-pill px-3" onclick="document.getElementById('comprobante-input').click()"><i class="bi bi-arrow-repeat"></i> Reemplazar</button>
@@ -826,7 +831,7 @@
             p.innerHTML = `
                 <div class="p-3 bg-light rounded-3 text-start border d-flex justify-content-between align-items-center">
                     <div>
-                        <i class="bi bi-file-pdf text-danger fs-3 me-2"></i><b>${f.name}</b> adjunto listo.
+                        <i class="bi bi-file-pdf text-danger fs-3 me-2"></i><b>${escapeHTML(f.name)}</b> adjunto listo.
                     </div>
                     <div>
                         <button class="btn btn-sm btn-outline-danger me-2" onclick="rmFile()"><i class="bi bi-trash"></i></button>

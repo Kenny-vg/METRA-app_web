@@ -13,7 +13,6 @@ class Suscripcion extends Model
     protected $fillable = [
         'cafe_id',
         'plan_id',
-        'plan_solicitado_id',
         'fecha_inicio',
         'fecha_fin',
         'estado_pago',

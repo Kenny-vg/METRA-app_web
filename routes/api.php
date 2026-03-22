@@ -36,7 +36,7 @@ use App\Http\Controllers\Api\Gerente\StaffController;
 use App\Http\Controllers\Api\Publico\PublicCafeteriaController;
 
 /* |------------------------------------------ | RUTAS PÚBLICAS |------------------------------------------ */
-Route::post('/login', [LoginController::class , 'login']);
+Route::post('/login', [LoginController::class , 'login'])->middleware('throttle:5,1');
 
 // Activar cuenta
 Route::post('/activar-cuenta', [RegisterController::class , 'activarCuenta']);

@@ -19,6 +19,26 @@
         <!-- Productos cargados por JS -->
     </div>
 
+    <!-- Template HTML para Producto (previene XSS vía clonación en JS) -->
+    <template id="producto-template">
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 js-card" style="background: var(--white-pure);">
+                <div class="js-img" style="height: 180px; width: 100%; background-size: cover; background-position: center; border-bottom: 1px solid var(--border-light);"></div>
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="fw-bold mb-0 text-truncate pe-2 js-nombre" style="color: var(--black-primary); font-size: 1.1rem;"></h5>
+                        <span class="badge rounded-pill js-badge" style="font-size: 0.7rem;"></span>
+                    </div>
+                    <p class="small text-muted mb-4 flex-grow-1 js-desc" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"></p>
+                    
+                    <div class="d-flex justify-content-end mt-auto align-items-center border-top pt-3 js-actions" style="border-color: var(--border-light) !important;">
+                        <!-- Botones insertados por JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
     <!-- Modal Producto -->
     <div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -104,37 +124,56 @@
                     return;
                 }
 
+                const template = document.getElementById('producto-template');
+                const fragment = document.createDocumentFragment();
+
                 productos.forEach(p => {
-                    const opacityClass = p.activo ? '' : 'opacity-50';
-                    const badgeClass = p.activo ? 'bg-success' : 'bg-secondary';
-                    const badgeText = p.activo ? 'Activo' : 'Inactivo';
+                    const clone = template.content.cloneNode(true);
                     
+                    const card = clone.querySelector('.js-card');
+                    if (!p.activo) card.classList.add('opacity-50');
+
+                    const img = clone.querySelector('.js-img');
                     const imgUrl = p.imagen_url ? (p.imagen_url.startsWith('http') ? p.imagen_url : `{{ url('storage') }}/${p.imagen_url}`) : 'https://placehold.co/400x300?text=Sin+Imagen';
+                    img.style.backgroundImage = `url('${imgUrl}')`;
 
-                    const actions = p.activo
-                        ? `<button class="btn btn-sm btn-outline-dark me-2" onclick='editProducto(${JSON.stringify(p)})' title="Editar"><i class="bi bi-pencil"></i></button>
-                           <button class="btn btn-sm btn-outline-primary" onclick="deleteProducto(${p.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>`
-                        : `<button class="btn btn-sm btn-success w-100 mt-2" onclick="reactivateProducto(${p.id})"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
+                    clone.querySelector('.js-nombre').textContent = p.nombre_producto;
+                    
+                    const badge = clone.querySelector('.js-badge');
+                    badge.classList.add(p.activo ? 'bg-success' : 'bg-secondary');
+                    badge.textContent = p.activo ? 'Activo' : 'Inactivo';
 
-                    container.innerHTML += `
-                        <div class="col-md-6 col-lg-4 col-xl-3">
-                            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 ${opacityClass}" style="background: var(--white-pure);">
-                                <div style="height: 180px; width: 100%; background-image: url('${imgUrl}'); background-size: cover; background-position: center; border-bottom: 1px solid var(--border-light);"></div>
-                                <div class="card-body p-4 d-flex flex-column">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h5 class="fw-bold mb-0 text-truncate pe-2" style="color: var(--black-primary); font-size: 1.1rem;">${p.nombre_producto}</h5>
-                                        <span class="badge ${badgeClass} rounded-pill" style="font-size: 0.7rem;">${badgeText}</span>
-                                    </div>
-                                    <p class="small text-muted mb-4 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${p.descripcion || 'Sin descripción'}</p>
-                                    
-                                    <div class="d-flex justify-content-end mt-auto align-items-center border-top pt-3" style="border-color: var(--border-light) !important;">
-                                        ${actions}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
+                    clone.querySelector('.js-desc').textContent = p.descripcion || 'Sin descripción';
+
+                    const actionsDiv = clone.querySelector('.js-actions');
+                    if (p.activo) {
+                        const btnEdit = document.createElement('button');
+                        btnEdit.className = 'btn btn-sm btn-outline-dark me-2';
+                        btnEdit.title = 'Editar';
+                        btnEdit.innerHTML = '<i class="bi bi-pencil"></i>';
+                        btnEdit.addEventListener('click', () => editProducto(p));
+                        
+                        const btnDeactivate = document.createElement('button');
+                        btnDeactivate.className = 'btn btn-sm btn-outline-primary';
+                        btnDeactivate.title = 'Desactivar';
+                        btnDeactivate.innerHTML = '<i class="bi bi-x-circle"></i>';
+                        btnDeactivate.addEventListener('click', () => deleteProducto(p.id));
+
+                        actionsDiv.appendChild(btnEdit);
+                        actionsDiv.appendChild(btnDeactivate);
+                    } else {
+                        const btnReactivate = document.createElement('button');
+                        btnReactivate.className = 'btn btn-sm btn-success w-100 mt-2';
+                        btnReactivate.innerHTML = '<i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar';
+                        btnReactivate.addEventListener('click', () => reactivateProducto(p.id));
+
+                        actionsDiv.appendChild(btnReactivate);
+                    }
+
+                    fragment.appendChild(clone);
                 });
+                
+                container.appendChild(fragment);
             } catch (error) {
                 console.error(error);
                 showToast('error', 'Error al cargar los productos');

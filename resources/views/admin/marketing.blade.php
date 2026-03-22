@@ -13,20 +13,45 @@
 
 <ul class="nav nav-pills mb-4 gap-2" id="pills-tab" role="tablist">
     <li class="nav-item">
-        <button class="nav-link active rounded-pill px-4" id="promociones-tab" data-bs-toggle="pill" data-bs-target="#promociones" style="border: 1px solid var(--border-light); font-weight: 600; font-size: 0.9rem;">
-            <i class="bi bi-megaphone me-2"></i>Promociones Activas
+        <button class="nav-link active rounded-pill px-4" id="ocasiones-tab" data-bs-toggle="pill" data-bs-target="#ocasiones" style="border: 1px solid var(--border-light); font-weight: 600; font-size: 0.9rem;">
+            <i class="bi bi-balloon me-2"></i>Ocasiones Especiales
         </button>
     </li>
     <li class="nav-item">
-        <button class="nav-link rounded-pill px-4" id="ocasiones-tab" data-bs-toggle="pill" data-bs-target="#ocasiones" style="border: 1px solid var(--border-light); font-weight: 600; font-size: 0.9rem;">
-            <i class="bi bi-balloon me-2"></i>Ocasiones Especiales
+        <button class="nav-link rounded-pill px-4" id="promociones-tab" data-bs-toggle="pill" data-bs-target="#promociones" style="border: 1px solid var(--border-light); font-weight: 600; font-size: 0.9rem;">
+            <i class="bi bi-megaphone me-2"></i>Promociones Activas
         </button>
     </li>
 </ul>
 
 <div class="tab-content">
+    <!-- OCASIONES ESPECIALES -->
+    <div class="tab-pane fade show active" id="ocasiones">
+        <div class="card border-0 p-4 p-md-5 premium-card">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom" style="border-color: var(--border-light) !important;">
+                <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Ocasiones Especiales</h5>
+                <button class="btn-admin-primary" onclick="openModalOcasion()">
+                    <i class="bi bi-plus-lg me-2"></i>Nueva Ocasión
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table-metra mt-2">
+                    <thead>
+                        <tr>
+                            <th>Motivo / Celebración</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-ocasiones-body">
+                        <!-- Ocasiones cargadas por JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- PROMOCIONES -->
-    <div class="tab-pane fade show active" id="promociones">
+    <div class="tab-pane fade" id="promociones">
         <div class="d-flex justify-content-end mb-4">
             <button class="btn-metra-main" onclick="abrirModalNuevaPromo()" style="padding: 12px 24px; font-size: 0.9rem;">
                 <i class="bi bi-plus-lg me-2"></i>Nueva Promoción
@@ -91,32 +116,37 @@
     </div>
 </div>
 </div>
-
-    <!-- OCASIONES ESPECIALES -->
-    <div class="tab-pane fade" id="ocasiones">
-        <div class="card border-0 p-4 p-md-5 premium-card">
-            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom" style="border-color: var(--border-light) !important;">
-                <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Ocasiones Especiales</h5>
-                <button class="btn-admin-primary" onclick="openModalOcasion()">
-                    <i class="bi bi-plus-lg me-2"></i>Nueva Ocasión
-                </button>
-            </div>
-            <div class="table-responsive">
-                <table class="table-metra mt-2">
-                    <thead>
-                        <tr>
-                            <th>Motivo / Celebración</th>
-                            <th class="text-end">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabla-ocasiones-body">
-                        <!-- Ocasiones cargadas por JS -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
 </div>
+
+<!-- Plantillas para Renderizado Estructural (Seguridad XSS y Rendimiento) -->
+<template id="promo-template">
+    <tr class="js-row">
+        <td>
+            <div class="js-badge-container" style="display: none;">
+                <span class="badge bg-secondary mb-1" style="font-size:0.65rem;">Inactiva</span><br>
+            </div>
+            <span class="fw-bold js-nombre" style="color: var(--black-primary); font-size: 1.05rem;"></span>
+        </td>
+        <td><span class="text-muted small js-desc" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 300px;"></span></td>
+        <td>
+            <span class="badge fs-6 rounded-pill js-precio" style="background: rgba(212,175,55,0.1); color: var(--accent-gold); border: 1px solid rgba(212,175,55,0.2);"></span>
+        </td>
+        <td class="text-end align-middle js-actions"></td>
+    </tr>
+</template>
+
+<template id="ocasion-template">
+    <tr class="js-row">
+        <td>
+            <div class="fw-bold js-nombre-container" style="color: var(--black-primary);">
+                <span class="js-nombre"></span>
+                <span class="badge bg-secondary ms-2 text-xs js-badge" style="display: none;">Inactivo</span>
+            </div>
+            <div class="small text-muted text-truncate js-desc" style="max-width: 300px;"></div>
+        </td>
+        <td class="text-end align-middle js-actions"></td>
+    </tr>
+</template>
 
 <!-- Modal nueva/editar promoción -->
 <div class="modal fade" id="modalPromo" tabindex="-1" style="font-family: inherit !important;">
@@ -232,34 +262,52 @@ async function loadPromociones() {
             return;
         }
 
-        promos.forEach(p => {
-            const opacityClass = p.activo ? '' : 'opacity-50';
-            const bgClass = p.activo ? '' : 'table-secondary';
-            const badge = !p.activo ? `<span class="badge bg-secondary mb-1" style="font-size:0.65rem;">Inactiva</span><br>` : '';
-            
-            const actions = p.activo
-                ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick='editPromocion(${JSON.stringify(p)})' title="Editar"><i class="bi bi-pencil"></i></button>
-                   <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deletePromocion(${p.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>`
-                : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivatePromocion(${p.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
+        const fragment = document.createDocumentFragment();
+        const template = document.getElementById('promo-template');
 
-            tbody.innerHTML += `
-                <tr class="${bgClass} ${opacityClass}">
-                    <td>
-                        ${badge}
-                        <span class="fw-bold" style="color: var(--black-primary); font-size: 1.05rem;">${p.nombre_promocion}</span>
-                    </td>
-                    <td><span class="text-muted small" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 300px;">${p.descripcion || '-'}</span></td>
-                    <td>
-                        <span class="badge fs-6 rounded-pill" style="background: rgba(212,175,55,0.1); color: var(--accent-gold); border: 1px solid rgba(212,175,55,0.2);">
-                            ${formatPrice(p.precio)}
-                        </span>
-                    </td>
-                    <td class="text-end align-middle">
-                        ${actions}
-                    </td>
-                </tr>
-            `;
+        promos.forEach(p => {
+            const clone = template.content.cloneNode(true);
+            const row = clone.querySelector('.js-row');
+
+            if (!p.activo) {
+                row.classList.add('table-secondary', 'opacity-50');
+                clone.querySelector('.js-badge-container').style.display = 'block';
+            }
+
+            clone.querySelector('.js-nombre').textContent = p.nombre_promocion;
+            clone.querySelector('.js-desc').textContent = p.descripcion || '-';
+            clone.querySelector('.js-precio').textContent = formatPrice(p.precio);
+
+            const actionsCol = clone.querySelector('.js-actions');
+            if (p.activo) {
+                const btnEdit = document.createElement('button');
+                btnEdit.className = 'btn btn-sm btn-outline-dark rounded-circle me-1';
+                btnEdit.title = 'Editar';
+                btnEdit.innerHTML = '<i class="bi bi-pencil"></i>';
+                btnEdit.addEventListener('click', () => editPromocion(p));
+
+                const btnDelete = document.createElement('button');
+                btnDelete.className = 'btn btn-sm btn-outline-primary rounded-circle';
+                btnDelete.title = 'Desactivar';
+                btnDelete.innerHTML = '<i class="bi bi-x-circle"></i>';
+                btnDelete.addEventListener('click', () => deletePromocion(p.id));
+
+                actionsCol.appendChild(btnEdit);
+                actionsCol.appendChild(btnDelete);
+            } else {
+                const btnReactivate = document.createElement('button');
+                btnReactivate.className = 'btn btn-sm btn-success rounded-pill px-3 shadow-sm';
+                btnReactivate.title = 'Reactivar';
+                btnReactivate.innerHTML = '<i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar';
+                btnReactivate.addEventListener('click', () => reactivatePromocion(p.id));
+
+                actionsCol.appendChild(btnReactivate);
+            }
+
+            fragment.appendChild(clone);
         });
+        
+        tbody.appendChild(fragment);
     } catch (error) {
         console.error(error);
         document.getElementById('tabla-promos-body').innerHTML = '<tr><td colspan="4" class="text-center text-danger py-4">Error de conexión al cargar promociones.</td></tr>';
@@ -504,27 +552,51 @@ async function loadOcasiones() {
         const tbody = document.getElementById('tabla-ocasiones-body');
         tbody.innerHTML = '';
         
-        ocasiones.forEach(o => {
-            const opacityClass = o.activo ? '' : 'opacity-50';
-            const bgClass = o.activo ? '' : 'table-secondary';
-            const badge = !o.activo ? `<span class="badge bg-secondary ms-2 text-xs">Inactivo</span>` : '';
-            const actions = o.activo 
-                ? `<button class="btn btn-sm btn-outline-dark rounded-circle me-1" onclick="editOcasion(${o.id}, '${o.nombre}', '${o.descripcion || ''}')" title="Editar"><i class="bi bi-pencil"></i></button>
-                   <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="deleteOcasion(${o.id})" title="Desactivar"><i class="bi bi-x-circle"></i></button>`
-                : `<button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="reactivateOcasion(${o.id})" title="Reactivar"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
+        const template = document.getElementById('ocasion-template');
+        const fragment = document.createDocumentFragment();
 
-            tbody.innerHTML += `
-                <tr class="${bgClass} ${opacityClass}">
-                    <td>
-                        <div class="fw-bold" style="color: var(--black-primary);">${o.nombre} ${badge}</div>
-                        <div class="small text-muted text-truncate" style="max-width: 300px;">${o.descripcion || 'Sin descripción'}</div>
-                    </td>
-                    <td class="text-end align-middle">
-                        ${actions}
-                    </td>
-                </tr>
-            `;
+        ocasiones.forEach(o => {
+            const clone = template.content.cloneNode(true);
+            const row = clone.querySelector('.js-row');
+
+            if (!o.activo) {
+                row.classList.add('table-secondary', 'opacity-50');
+                clone.querySelector('.js-badge').style.display = 'inline-block';
+            }
+
+            clone.querySelector('.js-nombre').textContent = o.nombre;
+            clone.querySelector('.js-desc').textContent = o.descripcion || 'Sin descripción';
+
+            const actionsCol = clone.querySelector('.js-actions');
+            if (o.activo) {
+                const btnEdit = document.createElement('button');
+                btnEdit.className = 'btn btn-sm btn-outline-dark rounded-circle me-1';
+                btnEdit.title = 'Editar';
+                btnEdit.innerHTML = '<i class="bi bi-pencil"></i>';
+                btnEdit.addEventListener('click', () => editOcasion(o));
+
+                const btnDelete = document.createElement('button');
+                btnDelete.className = 'btn btn-sm btn-outline-primary rounded-circle';
+                btnDelete.title = 'Desactivar';
+                btnDelete.innerHTML = '<i class="bi bi-x-circle"></i>';
+                btnDelete.addEventListener('click', () => deleteOcasion(o.id));
+
+                actionsCol.appendChild(btnEdit);
+                actionsCol.appendChild(btnDelete);
+            } else {
+                const btnReactivate = document.createElement('button');
+                btnReactivate.className = 'btn btn-sm btn-success rounded-pill px-3 shadow-sm';
+                btnReactivate.title = 'Reactivar';
+                btnReactivate.innerHTML = '<i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar';
+                btnReactivate.addEventListener('click', () => reactivateOcasion(o.id));
+
+                actionsCol.appendChild(btnReactivate);
+            }
+
+            fragment.appendChild(clone);
         });
+
+        tbody.appendChild(fragment);
     } catch (error) {
         console.error(error);
         document.getElementById('tabla-ocasiones-body').innerHTML = '<tr><td colspan="2" class="text-center text-danger py-4">Error de conexión al cargar ocasiones.</td></tr>';
@@ -539,10 +611,10 @@ function openModalOcasion() {
     modalOcasionInst.show();
 }
 
-function editOcasion(id, nombre, descripcion) {
-    document.getElementById('ocasion-id').value = id;
-    document.getElementById('ocasion-nombre').value = nombre;
-    document.getElementById('ocasion-descripcion').value = descripcion;
+function editOcasion(o) {
+    document.getElementById('ocasion-id').value = o.id;
+    document.getElementById('ocasion-nombre').value = o.nombre;
+    document.getElementById('ocasion-descripcion').value = o.descripcion || '';
     document.getElementById('modalOcasionTitle').innerText = 'Editar Ocasión Especial';
     modalOcasionInst.show();
 }

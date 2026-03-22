@@ -32,6 +32,7 @@ return new class extends Migration
 
             $table->foreignId('user_id')->nullable()->constrained('users');
             $table->dateTime('fecha_validacion')->nullable();
+            $table->boolean('en_revision')->default(false);
 
             $table->timestamps();
         });

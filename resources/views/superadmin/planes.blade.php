@@ -75,7 +75,7 @@ function renderPlanes() {
             <div class="card bg-white border-0 shadow-sm rounded-4 h-100">
                 <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
                     <h5 class="fw-bold text-primary mb-0 d-flex justify-content-between align-items-center">
-                        Plan ${plan.nombre_plan}
+                        Plan ${escapeHTML(plan.nombre_plan)}
                         <i class="bi bi-card-checklist text-muted" style="font-size: 1.2rem; opacity: 0.5;"></i>
                     </h5>
                 </div>
@@ -83,7 +83,7 @@ function renderPlanes() {
                     <form id="form-plan-${plan.id}" onsubmit="event.preventDefault(); guardarPlan(${plan.id});">
                         <div class="mb-3">
                             <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Nombre del Plan</label>
-                            <input type="text" class="form-control bg-light border-0" id="nombre-${plan.id}" value="${plan.nombre_plan}" maxlength="100" required>
+                            <input type="text" class="form-control bg-light border-0" id="nombre-${plan.id}" value="${escapeHTML(plan.nombre_plan)}" maxlength="100" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Precio (MXN)</label>
@@ -108,7 +108,7 @@ function renderPlanes() {
                         </div>
                         <div class="mb-4">
                             <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Descripción</label>
-                            <textarea class="form-control bg-light border-0" id="desc-${plan.id}" rows="2" maxlength="255">${plan.descripcion || ''}</textarea>
+                            <textarea class="form-control bg-light border-0" id="desc-${plan.id}" rows="2" maxlength="255">${escapeHTML(plan.descripcion || '')}</textarea>
                         </div>
                         
                         <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm d-flex align-items-center justify-content-center">

@@ -131,6 +131,10 @@
         uploadArea.style.display = 'none';
         const f = input.files[0];
         
+        const parseHTML = (str) => {
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        };
+        
         if (f.type.startsWith('image/')) {
             const rd = new FileReader();
             rd.onload = e => {
@@ -138,7 +142,7 @@
                     <div class="position-relative d-inline-block">
                         <img src="${e.target.result}" style="max-width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
                     </div>
-                    <div class="small text-muted mt-3 fw-semibold">${f.name}</div>
+                    <div class="small text-muted mt-3 fw-semibold">${parseHTML(f.name)}</div>
                     <div class="mt-3">
                         <button class="btn btn-sm btn-outline-danger me-2 shadow-sm rounded-pill px-3" onclick="rmFile()"><i class="bi bi-trash"></i> Eliminar</button>
                         <button class="btn btn-sm btn-outline-primary shadow-sm rounded-pill px-3" onclick="document.getElementById('comprobante-input').click()"><i class="bi bi-arrow-repeat"></i> Reemplazar</button>
@@ -150,7 +154,7 @@
             p.innerHTML = `
                 <div class="p-3 bg-light rounded-3 text-start border d-flex justify-content-between align-items-center">
                     <div class="text-truncate me-3">
-                        <i class="bi bi-file-pdf text-danger fs-3 me-2"></i><b>${f.name}</b> adjunto.
+                        <i class="bi bi-file-pdf text-danger fs-3 me-2"></i><b>${parseHTML(f.name)}</b> adjunto.
                     </div>
                     <div class="text-nowrap">
                         <button class="btn btn-sm btn-outline-danger me-1" onclick="rmFile()"><i class="bi bi-trash"></i></button>
