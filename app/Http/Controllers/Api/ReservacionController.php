@@ -25,8 +25,7 @@ class ReservacionController extends Controller
     {
         $modo = $request->query('modo', 'dia');
 
-        $query = Reservacion::with(['ocasionEspecial', 'promocion', 'zona'])
-            ->whereIn('estado', ['pendiente', 'en_curso']);
+        $query = Reservacion::with(['ocasionEspecial', 'promocion', 'zona']);
 
         if ($modo === 'todo') {
             // Hoy + todo el futuro en un solo payload para filtrado en frontend.
