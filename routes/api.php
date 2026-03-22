@@ -155,7 +155,6 @@ Route::middleware([
         Route::patch('/suscripciones/{suscripcion}/aprobar-renovacion', [SuscripcionController::class , 'aprobarRenovacion']);
         // Ver comprobantes
         Route::get('/suscripciones/{suscripcion}/comprobante', [SuscripcionController::class , 'verComprobante']);
-        Route::get('/suscripciones-historial/{id}/comprobante', [SuscripcionController::class , 'verComprobanteHistorial']);
 
         //DASHBOARD
         Route::get('/dashboard', [DashboardController::class , 'index']);

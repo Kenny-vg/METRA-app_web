@@ -22,16 +22,15 @@ class SuscripcionController extends Controller
         $query = Suscripcion::with(['cafeteria', 'plan']);
 
         if ($request->has('cafe_id')) {
-            // HISTORIAL MODE: Devolver tanto la actual como las históricas
-            
-            // 1. Suscripciones actuales
-            $actuales = Suscripcion::with(['cafeteria', 'plan'])
+            // HISTORIAL MODE: Devolver todas las suscripciones de esta cafetería
+            $historial = Suscripcion::with(['cafeteria', 'plan'])
                 ->where('cafe_id', $request->cafe_id)
+                ->orderBy('fecha_inicio', 'desc')
                 ->get()
                 ->map(function($s) {
                     return [
                         'id' => $s->id,
-                        'tipo' => 'actual',
+                        'tipo' => 'historial', // Frontend podria esperar esta propiedad
                         'plan' => $s->plan,
                         'monto' => $s->monto,
                         'fecha_inicio' => $s->fecha_inicio,
@@ -41,28 +40,8 @@ class SuscripcionController extends Controller
                     ];
                 });
 
-            // 2. Históricas
-            $historial = \App\Models\RenovacionHistorial::with('plan')
-                ->where('cafe_id', $request->cafe_id)
-                ->get()
-                ->map(function($h) {
-                    return [
-                        'id' => $h->id,
-                        'tipo' => 'historial',
-                        'plan' => $h->plan,
-                        'monto' => $h->monto,
-                        'fecha_inicio' => $h->fecha_inicio_anterior,
-                        'fecha_fin' => $h->fecha_fin_anterior,
-                        'estado_pago' => $h->estado_pago_anterior,
-                        'comprobante_url' => $h->comprobante_url,
-                    ];
-                });
-
-            // 3. Juntar y ordenar por fecha_inicio descendente
-            $completo = $actuales->concat($historial)->sortByDesc('fecha_inicio')->values();
-
             return ApiResponse::success(
-                $completo,
+                $historial,
                 'Historial completo'
             );
         }
@@ -191,25 +170,7 @@ class SuscripcionController extends Controller
         );
     }
 
-    /**
-     * Servir el comprobante de una suscripción antigua (en historial).
-     */
-    public function verComprobanteHistorial($id)
-    {
-        $historial = \App\Models\RenovacionHistorial::findOrFail($id);
 
-        if (!$historial->comprobante_url) {
-            return ApiResponse::error('Esta suscripción antigua no tiene comprobante.', 404);
-        }
-
-        if (!\Illuminate\Support\Facades\Storage::exists($historial->comprobante_url)) {
-            return ApiResponse::error('Archivo no encontrado.', 404);
-        }
-
-        return response()->file(
-            \Illuminate\Support\Facades\Storage::path($historial->comprobante_url)
-        );
-    }
 
     /**
      * Aprobar renovación de suscripción — para cafeterías activas que renovaron.
@@ -231,14 +192,14 @@ class SuscripcionController extends Controller
             ? \App\Models\Plan::find($suscripcion->plan_solicitado_id) 
             : $suscripcion->plan;
 
-        // REGLA DE ORO: Si renueva antes de vencer, sumar días. Si renueva vencido, empezar desde hoy.
-        if (\Carbon\Carbon::parse($suscripcion->fecha_fin)->isFuture()) {
-            // Aún tenía días, sumarle los días del plan a partir de su fecha final actual
-            $nueva_fecha_inicio = $suscripcion->fecha_inicio; // se queda igual
-            $nueva_fecha_fin = \Carbon\Carbon::parse($suscripcion->fecha_fin)
-                ->addDays(max(0, $plan_aprobar->duracion_dias)); // Se extiende
+        // REGLA: Como esta fila era PENDIENTE, ya traía unas fechas propuestas.
+        // Si su fecha_inicio es futura (renovó a tiempo antes de vencer su plan activo), mantenemos esas fechas.
+        // Si su fecha_inicio ya pasó (renovó estando vencido, y el superadmin tardó días en aprobar),
+        // recalculamos para que no pierda días y empiece HOY.
+        if (\Carbon\Carbon::parse($suscripcion->fecha_inicio)->startOfDay()->isFuture()) {
+            $nueva_fecha_inicio = $suscripcion->fecha_inicio;
+            $nueva_fecha_fin = $suscripcion->fecha_fin;
         } else {
-            // Ya venció, empieza la suscripción a contar desde HOY
             $nueva_fecha_inicio = now()->startOfDay();
             $nueva_fecha_fin = now()->startOfDay()->addDays(max(0, $plan_aprobar->duracion_dias - 1))->endOfDay();
         }

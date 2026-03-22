@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\Gerente;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Suscripcion;
-use App\Models\RenovacionHistorial;
 use App\Models\Plan;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\Storage;
@@ -82,7 +81,7 @@ class RenovarSuscripcionController extends Controller
         // Guardar el nuevo comprobante en storage
         $nuevaRutaComprobante = $request->file('comprobante')->store('comprobantes');
 
-        // Calcular las nuevas fechas para la renovación
+        // Calcular las nuevas fechas esperadas para la renovación (como propuesta inicial)
         $suscripcionActiva = Suscripcion::where('cafe_id', $cafeteria->id)
             ->where('estado_pago', 'pagado')
             ->where('fecha_fin', '>', now())
@@ -96,49 +95,19 @@ class RenovarSuscripcionController extends Controller
         }
         $fin = $inicio->copy()->addDays(max(0, $plan->duracion_dias - 1))->endOfDay();
 
-        if ($suscripcionExistente) {
-            // ─── CASO: Ya existe suscripción → guardar historial y actualizar ───
-
-            // Guardar snapshot del estado anterior ANTES de sobrescribir
-            RenovacionHistorial::create([
-                'cafe_id'               => $cafeteria->id,
-                'suscripcion_id'        => $suscripcionExistente->id,
-                'plan_id'               => $suscripcionExistente->plan_id,
-                'monto'                 => $suscripcionExistente->monto,
-                'comprobante_url'       => $suscripcionExistente->comprobante_url, // comprobante ANTERIOR
-                'fecha_inicio_anterior' => $suscripcionExistente->fecha_inicio,
-                'fecha_fin_anterior'    => $suscripcionExistente->fecha_fin,
-                'estado_pago_anterior'  => $suscripcionExistente->estado_pago,
-                'fecha_solicitud'       => now(),
-            ]);
-
-            // Actualizar el registro principal: MARCAMOS COMO PENDIENTE pero no tocamos fechas ni plan_id activo!
-            $suscripcionExistente->update([
-                'plan_solicitado_id' => $plan->id, // Plan que quiere
-                'user_id'          => $user->id,
-                'monto'            => $plan->precio,
-                'comprobante_url'  => $nuevaRutaComprobante,
-                'estado_pago'      => 'pendiente', // SIEMPRE PENDIENTE AL RENOVAR
-                'en_revision'      => true,
-            ]);
-
-            $suscripcion = $suscripcionExistente->fresh();
-
-        } else {
-            // ─── CASO: Primera suscripción de esta cafetería → crear ───
-            $suscripcion = Suscripcion::create([
-                'cafe_id'            => $cafeteria->id,
-                'plan_id'            => $plan->id,
-                'plan_solicitado_id' => $plan->id,
-                'user_id'            => $user->id,
-                'fecha_inicio'       => now()->startOfDay(),
-                'fecha_fin'          => now()->startOfDay()->addDays(max(0, $plan->duracion_dias - 1))->endOfDay(),
-                'monto'              => $plan->precio,
-                'comprobante_url'    => $nuevaRutaComprobante,
-                'estado_pago'        => 'pendiente',
-                'en_revision'        => true,
-            ]);
-        }
+        // ─── Siempre crear una nueva solicitud en el historial 1:N ───
+        $suscripcion = Suscripcion::create([
+            'cafe_id'            => $cafeteria->id,
+            'plan_id'            => $plan->id,
+            'plan_solicitado_id' => null, // Ya no se usa para historial
+            'user_id'            => $user->id,
+            'fecha_inicio'       => $inicio,
+            'fecha_fin'          => $fin,
+            'monto'              => $plan->precio,
+            'comprobante_url'    => $nuevaRutaComprobante,
+            'estado_pago'        => 'pendiente',
+            'en_revision'        => true,
+        ]);
 
         return ApiResponse::success([
             'suscripcion_id' => $suscripcion->id,

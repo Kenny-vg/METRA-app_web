@@ -90,8 +90,9 @@ class LoginController extends Controller
                 );
             }
 
-            // 1. Regla principal: Si fecha_vencimiento >= hoy, PERMITIR ACCESO
+            // 1. Regla principal: Si tiene suscripción PAGADA y vigente, PERMITIR ACCESO
             $suscActiva = $cafeteria->suscripciones()
+                ->where('estado_pago', 'pagado')
                 ->where('fecha_fin', '>=', now()->startOfDay())
                 ->first();
 
@@ -132,6 +133,7 @@ class LoginController extends Controller
             if ($cafeteria) {
                 $extraData['nombre_cafeteria'] = $cafeteria->nombre;
                 $suscActiva = $cafeteria->suscripciones()
+                    ->where('estado_pago', 'pagado')
                     ->where('fecha_fin', '>=', now()->startOfDay())
                     ->first();
                 if ($suscActiva && $suscActiva->fecha_fin) {
@@ -157,7 +159,7 @@ class LoginController extends Controller
                 'role' => $user->role,
                 'cafe_id' => $user->cafe_id
             ], $extraData)
-        ], 'Login correcto')->withCookie(cookie('metra_role', $user->role, 60 * 24));
+        ], 'Login correcto');
     }
 
     public function logout(Request $request)
@@ -167,6 +169,6 @@ class LoginController extends Controller
         if ($token) {
             $token->delete();
         }
-        return ApiResponse::success(null, 'Sesión cerrada')->withCookie(cookie()->forget('metra_role'));
+        return ApiResponse::success(null, 'Sesión cerrada');
     }
 }
