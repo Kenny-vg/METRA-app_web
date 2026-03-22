@@ -329,8 +329,12 @@
             const iTel = document.getElementById('telefono');
 
             const diasMap = {0:'Domingo',1:'Lunes',2:'Martes',3:'Miércoles',4:'Jueves',5:'Viernes',6:'Sábado'};
+            // Nombres normalizados de los días para hacer match con la API
+            const diasApiMap = {0:'Domingo',1:'Lunes',2:'Martes',3:'Miercoles',4:'Jueves',5:'Viernes',6:'Sabado'};
             let flatpickrInstance = null;
             let disabledDaysNumerico = [];
+            // Guardamos los horarios de operación por día para usarlos en la generación de slots
+            let schedulesData = [];
 
             // Helper to clean accents "Miércoles" -> "miercoles"
             const normalizarStr = (str) => {
@@ -397,6 +401,8 @@
                 if(resH.ok){
                     const jsonH = await resH.json();
                     let operacionHorariosInicial = jsonH.data || [];
+                    // Guardamos los horarios para usarlos al generar slots adicionales
+                    schedulesData = operacionHorariosInicial;
                     
                     const activeDaysNames = operacionHorariosInicial.map(h => normalizarStr(h.dia_semana));
                     disabledDaysNumerico = [];
@@ -416,8 +422,8 @@
                             }
                         ],
                         onChange: function(selectedDates, dateStr, instance) {
-                            fechaInput.classList.remove('is-invalid'); // Trigger visual cleanup
-                            cargarHorasDisponibles();     // USE BACKEND ENDPOINT
+                            fechaInput.classList.remove('is-invalid');
+                            cargarHorasDisponibles();
                             checkFormValidity();
                         }
                     });
@@ -453,6 +459,20 @@
                 
             } catch(e) { console.error('Error init', e); }
 
+            // Helper: convierte "HH:MM" a minutos desde medianoche
+            function hhmm2min(str) {
+                if (!str) return 0;
+                const [h, m] = str.split(':').map(Number);
+                return h * 60 + m;
+            }
+
+            // Helper: convierte minutos a string "HH:MM" en formato 24h
+            function min2hhmm(min) {
+                const h = Math.floor(min / 60).toString().padStart(2, '0');
+                const m = (min % 60).toString().padStart(2, '0');
+                return `${h}:${m}`;
+            }
+
             // --- SINCRONIZACION DE HORAS DISPONIBLES USANDO API ---
             async function cargarHorasDisponibles() {
                 const fecha = fechaInput.value;
@@ -475,7 +495,46 @@
                     if (!resH.ok) throw new Error('Error al consultar horarios');
                     const jsonH = await resH.json();
                     
-                    const horarios = jsonH.data || [];
+                    let horarios = jsonH.data || [];
+
+                    // --- EXTENSION FRONTEND: slots adicionales hasta (cierre - 30min) ---
+                    // El backend corta slots cuando la duracion_reserva_min se pasa del cierre.
+                    // En el frontend agregamos los slots faltantes usando el horario real del gerente.
+                    if (horarios.length > 0 && schedulesData.length > 0) {
+                        // Determinar el día de la semana de la fecha seleccionada
+                        const [y, mo, d] = fecha.split('-').map(Number);
+                        const diaSemana = new Date(y, mo - 1, d).getDay(); // 0=Dom...6=Sab
+                        const diaNombre = normalizarStr(diasApiMap[diaSemana]);
+
+                        // Buscar el horario del gerente para ese día
+                        const scheduleHoy = schedulesData.find(s => normalizarStr(s.dia_semana) === diaNombre);
+
+                        if (scheduleHoy && scheduleHoy.hora_cierre) {
+                            const cierreMin = hhmm2min(scheduleHoy.hora_cierre.substring(0, 5));
+                            // Última hora válida para reservar: 30 min antes del cierre
+                            const limiteMin = cierreMin - 30;
+
+                            // Inferir el intervalo entre slots a partir del array recibido
+                            let intervaloMin = 30; // default
+                            if (horarios.length >= 2) {
+                                intervaloMin = hhmm2min(horarios[1]) - hhmm2min(horarios[0]);
+                                if (intervaloMin <= 0) intervaloMin = 30;
+                            }
+
+                            // Último slot que dio el backend
+                            let ultimoMin = hhmm2min(horarios[horarios.length - 1]);
+
+                            // Agregar slots adicionales que el backend omitió
+                            let siguiente = ultimoMin + intervaloMin;
+                            while (siguiente <= limiteMin) {
+                                const slotStr = min2hhmm(siguiente);
+                                if (!horarios.includes(slotStr)) {
+                                    horarios.push(slotStr);
+                                }
+                                siguiente += intervaloMin;
+                            }
+                        }
+                    }
                     
                     if (horarios.length === 0) {
                         horaSelect.innerHTML = '<option value="">No hay horarios disponibles</option>';
@@ -483,6 +542,7 @@
                         horaSelect.classList.remove('is-invalid');
                     } else {
                         horaSelect.innerHTML = '<option value="">Seleccione un horario</option>';
+                        // Mostrar en formato 24h (los slots ya vienen en HH:MM)
                         horarios.forEach(hora => {
                             horaSelect.innerHTML += `<option value="${hora}">${hora} hrs</option>`;
                         });

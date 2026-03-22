@@ -9,10 +9,25 @@
     </header>
 
     <!-- Loading overlay -->
-    <div id="overlay-loading" style="display:none !important; position:fixed; top:0;left:0;width:100%;height:100%; z-index:9999; align-items:center; justify-content:center;">
+    <div id="overlay-loading" style="display:none !important; position:fixed; top:0;left:0;width:100%;height:100%; z-index:9999; align-items:center; justify-content:center; background: rgba(255,255,255,0.8);">
         <div class="text-center">
             <div class="spinner-border mb-3" style="width:3rem;height:3rem;"></div>
             <p class="fw-bold">Procesando...</p>
+        </div>
+    </div>
+
+    <!-- SECCIÓN DE SOLICITUDES PENDIENTES (Oculta por defecto) -->
+    <div id="seccion-pendientes" class="mb-4 d-none">
+        <div class="alert" style="background-color: #FFF8E1; border: 1px solid #FFC107; border-radius: 12px;">
+            <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-bell-fill fs-4 me-3" style="color: #FF8F00;"></i>
+                <h5 class="fw-bold m-0" style="color: #FF8F00;">Solicitudes Pendientes de Revisión (<span id="contador-pendientes">0</span>)</h5>
+            </div>
+            <p class="small text-muted mb-3">Los siguientes negocios han subido su comprobante de pago para renovación de suscripción y esperan tu aprobación.</p>
+            
+            <div class="row g-3" id="contenedor-tarjetas-pendientes">
+                <!-- Las tarjetas se generan dinámicamente aquí -->
+            </div>
         </div>
     </div>
 
@@ -117,6 +132,9 @@ function authHeaders() {
 
 async function cargarSuscripciones() {
     try {
+        // Cargar pendientes
+        cargarPendientes();
+
         const res = await fetch(`${API}/superadmin/suscripciones`, { headers: authHeaders() });
         const json = await res.json();
         if (!res.ok) throw new Error("Error del servidor");
@@ -125,6 +143,57 @@ async function cargarSuscripciones() {
     } catch (e) {
         document.getElementById('tabla-suscripciones').innerHTML = 
             '<tr><td colspan="6" class="text-danger text-center py-4">Ocurrió un problema al procesar la solicitud. Intenta nuevamente.</td></tr>';
+    }
+}
+
+async function cargarPendientes() {
+    const seccion = document.getElementById('seccion-pendientes');
+    const contenedor = document.getElementById('contenedor-tarjetas-pendientes');
+    const contador = document.getElementById('contador-pendientes');
+
+    try {
+        const res = await fetch(`${API}/superadmin/suscripciones-pendientes`, { headers: authHeaders() });
+        const json = await res.json();
+        
+        if (res.ok && json.data && json.data.length > 0) {
+            const pendientes = json.data;
+            contador.innerText = pendientes.length;
+            seccion.classList.remove('d-none');
+            
+            contenedor.innerHTML = pendientes.map(p => {
+                const cafeNombre = p.cafeteria?.nombre || 'Cafetería Desconocida';
+                const planNombre = p.plan?.nombre_plan || 'Plan';
+                const monto = p.monto ? `$${parseFloat(p.monto).toFixed(2)}` : 'N/A';
+                // Fecha desde la tabla de suscripción principal que acaba de ser actualizada
+                const fechaSolicitud = p.updated_at ? new Date(p.updated_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Reciente';
+
+                return `
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm" style="border-radius: 10px; border-left: 4px solid #FFC107 !important;">
+                        <div class="card-body">
+                            <h6 class="fw-bold text-dark mb-1">${cafeNombre}</h6>
+                            <p class="small text-muted mb-2"><i class="bi bi-calendar-event me-1"></i>Solicitado el: ${fechaSolicitud}</p>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge" style="background: #FFF8E1; color: #FFA000; border: 1px solid #FFE082;">${planNombre}</span>
+                                <span class="fw-bold" style="color: var(--black-primary);">${monto}</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-outline-secondary w-50" onclick="verComprobanteSub(${p.id})">
+                                    <i class="bi bi-receipt me-1"></i>Ver Ticket
+                                </button>
+                                <button class="btn btn-sm btn-success w-50" style="background-color: #2E7D32; border-color: #2E7D32;" onclick="aprobarRenovacion(${p.id})">
+                                    <i class="bi bi-check-lg me-1"></i>Aprobar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        } else {
+            seccion.classList.add('d-none');
+        }
+    } catch (e) {
+        console.error('Error cargando solicitudes pendientes', e);
     }
 }
 
@@ -419,9 +488,16 @@ async function verHistorial(cafeteriaId, nombre) {
                 badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #F5F5F5; color: #757575; border: 1px solid #E0E0E0;">● Cancelada</span>`;
             }
 
-            let btnComprobante = s.comprobante_url 
-                ? `<button type="button" class="btn btn-sm btn-outline-dark rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" title="Ver Recibo" onclick="verComprobanteSub(${s.id})"><i class="bi bi-file-earmark-text"></i></button>`
-                : '<span class="text-muted small">—</span>';
+            let btnComprobante = '';
+            if (s.comprobante_url) {
+                if (s.tipo === 'historial') {
+                    btnComprobante = `<button type="button" class="btn btn-sm btn-outline-dark rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" title="Ver Recibo Histórico" onclick="verComprobanteHis(${s.id})"><i class="bi bi-file-earmark-text"></i></button>`;
+                } else {
+                    btnComprobante = `<button type="button" class="btn btn-sm btn-outline-dark rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" title="Ver Recibo Actual" onclick="verComprobanteSub(${s.id})"><i class="bi bi-file-earmark-text"></i></button>`;
+                }
+            } else {
+                btnComprobante = '<span class="text-muted small">—</span>';
+            }
 
             return `<tr>
                 <td style="color: var(--text-muted); font-size: 0.9rem;">
@@ -437,6 +513,49 @@ async function verHistorial(cafeteriaId, nombre) {
 
     } catch (e) {
         tbody.innerHTML = '<tr><td colspan="4" class="text-danger text-center py-4">Ocurrió un problema al cargar el historial. Intenta nuevamente.</td></tr>';
+    }
+}
+
+async function verComprobanteHis(historialId) {
+    const modal = new bootstrap.Modal(document.getElementById('modalDetalle'));
+    const body = document.getElementById('detalle-body');
+    
+    body.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Cargando comprobante histórico...</p></div>';
+    modal.show();
+    
+    try {
+        const url = `${API}/superadmin/suscripciones-historial/${historialId}/comprobante`;
+        const response = await fetch(url, { headers: authHeaders() });
+        
+        if (!response.ok) throw new Error('Error al cargar el comprobante histórico');
+        
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const contentType = response.headers.get('content-type');
+        
+        if (contentType && contentType.includes('pdf')) {
+            body.innerHTML = `
+                <div class="text-center p-4">
+                    <i class="bi bi-file-earmark-pdf fs-1 text-danger mb-3 d-block"></i>
+                    <a href="${blobUrl}" target="_blank" class="btn btn-dark px-4 rounded-pill">
+                        <i class="bi bi-box-arrow-up-right me-2"></i>Abrir PDF
+                    </a>
+                </div>
+            `;
+        } else {
+            body.innerHTML = `
+                <div class="text-center">
+                    <img src="${blobUrl}" class="img-fluid rounded-3 shadow-sm mb-3" style="max-height: 400px;" alt="Comprobante Histórico">
+                    <div>
+                        <a href="${blobUrl}" download="comprobante_historico" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                            <i class="bi bi-download me-1"></i>Descargar
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+    } catch (e) {
+        body.innerHTML = '<p class="text-danger text-center">No pudimos cargar el comprobante histórico.</p>';
     }
 }
 

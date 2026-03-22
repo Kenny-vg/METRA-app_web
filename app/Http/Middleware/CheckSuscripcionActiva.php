@@ -26,24 +26,28 @@ class CheckSuscripcionActiva
                 );
             }
 
-            // Verificar suscripción activa
+            // 1. Regla principal: Si fecha_vencimiento >= hoy, PERMITIR ACCESO
             $suscripcionActiva = $cafeteria->suscripciones()
-                ->where('estado_pago','pagado')
-                ->where('fecha_inicio','<=',now())
-                ->where('fecha_fin','>=',now())
+                ->where('fecha_fin','>=',now()->startOfDay())
                 ->first();
 
             if(!$suscripcionActiva){
 
+                // 2. Si ya expiró, verificamos si subió un comprobante pendiente de revisión
+                $enRevision = $cafeteria->suscripciones()->where('en_revision', true)->exists();
+
                 // cerrar sesión si expiró
                 $request->user()->currentAccessToken()?->delete();
 
-                $todasCount = $cafeteria->suscripciones()->count();
-                $lastSub = $cafeteria->suscripciones()->latest('id')->first();
-                $debugMsg = $lastSub ? "Estado: {$lastSub->estado_pago}, Fin: {$lastSub->fecha_fin}, Now: " . now() : "Ninguna";
+                if ($enRevision) {
+                    return ApiResponse::error(
+                        'Tu suscripción venció, pero estamos validando tu pago. En breve tendrás acceso total.',
+                        403
+                    );
+                }
 
                 return ApiResponse::error(
-                    'Tu suscripción ha expirado. (Debug: SubsCount=' . $todasCount . ' Last: ' . $debugMsg . ')',
+                    'No tienes suscripción activa',
                     403
                 );
             }

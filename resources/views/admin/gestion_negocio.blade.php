@@ -910,8 +910,7 @@
             document.getElementById('staff-nombre').value = s.name;
             document.getElementById('staff-email').value = s.email;
             
-            // Deshabilitar email, hacer contraseña opcional
-            document.getElementById('staff-email').disabled = true;
+            // Hacer contraseña opcional
             document.getElementById('staff-password').required = false;
             document.getElementById('staff-password-confirm').required = false;
             document.getElementById('staff-password-help').style.display = 'block';
@@ -933,12 +932,9 @@
             }
 
             const data = {
-                name: document.getElementById('staff-nombre').value
+                name: document.getElementById('staff-nombre').value,
+                email: document.getElementById('staff-email').value
             };
-            
-            if (!id) {
-                data.email = document.getElementById('staff-email').value;
-            }
             
             if (password) {
                 data.password = password;

@@ -90,11 +90,9 @@ class LoginController extends Controller
                 );
             }
 
-            // Verificar si tienen una suscripción actualmente activa
+            // 1. Regla principal: Si fecha_vencimiento >= hoy, PERMITIR ACCESO
             $suscActiva = $cafeteria->suscripciones()
-                ->where('estado_pago', 'pagado')
-                ->where('fecha_inicio', '<=', now())
-                ->where('fecha_fin', '>=', now())
+                ->where('fecha_fin', '>=', now()->startOfDay())
                 ->first();
 
             if (!$suscActiva) {
@@ -134,9 +132,7 @@ class LoginController extends Controller
             if ($cafeteria) {
                 $extraData['nombre_cafeteria'] = $cafeteria->nombre;
                 $suscActiva = $cafeteria->suscripciones()
-                    ->where('estado_pago', 'pagado')
-                    ->where('fecha_inicio', '<=', now())
-                    ->where('fecha_fin', '>=', now())
+                    ->where('fecha_fin', '>=', now()->startOfDay())
                     ->first();
                 if ($suscActiva && $suscActiva->fecha_fin) {
                     $extraData['dias_restantes'] = (int)now()->startOfDay()->diffInDays(

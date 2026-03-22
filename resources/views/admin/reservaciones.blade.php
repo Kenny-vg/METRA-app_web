@@ -225,7 +225,7 @@
                 grid.innerHTML = `
                     <div class="col-12 text-center py-5">
                         <h4 class="fw-bold" style="color:var(--black-primary);font-family:'Inter',sans-serif;">Todo tranquilo por ahora.</h4>
-                        <p class="text-muted">Â¡Preparate o descansa para el siguiente flujo de invitados!</p>
+                        <p class="text-muted">¡Preparate o descansa para el siguiente flujo de invitados!</p>
                     </div>`;
                 return;
             }

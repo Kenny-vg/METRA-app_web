@@ -68,12 +68,16 @@
 
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Ciudad</label>
-                                <input type="text" name="ciudad" class="form-control border-0 shadow-sm rounded-3 p-3" maxlength="80" style="background: var(--off-white);">
+                                <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Estado</label>
+                                <select name="estado_republica" id="estado_republica" class="form-select border-0 shadow-sm rounded-3 p-3" style="background: var(--off-white);" required>
+                                    <option value="">Cargando estados...</option>
+                                </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Estado</label>
-                                <input type="text" name="estado_republica" class="form-control border-0 shadow-sm rounded-3 p-3" maxlength="80" style="background: var(--off-white);">
+                                <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Ciudad / Municipio</label>
+                                <select name="ciudad" id="ciudad" class="form-select border-0 shadow-sm rounded-3 p-3" style="background: var(--off-white);" required disabled>
+                                    <option value="">Primero selecciona estado...</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -139,6 +143,45 @@
         const API = '/api';
         let authToken = localStorage.getItem('token');
         let cafeteriaId = null;
+        let estadosMunicipiosData = {};
+
+        async function cargarEstadosMunicipios() {
+            try {
+                const res = await fetch('/data/estados-municipios.json');
+                estadosMunicipiosData = await res.json();
+                
+                const estadoSelect = document.getElementById('estado_republica');
+                const ciudadSelect = document.getElementById('ciudad');
+                
+                estadoSelect.innerHTML = '<option value="">Selecciona un estado...</option>';
+                Object.keys(estadosMunicipiosData).sort().forEach(estado => {
+                    const option = document.createElement('option');
+                    option.value = estado;
+                    option.textContent = estado;
+                    estadoSelect.appendChild(option);
+                });
+                
+                estadoSelect.addEventListener('change', function() {
+                    const estado = this.value;
+                    ciudadSelect.innerHTML = '<option value="">Selecciona un municipio...</option>';
+                    
+                    if (estado && estadosMunicipiosData[estado]) {
+                        ciudadSelect.disabled = false;
+                        estadosMunicipiosData[estado].sort().forEach(municipio => {
+                            const option = document.createElement('option');
+                            option.value = municipio;
+                            option.textContent = municipio;
+                            ciudadSelect.appendChild(option);
+                        });
+                    } else {
+                        ciudadSelect.innerHTML = '<option value="">Primero selecciona estado...</option>';
+                        ciudadSelect.disabled = true;
+                    }
+                });
+            } catch(e) {
+                console.error("Error cargando estados y municipios", e);
+            }
+        }
 
         function authHeaders() {
             return {
@@ -167,8 +210,20 @@
                 if (cafe.num_interior) document.querySelector('input[name="num_interior"]').value = cafe.num_interior;
                 if (cafe.colonia) document.querySelector('input[name="colonia"]').value = cafe.colonia;
                 if (cafe.cp) document.querySelector('input[name="cp"]').value = cafe.cp;
-                if (cafe.ciudad) document.querySelector('input[name="ciudad"]').value = cafe.ciudad;
-                if (cafe.estado_republica) document.querySelector('input[name="estado_republica"]').value = cafe.estado_republica;
+                if (cafe.ciudad) {
+                    // Esperar un momento a que se carguen los estados en el select antes de asignarlo
+                    setTimeout(() => {
+                        const ciudadSelect = document.querySelector('select[name="ciudad"]');
+                        if (ciudadSelect) ciudadSelect.value = cafe.ciudad;
+                    }, 100);
+                }
+                if (cafe.estado_republica) {
+                    const estadoSelect = document.querySelector('select[name="estado_republica"]');
+                    if(estadoSelect) {
+                        estadoSelect.value = cafe.estado_republica;
+                        estadoSelect.dispatchEvent(new Event('change'));
+                    }
+                }
                 if (cafe.telefono) document.querySelector('input[name="telefono"]').value = cafe.telefono;
                 if (cafe.foto_url) {
                     document.getElementById('previewFoto').src = `{{ asset('storage') }}/${cafe.foto_url}?v=` + new Date().getTime();
@@ -227,8 +282,8 @@
             formData.append('num_interior',    document.querySelector('input[name="num_interior"]').value);
             formData.append('colonia',         document.querySelector('input[name="colonia"]').value);
             formData.append('cp',              document.querySelector('input[name="cp"]').value);
-            formData.append('ciudad',          document.querySelector('input[name="ciudad"]').value);
-            formData.append('estado_republica',document.querySelector('input[name="estado_republica"]').value);
+            formData.append('ciudad',          document.querySelector('select[name="ciudad"]').value);
+            formData.append('estado_republica',document.querySelector('select[name="estado_republica"]').value);
             formData.append('telefono',        document.querySelector('input[name="telefono"]').value);
 
             const fotoInput = document.getElementById('inputFoto');
@@ -278,7 +333,12 @@
             }
         });
 
-        cargarPerfil();
+        async function init() {
+            await cargarEstadosMunicipios();
+            cargarPerfil();
+        }
+
+        init();
 
     </script>
 

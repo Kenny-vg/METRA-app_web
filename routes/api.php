@@ -149,10 +149,13 @@ Route::middleware([
         // SUSCRIPCIONES
         Route::get('/suscripciones', [SuscripcionController::class , 'index']);
         Route::post('/suscripciones', [SuscripcionController::class , 'store']);
+        // Solicitudes pendientes de revisión (gerentes que subieron comprobante)
+        Route::get('/suscripciones-pendientes', [SuscripcionController::class , 'pendientes']);
         // Aprobar renovación de suscripción pendiente (cafeteria activa que renueva)
         Route::patch('/suscripciones/{suscripcion}/aprobar-renovacion', [SuscripcionController::class , 'aprobarRenovacion']);
-        // Ver comprobante de una suscripción
+        // Ver comprobantes
         Route::get('/suscripciones/{suscripcion}/comprobante', [SuscripcionController::class , 'verComprobante']);
+        Route::get('/suscripciones-historial/{id}/comprobante', [SuscripcionController::class , 'verComprobanteHistorial']);
 
         //DASHBOARD
         Route::get('/dashboard', [DashboardController::class , 'index']);

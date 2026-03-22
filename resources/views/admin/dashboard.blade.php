@@ -211,13 +211,21 @@
             const alertContainer = document.getElementById('alerta-vencimiento-container');
             
             if (!cafe || !cafe.suscripcion_actual) {
-                container.innerHTML = `
-                    <div class="card border-0 p-4 premium-card text-center">
-                        <p class="text-muted m-0">No tienes una suscripción activa.</p>
-                        <button class="btn-admin-primary mt-3 px-4" onclick="abrirModalRenovar('${cafe ? cafe.estado : ''}')"><i class="bi bi-arrow-repeat me-2"></i>Ver Estatus</button>
-                    </div>`;
-                // Auto-open modal upon loading dashboard to lock the user view naturally
-                abrirModalRenovar(cafe ? cafe.estado : '');
+                if (cafe && cafe.estado === 'pendiente') {
+                    container.innerHTML = `
+                        <div class="card border-0 p-4 premium-card text-center shadow-sm">
+                            <h5 class="fw-bold mb-3 text-warning"><i class="bi bi-hourglass-split me-2"></i>Pago en validación</h5>
+                            <p class="text-muted m-0">Tu suscripción venció, pero estamos validando tu pago. En breve tendrás acceso total.</p>
+                        </div>`;
+                } else {
+                    container.innerHTML = `
+                        <div class="card border-0 p-4 premium-card text-center shadow-sm">
+                            <h5 class="fw-bold mb-3 text-danger"><i class="bi bi-exclamation-circle me-2"></i>Suscripción Vencida</h5>
+                            <p class="text-muted m-0">No tienes una suscripción activa.</p>
+                            <button class="btn-admin-primary mt-3 px-4" onclick="abrirModalRenovar('${cafe ? cafe.estado : ''}')"><i class="bi bi-arrow-repeat me-2"></i>Renovar ahora</button>
+                        </div>`;
+                    abrirModalRenovar(cafe ? cafe.estado : '');
+                }
                 return;
             }
 
@@ -242,14 +250,24 @@
                     </div>`;
             }
 
-            // Alerta de vencimiento
-            if (diasRestantes <= 7 && diasRestantes >= 0) {
+            // Alerta de revisión (prioritaria si ya subió comprobante)
+            if (cafe.estado === 'pendiente' || cafe.estado === 'en_revision') {
+                alertContainer.innerHTML = `
+                    <div class="alert alert-info border-0 rounded-3 mb-4 d-flex align-items-center fw-bold shadow-sm" style="background-color: #e3f2fd; color: #0d47a1;">
+                        <i class="bi bi-info-circle-fill me-3 fs-3"></i>
+                        <div>Tu suscripción actual vence en ${diasRestantes} días. Tu nueva renovación está en proceso.</div>
+                    </div>`;
+            }
+            // Alerta de vencimiento (solo si NO está en revisión)
+            else if (diasRestantes <= 7 && diasRestantes >= 0) {
                 alertContainer.innerHTML = `
                     <div class="alert alert-danger border-0 rounded-3 mb-4 d-flex align-items-center fw-bold shadow-sm" style="background-color: #ffebee; color: #c62828;">
                         <i class="bi bi-clock-history me-3 fs-3"></i>
                         <div>Tu suscripción vence en ${diasRestantes} días. Por favor, renueva para evitar la suspensión del servicio.</div>
                         <button class="btn btn-sm btn-danger ms-auto px-3" onclick="abrirModalRenovar('${cafe.estado}')">Renovar ahora</button>
                     </div>`;
+            } else {
+                alertContainer.innerHTML = '';
             }
 
             container.innerHTML = `
@@ -265,12 +283,12 @@
                             </div>
                         </div>
                         <div class="text-end">
-                            ${cafe.estado === 'en_revision' ? 
-                                `<div class="mb-2"><span class="badge bg-warning text-dark px-3 py-2 rounded-pill"><i class="bi bi-hourglass-split me-1"></i>En revisión por administrador</span></div>` : ''
+                            ${cafe.estado === 'pendiente' || cafe.estado === 'en_revision' 
+                                ? `<div class="mt-2"><span class="badge bg-warning text-dark px-3 py-2 rounded-pill"><i class="bi bi-hourglass-split me-1"></i>Gracias, hemos recibido tu comprobante. El administrador lo está validando.</span></div>`
+                                : `<button class="btn-admin-secondary px-4 py-2" onclick="abrirModalRenovar('${cafe.estado}')">
+                                      <i class="bi bi-arrow-repeat me-2"></i>Renovar Suscripción
+                                   </button>`
                             }
-                            <button class="btn-admin-secondary px-4 py-2" onclick="abrirModalRenovar('${cafe.estado}')">
-                                <i class="bi bi-arrow-repeat me-2"></i>${cafe.estado === 'en_revision' ? 'Actualizar Comprobante' : 'Renovar Suscripción'}
-                            </button>
                         </div>
                     </div>
                 </div>

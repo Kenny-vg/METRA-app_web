@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Gerente;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Suscripcion;
+use App\Models\RenovacionHistorial;
 use App\Models\Plan;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\Storage;
@@ -12,16 +13,20 @@ use Illuminate\Support\Facades\Storage;
 class RenovarSuscripcionController extends Controller
 {
     /**
-     * El gerente solicita renovación de su suscripción:
-     * - Puede hacerlo MIENTRAS su suscripción actual sigue activa.
-     * - Se crea una NUEVA suscripción en estado 'pendiente'.
-     * - El superadmin la revisará y la aprobará, activándola al vencer la actual.
+     * El gerente solicita renovación de su suscripción.
+     *
+     * LÓGICA CORREGIDA (sin duplicados):
+     * - Busca la suscripción vigente o más reciente de la cafetería.
+     * - Guarda un snapshot del estado anterior en renovaciones_historial.
+     * - Actualiza el registro principal con el nuevo comprobante, plan y fechas.
+     * - Marca en_revision=true y estado_pago='pendiente' para que el Superadmin lo vea.
+     * - Si no existe ninguna suscripción previa, crea una nueva (primer registro).
      */
     public function store(Request $request)
     {
         $user = $request->user();
 
-        // 1. Si la ruta no corre bajo auth:sanctum, intentar resolver el token manualmente
+        // 1. Intentar resolver el token si no viene en el request
         if (!$user) {
             $user = auth('sanctum')->user();
         }
@@ -59,17 +64,26 @@ class RenovarSuscripcionController extends Controller
             return ApiResponse::error('El plan seleccionado no está disponible.', 422);
         }
 
-        // Verificar si ya tiene una renovación pendiente
-        $tienePendiente = $cafeteria->suscripciones()
+        // Verificar si ya hay una solicitud en revisión para evitar spam
+        $yaEnRevision = Suscripcion::where('cafe_id', $cafeteria->id)
+            ->where('en_revision', true)
             ->where('estado_pago', 'pendiente')
             ->exists();
 
-        if ($tienePendiente) {
-            return ApiResponse::error('Ya tienes una renovación pendiente de aprobación.', 422);
+        if ($yaEnRevision) {
+            return ApiResponse::error('Ya tienes una renovación pendiente de aprobación. Espera a que el Superadmin la revise.', 422);
         }
 
-        // Calcular fechas de la suscripción
-        $suscripcionActiva = $cafeteria->suscripciones()
+        // Buscar la suscripción principal más reciente de esta cafetería
+        $suscripcionExistente = Suscripcion::where('cafe_id', $cafeteria->id)
+            ->latest('id')
+            ->first();
+
+        // Guardar el nuevo comprobante en storage
+        $nuevaRutaComprobante = $request->file('comprobante')->store('comprobantes');
+
+        // Calcular las nuevas fechas para la renovación
+        $suscripcionActiva = Suscripcion::where('cafe_id', $cafeteria->id)
             ->where('estado_pago', 'pagado')
             ->where('fecha_fin', '>', now())
             ->latest('fecha_fin')
@@ -82,26 +96,54 @@ class RenovarSuscripcionController extends Controller
         }
         $fin = $inicio->copy()->addDays(max(0, $plan->duracion_dias - 1))->endOfDay();
 
-        // Guardar el nuevo comprobante
-        $path = $request->file('comprobante')->store('comprobantes');
+        if ($suscripcionExistente) {
+            // ─── CASO: Ya existe suscripción → guardar historial y actualizar ───
 
-        $suscripcion = Suscripcion::create([
-            'cafe_id'         => $cafeteria->id,
-            'plan_id'         => $plan->id,
-            'user_id'         => $user->id,
-            'fecha_inicio'    => $inicio,
-            'fecha_fin'       => $fin,
-            'monto'           => $plan->precio,
-            'comprobante_url' => $path,
-            'estado_pago'     => 'pendiente',
-        ]);
+            // Guardar snapshot del estado anterior ANTES de sobrescribir
+            RenovacionHistorial::create([
+                'cafe_id'               => $cafeteria->id,
+                'suscripcion_id'        => $suscripcionExistente->id,
+                'plan_id'               => $suscripcionExistente->plan_id,
+                'monto'                 => $suscripcionExistente->monto,
+                'comprobante_url'       => $suscripcionExistente->comprobante_url, // comprobante ANTERIOR
+                'fecha_inicio_anterior' => $suscripcionExistente->fecha_inicio,
+                'fecha_fin_anterior'    => $suscripcionExistente->fecha_fin,
+                'estado_pago_anterior'  => $suscripcionExistente->estado_pago,
+                'fecha_solicitud'       => now(),
+            ]);
+
+            // Actualizar el registro principal: MARCAMOS COMO PENDIENTE pero no tocamos fechas ni plan_id activo!
+            $suscripcionExistente->update([
+                'plan_solicitado_id' => $plan->id, // Plan que quiere
+                'user_id'          => $user->id,
+                'monto'            => $plan->precio,
+                'comprobante_url'  => $nuevaRutaComprobante,
+                'estado_pago'      => 'pendiente', // SIEMPRE PENDIENTE AL RENOVAR
+                'en_revision'      => true,
+            ]);
+
+            $suscripcion = $suscripcionExistente->fresh();
+
+        } else {
+            // ─── CASO: Primera suscripción de esta cafetería → crear ───
+            $suscripcion = Suscripcion::create([
+                'cafe_id'            => $cafeteria->id,
+                'plan_id'            => $plan->id,
+                'plan_solicitado_id' => $plan->id,
+                'user_id'            => $user->id,
+                'fecha_inicio'       => now()->startOfDay(),
+                'fecha_fin'          => now()->startOfDay()->addDays(max(0, $plan->duracion_dias - 1))->endOfDay(),
+                'monto'              => $plan->precio,
+                'comprobante_url'    => $nuevaRutaComprobante,
+                'estado_pago'        => 'pendiente',
+                'en_revision'        => true,
+            ]);
+        }
 
         return ApiResponse::success([
             'suscripcion_id' => $suscripcion->id,
             'plan'           => $plan->nombre_plan,
-            'fecha_inicio'   => $inicio->toDateString(),
-            'fecha_fin'      => $fin->toDateString(),
-        ], '¡Recibido! Espera a que el Superadmin te apruebe.');
+            'en_revision'    => true,
+        ], '¡Comprobante recibido! Tu solicitud está En Revisión. El Superadmin te notificará pronto.');
     }
-
 }

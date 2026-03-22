@@ -99,11 +99,9 @@ class GoogleController extends Controller
                 );
             }
 
-            // Verificar si tienen una suscripción actualmente activa
+            // 1. Regla principal: Si fecha_vencimiento >= hoy, PERMITIR ACCESO
             $suscActiva = $cafeteria->suscripciones()
-                ->where('estado_pago', 'pagado')
-                ->where('fecha_inicio', '<=', now())
-                ->where('fecha_fin', '>=', now())
+                ->where('fecha_fin', '>=', now()->startOfDay())
                 ->first();
 
             if (!$suscActiva) {
