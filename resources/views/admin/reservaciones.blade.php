@@ -309,6 +309,7 @@
             // 3. Proxima Reserva: BUSQUEDA GLOBAL (siempre la siguiente del monitor)
             const pendientesGlobal = todasLasReservas
                 .filter(r => {
+                    if (calcularEstadoReserva(r) !== 'pendiente') return false;
                     const end = r.hora_fin
                         ? buildDateTime(r.fecha, r.hora_fin)
                         : new Date(buildDateTime(r.fecha, r.hora_inicio).getTime() + 2 * 60 * 60 * 1000);
@@ -429,6 +430,7 @@
         // Bootstrap
         // ------------------------------------------------------------------
         document.addEventListener('DOMContentLoaded', () => {
+            updateDateUI();
             cargarMaestro(); // fetch inicial
 
             document.querySelectorAll('.btn-day-nav').forEach(btn => {
