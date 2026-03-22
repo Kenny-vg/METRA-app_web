@@ -328,7 +328,13 @@ class ReservacionController extends Controller
             ->sum('numero_personas');
 
 
-        return ($personasReservadas + $personas) <= $capacidadTotal;
+        $cafeteria = Cafeteria::find($cafeId);
+
+        $porcentaje = max(0, min(100, $cafeteria->porcentaje_reservas ?? 50)) / 100;
+
+        $capacidadReservable = floor($capacidadTotal * $porcentaje);
+
+        return ($personasReservadas + $personas) <= $capacidadReservable;
     }
 
     public function checkin($id)

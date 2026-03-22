@@ -24,7 +24,8 @@ class Cafeteria extends Model
         'user_id',
         'comprobante_url',
         'duracion_reserva_min',
-        'intervalo_reserva_min'
+        'intervalo_reserva_min',
+        'porcentaje_reservas'
     ];
 
     protected $appends = ['estado_dinamico'];

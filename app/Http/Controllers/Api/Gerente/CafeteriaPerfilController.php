@@ -34,16 +34,16 @@ class CafeteriaPerfilController extends Controller
     public function update(Request $request)
     {
         $camposTexto = ['nombre', 'descripcion', 'calle', 'num_exterior', 'num_interior', 'colonia', 'estado_republica', 'municipio'];
-        foreach($camposTexto as $campo){
-            if($request->has($campo) && !empty($request->$campo)){
+        foreach ($camposTexto as $campo) {
+            if ($request->has($campo) && !empty($request->$campo)) {
                 $request->merge([$campo => strip_tags($request->$campo)]);
             }
         }
-           
-        $cafeteria=$request->user()->cafeteria;
+
+        $cafeteria = $request->user()->cafeteria;
 
         //seguridad
-        if(!$cafeteria){
+        if (!$cafeteria) {
             return ApiResponse::error(
                 'El usuario no tiene cafetería asignada',
                 404
@@ -53,36 +53,39 @@ class CafeteriaPerfilController extends Controller
 
         $data = $request->validate([
             'nombre' => 'sometimes|string|max:100',
-            'descripcion'=>'nullable|string|max:255',
-            'calle'=>'nullable|string|max:100',
-            'num_exterior'=>'nullable|string|max:10',
-            'num_interior'=>'nullable|string|max:10',
-            'colonia'=>'nullable|string|max:80',
-            'estado_republica'=>'nullable|string|max:80',
-            'municipio'=>'nullable|string|max:80',
-            'cp'=>'nullable|string|max:10',
-            'telefono'=>'nullable|string|max:20',
-            'foto'=>'nullable|image|mimes:jpg,jpeg,png|max:2048'
+            'descripcion' => 'nullable|string|max:255',
+            'calle' => 'nullable|string|max:100',
+            'num_exterior' => 'nullable|string|max:10',
+            'num_interior' => 'nullable|string|max:10',
+            'colonia' => 'nullable|string|max:80',
+            'estado_republica' => 'nullable|string|max:80',
+            'municipio' => 'nullable|string|max:80',
+            'cp' => 'nullable|string|max:10',
+            'telefono' => 'nullable|string|max:20',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'porcentaje_reservas' => 'sometimes|integer|min:0|max:100',
+            'duracion_reserva_min' => 'sometimes|integer|min:15|max:240',
+            'intervalo_reserva_min' => 'sometimes|integer|min:15|max:120',
         ]);
 
-        if($request->hasFile('foto')){
+        if ($request->hasFile('foto')) {
             // borrar foto anterior
-            if($cafeteria->foto_url){
+            if ($cafeteria->foto_url) {
                 Storage::disk('public')->delete($cafeteria->foto_url);
             }
 
-            $path = $request->file('foto')->store('cafeterias','public');
+            $path = $request->file('foto')->store('cafeterias', 'public');
 
             $data['foto_url'] = $path;
         }
-                $cafeteria->update($data);
+        $cafeteria->update($data);
 
-                $cafeteria->refresh(); //Devuelve los datos actualizados
+        $cafeteria->refresh(); //Devuelve los datos actualizados
 
-                return ApiResponse::success(
-                    $cafeteria,
-                    'Cafetería actualizada correctamente'
-                );
-            }
+        return ApiResponse::success(
+            $cafeteria,
+            'Cafetería actualizada correctamente'
+        );
+    }
 
 }

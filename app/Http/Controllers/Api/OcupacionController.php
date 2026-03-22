@@ -60,22 +60,12 @@ class OcupacionController extends Controller
             if ($yaOcupada) {
                 return ApiResponse::error('Esta reservación ya está en uso');
             }
-
-            // Validar tiempo de llegada (máximo 15 minutos antes)
-            $inicio = \Carbon\Carbon::parse($reservacion->fecha . ' ' . $reservacion->hora_inicio);
-            $horaPermitida = $inicio->copy()->subMinutes(15);
-            
-            if (now()->lt($horaPermitida)) {
-                return ApiResponse::error('Aún faltan más de 15 minutos para la reserva. No se le puede asignar mesa aún.');
-            }
         }
 
-        $mesa = Mesa::where('id', $request->mesa_id)
-            ->where('zona_id', $request->zona_id)
-            ->first();
+        $mesa = Mesa::find($request->mesa_id);
 
         if (!$mesa) {
-            return ApiResponse::error('La mesa no pertenece a la zona seleccionada');
+            return ApiResponse::error('Mesa no encontrada');
         }
 
         if ($request->numero_personas > $mesa->capacidad) {
@@ -100,7 +90,7 @@ class OcupacionController extends Controller
             'comentarios' => $request->comentarios,
             'hora_entrada' => now(),
             'estado' => 'activa',
-            'token_resena' => Str::random(40),
+            'token_resena' => ($request->email || ($reservacion && $reservacion->email)) ? Str::random(40) : null,
             'cafe_id' => auth()->user()->cafe_id,
             'user_id' => auth()->id()
         ]);
@@ -155,18 +145,15 @@ class OcupacionController extends Controller
 
     public function estadoMesas()
     {
-        $mesas = Mesa::with('zona')->get()->map(function ($mesa) {
+        $ocupadas = DetalleOcupacion::where('estado', 'activa')->pluck('mesa_id')->toArray();
 
-            $ocupada = DetalleOcupacion::where('mesa_id', $mesa->id)
-                ->where('estado', 'activa')
-                ->exists();
-
+        $mesas = Mesa::with('zona')->get()->map(function ($mesa) use ($ocupadas) {
             return [
             'id' => $mesa->id,
             'numero' => $mesa->numero,
             'capacidad' => $mesa->capacidad,
             'zona' => $mesa->zona->nombre,
-            'estado' => $ocupada ? 'ocupada' : 'libre'
+            'estado' => in_array($mesa->id, $ocupadas) ? 'ocupada' : 'libre'
             ];
         });
 
