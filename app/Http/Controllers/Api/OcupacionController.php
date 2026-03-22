@@ -60,6 +60,14 @@ class OcupacionController extends Controller
             if ($yaOcupada) {
                 return ApiResponse::error('Esta reservación ya está en uso');
             }
+
+            // Validar tiempo de llegada (máximo 15 minutos antes)
+            $inicio = \Carbon\Carbon::parse($reservacion->fecha . ' ' . $reservacion->hora_inicio);
+            $horaPermitida = $inicio->copy()->subMinutes(15);
+            
+            if (now()->lt($horaPermitida)) {
+                return ApiResponse::error('Aún faltan más de 15 minutos para la reserva. No se le puede asignar mesa aún.');
+            }
         }
 
         $mesa = Mesa::where('id', $request->mesa_id)

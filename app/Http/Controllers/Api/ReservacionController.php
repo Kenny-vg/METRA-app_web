@@ -337,11 +337,11 @@ class ReservacionController extends Controller
 
         $inicio = Carbon::parse($reservacion->fecha . ' ' . $reservacion->hora_inicio);
 
-        // Permitir llegada 30 minutos antes
-        $horaPermitida = $inicio->copy()->subMinutes(30);
+        // Permitir llegada 15 minutos antes
+        $horaPermitida = $inicio->copy()->subMinutes(15);
 
         if (now()->lt($horaPermitida)) {
-            return ApiResponse::error('Aún no puedes marcar la llegada del cliente');
+            return ApiResponse::error('Aún faltan más de 15 minutos para la reserva. No puedes marcar llegada aún.');
         }
 
         if ($reservacion->estado !== 'pendiente') {
