@@ -18,8 +18,6 @@ class CheckSuscripcionActiva
             $cafeteria = $user->cafeteria;
 
             if (!$cafeteria) {
-                $request->user()->currentAccessToken()?->delete();
-
                 return ApiResponse::error(
                     'No tienes una cafetería asociada. (Debug: cafe_id=' . $user->cafe_id . ')',
                     403
@@ -35,9 +33,6 @@ class CheckSuscripcionActiva
 
                 // 2. Si ya expiró, verificamos si subió un comprobante pendiente de revisión
                 $enRevision = $cafeteria->suscripciones()->where('en_revision', true)->exists();
-
-                // cerrar sesión si expiró
-                $request->user()->currentAccessToken()?->delete();
 
                 if ($enRevision) {
                     return ApiResponse::error(

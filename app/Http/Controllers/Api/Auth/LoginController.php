@@ -124,8 +124,7 @@ class LoginController extends Controller
             }
         }
 
-        // Eliminar tokens anteriores para forzar sesión única por dispositivo/usuario
-        $user->tokens()->delete();
+        // Permitir múltiples sesiones activas (no eliminar tokens anteriores)
         $token = $user->createToken('metra_token')->plainTextToken;
 
         // Datos extra para sidebar y banner de suscripción

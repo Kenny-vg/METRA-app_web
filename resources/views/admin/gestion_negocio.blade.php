@@ -378,6 +378,15 @@
             'Authorization': `Bearer ${getToken()}`
         });
 
+        // Redirige al login si el token expiró o fue revocado
+        const handleAuthError = (res) => {
+            if (res.status === 401 || res.status === 403) {
+                window.location.href = '/login';
+                return true;
+            }
+            return false;
+        };
+
         const showToast = (icon, title) => {
             Swal.fire({
                 toast: true,
@@ -393,6 +402,7 @@
         async function loadZonas() {
             try {
                 const res = await fetch(`${API_URL}/zonas`, { headers: headers() });
+                if (handleAuthError(res)) return;
                 if (!res.ok) throw new Error('Error al cargar zonas');
                 
                 const response = await res.json();
@@ -502,6 +512,7 @@
                     body: JSON.stringify({ nombre_zona })
                 });
 
+                if (handleAuthError(res)) return;
                 if (res.ok) {
                     showToast('success', id ? 'Zona actualizada' : 'Zona creada');
                     modalZonaInst.hide();
@@ -535,6 +546,7 @@
                 if (result.isConfirmed) {
                     try {
                         const res = await fetch(`${API_URL}/zonas/${id}`, { method: 'DELETE', headers: headers() });
+                        if (handleAuthError(res)) return;
                         if (res.ok) {
                             showToast('success', 'Zona desactivada');
                             loadZonas();
@@ -564,6 +576,7 @@
                 if (result.isConfirmed) {
                     try {
                         const res = await fetch(`${API_URL}/zonas/${id}/activar`, { method: 'PATCH', headers: headers() });
+                        if (handleAuthError(res)) return;
                         if (res.ok) {
                             showToast('success', 'Zona reactivada');
                             loadZonas();
@@ -583,6 +596,7 @@
         async function loadMesas() {
             try {
                 const res = await fetch(`${API_URL}/mesas`, { headers: headers() });
+                if (handleAuthError(res)) return;
                 if (!res.ok) throw new Error('Error al cargar mesas');
                 
                 const response = await res.json();
@@ -688,6 +702,7 @@
                     body: JSON.stringify(data)
                 });
 
+                if (handleAuthError(res)) return;
                 if (res.ok) {
                     showToast('success', id ? 'Mesa actualizada' : 'Mesa creada');
                     modalMesaInst.hide();
@@ -719,6 +734,7 @@
                 if (result.isConfirmed) {
                     try {
                         const res = await fetch(`${API_URL}/mesas/${id}`, { method: 'DELETE', headers: headers() });
+                        if (handleAuthError(res)) return;
                         if (res.ok) {
                             showToast('success', 'Mesa desactivada');
                             loadMesas();
@@ -747,6 +763,7 @@
                 if (result.isConfirmed) {
                     try {
                         const res = await fetch(`${API_URL}/mesas/${id}/activar`, { method: 'PATCH', headers: headers() });
+                        if (handleAuthError(res)) return;
                         if (res.ok) {
                             showToast('success', 'Mesa reactivada');
                             loadMesas();
@@ -765,6 +782,7 @@
         async function loadHorarios() {
             try {
                 const res = await fetch(`${API_URL}/horarios`, { headers: headers() });
+                if (handleAuthError(res)) return;
                 if (!res.ok) throw new Error('Error al cargar horarios');
                 
                 const response = await res.json();
@@ -886,6 +904,7 @@
                     body: JSON.stringify(data)
                 });
 
+                if (handleAuthError(res)) return;
                 if (res.ok) {
                     showToast('success', id ? 'Horario actualizado' : 'Horario creado');
                     modalHorarioInst.hide();
@@ -917,6 +936,7 @@
                 if (result.isConfirmed) {
                     try {
                         const res = await fetch(`${API_URL}/horarios/${id}`, { method: 'DELETE', headers: headers() });
+                        if (handleAuthError(res)) return;
                         if (res.ok) {
                             showToast('success', 'Horario desactivado');
                             loadHorarios();
@@ -945,6 +965,7 @@
                 if (result.isConfirmed) {
                     try {
                         const res = await fetch(`${API_URL}/horarios/${id}/activar`, { method: 'PATCH', headers: headers() });
+                        if (handleAuthError(res)) return;
                         if (res.ok) {
                             showToast('success', 'Horario reactivado');
                             loadHorarios();
@@ -963,6 +984,7 @@
         async function loadStaff() {
             try {
                 const res = await fetch(`${API_URL}/staff`, { headers: headers() });
+                if (handleAuthError(res)) return;
                 if (!res.ok) throw new Error('Error al cargar personal');
                 
                 const response = await res.json();
@@ -1100,6 +1122,7 @@
                     body: JSON.stringify(data)
                 });
 
+                if (handleAuthError(res)) return;
                 const result = await res.json();
 
                 if (res.ok && result.success) {
@@ -1131,6 +1154,7 @@
                 if (result.isConfirmed) {
                     try {
                         const res = await fetch(`${API_URL}/staff/${id}`, { method: 'DELETE', headers: headers() });
+                        if (handleAuthError(res)) return;
                         const data = await res.json();
                         
                         if (res.ok && data.success !== false) {
@@ -1160,6 +1184,7 @@
                 if (result.isConfirmed) {
                     try {
                         const res = await fetch(`${API_URL}/staff/${id}/activar`, { method: 'PATCH', headers: headers() });
+                        if (handleAuthError(res)) return;
                         const data = await res.json();
                         
                         if (res.ok && data.success !== false) {

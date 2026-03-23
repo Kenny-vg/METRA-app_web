@@ -35,7 +35,8 @@ class OcupacionController extends Controller
     {
 
         $request->validate([
-            'mesa_id' => 'required|exists:mesas,id',
+            'mesa_ids' => 'required|array|min:1',
+            'mesa_ids.*' => 'exists:mesas,id',
             'zona_id' => 'required|exists:zonas,id',
             'numero_personas' => 'required|integer|min:1',
             'reservacion_id' => 'nullable|exists:reservaciones,id',
@@ -62,39 +63,44 @@ class OcupacionController extends Controller
             }
         }
 
-        $mesa = Mesa::find($request->mesa_id);
+        $mesas = Mesa::whereIn('id', $request->mesa_ids)->get();
 
-        if (!$mesa) {
-            return ApiResponse::error('Mesa no encontrada');
+        // Validar capacidad total
+        $capacidadTotalMesas = $mesas->sum('capacidad');
+
+        if ($request->numero_personas > $capacidadTotalMesas) {
+            return ApiResponse::error('Las mesas no tienen capacidad suficiente');
         }
 
-        if ($request->numero_personas > $mesa->capacidad) {
-            return ApiResponse::error('La mesa no tiene capacidad suficiente');
-        }
-
-        $ocupada = DetalleOcupacion::where('mesa_id', $request->mesa_id)
+        // Validar que no estén ocupadas
+        $mesasOcupadas = DetalleOcupacion::whereIn('mesa_id', $request->mesa_ids)
             ->where('estado', 'activa')
             ->exists();
 
-        if ($ocupada) {
-            return ApiResponse::error('La mesa ya está ocupada');
+        if ($mesasOcupadas) {
+            return ApiResponse::error('Una o más mesas ya están ocupadas');
         }
 
-        $ocupacion = DetalleOcupacion::create([
-            'mesa_id' => $request->mesa_id,
-            'numero_personas' => $request->numero_personas,
-            'reservacion_id' => $request->reservacion_id,
-            'tipo' => $request->reservacion_id ? 'reservacion' : 'walkin',
-            'nombre_cliente' => $request->nombre_cliente,
-            'email' => $request->email,
-            'comentarios' => $request->comentarios,
-            'hora_entrada' => now(),
-            'estado' => 'activa',
-            'token_resena' => ($request->email || ($reservacion && $reservacion->email)) ? Str::random(40) : null,
-            'cafe_id' => auth()->user()->cafe_id,
-            'user_id' => auth()->id()
-        ]);
+        $ocupaciones = [];
 
+        $personasPorMesa = ceil($request->numero_personas / count($request->mesa_ids));
+
+        foreach ($request->mesa_ids as $mesaId) {
+            $ocupaciones[] = DetalleOcupacion::create([
+                'mesa_id' => $mesaId,
+                'numero_personas' => $personasPorMesa,
+                'reservacion_id' => $request->reservacion_id,
+                'tipo' => $request->reservacion_id ? 'reservacion' : 'walkin',
+                'nombre_cliente' => $request->nombre_cliente,
+                'email' => $request->email,
+                'comentarios' => $request->comentarios,
+                'hora_entrada' => now(),
+                'estado' => 'activa',
+                'token_resena' => ($request->email || ($reservacion && $reservacion->email)) ? Str::random(40) : null,
+                'cafe_id' => auth()->user()->cafe_id,
+                'user_id' => auth()->id()
+            ]);
+        }
         // Actualizar reservación si existe
         if ($reservacion) {
             $reservacion->update([
@@ -103,7 +109,7 @@ class OcupacionController extends Controller
             ]);
         }
 
-        return ApiResponse::success($ocupacion, 'Mesa abierta');
+        return ApiResponse::success($ocupaciones, 'Mesas abiertas');
     }
 
     /**
