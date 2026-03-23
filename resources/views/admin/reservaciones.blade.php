@@ -147,7 +147,7 @@
                      </div>
                  </div>
                  <div class="col-12 mt-3" id="m_comentarios_box">
-                     <p class="text-muted small mb-1 fw-bold">NOTAS/OCASIÃ“N</p>
+                     <p class="text-muted small mb-1 fw-bold">NOTAS/OCASIÓN</p>
                      <p class="fst-italic p-3 rounded-3" style="background: #fff8e1; border-left: 4px solid #d4af37;" id="m_comentarios">...</p>
                  </div>
              </div>
@@ -285,7 +285,7 @@
 
             let notas = [];
             if (r.zona   && r.zona.nombre_zona)   notas.push('Zona: '    + r.zona.nombre_zona);
-            if (r.ocasion && r.ocasion.nombre)     notas.push('OcasiÃ³n: ' + r.ocasion.nombre);
+            if (r.ocasion && r.ocasion.nombre)     notas.push('Ocasión: ' + r.ocasion.nombre);
             if (r.comentarios)                     notas.push(r.comentarios);
 
             if (notas.length > 0) {
