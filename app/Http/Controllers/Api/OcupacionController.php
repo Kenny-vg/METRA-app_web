@@ -50,7 +50,7 @@ class OcupacionController extends Controller
         if ($request->reservacion_id) {
             $reservacion = Reservacion::find($request->reservacion_id);
 
-            if (!$reservacion || $reservacion->estado !== 'pendiente') {
+        if (!$reservacion || !in_array($reservacion->estado, ['pendiente', 'en_curso']))  {
                 return ApiResponse::error('La reservación no está disponible para ocupar');
             }
 
