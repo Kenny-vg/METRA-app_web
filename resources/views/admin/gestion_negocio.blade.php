@@ -24,11 +24,6 @@
             </button>
         </li>
         <li class="nav-item">
-            <button class="nav-link rounded-pill px-4" id="reviews-tab" data-bs-toggle="pill" data-bs-target="#reviews" style="border: 1px solid var(--border-light); font-weight: 600; font-size: 0.9rem;">
-                <i class="bi bi-star me-2"></i>Reseñas
-            </button>
-        </li>
-        <li class="nav-item">
             <button class="nav-link rounded-pill px-4" id="horarios-tab" data-bs-toggle="pill" data-bs-target="#horarios" style="border: 1px solid var(--border-light); font-weight: 600; font-size: 0.9rem;">
                 <i class="bi bi-clock me-2"></i>Horarios
             </button>
@@ -276,15 +271,35 @@
                         <div class="row g-3 mb-4">
                             <div class="col-6">
                                 <label class="form-label small fw-bold text-muted">APERTURA</label>
-                                <input type="time" id="horario-apertura"
-                                       class="form-control border-0 shadow-sm rounded-3"
-                                       style="background: var(--off-white);" required>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="dropdown w-100">
+                                        <input type="text" class="form-control form-select border-0 shadow-sm rounded-3 text-start w-100" id="btn-apertura-hora" data-bs-toggle="dropdown" aria-expanded="false" style="background: var(--off-white); cursor: text;" placeholder="HH" autocomplete="off" maxlength="2">
+                                        <ul class="dropdown-menu w-100 shadow-sm border-0 py-1" style="max-height: 200px; overflow-y: auto; background: var(--off-white);" id="menu-apertura-hora"></ul>
+                                        <input type="hidden" id="horario-apertura-hora">
+                                    </div>
+                                    <span class="fw-bold" style="color: var(--black-primary);">:</span>
+                                    <div class="dropdown w-100">
+                                        <input type="text" class="form-control form-select border-0 shadow-sm rounded-3 text-start w-100" id="btn-apertura-minuto" data-bs-toggle="dropdown" aria-expanded="false" style="background: var(--off-white); cursor: text;" placeholder="MM" autocomplete="off" maxlength="2">
+                                        <ul class="dropdown-menu w-100 shadow-sm border-0 py-1" style="max-height: 200px; overflow-y: auto; background: var(--off-white);" id="menu-apertura-minuto"></ul>
+                                        <input type="hidden" id="horario-apertura-minuto">
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-6">
                                 <label class="form-label small fw-bold text-muted">CIERRE</label>
-                                <input type="time" id="horario-cierre"
-                                       class="form-control border-0 shadow-sm rounded-3"
-                                       style="background: var(--off-white);" required>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="dropdown w-100">
+                                        <input type="text" class="form-control form-select border-0 shadow-sm rounded-3 text-start w-100" id="btn-cierre-hora" data-bs-toggle="dropdown" aria-expanded="false" style="background: var(--off-white); cursor: text;" placeholder="HH" autocomplete="off" maxlength="2">
+                                        <ul class="dropdown-menu w-100 shadow-sm border-0 py-1" style="max-height: 200px; overflow-y: auto; background: var(--off-white);" id="menu-cierre-hora"></ul>
+                                        <input type="hidden" id="horario-cierre-hora">
+                                    </div>
+                                    <span class="fw-bold" style="color: var(--black-primary);">:</span>
+                                    <div class="dropdown w-100">
+                                        <input type="text" class="form-control form-select border-0 shadow-sm rounded-3 text-start w-100" id="btn-cierre-minuto" data-bs-toggle="dropdown" aria-expanded="false" style="background: var(--off-white); cursor: text;" placeholder="MM" autocomplete="off" maxlength="2">
+                                        <ul class="dropdown-menu w-100 shadow-sm border-0 py-1" style="max-height: 200px; overflow-y: auto; background: var(--off-white);" id="menu-cierre-minuto"></ul>
+                                        <input type="hidden" id="horario-cierre-minuto">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <button type="submit" class="btn-admin-primary w-100 py-3 mt-3">Guardar Horario</button>
@@ -342,15 +357,100 @@
     @include('partials.footer_admin')
 
     <script>
-        // Mask for HH:MM inputs
-       // function formatTime(input) {
-          //  let val = input.value.replace(/\D/g, '');
-           // if (val.length >= 3) {
-           //     input.value = val.substring(0, 2) + ':' + val.substring(2, 4);
-          //  } else {
-          //      input.value = val;
-          //  }
-     //   }
+        function bindDropdownSelection(menuId, inputId, hiddenId, isHour) {
+            const menu = document.getElementById(menuId);
+            const input = document.getElementById(inputId);
+            const hidden = document.getElementById(hiddenId);
+
+            const items = menu.querySelectorAll('.dropdown-item');
+
+            // Allow typing numbers only and filter live
+            input.addEventListener('input', (e) => {
+                let val = e.target.value.replace(/\D/g, '');
+                
+                if (isHour && val.length === 2 && parseInt(val) > 23) {
+                    val = '23';
+                } else if (!isHour && val.length === 2 && parseInt(val) > 59) {
+                    val = '59';
+                }
+                
+                e.target.value = val;
+                
+                // Reactive filtering & highlighting
+                let exactMatch = false;
+                items.forEach(item => {
+                    const itemVal = item.getAttribute('data-value');
+                    
+                    // Filter dropdown (show if starts with val)
+                    if (val === '' || itemVal.startsWith(val)) {
+                        item.parentElement.style.display = 'block';
+                    } else {
+                        item.parentElement.style.display = 'none';
+                    }
+                    
+                    // Highlight (active class)
+                    if (val.length > 0 && itemVal === val) {
+                        item.classList.add('active', 'bg-primary', 'text-white');
+                        exactMatch = true;
+                    } else if (val.length > 0 && itemVal === val.padStart(2, '0')) {
+                        // Resalta también si teclea '8' para '08' pero sin forzar autocompletado del input visible
+                        item.classList.add('active', 'bg-primary', 'text-white');
+                        exactMatch = true;
+                    } else {
+                        item.classList.remove('active', 'bg-primary', 'text-white');
+                    }
+                });
+
+                // Update hidden input when typed 2 characters or exact matching 1 digit
+                if (val.length === 2) {
+                    hidden.value = val;
+                } else if (val.length === 1 && exactMatch) {
+                    hidden.value = val.padStart(2, '0');
+                } else if (val === '') {
+                    hidden.value = '';
+                }
+            });
+
+            // Handle clicking an item from the dropdown
+            menu.addEventListener('click', (e) => {
+                e.preventDefault();
+                if(e.target.tagName === 'A') {
+                    const value = e.target.getAttribute('data-value');
+                    input.value = value;
+                    hidden.value = value;
+                    
+                    // Remove active from all and add to selected
+                    items.forEach(item => {
+                        item.classList.remove('active', 'bg-primary', 'text-white');
+                        item.parentElement.style.display = 'block'; // Reset filter when clicking
+                    });
+                    e.target.classList.add('active', 'bg-primary', 'text-white');
+                }
+            });
+        }
+
+        function buildTimeSelects() {
+            let hoursItems = '';
+            for(let i=0; i<24; i++) {
+                const h = i.toString().padStart(2, '0');
+                hoursItems += `<li><a class="dropdown-item fw-medium px-3 py-1 text-center" href="#" data-value="${h}">${h}</a></li>`;
+            }
+            
+            let minutesItems = '';
+            for(let i=0; i<60; i++) {
+                const m = i.toString().padStart(2, '0');
+                minutesItems += `<li><a class="dropdown-item fw-medium px-3 py-1 text-center" href="#" data-value="${m}">${m}</a></li>`;
+            }
+            
+            ['apertura-hora', 'cierre-hora'].forEach(id => {
+                document.getElementById('menu-' + id).innerHTML = hoursItems;
+                bindDropdownSelection('menu-' + id, 'btn-' + id, 'horario-' + id, true);
+            });
+            ['apertura-minuto', 'cierre-minuto'].forEach(id => {
+                document.getElementById('menu-' + id).innerHTML = minutesItems;
+                bindDropdownSelection('menu-' + id, 'btn-' + id, 'horario-' + id, false);
+            });
+        }
 
         let modalZonaInst;
         let modalMesaInst;
@@ -363,6 +463,7 @@
             modalHorarioInst = new bootstrap.Modal(document.getElementById('modalHorario'));
             modalStaffInst = new bootstrap.Modal(document.getElementById('modalMesero'));
             
+            buildTimeSelects();
             loadZonas();
             loadMesas();
             loadHorarios();
@@ -859,6 +960,12 @@
             document.getElementById('formHorario').reset();
             document.getElementById('horario-id').value = '';
             document.getElementById('horario-dia').disabled = false; // Permitir seleccionar día en nuevo
+            
+            ['apertura-hora', 'apertura-minuto', 'cierre-hora', 'cierre-minuto'].forEach(id => {
+               document.getElementById('horario-' + id).value = '';
+               document.getElementById('btn-' + id).value = '';
+            });
+            
             document.getElementById('modalHorarioTitle').innerText = 'Añadir Horario';
             modalHorarioInst.show();
         }
@@ -869,8 +976,18 @@
             document.getElementById('horario-dia').disabled = true; // Deshabilitar cambio de día en edición
             
             // Format HH:MM from HH:MM:SS
-            document.getElementById('horario-apertura').value = h.hora_apertura.substring(0, 5);
-            document.getElementById('horario-cierre').value = h.hora_cierre.substring(0, 5);
+            const apertura = h.hora_apertura.substring(0, 5).split(':');
+            const cierre = h.hora_cierre.substring(0, 5).split(':');
+            
+            document.getElementById('horario-apertura-hora').value = apertura[0];
+            document.getElementById('btn-apertura-hora').value = apertura[0];
+            document.getElementById('horario-apertura-minuto').value = apertura[1];
+            document.getElementById('btn-apertura-minuto').value = apertura[1];
+            
+            document.getElementById('horario-cierre-hora').value = cierre[0];
+            document.getElementById('btn-cierre-hora').value = cierre[0];
+            document.getElementById('horario-cierre-minuto').value = cierre[1];
+            document.getElementById('btn-cierre-minuto').value = cierre[1];
             
             document.getElementById('modalHorarioTitle').innerText = 'Editar Horario';
             modalHorarioInst.show();
@@ -888,10 +1005,23 @@
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
 
             const id = document.getElementById('horario-id').value;
+            const hA = document.getElementById('horario-apertura-hora').value;
+            const mA = document.getElementById('horario-apertura-minuto').value;
+            const hC = document.getElementById('horario-cierre-hora').value;
+            const mC = document.getElementById('horario-cierre-minuto').value;
+            
+            if(!hA || !mA || !hC || !mC) {
+                Swal.fire('Error', 'Por favor complete correctamente las horas de apertura y cierre seleccionando una hora válida del menú', 'error');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                isSubmittingHorario = false;
+                return;
+            }
+
             const data = {
-                dia_semana: document.getElementById('horario-dia').value, // Aunque disabled, leer el value funciona, pero disabled inputs don't submit in normal forms. we read it manually anyway.
-                hora_apertura: document.getElementById('horario-apertura').value,
-                hora_cierre: document.getElementById('horario-cierre').value
+                dia_semana: document.getElementById('horario-dia').value, // Aunque disabled, leer el value funciona
+                hora_apertura: hA + ':' + mA,
+                hora_cierre: hC + ':' + mC
             };
             
             const method = id ? 'PUT' : 'POST';
