@@ -1,4 +1,4 @@
-@extends('admin.menu')
+﻿@extends('admin.menu')
 @section('title', 'Dashboard de Reservaciones')
 
 @section('content')
@@ -222,11 +222,9 @@
     @include('partials.footer_admin')
     
     <script>
-        let currentDate = new Date();
-        let modoVista   = 'dia';
+        let currentDate  = new Date();
+        let modoVista    = 'dia';
 
-        // Master array: contiene TODAS las reservas de hoy + futuro (un solo fetch)
-        let todasLasReservas = [];
         // Array visible actual (el que muestra el grid y usa el modal)
         let reservasGlobales = [];
 
@@ -380,27 +378,26 @@
         // Calculo de metricas: Aforo y En Curso dependen de la vista
         // Proxima Reserva sigue siendo global para el monitor tactico
         // ------------------------------------------------------------------
+        // Métricas: calculadas sobre las reservas visibles en pantalla
+        // ------------------------------------------------------------------
         function actualizarMetricas(reservasVisibles = []) {
-            const now = new Date();
+            const now      = new Date();
             const todayIso = toIsoLocal(now);
 
-            // 1. Aforo Esperado (de lo que se ve en pantalla)
-            const aforoEstados = ['pendiente'];
+            // 1. Aforo Esperado — pendientes visibles
             const totalAforo = reservasVisibles
-                .filter(r => aforoEstados.includes(calcularEstadoReserva(r)))
+                .filter(r => calcularEstadoReserva(r) === 'pendiente')
                 .reduce((sum, r) => sum + r.numero_personas, 0);
-            
             document.getElementById('statTotalPersonas').textContent = totalAforo;
 
-            // 2. En Curso (de lo que se ve en pantalla)
+            // 2. En Curso — visibles
             const totalEnCurso = reservasVisibles
                 .filter(r => calcularEstadoReserva(r) === 'en_curso')
                 .reduce((sum, r) => sum + r.numero_personas, 0);
-            
             document.getElementById('statEnCurso').textContent = totalEnCurso;
 
-            // 3. Proxima Reserva: BUSQUEDA GLOBAL (siempre la siguiente del monitor)
-            const pendientesGlobal = todasLasReservas
+            // 3. Próxima Reserva — la siguiente pendiente con hora de fin > ahora
+            const pendientes = reservasVisibles
                 .filter(r => {
                     if (calcularEstadoReserva(r) !== 'pendiente') return false;
                     const end = r.hora_fin
@@ -410,17 +407,16 @@
                 })
                 .sort((a, b) => buildDateTime(a.fecha, a.hora_inicio) - buildDateTime(b.fecha, b.hora_inicio));
 
-            if (pendientesGlobal.length === 0) {
+            if (pendientes.length === 0) {
                 document.getElementById('statProxima').textContent = 'Sin reservas futuras';
             } else {
-                const prox       = pendientesGlobal[0];
-                const proxDate   = new Date(prox.fecha + 'T00:00:00');
-                const esHoy      = toIsoLocal(proxDate) === todayIso;
-                const estadoProx = calcularEstadoReserva(prox);
-                const nombre     = (prox.nombre_cliente || '').split(' ')[0];
+                const prox     = pendientes[0];
+                const proxDate = new Date(prox.fecha + 'T00:00:00');
+                const esHoy    = toIsoLocal(proxDate) === todayIso;
+                const nombre   = (prox.nombre_cliente || '').split(' ')[0];
 
                 if (esHoy) {
-                    const label = estadoProx === 'en_curso' ? 'En curso' : 'Siguiente';
+                    const label = calcularEstadoReserva(prox) === 'en_curso' ? 'En curso' : 'Siguiente';
                     document.getElementById('statProxima').textContent =
                         `${label}: ${nombre} a las ${prox.hora_inicio.substring(0, 5)}`;
                 } else {
@@ -433,22 +429,30 @@
         }
 
         // ------------------------------------------------------------------
-        // Fetch maestro unico (?modo=todo -> hoy + futuro)
+        // Fetch por rango de fechas — cada vista pide exactamente lo que necesita
         // ------------------------------------------------------------------
-        async function cargarMaestro(silencioso = false) {
-            if (!silencioso) {
-                document.getElementById('reservaciones-grid').innerHTML =
-                    '<div class="col-12 text-center py-5"><div class="spinner-border text-muted"></div>' +
-                    '<p class="mt-2 text-muted fw-bold small">SINCRONIZANDO AGENDA...</p></div>';
-                document.getElementById('statTotalPersonas').textContent = '...';
-                document.getElementById('statProxima').textContent       = '...';
-                document.getElementById('statEnCurso').textContent       = '...';
-            }
+        function mostrarSpinner() {
+            document.getElementById('reservaciones-grid').innerHTML =
+                '<div class="col-12 text-center py-5"><div class="spinner-border text-muted"></div>' +
+                '<p class="mt-2 text-muted fw-bold small">SINCRONIZANDO AGENDA...</p></div>';
+            document.getElementById('statTotalPersonas').textContent = '...';
+            document.getElementById('statProxima').textContent       = '...';
+            document.getElementById('statEnCurso').textContent       = '...';
+        }
 
+        function mostrarError() {
+            document.getElementById('reservaciones-grid').innerHTML =
+                '<div class="col-12 text-center py-5 text-danger">' +
+                '<i class="bi bi-shield-exclamation fs-1"></i>' +
+                '<p class="fw-bold mt-2">Error de conexion al obtener la agenda.</p></div>';
+        }
+
+        async function fetchReservaciones(desde, hasta, silencioso = false) {
+            if (!silencioso) mostrarSpinner();
             try {
-                const token     = localStorage.getItem('token');
-                const clientHoy = toIsoLocal(new Date()); // Fecha local del cliente (evita desfase UTC)
-                const res = await fetch(`/api/gerente/reservaciones?modo=todo&desde=${clientHoy}&t=${Date.now()}`, {
+                const token = localStorage.getItem('token');
+                const url   = `/api/gerente/reservaciones?desde=${desde}&hasta=${hasta}&t=${Date.now()}`;
+                const res   = await fetch(url, {
                     headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
                 });
 
@@ -457,18 +461,26 @@
                     throw new Error('Error de red');
                 }
 
-                todasLasReservas = (await res.json()).data || [];
-                aplicarVistaActual(); // Esto llamara a actualizarMetricas con la vista correcta
+                const data = (await res.json()).data || [];
+                actualizarMetricas(data);
+                renderizarTarjetas(data);
 
             } catch (e) {
                 console.error(e);
-                if (!silencioso) {
-                    document.getElementById('reservaciones-grid').innerHTML =
-                        '<div class="col-12 text-center py-5 text-danger">' +
-                        '<i class="bi bi-shield-exclamation fs-1"></i>' +
-                        '<p class="fw-bold mt-2">Error de conexion al obtener la agenda.</p></div>';
-                }
+                if (!silencioso) mostrarError();
             }
+        }
+
+        /** Vista por Día: fetch solo del día seleccionado */
+        function cargarDia(silencioso = false) {
+            const iso = toIsoLocal(currentDate);
+            fetchReservaciones(iso, iso, silencioso);
+        }
+
+        /** Vista Próximas: fetch desde hoy + 30 días (default del backend) */
+        function cargarProximas(silencioso = false) {
+            const hoy = toIsoLocal(new Date());
+            fetchReservaciones(hoy, '', silencioso); // sin hasta → backend usa hoy+30d
         }
 
         // ------------------------------------------------------------------
@@ -583,29 +595,7 @@
         }
 
         // ------------------------------------------------------------------
-        // Aplicar vista actual sobre el master array
-        // ------------------------------------------------------------------
-        function aplicarVistaActual() {
-            let vista;
-            if (modoVista === 'futuras') {
-                const now = new Date();
-                vista = todasLasReservas.filter(r => {
-                    const end = r.hora_fin
-                        ? buildDateTime(r.fecha, r.hora_fin)
-                        : new Date(buildDateTime(r.fecha, r.hora_inicio).getTime() + 2 * 60 * 60 * 1000);
-                    return end > now;
-                });
-            } else {
-                const isoSeleccionado = toIsoLocal(currentDate);
-                vista = todasLasReservas.filter(r => r.fecha === isoSeleccionado);
-            }
-            
-            actualizarMetricas(vista); // Ahora pasamos el filtrado para metricas dinamicas
-            renderizarTarjetas(vista);
-        }
-
-        // ------------------------------------------------------------------
-        // Cambio de modo (botones Vista por Dia / PrÃ³ximas)
+        // Cambio de modo (botones Vista por Dia / Próximas)
         // ------------------------------------------------------------------
         function cambiarModo(modo) {
             modoVista = modo;
@@ -613,29 +603,34 @@
                 document.getElementById('btn-modo-dia').classList.replace('btn-outline-dark', 'btn-dark');
                 document.getElementById('btn-modo-futuras').classList.replace('btn-dark', 'btn-outline-dark');
                 document.getElementById('panel-selector-dia').style.display = 'flex';
+                cargarDia();
             } else {
                 document.getElementById('btn-modo-futuras').classList.replace('btn-outline-dark', 'btn-dark');
                 document.getElementById('btn-modo-dia').classList.replace('btn-dark', 'btn-outline-dark');
                 document.getElementById('panel-selector-dia').style.display = 'none';
+                cargarProximas();
             }
-            aplicarVistaActual();
         }
 
         // ------------------------------------------------------------------
         // Selector de dia
         // ------------------------------------------------------------------
         function updateDateUI() {
-            document.getElementById('dateDisplay').textContent   = formatDisplayDate(currentDate);
-            document.getElementById('inputDate').value           = toIsoLocal(currentDate);
-            aplicarVistaActual(); // solo re-filtrar, sin re-fetch
+            document.getElementById('dateDisplay').textContent = formatDisplayDate(currentDate);
+            document.getElementById('inputDate').value         = toIsoLocal(currentDate);
+            cargarDia(); // fetch del día seleccionado
         }
 
         // ------------------------------------------------------------------
         // Bootstrap
         // ------------------------------------------------------------------
         document.addEventListener('DOMContentLoaded', () => {
-            updateDateUI();
-            cargarMaestro(); // fetch inicial
+            // Mostrar fecha inicial en el selector
+            document.getElementById('dateDisplay').textContent = formatDisplayDate(currentDate);
+            document.getElementById('inputDate').value         = toIsoLocal(currentDate);
+
+            // Carga inicial (modo dia por defecto)
+            cargarDia();
 
             document.querySelectorAll('.btn-day-nav').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -651,8 +646,11 @@
                 }
             });
 
-            // Re-fetch completo cada 60 s â†’ datos frescos + metricas actualizadas
-            setInterval(() => cargarMaestro(true), 60000);
+            // Re-fetch silencioso cada 60 s - usa la vista activa
+            setInterval(() => {
+                if (modoVista === 'dia') cargarDia(true);
+                else cargarProximas(true);
+            }, 60000);
         });
     </script>
 @endsection

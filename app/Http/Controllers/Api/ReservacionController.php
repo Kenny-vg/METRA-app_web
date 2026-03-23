@@ -18,39 +18,31 @@ class ReservacionController extends Controller
 {
 
     /**
-     * Listar reservaciones del día (o futuras) para el gerente.
+     * Listar reservaciones por rango de fechas para el gerente (y la app móvil).
      * El CafeScope filtra automáticamente por el cafe_id del usuario autenticado.
+     *
+     * Query params:
+     *   desde    (date, default: hoy)          — fecha inicio del rango
+     *   hasta    (date, default: desde + 30d)  — fecha fin del rango
+     *   per_page (int,  opcional)              — activa paginación
      */
     public function index(Request $request)
     {
-        $modo = $request->query('modo', 'dia');
+        $desde = $request->query('desde', now()->toDateString());
+        $hasta = $request->query('hasta', Carbon::parse($desde)->addDays(30)->toDateString());
 
-        $query = Reservacion::with(['ocasionEspecial', 'promocion', 'zona']);
+        $query = Reservacion::with(['ocasionEspecial', 'promocion', 'zona'])
+            ->whereBetween('fecha', [$desde, $hasta])
+            ->orderBy('fecha')
+            ->orderBy('hora_inicio');
 
-        if ($modo === 'todo') {
-            // Hoy + todo el futuro en un solo payload para filtrado en frontend.
-            // Se usa el parámetro 'desde' enviado por el cliente para evitar desfases
-            // de zona horaria (el servidor UTC puede estar un día adelante del cliente).
-            $desde = $request->query('desde', now()->toDateString());
-            $query->where('fecha', '>=', $desde)
-                ->orderBy('fecha')
-                ->orderBy('hora_inicio');
-        }
-        elseif ($modo === 'futuras') {
-            // Desde mañana en adelante (se mantiene por compatibilidad)
-            $query->where('fecha', '>', now()->toDateString())
-                ->orderBy('fecha')
-                ->orderBy('hora_inicio');
-        }
-        else {
-            // Por fecha específica (default: hoy)
-            $fecha = $request->query('fecha', now()->toDateString());
-            $query->where('fecha', $fecha)->orderBy('hora_inicio');
+        if ($request->filled('per_page')) {
+            $reservaciones = $query->paginate((int) $request->query('per_page'))
+                ->through(fn ($r) => $this->formatReservacion($r));
+            return ApiResponse::success($reservaciones, 'Reservaciones');
         }
 
-        $reservaciones = $query->get()->map(function ($r) {
-            return $this->formatReservacion($r);
-        });
+        $reservaciones = $query->get()->map(fn ($r) => $this->formatReservacion($r));
 
         return ApiResponse::success($reservaciones, 'Reservaciones');
     }
