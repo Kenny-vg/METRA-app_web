@@ -21,6 +21,12 @@ class Promocion extends Model
         'cafe_id'
     ];
 
+    protected $casts = [
+        'dias_semana' => 'array',
+        'activo' => 'boolean',
+        'precio' => 'decimal:2',
+    ];
+
     protected static function booted()
     {
         static::addGlobalScope(new CafeScope);
