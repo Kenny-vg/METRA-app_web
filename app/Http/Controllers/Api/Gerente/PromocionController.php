@@ -57,10 +57,10 @@ class PromocionController extends Controller
             'descripcion'=>'nullable|string|max:255',
             'precio'=>'required|numeric|min:0',
             'ocasiones'=>'nullable|array',
-            'fecha_inicio'=>'nullable|date',
+            'fecha_inicio'=>'nullable|date|after_or_equal:today',
             'fecha_fin'=>'nullable|date|after_or_equal:fecha_inicio',
             'hora_inicio'=>'nullable|date_format:H:i',
-            'hora_fin'=>'nullable|date_format:H:i',
+            'hora_fin'=>'nullable|date_format:H:i|after:hora_inicio',
             'dias_semana'=>'nullable|array'
         ], $messages);
 
@@ -114,10 +114,10 @@ class PromocionController extends Controller
             'descripcion'=>'nullable|string|max:255',
             'precio'=>'required|numeric|min:0',
             'ocasiones'=>'nullable|array',
-            'fecha_inicio'=>'nullable|date',
+            'fecha_inicio'=>'nullable|date|after_or_equal:today',
             'fecha_fin'=>'nullable|date|after_or_equal:fecha_inicio',
             'hora_inicio'=>'nullable|date_format:H:i',
-            'hora_fin'=>'nullable|date_format:H:i',
+            'hora_fin'=>'nullable|date_format:H:i|after:hora_inicio',
             'dias_semana'=>'nullable|array'
         ], $messages);
 

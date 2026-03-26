@@ -126,8 +126,12 @@
                 <span class="badge bg-secondary mb-1" style="font-size:0.65rem;">Inactiva</span><br>
             </div>
             <span class="fw-bold js-nombre" style="color: var(--black-primary); font-size: 1.05rem;"></span>
+            <div class="js-ocasiones-container mt-1"></div>
         </td>
-        <td><span class="text-muted small js-desc" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 300px;"></span></td>
+        <td>
+            <div class="js-desc text-muted mb-2" style="font-size: 0.85rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 300px;"></div>
+            <div class="js-schedule-info small text-gold fw-medium" style="font-size: 0.75rem;"></div>
+        </td>
         <td>
             <span class="badge fs-6 rounded-pill js-precio" style="background: rgba(212,175,55,0.1); color: var(--accent-gold); border: 1px solid rgba(212,175,55,0.2);"></span>
         </td>
@@ -360,6 +364,32 @@ async function loadPromociones() {
             clone.querySelector('.js-desc').textContent = p.descripcion || '-';
             clone.querySelector('.js-precio').textContent = formatPrice(p.precio);
 
+            // Mostrar Ocasiones
+            const occasionsContainer = clone.querySelector('.js-ocasiones-container');
+            if (p.ocasiones && p.ocasiones.length > 0) {
+                p.ocasiones.forEach(o => {
+                    const span = document.createElement('span');
+                    span.className = 'badge rounded-pill me-1 text-xs';
+                    span.style = 'background: rgba(0,0,0,0.05); color: #666; font-size: 0.65rem; border: 1px solid #ddd;';
+                    span.textContent = o.nombre || o.nombre_ocasion;
+                    occasionsContainer.appendChild(span);
+                });
+            }
+
+            // Mostrar Horarios/Días
+            const scheduleInfo = clone.querySelector('.js-schedule-info');
+            let scheduleText = '';
+            if (p.fecha_inicio || p.fecha_fin) {
+                scheduleText += `<i class="bi bi-calendar-range me-1"></i> ${p.fecha_inicio || '...'} al ${p.fecha_fin || '...'}<br>`;
+            }
+            if (p.hora_inicio || p.hora_fin) {
+                scheduleText += `<i class="bi bi-clock me-1"></i> ${p.hora_inicio ? p.hora_inicio.substring(0,5) : '...'} - ${p.hora_fin ? p.hora_fin.substring(0,5) : '...'}<br>`;
+            }
+            if (p.dias_semana && p.dias_semana.length > 0) {
+                scheduleText += `<i class="bi bi-calendar-check me-1"></i> ${p.dias_semana.join(', ')}`;
+            }
+            scheduleInfo.innerHTML = scheduleText;
+
             const actionsCol = clone.querySelector('.js-actions');
             if (p.activo) {
                 const btnEdit = document.createElement('button');
@@ -457,16 +487,14 @@ async function abrirModalNuevaPromo() {
     document.getElementById('promoTitulo').value = '';
     document.getElementById('promoDescripcion').value = '';
     document.getElementById('promoPrecio').value = '';
-    document.getElementById('promoFechaInicio').value = '';
-    document.getElementById('promoFechaFin').value = '';
-    document.getElementById('promoHoraInicio').value = '';
-    document.getElementById('promoHoraFin').value = '';
-    document.querySelectorAll('.js-dia-semana').forEach(cb => cb.checked = false);
+    // Set min date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('promoFechaInicio').min = today;
+    document.getElementById('promoFechaFin').min = today;
 
-    // Aseguramos que el select esté lleno y listo antes de mostrar modal
-    if (promoTipoChoices) {
-        promoTipoChoices.removeActiveItems();
-    }
+    // Reset validation states
+    document.getElementById('promoTitulo').classList.remove('is-invalid');
+    document.getElementById('promoPrecio').classList.remove('is-invalid');
 
     modalPromoInst.show();
 }
@@ -479,6 +507,13 @@ function editPromocion(p) {
     document.getElementById('promoTitulo').value = p.nombre_promocion;
     document.getElementById('promoDescripcion').value = p.descripcion || '';
     document.getElementById('promoPrecio').value = p.precio;
+
+    // Set min date and reset validation
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('promoFechaInicio').min = today;
+    document.getElementById('promoFechaFin').min = today;
+    document.getElementById('promoTitulo').classList.remove('is-invalid');
+    document.getElementById('promoPrecio').classList.remove('is-invalid');
     document.getElementById('promoFechaInicio').value = p.fecha_inicio || '';
     document.getElementById('promoFechaFin').value = p.fecha_fin || '';
     document.getElementById('promoHoraInicio').value = p.hora_inicio ? p.hora_inicio.substring(0,5) : '';
@@ -519,8 +554,8 @@ async function guardarPromo() {
     const useSchedule = document.getElementById('toggleSchedule').checked;
 
     const data = {
-        nombre_promocion: document.getElementById('promoTitulo').value,
-        descripcion: document.getElementById('promoDescripcion').value,
+        nombre_promocion: document.getElementById('promoTitulo').value.trim(),
+        descripcion: document.getElementById('promoDescripcion').value.trim(),
         precio: document.getElementById('promoPrecio').value,
         fecha_inicio: useSchedule ? (document.getElementById('promoFechaInicio').value || null) : null,
         fecha_fin: useSchedule ? (document.getElementById('promoFechaFin').value || null) : null,
@@ -530,6 +565,32 @@ async function guardarPromo() {
         activo: true,
         ocasiones: ocasionesMarcadas
     };
+
+    // Frontend validation
+    let isValid = true;
+    if (!data.nombre_promocion) {
+        document.getElementById('promoTitulo').classList.add('is-invalid');
+        isValid = false;
+    } else {
+        document.getElementById('promoTitulo').classList.remove('is-invalid');
+    }
+
+    if (data.precio === '') {
+        document.getElementById('promoPrecio').classList.add('is-invalid');
+        isValid = false;
+    } else {
+        document.getElementById('promoPrecio').classList.remove('is-invalid');
+    }
+
+    if (useSchedule && data.hora_inicio && data.hora_fin && data.hora_inicio >= data.hora_fin) {
+        showToast('error', 'La hora de fin debe ser posterior a la hora de inicio');
+        return;
+    }
+
+    if (!isValid) {
+        showToast('error', 'Por favor completa los campos obligatorios');
+        return;
+    }
     
     if (data.dias_semana && data.dias_semana.length === 0) data.dias_semana = null;
     
@@ -709,8 +770,15 @@ document.getElementById('formOcasion').addEventListener('submit', async (e) => {
     e.preventDefault();
     const id = document.getElementById('ocasion-id').value;
     const nombre = document.getElementById('ocasion-nombre').value;
-    const descripcion = document.getElementById('ocasion-descripcion').value;
+    const descripcion = document.getElementById('ocasion-descripcion').value.trim();
     
+    if(!nombre) {
+        document.getElementById('ocasion-nombre').classList.add('is-invalid');
+        showToast('error', 'El nombre es obligatorio');
+        return;
+    }
+    document.getElementById('ocasion-nombre').classList.remove('is-invalid');
+
     const method = id ? 'PUT' : 'POST';
     const url = id ? `${API_URL}/ocasiones/${id}` : `${API_URL}/ocasiones`;
 

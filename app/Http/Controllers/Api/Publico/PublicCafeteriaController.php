@@ -90,6 +90,10 @@ class PublicCafeteriaController extends Controller
     {
         $zonas = Zona::where('cafe_id', $cafeteria->id)
             ->where('activo', true)
+            ->whereHas('mesas', function ($q) {
+                // Solo zonas que tengan al menos una mesa activa
+                $q->where('activo', true);
+            })
             ->orderBy('nombre_zona')
             ->get(['id', 'nombre_zona']);
 

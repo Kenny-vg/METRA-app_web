@@ -610,7 +610,22 @@
                         return;
                     }
 
-                    let ht = '<div class="row g-3"><div class="col-12 col-md-6"><input type="radio" name="promo" id="promo-0" value="" class="btn-check" checked onchange="document.getElementById(\'promocion_id\').value=\'\';"><label class="card h-100 p-4 w-100 promo-label" for="promo-0"><div class="text-center py-2 h-100 d-flex flex-column justify-content-center"><h6 class="fw-bold mb-1" style="color:#334155;">Sin Complemento Adicional</h6></div></label></div>';
+                    let ht = `
+                        <div class="alert alert-warning mb-4 py-3 border-0 rounded-4" style="background: rgba(212,175,55,0.05); color: #856404; font-size: 0.85rem;">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-info-circle-fill me-3 fs-5" style="color: #d4af37;"></i>
+                                <span><strong>Aviso de Beneficios:</strong> Los complementos y cortesías seleccionados están <strong>sujetos a disponibilidad física</strong> en sucursal y a las políticas de consumo de la cafetería. No acumulable con otras promociones.</span>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <input type="radio" name="promo" id="promo-0" value="" class="btn-check" checked onchange="document.getElementById('promocion_id').value='';">
+                                <label class="card h-100 p-4 w-100 promo-label" for="promo-0">
+                                    <div class="text-center py-2 h-100 d-flex flex-column justify-content-center">
+                                        <h6 class="fw-bold mb-1" style="color:#334155;">Sin Complemento Adicional</h6>
+                                    </div>
+                                </label>
+                            </div>`;
 
                     promos.forEach(p => {
                         const isFree = parseFloat(p.precio) === 0;
