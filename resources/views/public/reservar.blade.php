@@ -497,10 +497,10 @@
                 try {
                     const url = `/api/cafeterias/${cafeSlug}/horarios-disponibles?fecha=${fecha}&numero_personas=${pax}`;
                     const resH = await fetch(url);
-                    
                     if (!resH.ok) throw new Error('Error al consultar horarios');
                     const jsonH = await resH.json();
                     
+                    console.log('Horarios recibidos:', jsonH.data);
                     let horarios = jsonH.data || [];
 
                     // --- EXTENSION FRONTEND: slots adicionales hasta (cierre - 30min) ---
@@ -696,8 +696,8 @@
                         // Mostrar pantalla de confirmación tal como se pidió
                         const rsv = json.data;
                         const cafeNombre = escapeHTML(rsv.cafeteria ? rsv.cafeteria.nombre : 'La Cafetería');
-                        const zonaP = escapeHTML(rsv.zona ? rsv.zona.nombre_zona : 'Área General');
-                        const ocasionP = escapeHTML(rsv.ocasion_especial ? rsv.ocasion_especial.nombre : 'Sin Ocasión Especial');
+                        const zonaP = escapeHTML(rsv.zona ? rsv.zona.nombre : 'Área General');
+                        const ocasionP = escapeHTML(rsv.ocasion ? rsv.ocasion.nombre : 'Sin Ocasión Especial');
                         
                         document.querySelector('.reserva-card').innerHTML = `
                             <div class="text-center py-5 px-3">

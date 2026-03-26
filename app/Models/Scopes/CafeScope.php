@@ -21,8 +21,9 @@ class CafeScope implements Scope
             return;
         }
 
-        // Solo filtrar si hay usuario y no es superadmin
-        if($user->role !== 'superadmin'){
+        // Solo filtrar si el usuario pertenece a una cafetería (gerente o personal)
+        // Esto evita que clientes o invitados vean sus consultas filtradas por cafe_id = null
+        if (in_array($user->role, ['gerente', 'personal'])) {
             $builder->where(
                 $model->getTable().'.cafe_id',
                 $user->cafe_id
