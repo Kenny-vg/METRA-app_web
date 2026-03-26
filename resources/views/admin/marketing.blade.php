@@ -173,16 +173,33 @@
                         <input type="number" id="promoPrecio" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="0.00" step="0.01" min="0" required>
                         <div class="form-text mt-1 x-small text-muted">Si es 0, se mostrará como "Cortesía".</div>
                     </div>
-                    <div class="col-md-7">
-                        <label class="form-label small fw-bold text-muted">APLICA A (OCASIONES)</label>
-                        <select id="promoTipo" name="ocasiones[]" multiple class="form-select border-0 shadow-sm rounded-3">
-                        </select>
-                        <div class="form-text mt-1 x-small text-muted">Opcional: Si no selecciona ninguna, será una "Promo General".</div>
+
+                    <!-- NUEVO: Selector de Ocasiones condicional -->
+                    <div class="col-12 mt-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="toggleOccasions">
+                            <label class="form-check-label small fw-bold text-dark" for="toggleOccasions">Limitar por Ocasión Especial</label>
+                            <div class="form-text x-small text-muted">Aplica cuando el cliente selecciona un motivo de reserva (cumpleaños, etc).</div>
+                        </div>
                     </div>
 
+                    <div class="col-12" id="sectionOccasions" style="display: none;">
+                        <label class="form-label small fw-bold text-muted">SELECCIONA LAS OCASIONES</label>
+                        <select id="promoTipo" name="ocasiones[]" multiple class="form-select border-0 shadow-sm rounded-3">
+                        </select>
+                    </div>
+
+                    <!-- NUEVO: Restricciones de Tiempo condicionales -->
                     <div class="col-12 mt-4 pt-3 border-top">
-                        <h6 class="fw-bold mb-3 small" style="color: var(--black-primary); letter-spacing: 0.5px;">RESTRICCIONES DE TIEMPO (OPCIONAL)</h6>
-                        <div class="row g-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="toggleSchedule">
+                            <label class="form-check-label small fw-bold text-dark" for="toggleSchedule">Programar fechas o horarios</label>
+                            <div class="form-text x-small text-muted">Define cuándo estará disponible esta promoción.</div>
+                        </div>
+                    </div>
+
+                    <div id="sectionSchedule" class="col-12" style="display: none;">
+                        <div class="row g-3 mt-1">
                             <div class="col-6">
                                 <label class="form-label x-small fw-bold text-muted">FECHA INICIO</label>
                                 <input type="date" id="promoFechaInicio" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);">
@@ -280,6 +297,24 @@
 
 <script>
 const token = localStorage.getItem('token');
+const API_URL = '/api/gerente';
+const headers = () => ({
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Authorization': `Bearer ${token}`
+});
+
+const showToast = (icon, title) => {
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: icon,
+        title: title,
+        showConfirmButton: false,
+        timer: 3000
+    });
+};
+
 let promoEditandoId = null;
 
 let modalPromoInst;
@@ -411,6 +446,12 @@ async function abrirModalNuevaPromo() {
 
     // Not blocking for General Promos
 
+    // Reset toggles y visibilidad
+    document.getElementById('toggleOccasions').checked = false;
+    document.getElementById('toggleSchedule').checked = false;
+    document.getElementById('sectionOccasions').style.display = 'none';
+    document.getElementById('sectionSchedule').style.display = 'none';
+
     promoEditandoId = null;
     document.getElementById('modalPromoTitulo').innerText = 'Añadir Promoción';
     document.getElementById('promoTitulo').value = '';
@@ -456,31 +497,41 @@ function editPromocion(p) {
         }
     }
     
+    // Configurar visibilidad basada en los datos
+    const hasOccasions = p.ocasiones && p.ocasiones.length > 0;
+    const hasSchedule = p.fecha_inicio || p.fecha_fin || p.hora_inicio || p.hora_fin || (p.dias_semana && p.dias_semana.length > 0);
+
+    document.getElementById('toggleOccasions').checked = hasOccasions;
+    document.getElementById('sectionOccasions').style.display = hasOccasions ? 'block' : 'none';
+
+    document.getElementById('toggleSchedule').checked = hasSchedule;
+    document.getElementById('sectionSchedule').style.display = hasSchedule ? 'block' : 'none';
+
     modalPromoInst.show();
 }
 
 async function guardarPromo() {
     let ocasionesMarcadas = [];
-    if (promoTipoChoices) {
+    if (document.getElementById('toggleOccasions').checked && promoTipoChoices) {
         ocasionesMarcadas = promoTipoChoices.getValue(true).map(v => parseInt(v));
     }
 
-
+    const useSchedule = document.getElementById('toggleSchedule').checked;
 
     const data = {
         nombre_promocion: document.getElementById('promoTitulo').value,
         descripcion: document.getElementById('promoDescripcion').value,
         precio: document.getElementById('promoPrecio').value,
-        fecha_inicio: document.getElementById('promoFechaInicio').value || null,
-        fecha_fin: document.getElementById('promoFechaFin').value || null,
-        hora_inicio: document.getElementById('promoHoraInicio').value || null,
-        hora_fin: document.getElementById('promoHoraFin').value || null,
-        dias_semana: Array.from(document.querySelectorAll('.js-dia-semana:checked')).map(cb => cb.value),
+        fecha_inicio: useSchedule ? (document.getElementById('promoFechaInicio').value || null) : null,
+        fecha_fin: useSchedule ? (document.getElementById('promoFechaFin').value || null) : null,
+        hora_inicio: useSchedule ? (document.getElementById('promoHoraInicio').value || null) : null,
+        hora_fin: useSchedule ? (document.getElementById('promoHoraFin').value || null) : null,
+        dias_semana: useSchedule ? Array.from(document.querySelectorAll('.js-dia-semana:checked')).map(cb => cb.value) : null,
         activo: true,
         ocasiones: ocasionesMarcadas
     };
     
-    if (data.dias_semana.length === 0) data.dias_semana = null;
+    if (data.dias_semana && data.dias_semana.length === 0) data.dias_semana = null;
     
     const method = promoEditandoId ? 'PUT' : 'POST';
     const url = promoEditandoId ? `${API_URL}/promociones/${promoEditandoId}` : `${API_URL}/promociones`;
@@ -573,23 +624,6 @@ async function reactivatePromocion(id) {
 }
 
 // --- OCASIONES ESPECIALES ---
-const API_URL = '/api/gerente';
-const headers = () => ({
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'Authorization': `Bearer ${token}`
-});
-
-const showToast = (icon, title) => {
-    Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: icon,
-        title: title,
-        showConfirmButton: false,
-        timer: 3000
-    });
-};
 
 let modalOcasionInst;
 
@@ -762,6 +796,19 @@ async function reactivateOcasion(id) {
 document.addEventListener('DOMContentLoaded', () => {
     modalOcasionInst = new bootstrap.Modal(document.getElementById('modalOcasion'));
     modalPromoInst = new bootstrap.Modal(document.getElementById('modalPromo'));
+
+    // Event listeners para los toggles del modal de promociones
+    document.getElementById('toggleOccasions').addEventListener('change', (e) => {
+        document.getElementById('sectionOccasions').style.display = e.target.checked ? 'block' : 'none';
+        if (!e.target.checked && promoTipoChoices) {
+            promoTipoChoices.removeActiveItems();
+        }
+    });
+
+    document.getElementById('toggleSchedule').addEventListener('change', (e) => {
+        document.getElementById('sectionSchedule').style.display = e.target.checked ? 'block' : 'none';
+    });
+
     loadOcasiones();
     loadOcasionesForSelect();
     loadPromociones();
