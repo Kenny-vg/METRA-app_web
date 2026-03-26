@@ -12,6 +12,11 @@ class Promocion extends Model
         'nombre_promocion',
         'descripcion',
         'precio',
+        'fecha_inicio',
+        'fecha_fin',
+        'hora_inicio',
+        'hora_fin',
+        'dias_semana',
         'activo',
         'cafe_id'
     ];

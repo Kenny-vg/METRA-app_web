@@ -75,19 +75,12 @@ class PublicCafeteriaController extends Controller
     }
 
     /**
-     * Ver promociones ligadas a ocasiones
+     * Ver promociones ligadas a ocasiones (mantiene compatibilidad con rutas antiguas)
      */
-    public function promocionesPorOcasion(Cafeteria $cafeteria, $ocasion)
+    public function promocionesPorOcasion(\Illuminate\Http\Request $request, Cafeteria $cafeteria, $ocasion)
     {
-        $promociones = Promocion::where('cafe_id', $cafeteria->id)
-            ->where('activo', true)
-            ->whereHas('ocasiones', function ($q) use ($ocasion) {
-            $q->where('ocasion_especials.id', $ocasion);
-        })
-            ->orderBy('nombre_promocion')
-            ->get();
-
-        return ApiResponse::success($promociones);
+        $request->merge(['ocasion_id' => $ocasion]);
+        return $this->promociones($request, $cafeteria);
     }
 
     /**
@@ -129,14 +122,57 @@ class PublicCafeteriaController extends Controller
     }
 
     /**
-     * Ver promociones
+     * Ver promociones (con filtrado automático por fecha, hora y ocasión)
      */
-    public function promociones(Cafeteria $cafeteria)
+    public function promociones(\Illuminate\Http\Request $request, Cafeteria $cafeteria)
     {
-        $promociones = Promocion::where('cafe_id', $cafeteria->id)
-            ->where('activo', true)
-            ->orderBy('nombre_promocion')
-            ->get();
+        $query = Promocion::where('cafe_id', $cafeteria->id)
+            ->where('activo', true);
+
+        // 1. Filtrado por Fecha
+        if ($request->filled('fecha')) {
+            $fecha = $request->fecha;
+            $query->where(function ($q) use ($fecha) {
+                $q->whereNull('fecha_inicio')->orWhere('fecha_inicio', '<=', $fecha);
+            })->where(function ($q) use ($fecha) {
+                $q->whereNull('fecha_fin')->orWhere('fecha_fin', '>=', $fecha);
+            });
+
+            // Filtrado por día de la semana
+            $dias = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+            $diaNombre = $dias[date('w', strtotime($fecha))];
+            
+            $query->where(function ($q) use ($diaNombre) {
+                $q->whereNull('dias_semana')
+                  ->orWhereJsonContains('dias_semana', $diaNombre);
+            });
+        }
+
+        // 2. Filtrado por Hora
+        if ($request->filled('hora')) {
+            $hora = $request->hora;
+            $query->where(function ($q) use ($hora) {
+                $q->whereNull('hora_inicio')->orWhere('hora_inicio', '<=', $hora);
+            })->where(function ($q) use ($hora) {
+                $q->whereNull('hora_fin')->orWhere('hora_fin', '>=', $hora);
+            });
+        }
+
+        // 3. Filtrado por Ocasión
+        if ($request->filled('ocasion_id')) {
+            $ocasionId = $request->ocasion_id;
+            $query->where(function ($q) use ($ocasionId) {
+                $q->doesntHave('ocasiones') // Promociones Generales
+                  ->orWhereHas('ocasiones', function ($q2) use ($ocasionId) {
+                      $q2->where('ocasion_especials.id', $ocasionId); // Específicas de la ocasión
+                  });
+            });
+        } else {
+            // Si no hay ocasión seleccionada, mostrar solo las Generales
+            $query->doesntHave('ocasiones');
+        }
+
+        $promociones = $query->orderBy('nombre_promocion')->get();
 
         return ApiResponse::success($promociones);
     }

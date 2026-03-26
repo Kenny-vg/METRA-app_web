@@ -550,13 +550,17 @@
                                 </span>
                             `).join('');
                         } else {
-                            // Sin horarios configurados: ocultar la sección
-                            document.getElementById('horarios-slots-container').closest('hr')?.nextElementSibling
-                                    && (document.getElementById('horarios-slots-container').parentElement.style.display = 'none');
+                            // Sin horarios configurados: mostrar mensaje amigable en lugar de ocultar todo
+                            document.getElementById('horarios-slots-container').innerHTML = `
+                                <span class="badge rounded-pill px-3 py-2" style="background: var(--off-white); color: var(--text-muted); border: 1px solid var(--border-light); font-size: 0.8rem;">
+                                    Horarios por confirmar
+                                </span>
+                            `;
                         }
                     }
                 } catch (e) {
                     console.error('Error loading horarios públicos', e);
+                    document.getElementById('horarios-slots-container').innerHTML = '<small class="text-muted">Horarios no disponibles temporalmente.</small>';
                 }
 
             } catch(e) {

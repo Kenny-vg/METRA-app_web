@@ -38,9 +38,7 @@ class PromocionController extends Controller
             'precio.required' => 'El precio es obligatorio.',
             'precio.numeric' => 'El precio debe ser un número válido.',
             'precio.min' => 'El precio no puede ser negativo.',
-            'ocasiones.required' => 'Debes asociar la promoción a al menos una ocasión especial.',
             'ocasiones.array' => 'El formato de las ocasiones no es válido.',
-            'ocasiones.min' => 'Debes elegir al menos una ocasión.'
         ];
 
         $request->merge([
@@ -58,13 +56,23 @@ class PromocionController extends Controller
             ],
             'descripcion'=>'nullable|string|max:255',
             'precio'=>'required|numeric|min:0',
-            'ocasiones'=>'required|array|min:1'
+            'ocasiones'=>'nullable|array',
+            'fecha_inicio'=>'nullable|date',
+            'fecha_fin'=>'nullable|date|after_or_equal:fecha_inicio',
+            'hora_inicio'=>'nullable|date_format:H:i',
+            'hora_fin'=>'nullable|date_format:H:i',
+            'dias_semana'=>'nullable|array'
         ], $messages);
 
         $promocion = Promocion::create([
             'nombre_promocion'=>$request->nombre_promocion,
             'descripcion'=>$request->descripcion,
             'precio'=>$request->precio,
+            'fecha_inicio'=>$request->fecha_inicio,
+            'fecha_fin'=>$request->fecha_fin,
+            'hora_inicio'=>$request->hora_inicio,
+            'hora_fin'=>$request->hora_fin,
+            'dias_semana'=>$request->dias_semana,
             'activo'=>true,
             'cafe_id'=>$cafeId
         ]);
@@ -88,9 +96,7 @@ class PromocionController extends Controller
             'precio.required' => 'El precio es obligatorio.',
             'precio.numeric' => 'El precio debe ser un número válido.',
             'precio.min' => 'El precio no puede ser negativo.',
-            'ocasiones.required' => 'Debes asociar la promoción a al menos una ocasión especial.',
             'ocasiones.array' => 'El formato de las ocasiones no es válido.',
-            'ocasiones.min' => 'Debes elegir al menos una ocasión.'
         ];
 
         $request->merge([
@@ -107,13 +113,23 @@ class PromocionController extends Controller
             ],
             'descripcion'=>'nullable|string|max:255',
             'precio'=>'required|numeric|min:0',
-            'ocasiones'=>'required|array|min:1'
+            'ocasiones'=>'nullable|array',
+            'fecha_inicio'=>'nullable|date',
+            'fecha_fin'=>'nullable|date|after_or_equal:fecha_inicio',
+            'hora_inicio'=>'nullable|date_format:H:i',
+            'hora_fin'=>'nullable|date_format:H:i',
+            'dias_semana'=>'nullable|array'
         ], $messages);
 
         $promocion->update([
             'nombre_promocion' => $request->nombre_promocion,
             'descripcion'      => $request->input('descripcion', $promocion->descripcion),
             'precio'           => $request->precio,
+            'fecha_inicio'     => $request->fecha_inicio,
+            'fecha_fin'        => $request->fecha_fin,
+            'hora_inicio'      => $request->hora_inicio,
+            'hora_fin'         => $request->hora_fin,
+            'dias_semana'      => $request->dias_semana,
             'activo'           => $request->has('activo') ? $request->boolean('activo') : $promocion->activo,
         ]);
 

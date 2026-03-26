@@ -429,6 +429,7 @@
                         onChange: function(selectedDates, dateStr, instance) {
                             fechaInput.classList.remove('is-invalid');
                             cargarHorasDisponibles();
+                            cargarPromocionesDisponibles();
                             checkFormValidity();
                         }
                     });
@@ -579,24 +580,33 @@
                 }
             });
 
-            // --- PROMOCIONES DINAMICAS DINAMICAS ---
-            ocasionSelect.addEventListener('change', async (e) => {
-                const oId = e.target.value;
+            // --- PROMOCIONES DINAMICAS (FILTRADO EN BACKEND) ---
+            async function cargarPromocionesDisponibles() {
+                const fecha = fechaInput.value;
+                const hora = horaSelect.value;
+                const ocasionId = ocasionSelect.value;
                 const pCont = document.getElementById('promos-container');
-                if(!oId){ 
-                    pCont.innerHTML = '<div class="text-center py-5 small" style="background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1; color: #64748b;"><i class="bi bi-stars fs-3 d-block mb-3 text-gold"></i>Seleccione una <strong>ocasión especial</strong> arriba para descubrir regalos o atenciones.</div><input type="hidden" id="promocion_id" value="">';
-                    return; 
+
+                if (!fecha || !hora) {
+                    pCont.innerHTML = '<div class="text-center py-5 small" style="background: #faf9f7; border-radius: 12px; border: 1px dashed #e0ddd5; color: #7b7871;"><i class="bi bi-calendar-event fs-3 d-block mb-3 text-gold"></i>Seleccione <strong>fecha y hora</strong> para ver beneficios disponibles.</div><input type="hidden" id="promocion_id" value="">';
+                    return;
                 }
 
-                pCont.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-secondary spinner-border-sm"></div><div class="mt-2 text-muted x-small">Cargando beneficios...</div></div>';
+                pCont.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-gold spinner-border-sm"></div><div class="mt-2 text-muted x-small">Buscando beneficios...</div></div>';
+                
                 try {
-                    // Fetch en tiempo real para no atrapar promociones caducas
-                    const resP = await fetch(`/api/cafeterias/${cafeSlug}/ocasiones/${oId}/promociones?t=${new Date().getTime()}`);
+                    let url = `/api/cafeterias/${cafeSlug}/promociones?fecha=${fecha}&hora=${hora}`;
+                    if(ocasionId) url += `&ocasion_id=${ocasionId}`;
+                    
+                    const resP = await fetch(url + `&t=${new Date().getTime()}`);
                     const jsonP = await resP.json();
                     const promos = jsonP.data || [];
 
                     if(promos.length === 0){
-                        pCont.innerHTML = '<div class="text-center py-5 small" style="background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1; color: #64748b;">No hay complementos disponibles para esta ocasión en este momento.</div><input type="hidden" id="promocion_id" value="">';
+                        let msg = ocasionId 
+                            ? 'No hay promociones para esta ocasión en el horario seleccionado.' 
+                            : 'No hay promociones generales para este horario.';
+                        pCont.innerHTML = `<div class="text-center py-5 small" style="background: #faf9f7; border-radius: 12px; border: 1px dashed #e0ddd5; color: #7b7871;">${msg}</div><input type="hidden" id="promocion_id" value="">`;
                         return;
                     }
 
@@ -604,14 +614,20 @@
 
                     promos.forEach(p => {
                         const isFree = parseFloat(p.precio) === 0;
-                        const dP = isFree ? 'Cortesía' : `$${p.precio}`;
+                        const dP = isFree ? 'Cortesía / Sujeto a consumo' : `$${p.precio}`;
                         ht += `<div class="col-12 col-md-6"><input type="radio" name="promo" id="promo-${p.id}" value="${p.id}" class="btn-check" onchange="document.getElementById('promocion_id').value='${p.id}';"><label class="card h-100 p-4 w-100 promo-label" for="promo-${p.id}"><div class="d-flex justify-content-between mb-3"><span class="badge" style="background: rgba(212,175,55,0.1); color: #d4af37; border: 1px solid rgba(212,175,55,0.2); font-size: 0.8rem; letter-spacing: 0.5px;">${dP}</span></div><h6 class="fw-bold mb-2" style="font-size:1.05rem; color:#1e293b;">${escapeHTML(p.nombre_promocion)}</h6><p class="small text-muted mb-0" style="font-size: 0.85rem; line-height: 1.4;">${escapeHTML(p.descripcion||'')}</p></label></div>`;
                     });
                     
                     ht += '</div><input type="hidden" id="promocion_id" value="">';
                     pCont.innerHTML = ht;
-                } catch(e) { console.error('Error promos', e); }
-            });
+                } catch(e) { 
+                    console.error('Error promos', e);
+                    pCont.innerHTML = '<div class="text-center py-4 text-danger small">Error al cargar beneficios.</div>';
+                }
+            }
+
+            ocasionSelect.addEventListener('change', cargarPromocionesDisponibles);
+            horaSelect.addEventListener('change', cargarPromocionesDisponibles);
 
             // --- SUBMIT FINAL ---
             form.addEventListener('submit', async (e) => {

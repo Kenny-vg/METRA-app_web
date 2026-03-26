@@ -149,52 +149,99 @@
 </template>
 
 <!-- Modal nueva/editar promoción -->
-<div class="modal fade" id="modalPromo" tabindex="-1" style="font-family: inherit !important;">
+<div class="modal fade" id="modalPromo" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4 shadow-lg" style="overflow: visible; font-family: inherit !important;">
-            <div class="modal-header border-0 px-5 pt-5 pb-3" style="background: var(--off-white);">
-                <h5 class="modal-title fw-bold" style="color: var(--black-primary);" id="modalPromoTitulo">Nueva Promoción</h5>
+        <div class="modal-content rounded-4 border-0 p-2" style="box-shadow: 0 20px 50px rgba(0,0,0,0.1);">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="fw-bold m-0" id="modalPromoTitulo" style="color: var(--black-primary); letter-spacing: -0.5px;">Nueva Promoción</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body px-5 py-4">
-                <div class="alert alert-info d-flex align-items-start rounded-3 mb-4" style="background: rgba(13, 110, 253, 0.05); border: 1px solid rgba(13, 110, 253, 0.2); color: #084298;">
-                    <i class="bi bi-info-circle-fill fs-4 me-3 mt-1"></i>
-                    <div>
-                        <h6 class="fw-bold mb-1">Información</h6>
-                        <p class="mb-0 small" style="line-height: 1.4;">Las promociones pueden aplicarse a una o varias ocasiones especiales.<br>
-                        <strong>Ejemplo:</strong> Cumpleaños, Aniversario, Graduación.<br>
-                        Antes de crear una promoción debes registrar al menos una ocasión especial.</p>
-                    </div>
-                </div>
-                <div class="row g-4">
+            <div class="modal-body pt-4">
+                <p class="small text-muted mb-4">Configure los beneficios y promociones que sus clientes podrán elegir al reservar.</p>
+                
+                <div class="row g-3">
                     <div class="col-12">
-                        <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: var(--text-muted);">Título de la promoción</label>
-                        <input type="text" id="promoTitulo" class="form-control form-control-lg" style="border-radius: 10px; border-color: var(--border-light);" placeholder="Ej: Cumpleaños Especial" required>
+                        <label class="form-label small fw-bold text-muted">TÍTULO DE LA PROMO</label>
+                        <input type="text" id="promoTitulo" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="Ej: Cumpleaños Especial" required>
                     </div>
                     <div class="col-12">
-                        <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: var(--text-muted);">Descripción</label>
-                        <textarea id="promoDescripcion" class="form-control" rows="3" style="border-radius: 10px; border-color: var(--border-light);" placeholder="Describe brevemente la promoción o evento especial..."></textarea>
+                        <label class="form-label small fw-bold text-muted">DESCRIPCIÓN</label>
+                        <textarea id="promoDescripcion" class="form-control border-0 shadow-sm rounded-3" rows="2" style="background: var(--off-white);" placeholder="Describe brevemente el beneficio..."></textarea>
                     </div>
-                    <div class="col-12 col-md-4">
-                        <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: var(--text-muted);">Precio Especial</label>
-                        <div class="input-group shadow-sm" style="border-radius: 10px; border: 1px solid var(--border-light); overflow: hidden;">
-                            <span class="input-group-text border-0 bg-white" style="color: var(--black-primary); font-weight: 600;">$</span>
-                            <input type="number" id="promoPrecio" class="form-control border-0" placeholder="85.00" step="0.01" min="0" onkeydown="return event.keyCode !== 69 && event.keyCode !== 189" required>
-                        </div>
-                        <div class="form-text text-muted" style="font-size: 0.75rem; margin-top: 6px;"><i class="bi bi-info-circle me-1"></i>Si el precio es 0 la promoción se mostrará como "Incluido sin costo".</div>
+                    <div class="col-md-5">
+                        <label class="form-label small fw-bold text-muted">PRECIO ($)</label>
+                        <input type="number" id="promoPrecio" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="0.00" step="0.01" min="0" required>
+                        <div class="form-text mt-1 x-small text-muted">Si es 0, se mostrará como "Cortesía".</div>
                     </div>
-                    <div class="col-12 col-md-8">
-                        <label class="form-label small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: var(--text-muted);">Tipo de evento (Ocasiones)</label>
-                        <select id="promoTipo" name="ocasiones[]" multiple class="form-select shadow-sm" style="border-radius: 10px; border-color: var(--border-light);" required>
+                    <div class="col-md-7">
+                        <label class="form-label small fw-bold text-muted">APLICA A (OCASIONES)</label>
+                        <select id="promoTipo" name="ocasiones[]" multiple class="form-select border-0 shadow-sm rounded-3">
                         </select>
+                        <div class="form-text mt-1 x-small text-muted">Opcional: Si no selecciona ninguna, será una "Promo General".</div>
+                    </div>
+
+                    <div class="col-12 mt-4 pt-3 border-top">
+                        <h6 class="fw-bold mb-3 small" style="color: var(--black-primary); letter-spacing: 0.5px;">RESTRICCIONES DE TIEMPO (OPCIONAL)</h6>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label x-small fw-bold text-muted">FECHA INICIO</label>
+                                <input type="date" id="promoFechaInicio" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label x-small fw-bold text-muted">FECHA FIN</label>
+                                <input type="date" id="promoFechaFin" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label x-small fw-bold text-muted">HORA APERTURA</label>
+                                <input type="time" id="promoHoraInicio" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label x-small fw-bold text-muted">HORA CIERRE</label>
+                                <input type="time" id="promoHoraFin" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label x-small fw-bold text-muted d-block mb-2">DÍAS DISPONIBLES</label>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <div class="form-check form-check-inline m-0">
+                                        <input class="form-check-input js-dia-semana" type="checkbox" value="Lunes" id="dia-Lunes">
+                                        <label class="form-check-label x-small" for="dia-Lunes">Lun</label>
+                                    </div>
+                                    <div class="form-check form-check-inline m-0">
+                                        <input class="form-check-input js-dia-semana" type="checkbox" value="Martes" id="dia-Martes">
+                                        <label class="form-check-label x-small" for="dia-Martes">Mar</label>
+                                    </div>
+                                    <div class="form-check form-check-inline m-0">
+                                        <input class="form-check-input js-dia-semana" type="checkbox" value="Miercoles" id="dia-Miercoles">
+                                        <label class="form-check-label x-small" for="dia-Miercoles">Mié</label>
+                                    </div>
+                                    <div class="form-check form-check-inline m-0">
+                                        <input class="form-check-input js-dia-semana" type="checkbox" value="Jueves" id="dia-Jueves">
+                                        <label class="form-check-label x-small" for="dia-Jueves">Jue</label>
+                                    </div>
+                                    <div class="form-check form-check-inline m-0">
+                                        <input class="form-check-input js-dia-semana" type="checkbox" value="Viernes" id="dia-Viernes">
+                                        <label class="form-check-label x-small" for="dia-Viernes">Vie</label>
+                                    </div>
+                                    <div class="form-check form-check-inline m-0">
+                                        <input class="form-check-input js-dia-semana" type="checkbox" value="Sabado" id="dia-Sabado">
+                                        <label class="form-check-label x-small" for="dia-Sabado">Sáb</label>
+                                    </div>
+                                    <div class="form-check form-check-inline m-0">
+                                        <input class="form-check-input js-dia-semana" type="checkbox" value="Domingo" id="dia-Domingo">
+                                        <label class="form-check-label x-small" for="dia-Domingo">Dom</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer border-0 px-5 pb-5 pt-3">
-                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn-metra-main" onclick="guardarPromo()" style="padding: 12px 28px;">
-                    <i class="bi bi-check2 me-2"></i>Guardar Promoción
-                </button>
+                
+                <div class="mt-5 mb-2">
+                    <button type="button" class="btn-admin-primary w-100 py-3" onclick="guardarPromo()">
+                        <i class="bi bi-check2 me-2"></i>Guardar Promoción
+                    </button>
+                    <button type="button" class="btn btn-link w-100 text-muted small mt-2 text-decoration-none" data-bs-dismiss="modal">Cancelar</button>
+                </div>
             </div>
         </div>
     </div>
@@ -239,7 +286,7 @@ let modalPromoInst;
 let promoTipoChoices = null;
 
 const formatPrice = (price) => {
-    if (parseFloat(price) === 0) return 'Incluido sin costo';
+    if (parseFloat(price) === 0) return 'Cortesía / Sujeto a consumo';
     return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(price);
 };
 
@@ -362,23 +409,18 @@ async function abrirModalNuevaPromo() {
         await loadOcasionesForSelect();
     }
 
-    // Si tras cargar no hay ocasiones, prevenir creación de promo y avisar
-    if (ocasionesCargadas.length === 0) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Primero registra una ocasión especial',
-            text: 'Las promociones deben estar asociadas a al menos una ocasión. Ve a la pestaña "Ocasiones especiales".',
-            confirmButtonColor: '#3085d6',
-            confirmButtonText: 'Entendido'
-        });
-        return;
-    }
+    // Not blocking for General Promos
 
     promoEditandoId = null;
     document.getElementById('modalPromoTitulo').innerText = 'Añadir Promoción';
     document.getElementById('promoTitulo').value = '';
     document.getElementById('promoDescripcion').value = '';
     document.getElementById('promoPrecio').value = '';
+    document.getElementById('promoFechaInicio').value = '';
+    document.getElementById('promoFechaFin').value = '';
+    document.getElementById('promoHoraInicio').value = '';
+    document.getElementById('promoHoraFin').value = '';
+    document.querySelectorAll('.js-dia-semana').forEach(cb => cb.checked = false);
 
     // Aseguramos que el select esté lleno y listo antes de mostrar modal
     if (promoTipoChoices) {
@@ -389,16 +431,22 @@ async function abrirModalNuevaPromo() {
 }
 
 function editPromocion(p) {
-    if (ocasionesCargadas.length === 0) {
-        Swal.fire('Error', 'No hay ocasiones registradas.', 'error');
-        return;
-    }
+
 
     promoEditandoId = p.id;
     document.getElementById('modalPromoTitulo').innerText = 'Editar Promoción';
     document.getElementById('promoTitulo').value = p.nombre_promocion;
     document.getElementById('promoDescripcion').value = p.descripcion || '';
     document.getElementById('promoPrecio').value = p.precio;
+    document.getElementById('promoFechaInicio').value = p.fecha_inicio || '';
+    document.getElementById('promoFechaFin').value = p.fecha_fin || '';
+    document.getElementById('promoHoraInicio').value = p.hora_inicio ? p.hora_inicio.substring(0,5) : '';
+    document.getElementById('promoHoraFin').value = p.hora_fin ? p.hora_fin.substring(0,5) : '';
+    
+    const dias = p.dias_semana || [];
+    document.querySelectorAll('.js-dia-semana').forEach(cb => {
+        cb.checked = dias.includes(cb.value);
+    });
     
     if (promoTipoChoices) {
         promoTipoChoices.removeActiveItems();
@@ -417,18 +465,22 @@ async function guardarPromo() {
         ocasionesMarcadas = promoTipoChoices.getValue(true).map(v => parseInt(v));
     }
 
-    if (ocasionesMarcadas.length === 0) {
-        Swal.fire('Atención', 'Debes seleccionar al menos una ocasión especial.', 'warning');
-        return;
-    }
+
 
     const data = {
         nombre_promocion: document.getElementById('promoTitulo').value,
         descripcion: document.getElementById('promoDescripcion').value,
         precio: document.getElementById('promoPrecio').value,
+        fecha_inicio: document.getElementById('promoFechaInicio').value || null,
+        fecha_fin: document.getElementById('promoFechaFin').value || null,
+        hora_inicio: document.getElementById('promoHoraInicio').value || null,
+        hora_fin: document.getElementById('promoHoraFin').value || null,
+        dias_semana: Array.from(document.querySelectorAll('.js-dia-semana:checked')).map(cb => cb.value),
         activo: true,
         ocasiones: ocasionesMarcadas
     };
+    
+    if (data.dias_semana.length === 0) data.dias_semana = null;
     
     const method = promoEditandoId ? 'PUT' : 'POST';
     const url = promoEditandoId ? `${API_URL}/promociones/${promoEditandoId}` : `${API_URL}/promociones`;

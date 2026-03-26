@@ -19,6 +19,12 @@ return new class extends Migration
 
             $table->decimal('precio',8,2);
 
+            $table->date('fecha_inicio')->nullable();
+            $table->date('fecha_fin')->nullable();
+            $table->time('hora_inicio')->nullable();
+            $table->time('hora_fin')->nullable();
+            $table->json('dias_semana')->nullable();
+
             $table->boolean('activo')->default(true);
 
             $table->foreignId('cafe_id')
