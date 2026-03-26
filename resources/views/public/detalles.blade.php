@@ -97,10 +97,17 @@
 
                     <!-- MENÚ DESTACADO -->
                     <section class="mb-5">
-                        <div class="d-flex align-items-baseline justify-content-between mb-4">
-                            <h4 class="fw-bold mb-0" style="color: var(--black-primary); letter-spacing: -0.3px;">Menú Destacado</h4>
-                            <span class="small text-muted">Lo más pedido</span>
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                            <h4 class="fw-bold mb-0" style="color: var(--black-primary); letter-spacing: -0.3px;">Menú</h4>
+                            <span class="small text-muted">Explora nuestra oferta</span>
                         </div>
+                        
+                        <!-- Filtros de Menú -->
+                        <div id="menu-filtros-container" class="d-flex flex-wrap gap-2 mb-4">
+                            <button class="btn btn-sm px-3 rounded-pill btn-admin-primary btn-filtro-menu fw-medium" id="btn-todas-menu" onclick="filtrarMenu('todas')">Todas</button>
+                            <!-- Categorías cargadas por JS -->
+                        </div>
+
                         <div class="row g-3" id="menu-publico-container">
                             <div class="col-12 text-center text-muted py-3">
                                 <div class="spinner-border spinner-border-sm me-2" role="status"></div> Cargando menú...
@@ -288,18 +295,52 @@
                 document.getElementById('cafe-content').classList.remove('d-none');
 
                 // --- Load Menu ---
-                try {
-                    const resMenu = await fetch(`${API_URL}/cafeterias/${cafe.slug}/menu`);
-                    if(resMenu.ok) {
-                        const jsonMenu = await resMenu.json();
-                        const menuItems = jsonMenu.data || [];
-                        const menuContainer = document.getElementById('menu-publico-container');
-                        menuContainer.innerHTML = '';
+                let menuOriginalData = [];
+                window.filtrarMenu = function(categoriaId) {
+                    // Update active pill styling
+                    document.querySelectorAll('.btn-filtro-menu').forEach(btn => {
+                        btn.classList.remove('btn-admin-primary');
+                        btn.classList.add('btn-outline-secondary');
+                    });
+                    
+                    const activeBtn = categoriaId === 'todas' 
+                        ? document.getElementById('btn-todas-menu') 
+                        : document.getElementById(`btn-menu-cat-${categoriaId}`);
                         
-                        if(menuItems.length === 0) {
-                            menuContainer.innerHTML = '<div class="col-12"><p class="text-muted small">El menú aún no está disponible.</p></div>';
-                        } else {
-                            menuItems.forEach(item => {
+                    if (activeBtn) {
+                        activeBtn.classList.remove('btn-outline-secondary');
+                        activeBtn.classList.add('btn-admin-primary');
+                    }
+                    
+                    if (categoriaId === 'todas') {
+                        renderizarContenidoMenu(menuOriginalData);
+                    } else {
+                        const filtrada = menuOriginalData.filter(c => c.id == categoriaId);
+                        renderizarContenidoMenu(filtrada);
+                    }
+                };
+
+                function renderizarContenidoMenu(categorias) {
+                    const menuContainer = document.getElementById('menu-publico-container');
+                    menuContainer.innerHTML = '';
+                    
+                    if(categorias.length === 0) {
+                        menuContainer.innerHTML = '<div class="col-12 text-center py-4 text-muted small"><i class="bi bi-basket opacity-50 d-block fs-2 mb-2"></i>No hay productos disponibles.</div>';
+                        return;
+                    }
+
+                    categorias.forEach(categoria => {
+                        menuContainer.innerHTML += `
+                            <div class="col-12 mt-4 mb-2">
+                                <h6 class="fw-bold text-uppercase" style="color: var(--accent-gold); letter-spacing: 1px; font-size: 0.8rem;">
+                                    ${escapeHTML(categoria.nombre)}
+                                </h6>
+                            </div>
+                        `;
+
+                        if (categoria.menus && categoria.menus.length > 0) {
+                            categoria.menus.forEach(item => {
+                                const timestamp = new Date().getTime();
                                 const imgUrlWithCacheBuster = item.imagen_url.startsWith('http') ? item.imagen_url : `{{ url('storage') }}/${item.imagen_url}?v=${timestamp}`;
                                 const img = item.imagen_url ? imgUrlWithCacheBuster : 'https://placehold.co/300x200/faf6f0/c5a059?text=METRA';
                                 menuContainer.innerHTML += `
@@ -310,7 +351,25 @@
                                     </div>
                                 `;
                             });
+                        } else {
+                            menuContainer.innerHTML += '<div class="col-12"><p class="text-muted small ps-2">No hay productos en esta categoría.</p></div>';
                         }
+                    });
+                }
+
+                try {
+                    const resMenu = await fetch(`${API_URL}/cafeterias/${cafe.slug}/menu`);
+                    if(resMenu.ok) {
+                        const jsonMenu = await resMenu.json();
+                        menuOriginalData = jsonMenu.data || [];
+                        
+                        // Generar botones de filtro
+                        const filtrosContainer = document.getElementById('menu-filtros-container');
+                        menuOriginalData.forEach(cat => {
+                            filtrosContainer.innerHTML += `<button id="btn-menu-cat-${cat.id}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill btn-filtro-menu fw-medium" onclick="filtrarMenu(${cat.id})">${escapeHTML(cat.nombre)}</button>`;
+                        });
+
+                        renderizarContenidoMenu(menuOriginalData);
                     }
                 } catch (e) {
                     console.error("Error loading menu", e);

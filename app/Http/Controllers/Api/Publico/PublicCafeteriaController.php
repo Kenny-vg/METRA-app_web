@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\Publico;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cafeteria;
-use App\Models\Menu;
 use App\Models\OcasionEspecial;
+use App\Models\MenuCategoria;
 use App\Models\Promocion;
 use App\Models\Zona;
 use App\Models\Horario;
@@ -49,12 +49,16 @@ class PublicCafeteriaController extends Controller
      */
     public function menu(Cafeteria $cafeteria)
     {
-        $menu = Menu::where('cafe_id', $cafeteria->id)
+        $menuAgrupado = MenuCategoria::where('cafe_id', $cafeteria->id)
             ->where('activo', true)
-            ->orderBy('nombre_producto')
+            ->has('menus') // Solo categorías con productos
+            ->orderBy('orden')
+            ->with(['menus' => function ($q) {
+                $q->where('activo', true)->orderBy('orden');
+            }])
             ->get();
 
-        return ApiResponse::success($menu);
+        return ApiResponse::success($menuAgrupado);
     }
 
     /**

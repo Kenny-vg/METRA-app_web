@@ -23,3 +23,12 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# Cache-Control para la carpeta storage (imágenes inmutables)
+<IfModule mod_headers.c>
+    <Directory "%{DOCUMENT_ROOT}/storage">
+        <FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|webp|svg)$">
+            Header set Cache-Control "public, max-age=31536000, immutable"
+        </FilesMatch>
+    </Directory>
+</IfModule>

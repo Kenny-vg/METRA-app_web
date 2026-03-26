@@ -12,7 +12,9 @@ class Menu extends Model
         'descripcion',
         'imagen_url',
         'activo',
-        'cafe_id'
+        'orden',
+        'cafe_id',
+        'categoria_id'
     ];
 
     protected static function booted()
@@ -23,6 +25,11 @@ class Menu extends Model
     public function cafeteria()
     {
         return $this->belongsTo(Cafeteria::class,'cafe_id');
+    }
+
+    public function categoria()
+    {
+        return $this->belongsTo(MenuCategoria::class, 'categoria_id');
     }
 
     public function getImagenUrlAttribute($value)

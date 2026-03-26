@@ -8,18 +8,36 @@
                 <h2 class="fw-bold m-0" style="color: var(--black-primary); font-family: 'Inter', sans-serif; letter-spacing: -1px;">Menú Digital</h2>
                 <p class="m-0 mt-2" style="color: var(--text-muted); font-size: 0.95rem;">Gestiona los productos que ofreces a tus clientes.</p>
             </div>
-            <button class="btn-admin-primary px-4 py-2" onclick="openModalProducto()">
-                <i class="bi bi-plus-lg me-2"></i>Añadir Producto
-            </button>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-dark px-4 py-2" onclick="openModalGestionCategorias()" style="border-radius: 8px;">
+                    <i class="bi bi-tags me-2"></i>Categorías
+                </button>
+                <button class="btn-admin-primary px-4 py-2" onclick="openModalProducto()">
+                    <i class="bi bi-plus-lg me-2"></i>Añadir Producto
+                </button>
+            </div>
         </div>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     </header>
 
-    <div class="row g-4" id="productos-container">
-        <!-- Productos cargados por JS -->
+    <div id="carta-container">
+        <!-- Contenedor general para categorías y productos -->
     </div>
 
-    <!-- Template HTML para Producto (previene XSS vía clonación en JS) -->
+    <!-- Template for Category Group -->
+    <template id="categoria-group-template">
+        <div class="mb-5 js-categoria-section">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <h4 class="fw-bold mb-0 js-categoria-nombre" style="color: var(--black-primary); font-family: 'Inter', sans-serif;"></h4>
+                <hr class="flex-grow-1" style="opacity: 0.1;">
+            </div>
+            <div class="row g-4 js-productos-row">
+                <!-- Productos de esta categoría -->
+            </div>
+        </div>
+    </template>
+
+    <!-- Template HTML para Producto -->
     <template id="producto-template">
         <div class="col-md-6 col-lg-4 col-xl-3">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 js-card" style="background: var(--white-pure);">
@@ -32,7 +50,6 @@
                     <p class="small text-muted mb-4 flex-grow-1 js-desc" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"></p>
                     
                     <div class="d-flex justify-content-end mt-auto align-items-center border-top pt-3 js-actions" style="border-color: var(--border-light) !important;">
-                        <!-- Botones insertados por JS -->
                     </div>
                 </div>
             </div>
@@ -52,6 +69,13 @@
                         <input type="hidden" id="producto-id">
                         
                         <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">CATEGORÍA</label>
+                            <select id="producto-categoria" class="form-select border-0 shadow-sm rounded-3" style="background: var(--off-white);" required>
+                                <option value="" disabled selected>Selecciona una categoría</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label small fw-bold text-muted">NOMBRE DEL PRODUCTO</label>
                             <input type="text" id="producto-nombre" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" required>
                         </div>
@@ -64,7 +88,7 @@
                         <div class="mb-4">
                             <label class="form-label small fw-bold text-muted">IMAGEN (Opcional)</label>
                             <input type="file" id="producto-imagen" accept="image/png, image/jpeg, image/webp" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);">
-                            <div class="form-text mt-2 small text-muted">Archivos permitidos: JPG, PNG, WEBP. Máx: 5MB.</div>
+                            <div class="form-text mt-2 small text-muted">JPG, PNG, WEBP. Máx: 5MB.</div>
                         </div>
 
                         <button type="submit" id="btnSaveProducto" class="btn-admin-primary w-100 py-3 mt-2">
@@ -76,13 +100,64 @@
         </div>
     </div>
 
+    <!-- Modal Gestión Categorías -->
+    <div class="modal fade" id="modalGestionCategorias" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4 border-0 p-2">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Gestionar Categorías</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pt-4">
+                    <!-- Formulario Nueva Categoría -->
+                    <form id="formCategoria" onsubmit="saveCategoria(event)" class="mb-4 p-3 rounded-3" style="background: var(--off-white);">
+                        <input type="hidden" id="categoria-id">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-5">
+                                <label class="form-label small fw-bold text-muted">NOMBRE</label>
+                                <input type="text" id="categoria-nombre" class="form-control border-0 shadow-sm rounded-3" required placeholder="Ej: Bebidas">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small fw-bold text-muted">ORDEN</label>
+                                <input type="number" id="categoria-orden" class="form-control border-0 shadow-sm rounded-3" placeholder="0">
+                            </div>
+                            <div class="col-md-5 d-flex gap-2">
+                                <button type="submit" id="btnSaveCategoria" class="btn-admin-primary flex-grow-1">Guardar</button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="resetFormCategoria()">Limpiar</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Lista de Categorías -->
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle border-top">
+                            <thead>
+                                <tr class="text-muted small">
+                                    <th>NOMBRE</th>
+                                    <th>ORDEN</th>
+                                    <th>ESTADO</th>
+                                    <th class="text-end">ACCIONES</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categorias-lista-body">
+                                <!-- Cargado por JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        let modalProductoInst;
+        let modalProductoInst, modalCategoriasInst;
         const API_URL = '/api/gerente';
+        let categoriasLocales = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             modalProductoInst = new bootstrap.Modal(document.getElementById('modalProducto'));
-            loadProductos();
+            modalCategoriasInst = new bootstrap.Modal(document.getElementById('modalGestionCategorias'));
+            loadTodo();
         });
 
         const getToken = () => sessionStorage.getItem('token') || localStorage.getItem('token');
@@ -103,89 +178,186 @@
             });
         };
 
+        async function loadTodo() {
+            await loadCategorias(); // Cargar categorías para selects y lista
+            await loadProductos();   // Cargar menú agrupado
+        }
+
+        async function loadCategorias() {
+            try {
+                const res = await fetch(`${API_URL}/menu-categorias`, { headers: authHeaders() });
+                if (!res.ok) throw new Error();
+                const json = await res.json();
+                categoriasLocales = json.data || [];
+                
+                // 1. Poblar select del producto
+                const select = document.getElementById('producto-categoria');
+                select.innerHTML = '<option value="" disabled selected>Selecciona una categoría</option>';
+                categoriasLocales.forEach(c => {
+                    select.innerHTML += `<option value="${c.id}">${escapeHTML(c.nombre)}</option>`;
+                });
+
+                // 2. Poblar lista en modal de gestión
+                const lista = document.getElementById('categorias-lista-body');
+                lista.innerHTML = '';
+                categoriasLocales.forEach(c => {
+                    lista.innerHTML += `
+                        <tr>
+                            <td class="fw-bold">${escapeHTML(c.nombre)}</td>
+                            <td><span class="badge bg-light text-dark border">${c.orden}</span></td>
+                            <td><span class="badge ${c.activo ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'} border">${c.activo ? 'Activa' : 'Inactiva'}</span></td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-dark me-1" onclick="editCategoria(${JSON.stringify(c).replace(/"/g, '&quot;')})"><i class="bi bi-pencil"></i></button>
+                                <button class="btn btn-sm ${c.activo ? 'btn-outline-danger' : 'btn-outline-success'}" onclick="toggleEstadoCategoria(${c.id}, ${c.activo})">
+                                    <i class="bi ${c.activo ? 'bi-eye-slash' : 'bi-eye'}"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (e) { console.error('Error loadCategorias', e); }
+        }
+
         async function loadProductos() {
             try {
                 const res = await fetch(`${API_URL}/menu`, { headers: authHeaders() });
                 if (!res.ok) throw new Error('Error al cargar menú');
                 
                 const response = await res.json();
-                const productos = Array.isArray(response) ? response : (response.data || []);
+                const categoriasConProductos = response.data || [];
                 
-                const container = document.getElementById('productos-container');
+                const container = document.getElementById('carta-container');
                 container.innerHTML = '';
 
-                if (productos.length === 0) {
+                if (categoriasConProductos.length === 0) {
                     container.innerHTML = `
                         <div class="col-12 text-center text-muted py-5">
                             <i class="bi bi-basket text-muted mb-3 d-block" style="font-size: 3rem; opacity: 0.5;"></i>
-                            <p>No tienes productos en tu menú todavía.</p>
+                            <p>No tienes categorías ni productos en tu menú todavía.</p>
                         </div>
                     `;
                     return;
                 }
 
-                const template = document.getElementById('producto-template');
-                const fragment = document.createDocumentFragment();
+                const catTemplate = document.getElementById('categoria-group-template');
+                const prodTemplate = document.getElementById('producto-template');
 
-                productos.forEach(p => {
-                    const clone = template.content.cloneNode(true);
+                categoriasConProductos.forEach(cat => {
+                    const catClone = catTemplate.content.cloneNode(true);
+                    catClone.querySelector('.js-categoria-nombre').textContent = cat.nombre;
                     
-                    const card = clone.querySelector('.js-card');
-                    if (!p.activo) card.classList.add('opacity-50');
-
-                    const img = clone.querySelector('.js-img');
-                    const imgUrl = p.imagen_url ? (p.imagen_url.startsWith('http') ? p.imagen_url : `{{ url('storage') }}/${p.imagen_url}`) : 'https://placehold.co/400x300?text=Sin+Imagen';
-                    img.style.backgroundImage = `url('${imgUrl}')`;
-
-                    clone.querySelector('.js-nombre').textContent = p.nombre_producto;
+                    const productsRow = catClone.querySelector('.js-productos-row');
                     
-                    const badge = clone.querySelector('.js-badge');
-                    badge.classList.add(p.activo ? 'bg-success' : 'bg-secondary');
-                    badge.textContent = p.activo ? 'Activo' : 'Inactivo';
+                    if (cat.menus && cat.menus.length > 0) {
+                        cat.menus.forEach(p => {
+                            const pClone = prodTemplate.content.cloneNode(true);
+                            
+                            const card = pClone.querySelector('.js-card');
+                            if (!p.activo) card.classList.add('opacity-50');
 
-                    clone.querySelector('.js-desc').textContent = p.descripcion || 'Sin descripción';
+                            const img = pClone.querySelector('.js-img');
+                            const imgUrl = p.imagen_url ? (p.imagen_url.startsWith('http') ? p.imagen_url : `{{ url('storage') }}/${p.imagen_url}`) : 'https://placehold.co/400x300?text=Sin+Imagen';
+                            img.style.backgroundImage = `url('${imgUrl}')`;
 
-                    const actionsDiv = clone.querySelector('.js-actions');
-                    if (p.activo) {
-                        const btnEdit = document.createElement('button');
-                        btnEdit.className = 'btn btn-sm btn-outline-dark me-2';
-                        btnEdit.title = 'Editar';
-                        btnEdit.innerHTML = '<i class="bi bi-pencil"></i>';
-                        btnEdit.addEventListener('click', () => editProducto(p));
-                        
-                        const btnDeactivate = document.createElement('button');
-                        btnDeactivate.className = 'btn btn-sm btn-outline-primary';
-                        btnDeactivate.title = 'Desactivar';
-                        btnDeactivate.innerHTML = '<i class="bi bi-x-circle"></i>';
-                        btnDeactivate.addEventListener('click', () => deleteProducto(p.id));
+                            pClone.querySelector('.js-nombre').textContent = p.nombre_producto;
+                            
+                            const badge = pClone.querySelector('.js-badge');
+                            badge.classList.add(p.activo ? 'bg-success' : 'bg-secondary');
+                            badge.textContent = p.activo ? 'Activo' : 'Inactivo';
 
-                        actionsDiv.appendChild(btnEdit);
-                        actionsDiv.appendChild(btnDeactivate);
+                            pClone.querySelector('.js-desc').textContent = p.descripcion || 'Sin descripción';
+
+                            const actionsDiv = pClone.querySelector('.js-actions');
+                            if (p.activo) {
+                                actionsDiv.innerHTML = `
+                                    <button class="btn btn-sm btn-outline-dark me-2" onclick='editProducto(${JSON.stringify(p).replace(/"/g, '&quot;')})'><i class="bi bi-pencil"></i></button>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="deleteProducto(${p.id})"><i class="bi bi-x-circle"></i></button>
+                                `;
+                            } else {
+                                actionsDiv.innerHTML = `<button class="btn btn-sm btn-success w-100 mt-2" onclick="reactivateProducto(${p.id})"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
+                            }
+
+                            productsRow.appendChild(pClone);
+                        });
                     } else {
-                        const btnReactivate = document.createElement('button');
-                        btnReactivate.className = 'btn btn-sm btn-success w-100 mt-2';
-                        btnReactivate.innerHTML = '<i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar';
-                        btnReactivate.addEventListener('click', () => reactivateProducto(p.id));
-
-                        actionsDiv.appendChild(btnReactivate);
+                        productsRow.innerHTML = '<div class="col-12 text-muted small ps-3">Sin productos en esta categoría.</div>';
                     }
 
-                    fragment.appendChild(clone);
+                    container.appendChild(catClone);
                 });
-                
-                container.appendChild(fragment);
             } catch (error) {
                 console.error(error);
                 showToast('error', 'Error al cargar los productos');
-                document.getElementById('productos-container').innerHTML = `
-                    <div class="col-12 text-center text-danger py-5">
-                        <i class="bi bi-exclamation-triangle-fill mb-3 d-block" style="font-size: 3rem; opacity: 0.5;"></i>
-                        <p>No se pudieron cargar los productos debido a un problema de conexión.</p>
-                    </div>
-                `;
             }
         }
 
+        // --- Gestión de Categorías ---
+        function openModalGestionCategorias() {
+            resetFormCategoria();
+            modalCategoriasInst.show();
+        }
+
+        function resetFormCategoria() {
+            document.getElementById('formCategoria').reset();
+            document.getElementById('categoria-id').value = '';
+            document.getElementById('btnSaveCategoria').innerText = 'Guardar';
+        }
+
+        function editCategoria(c) {
+            document.getElementById('categoria-id').value = c.id;
+            document.getElementById('categoria-nombre').value = c.nombre;
+            document.getElementById('categoria-orden').value = c.orden;
+            document.getElementById('btnSaveCategoria').innerText = 'Actualizar';
+        }
+
+        async function saveCategoria(e) {
+            e.preventDefault();
+            const id = document.getElementById('categoria-id').value;
+            const url = id ? `${API_URL}/menu-categorias/${id}` : `${API_URL}/menu-categorias`;
+            
+            const payload = {
+                nombre: document.getElementById('categoria-nombre').value,
+                orden: document.getElementById('categoria-orden').value || 0
+            };
+
+            try {
+                const res = await fetch(url, {
+                    method: id ? 'PUT' : 'POST',
+                    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    showToast('success', 'Categoría guardada');
+                    resetFormCategoria();
+                    loadTodo();
+                } else {
+                    const err = await res.json();
+                    Swal.fire('Error', err.message || 'Error al guardar', 'error');
+                }
+            } catch (e) {
+                Swal.fire('Error', 'Problema de conexión', 'error');
+            }
+        }
+
+        async function toggleEstadoCategoria(id, activoActual) {
+            try {
+                const res = await fetch(`${API_URL}/menu-categorias/${id}`, {
+                    method: 'PUT',
+                    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ activo: !activoActual })
+                });
+                if (res.ok) {
+                    showToast('success', 'Estado de categoría actualizado');
+                    loadTodo();
+                } else {
+                    const err = await res.json();
+                    Swal.fire('Error', err.message || 'Error al actualizar categoría', 'error');
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        // --- Gestión de Productos ---
         function openModalProducto() {
             document.getElementById('formProducto').reset();
             document.getElementById('producto-id').value = '';
@@ -197,122 +369,75 @@
             document.getElementById('producto-id').value = p.id;
             document.getElementById('producto-nombre').value = p.nombre_producto;
             document.getElementById('producto-descripcion').value = p.descripcion || '';
-            document.getElementById('producto-imagen').value = ''; // Limpiar el file input, solo se llena si quieren cambiarla
+            document.getElementById('producto-categoria').value = p.categoria_id;
+            document.getElementById('producto-imagen').value = '';
             document.getElementById('modalProductoTitle').innerText = 'Editar Producto';
             modalProductoInst.show();
         }
 
         async function saveProducto(e) {
             e.preventDefault();
-            
             const btn = document.getElementById('btnSaveProducto');
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Guardando...';
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>';
 
             const id = document.getElementById('producto-id').value;
             const url = id ? `${API_URL}/menu/${id}` : `${API_URL}/menu`;
-            
-            // Usamos FormData en lugar de JSON porque subiremos imágenes
             const formData = new FormData();
             formData.append('nombre_producto', document.getElementById('producto-nombre').value);
             formData.append('descripcion', document.getElementById('producto-descripcion').value);
+            formData.append('categoria_id', document.getElementById('producto-categoria').value);
             
-            const fileInput = document.getElementById('producto-imagen');
-            if (fileInput.files.length > 0) {
-                formData.append('imagen_url', fileInput.files[0]);
-            }
+            if (id) formData.append('_method', 'PUT');
 
-            // Spoofing the method if it's an update, so Laravel processes the multipart/form-data gracefully
-            if (id) {
-                formData.append('_method', 'PUT');
-            }
+            const fileInput = document.getElementById('producto-imagen');
+            if (fileInput.files.length > 0) formData.append('imagen_url', fileInput.files[0]);
 
             try {
-                const res = await fetch(url, {
-                    method: 'POST', // Siempre POST con FormData. Laravel intercepta '_method'.
-                    headers: authHeaders(),
-                    body: formData
-                });
-
+                const res = await fetch(url, { method: 'POST', headers: authHeaders(), body: formData });
                 if (res.ok) {
-                    showToast('success', id ? 'Producto actualizado' : 'Producto añadido al menú');
+                    showToast('success', 'Producto guardado');
                     modalProductoInst.hide();
                     loadProductos();
                 } else {
-                    const errorData = await res.json();
-                    Swal.fire('Error', errorData.message || 'Error al guardar el producto', 'error');
+                    const err = await res.json();
+                    Swal.fire('Error', err.message || 'Error', 'error');
                 }
-            } catch (error) {
-                console.error(error);
-                Swal.fire('Error', 'Problema de conexión', 'error');
-            } finally {
+            } catch (error) { Swal.fire('Error', 'Error de conexión', 'error'); } 
+            finally {
                 btn.disabled = false;
                 btn.innerText = 'Guardar Producto';
             }
         }
 
         async function deleteProducto(id) {
-            Swal.fire({
-                title: '¿Desactivar Producto?',
-                text: 'El producto dejará de estar visible en el menú.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Sí, desactivar',
-                cancelButtonText: 'Cancelar'
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    try {
-                        const res = await fetch(`${API_URL}/menu/${id}`, { 
-                            method: 'DELETE', 
-                            headers: authHeaders() 
-                        });
-                        
-                        if (res.ok) {
-                            showToast('success', 'Producto desactivado');
-                            loadProductos();
-                        } else {
-                            const err = await res.json();
-                            Swal.fire('Error', err.message || 'Error al desactivar', 'error');
-                        }
-                    } catch (error) {
-                        Swal.fire('Error', 'Error de conexión', 'error');
-                    }
-                }
-            });
+            if (await confirmAction('¿Desactivar producto?', 'warning')) {
+                try {
+                    const res = await fetch(`${API_URL}/menu/${id}`, { method: 'DELETE', headers: authHeaders() });
+                    if (res.ok) { showToast('success', 'Desactivado'); loadProductos(); }
+                } catch (e) { console.error(e); }
+            }
         }
 
         async function reactivateProducto(id) {
-            Swal.fire({
-                title: '¿Reactivar Producto?',
-                text: 'Volverá a aparecer en tu menú digital.',
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Sí, reactivar',
-                cancelButtonText: 'Cancelar'
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    try {
-                        const res = await fetch(`${API_URL}/menu/${id}/activar`, { 
-                            method: 'PATCH', 
-                            headers: authHeaders() 
-                        });
-                        
-                        if (res.ok) {
-                            showToast('success', 'Producto reactivado');
-                            loadProductos();
-                        } else {
-                            const err = await res.json();
-                            Swal.fire('Error', err.message || 'Error al reactivar', 'error');
-                        }
-                    } catch (error) {
-                        Swal.fire('Error', 'Error de conexión', 'error');
-                    }
+            try {
+                const res = await fetch(`${API_URL}/menu/${id}/activar`, { 
+                    method: 'PATCH', 
+                    headers: authHeaders()
+                });
+                if (res.ok) { showToast('success', 'Reactivado'); loadProductos(); }
+                else {
+                    const err = await res.json();
+                    Swal.fire('Error', err.message || 'Error al reactivar', 'error');
                 }
+            } catch (e) { console.error(e); }
+        }
+
+        async function confirmAction(title, icon) {
+            const res = await Swal.fire({
+                title, icon, showCancelButton: true, confirmButtonText: 'Sí', cancelButtonText: 'No'
             });
+            return res.isConfirmed;
         }
     </script>
 @endsection

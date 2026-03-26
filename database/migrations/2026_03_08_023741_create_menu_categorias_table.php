@@ -11,25 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('menus', function (Blueprint $table) {
+        Schema::create('menu_categorias', function (Blueprint $table) {
             $table->id();
-
-            $table->string('nombre_producto', 100);
+            $table->string('nombre', 100);
             $table->string('descripcion', 255)->nullable();
-            $table->string('imagen_url', 255)->nullable();
-
-            $table->boolean('activo')->default(true);
             $table->integer('orden')->default(0);
-
+            $table->boolean('activo')->default(true);
+            
             $table->foreignId('cafe_id')
                 ->constrained('cafeterias')
                 ->cascadeOnDelete();
 
-            $table->foreignId('categoria_id')
-                ->constrained('menu_categorias')
-                ->cascadeOnDelete();
-
-            $table->index(['categoria_id', 'activo', 'orden']);
+            $table->index(['cafe_id', 'activo', 'orden']);
             $table->timestamps();
         });
     }
@@ -39,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('menus');
+        Schema::dropIfExists('menu_categorias');
     }
 };

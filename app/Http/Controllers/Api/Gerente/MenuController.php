@@ -8,6 +8,7 @@ use App\Models\Menu;
 use App\Helpers\ApiResponse;
 use App\Traits\Activable;
 use Illuminate\Support\Facades\Storage;
+use App\Models\MenuCategoria;
 use Illuminate\Validation\Rule;
 
 class MenuController extends Controller
@@ -18,9 +19,11 @@ class MenuController extends Controller
 
     public function index(Request $request)
     {
-        $menu = Menu::orderBy('nombre_producto')->get();
+        $menuAgrupado = MenuCategoria::orderBy('orden')
+            ->with(['menus' => fn($q) => $q->orderBy('orden')])
+            ->get();
 
-        return ApiResponse::success($menu);
+        return ApiResponse::success($menuAgrupado);
     }
 
     public function store(Request $request)
@@ -40,13 +43,20 @@ class MenuController extends Controller
                 Rule::unique('menus')->where(fn($query) => $query->where('cafe_id', $cafeId))
             ],
             'descripcion' => 'nullable|string|max:255',
-            'imagen_url' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120'
+            'imagen_url' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'categoria_id' => [
+                'required',
+                Rule::exists('menu_categorias', 'id')->where('cafe_id', $cafeId)
+            ],
+            'orden' => 'nullable|integer'
         ]);
 
         $data = [
             'nombre_producto' => $request->nombre_producto,
             'descripcion' => $request->descripcion,
             'activo' => true,
+            'orden' => $request->orden ?? 0,
+            'categoria_id' => $request->categoria_id,
             'cafe_id' => $request->user()->cafe_id
         ];
 
@@ -77,12 +87,21 @@ class MenuController extends Controller
                 Rule::unique('menus')->ignore($menu->id)->where(fn($query) => $query->where('cafe_id', $cafeId))
             ],
             'descripcion' => 'nullable|string|max:255',
-            'imagen_url' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120'
+            'imagen_url' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'categoria_id' => [
+                'sometimes',
+                'required',
+                Rule::exists('menu_categorias', 'id')->where('cafe_id', $cafeId)
+            ],
+            'orden' => 'nullable|integer'
         ]);
 
         $data = [
             'nombre_producto' => $request->nombre_producto,
             'descripcion' => $request->descripcion,
+            'categoria_id' => $request->categoria_id ?? $menu->categoria_id,
+            'orden' => $request->orden ?? $menu->orden,
+            'activo' => $request->has('activo') ? $request->boolean('activo') : $menu->activo,
         ];
 
         if ($request->hasFile('imagen_url')) {

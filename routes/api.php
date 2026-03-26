@@ -33,6 +33,7 @@ use App\Http\Controllers\Api\Gerente\OcasionController;
 use App\Http\Controllers\Api\Gerente\PromocionController;
 use App\Http\Controllers\Api\Gerente\RenovarSuscripcionController;
 use App\Http\Controllers\Api\Gerente\StaffController;
+use App\Http\Controllers\Api\Gerente\MenuCategoriaController;
 use App\Http\Controllers\Api\Publico\PublicCafeteriaController;
 
 /* |------------------------------------------ | RUTAS PÚBLICAS |------------------------------------------ */
@@ -204,6 +205,7 @@ Route::middleware([
     Route::apiResource('staff', StaffController::class); //crud staff
 
     // Rutas para el menú (Permite spoofing method _method=PUT para imágenes)
+    Route::apiResource('menu-categorias', MenuCategoriaController::class);
     Route::post('menu/{menu}', [MenuController::class , 'update']);
     Route::apiResource('menu', MenuController::class);
     Route::apiResource('promociones', PromocionController::class)->parameters([
