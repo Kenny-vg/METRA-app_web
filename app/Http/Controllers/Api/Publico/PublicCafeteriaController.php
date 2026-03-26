@@ -165,16 +165,22 @@ class PublicCafeteriaController extends Controller
         // 3. Filtrado por Ocasión
         if ($request->filled('ocasion_id')) {
             $ocasionId = $request->ocasion_id;
-            $query->where(function ($q) use ($ocasionId) {
-                $q->doesntHave('ocasiones') // Promociones Generales
-                  ->orWhereHas('ocasiones', function ($q2) use ($ocasionId) {
-                      $q2->where('ocasion_especials.id', $ocasionId); // Específicas de la ocasión
-                  });
-            });
-        } else {
-            // Si no hay ocasión seleccionada, mostrar solo las Generales
-            $query->doesntHave('ocasiones');
+            
+            if ($ocasionId !== 'todas') {
+                $query->where(function ($q) use ($ocasionId) {
+                    // Mostrar promociones ligadas a esta ocasión
+                    $q->whereHas('ocasiones', function ($q2) use ($ocasionId) {
+                        $q2->where('ocasion_especials.id', $ocasionId);
+                    });
+                    
+                    // Opcionalmente: Mostrar también las "Generales" (sin ninguna ocasión vinculada)
+                    // si prefieren que las generales siempre estén visibles.
+                    // El usuario se quejó de que se mostraban "todas", así que seremos más exclusivos.
+                    // $q->orWhereDoesntHave('ocasiones'); 
+                });
+            }
         }
+        // Nota: Si no hay ocasion_id o es 'todas', no aplicamos filtros, mostrando TODO (Generales + Ocasiones).
 
         $promociones = $query->orderBy('nombre_promocion')->get();
 
