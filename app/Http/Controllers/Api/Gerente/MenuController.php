@@ -48,6 +48,7 @@ class MenuController extends Controller
                 'required',
                 Rule::exists('menu_categorias', 'id')->where('cafe_id', $cafeId)
             ],
+            'precio' => 'required|numeric|min:0',
             'orden' => 'nullable|integer'
         ]);
 
@@ -56,6 +57,7 @@ class MenuController extends Controller
             'descripcion' => $request->descripcion,
             'activo' => true,
             'orden' => $request->orden ?? 0,
+            'precio' => $request->precio,
             'categoria_id' => $request->categoria_id,
             'cafe_id' => $request->user()->cafe_id
         ];
@@ -93,6 +95,7 @@ class MenuController extends Controller
                 'required',
                 Rule::exists('menu_categorias', 'id')->where('cafe_id', $cafeId)
             ],
+            'precio' => 'sometimes|required|numeric|min:0',
             'orden' => 'nullable|integer'
         ]);
 
@@ -101,6 +104,7 @@ class MenuController extends Controller
             'descripcion' => $request->descripcion,
             'categoria_id' => $request->categoria_id ?? $menu->categoria_id,
             'orden' => $request->orden ?? $menu->orden,
+            'precio' => $request->has('precio') ? $request->precio : $menu->precio,
             'activo' => $request->has('activo') ? $request->boolean('activo') : $menu->activo,
         ];
 

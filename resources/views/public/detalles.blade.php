@@ -347,6 +347,9 @@
                                     <div class="col-6 col-md-4 text-center mb-3">
                                         <div style="width: 100%; height: 120px; border-radius: 12px; background-image: url('${img}'); background-size: cover; background-position: center; border: 1px solid var(--border-light);" class="mb-2 shadow-sm"></div>
                                         <p class="small fw-bold mb-0 text-truncate" style="color: var(--black-primary);" title="${escapeHTML(item.nombre_producto)}">${escapeHTML(item.nombre_producto)}</p>
+                                        <div class="d-flex justify-content-center align-items-center gap-2 mb-1">
+                                            <span class="fw-bold text-accent-gold" style="font-size: 0.85rem;">${new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(item.precio || 0)}</span>
+                                        </div>
                                         <p class="text-muted small text-truncate" style="font-size: 0.75rem;" title="${escapeHTML(item.descripcion || '')}">${escapeHTML(item.descripcion ? item.descripcion : ' ')}</p>
                                     </div>
                                 `;

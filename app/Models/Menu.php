@@ -11,6 +11,7 @@ class Menu extends Model
         'nombre_producto',
         'descripcion',
         'imagen_url',
+        'precio',
         'activo',
         'orden',
         'cafe_id',

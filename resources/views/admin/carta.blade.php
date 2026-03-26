@@ -45,7 +45,10 @@
                 <div class="card-body p-4 d-flex flex-column">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <h5 class="fw-bold mb-0 text-truncate pe-2 js-nombre" style="color: var(--black-primary); font-size: 1.1rem;"></h5>
-                        <span class="badge rounded-pill js-badge" style="font-size: 0.7rem;"></span>
+                        <div class="d-flex flex-column align-items-end">
+                            <span class="badge rounded-pill mb-1 js-badge" style="font-size: 0.7rem;"></span>
+                            <span class="fw-bold text-admin-primary js-precio" style="font-size: 0.9rem;"></span>
+                        </div>
                     </div>
                     <p class="small text-muted mb-4 flex-grow-1 js-desc" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"></p>
                     
@@ -82,7 +85,12 @@
                         
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted">DESCRIPCIÓN (Opcional)</label>
-                            <textarea id="producto-descripcion" class="form-control border-0 shadow-sm rounded-3" rows="3" style="background: var(--off-white);"></textarea>
+                            <textarea id="producto-descripcion" class="form-control border-0 shadow-sm rounded-3" rows="2" style="background: var(--off-white);"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">PRECIO ($)</label>
+                            <input type="number" id="producto-precio" step="0.01" min="0" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" required placeholder="0.00">
                         </div>
                         
                         <div class="mb-4">
@@ -260,6 +268,7 @@
                             img.style.backgroundImage = `url('${imgUrl}')`;
 
                             pClone.querySelector('.js-nombre').textContent = p.nombre_producto;
+                            pClone.querySelector('.js-precio').textContent = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(p.precio || 0);
                             
                             const badge = pClone.querySelector('.js-badge');
                             badge.classList.add(p.activo ? 'bg-success' : 'bg-secondary');
@@ -359,6 +368,22 @@
 
         // --- Gestión de Productos ---
         function openModalProducto() {
+            if (categoriasLocales.length === 0) {
+                Swal.fire({
+                    title: '¡Espera!',
+                    text: 'Primero debes crear al menos una categoría (ej: Bebidas, Comidas, etc.) para poder añadir productos.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Crear categoría ahora',
+                    cancelButtonText: 'Entendido',
+                    confirmButtonColor: 'var(--accent-gold)'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        openModalGestionCategorias();
+                    }
+                });
+                return;
+            }
             document.getElementById('formProducto').reset();
             document.getElementById('producto-id').value = '';
             document.getElementById('modalProductoTitle').innerText = 'Añadir Producto';
@@ -370,6 +395,7 @@
             document.getElementById('producto-nombre').value = p.nombre_producto;
             document.getElementById('producto-descripcion').value = p.descripcion || '';
             document.getElementById('producto-categoria').value = p.categoria_id;
+            document.getElementById('producto-precio').value = p.precio || 0;
             document.getElementById('producto-imagen').value = '';
             document.getElementById('modalProductoTitle').innerText = 'Editar Producto';
             modalProductoInst.show();
@@ -387,6 +413,7 @@
             formData.append('nombre_producto', document.getElementById('producto-nombre').value);
             formData.append('descripcion', document.getElementById('producto-descripcion').value);
             formData.append('categoria_id', document.getElementById('producto-categoria').value);
+            formData.append('precio', document.getElementById('producto-precio').value);
             
             if (id) formData.append('_method', 'PUT');
 
