@@ -139,7 +139,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-const API = '/api';
+const API = '';
 let authToken = localStorage.getItem('token') || '';
 
 if (!authToken) {

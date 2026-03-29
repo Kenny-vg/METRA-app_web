@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- URL global del backend API (configurable por entorno) -->
+    <script>
+        window.APP_API_URL = window.location.origin;
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="zona-comensal">
@@ -102,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             try {
-                const API_URL = "{{ url('/api') }}";
+                const API_URL = '/api';
                 const response = await fetch(`${API_URL}/register-cliente`, {
                     method: 'POST',
                     headers: {

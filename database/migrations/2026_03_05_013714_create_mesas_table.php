@@ -30,6 +30,8 @@ return new class extends Migration
             // evita mesas duplicadas en la misma zona
             $table->unique(['cafe_id','zona_id','numero_mesa']);
 
+            $table->index('activo'); // equivalente al estado
+
             $table->timestamps();
         });
     }

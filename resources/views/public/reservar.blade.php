@@ -10,6 +10,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <script>
+        window.APP_API_URL = window.location.origin;
+        console.log("METRA Frontend initialized with API_URL:", window.APP_API_URL);
+    </script>
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
@@ -347,7 +351,7 @@
                 return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
             };
 
-            const getApiUrl = (endpoint) => `/api/cafeterias/${cafeSlug}/${endpoint}?t=${new Date().getTime()}`;
+            const getApiUrl = (endpoint) => `${window.location.origin}/api/cafeterias/${cafeSlug}/${endpoint}?t=${new Date().getTime()}`;
 
             // --- VALIDACIONES EN TIEMPO REAL ---
             const requiredInputs = [fechaInput, horaSelect, paxSelect, iNom, iApP, iEmail, iTel];
@@ -395,7 +399,7 @@
             // --- LLAMADAS INICIALES A LA API PARA CONFIGURAR DOM ---
             try {
                 // Fetch the actual ID from slug 
-                const resC = await fetch(`/api/cafeterias-publicas/${cafeSlug}`);
+                const resC = await fetch(`${window.location.origin}/api/cafeterias-publicas/${cafeSlug}`);
                 if(resC.ok){
                     const jsonC = await resC.json();
                     document.getElementById('cafe_id').value = jsonC.data.id;
@@ -595,7 +599,7 @@
                 pCont.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-gold spinner-border-sm"></div><div class="mt-2 text-muted x-small">Buscando beneficios...</div></div>';
                 
                 try {
-                    let url = `/api/cafeterias/${cafeSlug}/promociones?fecha=${fecha}&hora=${hora}`;
+                    let url = `${window.location.origin}/api/cafeterias/${cafeSlug}/promociones?fecha=${fecha}&hora=${hora}`;
                     if(ocasionId) url += `&ocasion_id=${ocasionId}`;
                     
                     const resP = await fetch(url + `&t=${new Date().getTime()}`);
@@ -699,7 +703,7 @@
                         headers['Authorization'] = `Bearer ${token}`;
                     }
 
-                    const res = await fetch(`/api/cafeterias/${cafeSlug}/reservaciones`, {
+                    const res = await fetch(`${window.location.origin}/api/cafeterias/${cafeSlug}/reservaciones`, {
                         method: 'POST',
                         headers: headers,
                         body: JSON.stringify(payload)

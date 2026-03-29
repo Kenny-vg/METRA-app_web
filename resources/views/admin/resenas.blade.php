@@ -65,6 +65,7 @@
     @include('partials.footer_admin')
 
     <script>
+        const API = '/api';
         let todasResenas = [];
         let filtroActual = 'todas';
 
@@ -166,7 +167,7 @@
 
             try {
                 const token = localStorage.getItem('token');
-                const res = await fetch('/api/gerente/resenas', {
+                const res = await fetch(`${API}/gerente/resenas`, {
                     headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
                 });
 
@@ -188,7 +189,7 @@
         async function cambiarEstado(id, accion) {
             try {
                 const token = localStorage.getItem('token');
-                const res = await fetch(`/api/gerente/resenas/${id}/${accion}`, {
+                const res = await fetch(`${API}/gerente/resenas/${id}/${accion}`, {
                     method: 'PATCH',
                     headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
                 });

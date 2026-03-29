@@ -34,8 +34,7 @@ class PasswordResetController extends Controller
             'activation_token' => $token
         ]);
 
-        $url = env('FRONTEND_URL') .
-            "/reset-password?token={$token}&email={$user->email}";
+        $url = url("/reset-password?token={$token}&email={$user->email}");
 
         try {
             Mail::to($user->email)->send(

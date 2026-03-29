@@ -69,6 +69,11 @@ return new class extends Migration
                 ->constrained('zonas')
                 ->nullOnDelete();
 
+            $table->integer('duracion_min')->virtualAs('TIMESTAMPDIFF(MINUTE, hora_inicio, hora_fin)');
+            
+            $table->index('user_id');
+            $table->index(['cafe_id', 'fecha', 'estado']);
+
             $table->timestamps();
         });
     }

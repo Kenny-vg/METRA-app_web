@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- URL global del backend API (configurable por entorno) -->
+    <script>
+        window.APP_API_URL = window.location.origin;
+    </script>
 </head>
 <body class="zona-comensal">
 
@@ -244,7 +248,7 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             const cafeSlug = getSlugFromUrl();
-            const API_URL = "{{ url('/api') }}";
+            const API_URL = '/api';
             const STORAGE_URL = "{{ asset('storage') }}";
             const BASE_URL = "{{ url('/') }}";
             const FALLBACK_IMG = "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&q=80&w=1600";

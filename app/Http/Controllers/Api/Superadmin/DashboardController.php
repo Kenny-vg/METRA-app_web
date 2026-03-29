@@ -7,6 +7,7 @@ use App\Models\Cafeteria;
 use App\Models\Plan;
 use App\Models\Suscripcion;
 use App\Helpers\ApiResponse;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -26,4 +27,5 @@ class DashboardController extends Controller
 
         ], 'Dashboard superadmin cargado correctamente');
     }
+
 }

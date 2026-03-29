@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- URL global del backend API (configurable por entorno) -->
+    <script>
+        window.APP_API_URL = window.location.origin;
+    </script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // Limpiar estado de wizard de registro si se accede al login (ej. tras logout)
@@ -140,8 +144,7 @@ function decodeJwtResponse(token) {
 }
 
 window.handleCredentialResponse = async function(response) {
-    const data = decodeJwtResponse(response.credential);
-    const API_URL = "{{ url('/api') }}";
+    const API_URL = '/api';
     try {
         const res = await fetch(`${API_URL}/auth/google`, {
             method: 'POST',
@@ -213,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!email) return;
 
         try {
-            const API_URL = "{{ url('/api') }}";
+                const API_URL = '/api';
             const res = await fetch(`${API_URL}/registro-pendiente`, {
                 method: 'POST',
                 headers: {
@@ -303,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
             let isRateLimited = false;
 
             try {
-                const API_URL = "{{ url('/api') }}";
+                    const API_URL = '/api';
                 const response = await fetch(`${API_URL}/login`, {
                     method: 'POST',
                     headers: {
@@ -521,7 +524,7 @@ window.abrirModalRenovar = async function(estado = '') {
     
     if (!isRevision) {
         try {
-            const API_URL = "{{ url('/api') }}";
+                const API_URL = '/api';
             const res = await fetch(`${API_URL}/planes-publicos`, { headers: { 'Accept': 'application/json' } });
             const json = await res.json();
             if (res.ok) {
@@ -566,7 +569,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (window.tempLoginEmail) formData.append('email', window.tempLoginEmail);
 
             try {
-                const API_URL = "{{ url('/api') }}";
+                    const API_URL = '/api';
                 let authToken = localStorage.getItem('token') || '';
                 
                 // Usar el endpoint de renovación
@@ -611,17 +614,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4 pt-0">
-                    @php
-                        $cafeteria = auth()->check() && auth()->user() ? auth()->user()->cafeteria : null;
-                        $isPendiente = $cafeteria ? $cafeteria->suscripciones()->where('estado_pago', 'pendiente')->exists() : false;
-                    @endphp
-                    @if($isPendiente)
-                        <div class="text-center p-4">
-                            <h5 class="fw-bold fs-4 text-warning mb-3"><i class="bi bi-clock-history"></i></h5>
-                            <h5 class="fw-bold">¡Pago en proceso!</h5>
-                            <p class="text-muted">Tu comprobante ha sido recibido y está pendiente de validación por el administrador. Por favor, espera a que tu acceso sea reactivado.</p>
-                        </div>
-                    @else
                         <form id="formRenovar">
                             <div class="mb-3" id="caja-r-plan">
                                 <label class="form-label small fw-bold">Selecciona tu nuevo plan</label>
@@ -635,7 +627,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                             <button type="submit" id="btn-submit-renovar" class="btn-metra-main w-100 py-3 mt-2" style="border-radius: 8px; font-size: 1.05rem; letter-spacing: 0.5px;">Enviar Renovación</button>
                         </form>
-                    @endif
                 </div>
             </div>
         </div>

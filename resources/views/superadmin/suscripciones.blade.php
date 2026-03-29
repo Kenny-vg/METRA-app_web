@@ -115,7 +115,7 @@
 }
 </style>
 <script>
-const API = '/api';
+const API = '';
 let authToken = localStorage.getItem('token') || '';
 
 if (!authToken) {

@@ -517,6 +517,10 @@
                 const selectZona = document.getElementById('mesa-zona-id');
                 selectZona.innerHTML = '<option value="">Seleccione zona...</option>';
 
+                if (zonas.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="2" class="text-center py-5 text-muted"><div class="mb-3"><i class="bi bi-inbox fs-1" style="color: var(--border-light);"></i></div><h6 class="fw-bold mb-1">No hay zonas configuradas</h6><p class="small mb-0">Empieza creando tu primera zona (ej. Terraza, Interior).</p></td></tr>';
+                }
+
                 const template = document.getElementById('zona-template');
                 const fragment = document.createDocumentFragment();
 
@@ -706,6 +710,10 @@
                 const tbody = document.getElementById('tabla-mesas-body');
                 tbody.innerHTML = '';
 
+                if (mesas.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted"><div class="mb-3"><i class="bi bi-layout-three-columns fs-1" style="color: var(--border-light);"></i></div><h6 class="fw-bold mb-1">Sin mesas registradas</h6><p class="small mb-0">Añade mesas para gestionar tus reservas físicas.</p></td></tr>';
+                }
+
                 const template = document.getElementById('mesa-template');
                 const fragment = document.createDocumentFragment();
 
@@ -893,7 +901,7 @@
                 container.innerHTML = '';
 
                 if (horarios.length === 0) {
-                    container.innerHTML = '<div class="col-12 text-center text-muted py-4">No hay horarios configurados aún.</div>';
+                    container.innerHTML = '<div class="col-12"><div class="text-center py-5 text-muted"><div class="mb-3"><i class="bi bi-clock fs-1" style="color: var(--border-light);"></i></div><h6 class="fw-bold mb-1">Sin horarios definidos</h6><p class="small mb-0">Configura cuándo abrirá tu negocio al público.</p></div></div>';
                     return;
                 }
 
@@ -1124,7 +1132,7 @@
                 tbody.innerHTML = '';
 
                 if (staff.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">No hay personal registrado.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted"><div class="mb-3"><i class="bi bi-people fs-1" style="color: var(--border-light);"></i></div><h6 class="fw-bold mb-1">Tu equipo está vacío</h6><p class="small mb-0">Añade a tu personal para delegar tareas.</p></td></tr>';
                     return;
                 }
 

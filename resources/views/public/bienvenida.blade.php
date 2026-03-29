@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- URL global del backend API (configurable por entorno) -->
+    <script>
+        window.APP_API_URL = window.location.origin;
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="zona-comensal">
@@ -364,7 +368,7 @@
 
     async function cargarCafeterias() {
         try {
-            const API_URL = "{{ url('/api') }}";
+            const API_URL = '/api';
             const BASE_URL = "{{ url('/') }}";
             const STORAGE_URL = "{{ url('/storage') }}";
             const res = await fetch(`${API_URL}/cafeterias-publicas`);

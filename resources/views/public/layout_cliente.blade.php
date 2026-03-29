@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @vite(['resources/css/app.css', 'resources/js/app.js']) 
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body style="background-color: var(--off-white); font-family: 'Inter', sans-serif;">
     <nav class="navbar navbar-expand-lg sticky-top py-3" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-light);">
@@ -70,8 +70,8 @@
         if (token) {
             document.getElementById('nav-profile-btn').style.setProperty('display', 'flex', 'important');
             try {
-                const API_URL = "{{ url('/api') }}";
-                const response = await fetch(`${API_URL}/mi-perfil`, {
+                const API_URL = '';
+                const response = await fetch('/api/mi-perfil', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

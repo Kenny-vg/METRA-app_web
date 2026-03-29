@@ -19,7 +19,7 @@ class PromocionController extends Controller
      */
     public function index()
     {
-        $promociones = Promocion::with('ocasiones')->orderBy('nombre_promocion')->get();
+        $promociones = Promocion::with('ocasiones')->orderBy('nombre_promocion')->paginate(15);
 
         return ApiResponse::success($promociones);
     }

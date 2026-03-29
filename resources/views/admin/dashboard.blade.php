@@ -25,10 +25,9 @@
                         <i class="bi bi-people-fill fs-5"></i>
                     </div>
                 </div>
-                <h3 class="fw-bold mb-1" style="color: var(--black-primary); font-size: 2.2rem; letter-spacing: -1px;">24</h3>
+                <h3 class="fw-bold mb-1" id="dash_reservas_hoy" style="color: var(--black-primary); font-size: 2.2rem; letter-spacing: -1px;">...</h3>
                 <div class="d-flex align-items-center mt-2">
-                    <span class="badge rounded-pill" style="background: rgba(46, 125, 50, 0.1); color: #2E7D32; border: 1px solid rgba(46, 125, 50, 0.2); font-weight: 700;">+15%</span>
-                    <span class="small ms-2" style="color: var(--text-muted); font-size: 0.75rem;">vs ayer</span>
+                    <span class="small" style="color: var(--text-muted); font-size: 0.75rem;">Reservaciones activas de hoy</span>
                 </div>
             </div>
         </div>
@@ -36,14 +35,14 @@
         <div class="col-12 col-sm-6 col-xl-3">
              <div class="card border-0 p-4 h-100 premium-card">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="small fw-bold text-uppercase" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.7rem;">Horas Pico</span>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: var(--off-white); color: var(--black-primary);">
-                        <i class="bi bi-bar-chart-fill fs-5"></i>
+                    <span class="small fw-bold text-uppercase" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.7rem;">Completadas</span>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: var(--off-white); color: #2E7D32;">
+                        <i class="bi bi-check-circle-fill fs-5"></i>
                     </div>
                 </div>
-                <h3 class="fw-bold mb-1" style="color: var(--black-primary); font-size: 2.2rem; letter-spacing: -1px;">06:00<span class="fs-5 text-muted fw-normal">PM</span></h3>
-                <div class="d-flex align-items-center mt-2">
-                    <span class="small" style="color: var(--text-muted); font-size: 0.75rem;">Tendencia estable</span>
+                <h3 class="fw-bold mb-1" id="dash_completadas" style="color: var(--black-primary); font-size: 2.2rem; letter-spacing: -1px;">...</h3>
+                <div id="badge_ocupacion_container" class="d-flex align-items-center mt-2">
+                    <span class="small" style="color: var(--text-muted); font-size: 0.75rem;">Calculando insight...</span>
                 </div>
             </div>
         </div>
@@ -51,14 +50,14 @@
         <div class="col-12 col-sm-6 col-xl-3">
              <div class="card border-0 p-4 h-100 premium-card">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="small fw-bold text-uppercase" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.7rem;">Ocupación</span>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: var(--off-white); color: var(--black-primary);">
-                        <i class="bi bi-grid-fill fs-5"></i>
+                    <span class="small fw-bold text-uppercase" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.7rem;">Bajas / No Show</span>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: var(--off-white); color: #c62828;">
+                        <i class="bi bi-x-circle-fill fs-5"></i>
                     </div>
                 </div>
-                <h3 class="fw-bold mb-1" style="color: var(--black-primary); font-size: 2.2rem; letter-spacing: -1px;">18<span class="fs-5 text-muted fw-normal">/25</span></h3>
-                <div class="progress mt-3" style="height: 6px; background: var(--off-white);">
-                    <div class="progress-bar" role="progressbar" style="width: 72%; background: var(--black-primary);" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
+                <h3 class="fw-bold mb-1" id="dash_bajas" style="color: var(--black-primary); font-size: 2.2rem; letter-spacing: -1px;">...</h3>
+                <div id="badge_cancelacion_container" class="d-flex align-items-center mt-2">
+                    <span class="small" style="color: var(--text-muted); font-size: 0.75rem;">Calculando riesgo...</span>
                 </div>
             </div>
         </div>
@@ -87,13 +86,10 @@
         <div class="col-12 col-xl-7">
             <div class="card border-0 p-4 p-lg-5 h-100 premium-card">
                 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center border-bottom pb-4 mb-4 gap-3" style="border-color: var(--border-light) !important;">
-                    <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Flujo Analítico (Demostración)</h5>
-                    <button class="btn-admin-secondary"><i class="bi bi-download me-2"></i>Exportar</button>
+                    <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Tendencia Operativa al Cierre</h5>
                 </div>
-                <div class="text-center py-3">
-                    <img src="https://support.content.office.net/es-es/media/9d77e47a-6f77-4977-90c2-511a2f605f6b.png" 
-                         class="img-fluid rounded-3" alt="Gráfica de minería de datos" style="opacity: 0.85; mix-blend-mode: multiply; filter: grayscale(100%) contrast(1.2);">
-                    <p class="mt-4 small" style="color: var(--text-muted);"><i class="bi bi-lightning-charge me-1"></i> Análisis proyectado de afluencia semanal.</p>
+                <div class="text-center py-3" style="position: relative; height:300px; width:100%; display:flex; justify-content:center; align-items:center;">
+                    <canvas id="chartReservas" style="max-height: 100%;"></canvas>
                 </div>
             </div>
         </div>
@@ -107,6 +103,35 @@
 
                 <div id="dash_panel_llegadas" class="d-flex flex-column gap-3 overflow-auto pe-2" style="max-height: 400px;">
                     <p class="text-muted text-center mt-3">Cargando llegadas...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tendencia Mensual (MV) -->
+    <div class="row g-4 mb-5">
+        <div class="col-12">
+            <div class="card border-0 p-4 p-lg-5 premium-card shadow-sm">
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-4 mb-4" style="border-color: var(--border-light) !important;">
+                    <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;"><i class="bi bi-clock-history me-2 text-warning"></i>Tendencia Operativa Mensual</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead style="background: var(--off-white);">
+                            <tr>
+                                <th class="text-secondary small fw-bold text-uppercase border-0 py-3 rounded-start">Periodo</th>
+                                <th class="text-secondary small fw-bold text-uppercase border-0 py-3 text-center">Reservas Totales</th>
+                                <th class="text-secondary small fw-bold text-uppercase border-0 py-3 text-center">Cancelaciones</th>
+                                <th class="text-secondary small fw-bold text-uppercase border-0 py-3 text-center">Efectividad</th>
+                                <th class="text-secondary small fw-bold text-uppercase border-0 py-3 rounded-end text-end">Tendencia</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla_historico">
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">Cargando registro histórico del servidor...</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -130,8 +155,7 @@
                     </div>
 
                     <form id="formRenovar" class="d-none">
-                        {{-- Campo oculto: email del gerente autenticado para el controlador --}}
-                        <input type="hidden" id="r-email" name="email" value="{{ auth()->user()->email ?? '' }}">
+                        <input type="hidden" id="r-email" name="email" value="">
                         <div class="mb-3" id="caja-r-plan">
                             <label class="form-label small fw-bold">Selecciona tu nuevo plan</label>
                             <select id="r-plan" class="form-select border-0 shadow-sm rounded-3" style="background: var(--off-white);" required>
@@ -149,26 +173,36 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
+        const token = localStorage.getItem('token');
         const API = '/api';
-        let authToken = localStorage.getItem('token');
-        let cafeteriaId = null;
+        let chartRef = null;
+
+        if (!token) {
+            window.location.href = '/login';
+        }
 
         function authHeaders() {
             return {
-                'Authorization': `Bearer ${authToken}`,
+                'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'
             };
         }
 
         async function cargarDashboard() {
             try {
-                const res = await fetch(`${API}/gerente/mi-cafeteria`, { headers: authHeaders() });
+                const res = await fetch('/api/gerente/mi-cafeteria', { headers: authHeaders() });
 
                 if (!res.ok) return;
                 const json = await res.json();
                 const cafe = json.data;
                 cafeteriaId = cafe.id;
+
+                // Rellenar el campo email del modal de renovar sin depender de Blade/sesión PHP
+                const emailField = document.getElementById('r-email');
+                if (emailField && cafe.gerente?.email) emailField.value = cafe.gerente.email;
 
                 renderWidgetSuscripcion(cafe);
             } catch (e) {
@@ -292,7 +326,7 @@
                 if(formRenovar) formRenovar.classList.remove('d-none');
 
                 try {
-                    const res = await fetch(`${API}/planes-publicos`, { headers: authHeaders() });
+                    const res = await fetch('/api/planes-publicos', { headers: authHeaders() });
                     const json = await res.json();
                     if (res.ok) {
                         selectPlan.innerHTML = '<option value="">Selecciona un plan...</option>' + 
@@ -336,9 +370,9 @@
 
             try {
                 // Usar el endpoint dedicado de renovación (requiere auth)
-                const res = await fetch(`${API}/gerente/renovar-suscripcion`, {
+                const res = await fetch('/api/gerente/renovar-suscripcion', {
                     method: 'POST',
-                    headers: { 'Authorization': `Bearer ${authToken}`, 'Accept': 'application/json' },
+                    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
                     body: formData
                 });
 
@@ -371,7 +405,7 @@
                 const off = new Date().getTimezoneOffset();
                 const hoyIso = new Date(Date.now() - off * 60000).toISOString().split('T')[0];
 
-                const resR = await fetch(`${API}/gerente/reservaciones?modo=todo&desde=${hoyIso}`, { headers: authHeaders() });
+                const resR = await fetch(`/api/gerente/reservaciones?modo=todo&desde=${hoyIso}`, { headers: authHeaders() });
                 if(resR.ok) {
                     const reservas = (await resR.json()).data || [];
                     const reservasHoy = reservas.filter(r => r.fecha === hoyIso);
@@ -386,7 +420,7 @@
                     if (pendientes.length > 0) {
                         const pr = pendientes[0];
                         document.getElementById('dash_proxima_hora').innerHTML = `${pr.hora_inicio.substring(0,5)}<span class="fs-5 fw-normal" style="color: rgba(255,255,255,0.6);">Hrs</span>`;
-                        document.getElementById('dash_proxima_nombre').textContent = `${pr.nombre_cliente} | ${pr.numero_personas} Pax`;
+                        document.getElementById('dash_proxima_nombre').textContent = `${pr.nombre_cliente} | ${pr.numero_personas} Personas`;
                     } else {
                         document.getElementById('dash_proxima_hora').innerHTML = `--:--`;
                         document.getElementById('dash_proxima_nombre').textContent = `Sin próximas llegadas`;
@@ -408,7 +442,7 @@
                             <div class="d-flex justify-content-between align-items-center p-3 rounded-3 mb-2" style="border: 1px solid var(--border-light); background: var(--off-white); transition: all 0.2s;">
                                 <div>
                                     <span class="fw-bold d-block" style="color: var(--black-primary);">${escapeHTML(r.nombre_cliente)}</span>
-                                    <small style="color: var(--text-muted); font-size: 0.8rem;"><i class="bi bi-clock me-1"></i>${r.hora_inicio.substring(0,5)} &nbsp;•&nbsp; ${r.numero_personas} pax</small>
+                                    <small style="color: var(--text-muted); font-size: 0.8rem;"><i class="bi bi-clock me-1"></i>${r.hora_inicio.substring(0,5)} &nbsp;•&nbsp; ${r.numero_personas} personas</small>
                                 </div>
                                 ${badge}
                             </div>
@@ -420,11 +454,169 @@
             } catch(e) { console.error('Error al cargar llegadas:', e); }
         }
 
+        function renderChart(completadas, pendientes, canceladas) {
+            const ctx = document.getElementById('chartReservas').getContext('2d');
+            
+            const sinActividad = (completadas === 0 && pendientes === 0 && canceladas === 0);
+            
+            const labelsGrafica = sinActividad 
+                ? ['Esperando reservas'] 
+                : ['Completadas', 'Esperadas (Pendientes)', 'Bajas'];
+                
+            const dataGrafica = sinActividad 
+                ? [1] 
+                : [completadas, pendientes, canceladas];
+                
+            const coloresGrafica = sinActividad 
+                ? ['#f0f0f0'] 
+                : ['#2E7D32', '#D4AF37', '#c62828'];
+
+            if (chartRef) {
+                chartRef.data.labels = labelsGrafica;
+                chartRef.data.datasets[0].data = dataGrafica;
+                chartRef.data.datasets[0].backgroundColor = coloresGrafica;
+                chartRef.update();
+                return;
+            }
+
+            chartRef = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labelsGrafica,
+                    datasets: [{
+                        data: dataGrafica,
+                        backgroundColor: coloresGrafica,
+                        borderWidth: 0,
+                        hoverOffset: sinActividad ? 0 : 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 13, weight: 'bold' } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if(sinActividad) return 'Aún no hay actividad hoy';
+                                    let label = context.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed !== null) { label += context.parsed + ' Personas'; }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function cargarVistasAnaliticas() {
+            try {
+                const url = `/api/gerente/metricas/diarias?t=${Date.now()}`;
+                const res = await fetch(url, { headers: authHeaders() });
+                if(res.ok) {
+                    const json = await res.json();
+                    if(json.success && json.data) {
+                        const completadas = parseInt(json.data.reservas_completadas) || 0;
+                        const canceladas = (parseInt(json.data.reservas_canceladas) || 0) + (parseInt(json.data.no_shows) || 0);
+                        const totales = parseInt(json.data.total_reservas) || 0;
+                        const pendientes = totales - (completadas + canceladas);
+
+                        // BINDING UX SIN LOGICA MATEMÁTICA EN JS (Puro API)
+                        const totalHtml = totales > 0 ? totales : '<span class="fs-5 text-muted fw-normal" style="letter-spacing:0;">Aún sin llegadas</span>';
+                        const completadasHtml = completadas > 0 ? completadas : '<span class="fs-5 text-muted fw-normal" style="letter-spacing:0;">Sin actividad</span>';
+                        const bajasHtml = canceladas > 0 ? canceladas : '<span class="fs-5 text-muted fw-normal" style="letter-spacing:0;">0 bajas registradas</span>';
+
+                        // Si hay 0 reservas, desactivamos los insights para no mostrar Badges engañosos
+                        if (totales === 0) {
+                            document.getElementById('badge_ocupacion_container').innerHTML = `<span class="small text-muted"><i class="bi bi-clock me-1"></i>Esperando primeras reservas</span>`;
+                            document.getElementById('badge_cancelacion_container').innerHTML = `<span class="small text-muted"><i class="bi bi-clock me-1"></i>Aún sin tendencias</span>`;
+                        } else {
+                            // Badge UX original restaurado (Píldora verde para ocupación, y roja-suave para bajas si hay riesgo)
+                            document.getElementById('badge_ocupacion_container').innerHTML = `
+                                <span class="badge rounded-pill" style="background: rgba(46, 125, 50, 0.1); color: #2E7D32; border: 1px solid rgba(46, 125, 50, 0.2); font-weight: 700;">${json.data.porcentaje_ocupacion}%</span>
+                                <span class="small ms-2" style="color: var(--text-muted); font-size: 0.75rem;">${json.data.insight_ocupacion}</span>
+                            `;
+                            
+                            const colorCancel = json.data.porcentaje_cancelacion > 20 ? 'c62828' : '6c757d';
+                            const bgCancel = json.data.porcentaje_cancelacion > 20 ? 'rgba(198,40,40,0.1)' : 'rgba(108,117,125,0.1)';
+                            
+                            document.getElementById('badge_cancelacion_container').innerHTML = `
+                                <span class="badge rounded-pill" style="background: ${bgCancel}; color: #${colorCancel}; border: 1px solid rgba(0,0,0,0.05); font-weight: 700;">${json.data.porcentaje_cancelacion}%</span>
+                                <span class="small ms-2" style="color: var(--text-muted); font-size: 0.75rem;">${json.data.insight_cancelacion}</span>
+                            `;
+                        }
+
+                        renderChart(completadas, pendientes > 0 ? pendientes : 0, canceladas);
+                    }
+                }
+            } catch(e) { console.error('Error fetching Vistas DB', e); }
+        }
+
+        async function cargarMetricasMensuales() {
+            try {
+                const res = await fetch('/api/gerente/metricas/mensuales', { headers: authHeaders() });
+                if(res.ok) {
+                    const json = await res.json();
+                    const tbody = document.getElementById('tabla_historico');
+                    if(json.data && json.data.length > 0) {
+                        const meses = ['-', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                        
+                        tbody.innerHTML = json.data.map((m, i) => {
+                            let tendenciaStr = '<span class="text-muted">-</span>';
+                            if (i < json.data.length - 1) { // hay mes anterior para comparar
+                                const mesAnterior = json.data[i+1];
+                                if (m.total_reservaciones > mesAnterior.total_reservaciones) {
+                                    tendenciaStr = '<span class="text-success fw-bold"><i class="bi bi-arrow-up-right me-1"></i>En Alta</span>';
+                                } else if (m.total_reservaciones < mesAnterior.total_reservaciones) {
+                                  tendenciaStr = '<span class="text-danger fw-bold"><i class="bi bi-arrow-down-right me-1"></i>A la baja</span>';
+                                } else {
+                                  tendenciaStr = '<span class="text-secondary fw-bold"><i class="bi bi-arrow-right me-1"></i>Estable</span>';
+                                }
+                            }
+
+                            return `
+                                <tr>
+                                    <td class="fw-bold">${meses[m.mes]} ${m.anio}</td>
+                                    <td class="text-center">${m.total_reservaciones}</td>
+                                    <td class="text-center">${m.cancelaciones}</td>
+                                    <td class="text-center">
+                                        <div class="progress" style="height: 6px; width: 60px; margin: 0 auto;">
+                                            <div class="progress-bar ${m.porcentaje_efectividad > 70 ? 'bg-success' : 'bg-warning'}" style="width: ${m.porcentaje_efectividad}%"></div>
+                                        </div>
+                                        <small class="text-muted d-block mt-1">${m.porcentaje_efectividad}%</small>
+                                    </td>
+                                    <td class="text-end">${tendenciaStr}</td>
+                                </tr>
+                            `;
+                        }).join('');
+                    } else {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted mb-2"><i class="bi bi-folder2-open fs-1 text-black-50 opacity-50"></i></div>
+                                    <h6 class="fw-bold text-dark mt-3">Aún no hay historial disponible</h6>
+                                    <p class="text-muted small">Comienza a recibir reservas para analizar tendencias de crecimiento mes a mes.</p>
+                                </td>
+                            </tr>
+                        `;
+                    }
+                }
+            } catch(e) { console.error('Error fetching Histórico', e); }
+        }
+
         // Init
-        if(authToken) {
+        if(token) {
             cargarDashboard();
             cargarLlegadas();
-            setInterval(cargarLlegadas, 60000); // 1 minuto
+            cargarVistasAnaliticas();
+            cargarMetricasMensuales();
+            setInterval(() => {
+                cargarLlegadas();
+                cargarVistasAnaliticas();
+            }, 60000); // 1 minuto
         }
     </script>
 @endsection

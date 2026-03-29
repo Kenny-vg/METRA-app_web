@@ -31,6 +31,8 @@ return new class extends Migration
                     ->constrained('cafeterias')
                     ->cascadeOnDelete();
 
+            $table->integer('dias_vigencia')->virtualAs('DATEDIFF(fecha_fin, fecha_inicio)')->nullable();
+
             $table->timestamps();
         });
     }

@@ -32,9 +32,22 @@ class ReservacionController extends Controller
         $hasta = $request->query('hasta', Carbon::parse($desde)->addDays(30)->toDateString());
 
         $query = Reservacion::with(['ocasionEspecial', 'promocion', 'zona'])
-            ->whereBetween('fecha', [$desde, $hasta])
-            ->orderBy('fecha')
-            ->orderBy('hora_inicio');
+            ->select(
+                'reservaciones.id', 'reservaciones.folio', 'reservaciones.nombre_cliente', 
+                'reservaciones.telefono', 'reservaciones.email', 'reservaciones.fecha', 
+                'reservaciones.hora_inicio', 'reservaciones.hora_fin', 'reservaciones.numero_personas', 
+                'reservaciones.estado', 'reservaciones.comentarios', 'reservaciones.fecha_checkin', 
+                'reservaciones.fecha_checkout', 'reservaciones.cafe_id', 'reservaciones.ocasion_especial_id', 
+                'reservaciones.promocion_id', 'reservaciones.zona_id', 'reservaciones.tipo', 'reservaciones.duracion_min'
+            )
+            ->addSelect([
+                'mesa_asignada_fisicamente' => DB::table('detalle_ocupaciones')
+                    ->selectRaw('count(*)')
+                    ->whereColumn('reservacion_id', 'reservaciones.id')
+            ])
+            ->whereBetween('reservaciones.fecha', [$desde, $hasta])
+            ->orderBy('reservaciones.fecha')
+            ->orderBy('reservaciones.hora_inicio');
 
         if ($request->filled('per_page')) {
             $reservaciones = $query->paginate((int) $request->query('per_page'))
@@ -242,9 +255,12 @@ class ReservacionController extends Controller
         }
 
         $reservas = Reservacion::withoutGlobalScope(\App\Models\Scopes\CafeScope::class)
+            ->select('reservaciones.*')
+            ->join('cafeterias', 'reservaciones.cafe_id', '=', 'cafeterias.id')
             ->with(['cafeteria:id,nombre', 'zona', 'promocion', 'ocasionEspecial'])
-            ->where('user_id', auth()->id())
-            ->latest('fecha')
+            ->where('cafeterias.estado', 'activa')
+            ->where('reservaciones.user_id', auth()->id())
+            ->orderBy('reservaciones.fecha', 'desc')
             ->get()
             ->map(fn($r) => $this->formatReservacion($r));
 
@@ -445,11 +461,13 @@ class ReservacionController extends Controller
             'fecha' => $r->fecha,
             'hora_inicio' => $r->hora_inicio,
             'hora_fin' => $r->hora_fin,
+            'duracion_min' => $r->duracion_min,
             'numero_personas' => $r->numero_personas,
             'estado' => $r->estado,
             'comentarios' => $r->comentarios,
             'fecha_checkin' => $r->fecha_checkin,
             'fecha_checkout' => $r->fecha_checkout,
+            'mesa_asignada_fisicamente' => isset($r->mesa_asignada_fisicamente) ? (bool)$r->mesa_asignada_fisicamente : false,
             'cafeteria' => $r->relationLoaded('cafeteria') && $r->cafeteria ? [
                 'nombre' => $r->cafeteria->nombre,
                 'calle' => $r->cafeteria->calle ?? null,

@@ -43,7 +43,7 @@ class AprobacionController extends Controller
 
         if ($cafeteria->gerente) {
             try {
-                $loginUrl = env('FRONTEND_URL', url('/')) . '/login';
+                $loginUrl = url('/login');
 
                 Mail::to($cafeteria->gerente->email)
                     ->send(new CuentaActivadaMail($loginUrl));

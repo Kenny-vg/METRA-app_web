@@ -61,7 +61,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-const API_URL  = "{{ url('/api') }}";
+const API_URL  = '/api';
 const BASE_URL = "{{ url('/') }}";
 const MESES    = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 

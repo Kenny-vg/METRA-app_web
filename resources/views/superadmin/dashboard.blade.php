@@ -27,6 +27,14 @@
             <h2 class="fw-bold">Panel de Control Maestro</h2>
             <p class="text-muted mb-0">Gestiona los negocios registrados en METRA.</p>
         </div>
+        <div class="text-start text-md-end mt-3 mt-md-0">
+            <button class="btn btn-outline-dark rounded-pill fw-bold shadow-sm px-4" onclick="manualRefresh(this)">
+                <i class="bi bi-arrow-clockwise me-1"></i> Actualizar
+            </button>
+            <div class="mt-2 d-none d-md-block">
+                <small class="text-muted" style="font-size: 0.75rem;"><i class="bi bi-info-circle me-1"></i>Actualiza manualmente para ver nuevas solicitudes de cafeterías.</small>
+            </div>
+        </div>
     </div>
 </header>
 
@@ -122,7 +130,7 @@
 </div>
 
 <script>
-const API = '/api';
+const API = '';
 let authToken = localStorage.getItem('token') || '';
 
 if (!authToken) {
@@ -486,32 +494,26 @@ async function cargarPlanesModal() {
 }
 
 // ────────────────────────────────────────────
-// Refresco silencioso (Polling)
+// Refresco manual
 // ────────────────────────────────────────────
-async function refreshDashboardSilently() {
+async function manualRefresh(btn) {
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Actualizando...';
+    btn.disabled = true;
+    
     try {
         const [resCafes, resSols] = await Promise.all([
             fetch(`${API}/superadmin/cafeterias`, { headers: authHeaders() }),
             fetch(`${API}/superadmin/solicitudes`, { headers: authHeaders() })
         ]);
 
-        // Manejo estricto de errores (419, 500) según requerimiento
-        if (resCafes.status === 419 || resCafes.status >= 500 || resSols.status === 419 || resSols.status >= 500) {
-            console.error("Inconsistencia detectada en servidor: Error 500/419 al intentar actualizar la tabla por polling. Posible causante de cierre de sesión inesperado.", "Estados -> Cafeterías:", resCafes.status, "| Solicitudes:", resSols.status);
-            return; 
-        }
-
         if (resCafes.status === 401 || resSols.status === 401) {
-             console.warn("Token expirado o inválido detectado durante el polling silencioso.");
              localStorage.removeItem('token');
              window.location.href = '/login';
              return;
         }
 
-        if (!resCafes.ok || !resSols.ok) {
-             console.warn("Advertencia: El servidor respondió con un error no crítico durante el polling.", resCafes.status, resSols.status);
-             return;
-        }
+        if (!resCafes.ok || !resSols.ok) throw new Error("Error de servidor");
 
         const jsonCafes = await resCafes.json();
         const jsonSols  = await resSols.json();
@@ -528,23 +530,30 @@ async function refreshDashboardSilently() {
         document.getElementById('stat-revision').textContent = revision;
         document.getElementById('stat-pendientes').textContent = pendientes;
 
-        if (revision > 0) {
-            document.getElementById('badge-revision-count').textContent = `${revision} nuevas`;
-        } else {
-            document.getElementById('badge-revision-count').textContent = '';
-        }
+        if (revision > 0) document.getElementById('badge-revision-count').textContent = `${revision} nuevas`;
+        else document.getElementById('badge-revision-count').textContent = '';
 
         renderTablaRevision(enRevision);
         window.todosData = todos;
         window.filtrarTabla(window.filtroActual || 'todos');
 
+        btn.innerHTML = '<i class="bi bi-check2 me-1"></i> ¡Actualizado!';
+        btn.classList.replace('btn-outline-dark', 'btn-success');
+        btn.classList.add('text-white');
     } catch (e) {
-        console.error('Error de red/API durante el polling silencioso:', e);
+        console.error('Error al actualizar:', e);
+        btn.innerHTML = '<i class="bi bi-x-circle me-1"></i> Error';
+        btn.classList.replace('btn-outline-dark', 'btn-danger');
+        btn.classList.add('text-white');
+    } finally {
+        setTimeout(() => {
+            btn.innerHTML = originalHtml;
+            btn.classList.remove('btn-success', 'btn-danger', 'text-white');
+            btn.classList.add('btn-outline-dark');
+            btn.disabled = false;
+        }, 2000);
     }
 }
-
-// Iniciar polling automático cada 20 segundos
-setInterval(refreshDashboardSilently, 20000);
 
 // Init
 cargarDashboard();

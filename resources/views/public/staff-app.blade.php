@@ -8,6 +8,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
+    <script>
+        window.APP_API_URL = window.location.origin;
+    </script>
 </head>
 <body style="background: var(--off-white); min-height: 100vh; display: flex; align-items: center; justify-content: center;">
 

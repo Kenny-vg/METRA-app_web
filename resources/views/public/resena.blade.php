@@ -7,6 +7,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <script>
+        window.APP_API_URL = window.location.origin;
+    </script>
     
     <style>
         body { 
@@ -269,7 +272,7 @@
 
             // Fetch visit details
             try {
-                const response = await fetch(`/api/resena/${token}`);
+                const response = await fetch(`${window.location.origin}/api/resena/${token}`);
                 const data = await response.json();
 
                 if (!response.ok || !data.success) {
@@ -317,7 +320,7 @@
                 submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
 
                 try {
-                    const response = await fetch(`/api/resena/${token}`, {
+                    const response = await fetch(`${window.location.origin}/api/resena/${token}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

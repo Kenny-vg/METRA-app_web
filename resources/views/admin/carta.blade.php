@@ -264,7 +264,7 @@
                             if (!p.activo) card.classList.add('opacity-50');
 
                             const img = pClone.querySelector('.js-img');
-                            const imgUrl = p.imagen_url ? (p.imagen_url.startsWith('http') ? p.imagen_url : `{{ url('storage') }}/${p.imagen_url}`) : 'https://placehold.co/400x300?text=Sin+Imagen';
+                            const imgUrl = p.imagen_url ? (p.imagen_url.startsWith('http') ? p.imagen_url : `/storage/${p.imagen_url}`) : 'https://placehold.co/400x300?text=Sin+Imagen';
                             img.style.backgroundImage = `url('${imgUrl}')`;
 
                             pClone.querySelector('.js-nombre').textContent = p.nombre_producto;

@@ -140,7 +140,7 @@
     @include('partials.footer_admin')
 
     <script>
-        const API = '/api';
+        const API_URL = '';
         let authToken = localStorage.getItem('token');
         let cafeteriaId = null;
         let estadosMunicipiosData = {};
@@ -194,7 +194,7 @@
         async function cargarPerfil() {
             if(!authToken) return;
             try {
-                const res = await fetch(`${API}/gerente/mi-cafeteria`, { headers: authHeaders() });
+                const res = await fetch('/api/gerente/mi-cafeteria', { headers: authHeaders() });
                 if (!res.ok) return;
                 const json = await res.json();
                 
@@ -226,7 +226,7 @@
                 }
                 if (cafe.telefono) document.querySelector('input[name="telefono"]').value = cafe.telefono;
                 if (cafe.foto_url) {
-                    document.getElementById('previewFoto').src = `{{ asset('storage') }}/${cafe.foto_url}?v=` + new Date().getTime();
+                    document.getElementById('previewFoto').src = `/storage/${cafe.foto_url}?v=` + new Date().getTime();
                     document.getElementById('previewFoto').classList.remove('d-none');
                     document.getElementById('placeholder-foto').classList.add('d-none');
                     document.getElementById('overlay-foto').classList.remove('d-none');
@@ -293,7 +293,7 @@
 
             // *** Authorization header only — NO Content-Type (el browser lo pone automático con boundary) ***
             try {
-                const res = await fetch(`${API}/gerente/mi-cafeteria`, {
+                const res = await fetch('/api/gerente/mi-cafeteria', {
                     method: 'POST',   // Laravel necesita POST + _method=PUT para FormData
                     headers: { 'Authorization': `Bearer ${authToken}`, 'Accept': 'application/json' },
                     body: formData
@@ -308,7 +308,7 @@
                 // Actualizar preview con la foto guardada (si la API devuelve foto_url)
                 const cafe = json.data || json;
                 if (cafe.foto_url) {
-                    document.getElementById('previewFoto').src = `{{ asset('storage') }}/${cafe.foto_url}?v=` + new Date().getTime();
+                    document.getElementById('previewFoto').src = `/storage/${cafe.foto_url}?v=` + new Date().getTime();
                     fotoInput.value = ''; // resetear input
                 }
 

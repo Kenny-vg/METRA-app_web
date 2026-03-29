@@ -1,4 +1,4 @@
-﻿@extends('admin.menu')
+@extends('admin.menu')
 @section('title', 'Dashboard de Reservaciones')
 
 @section('content')
@@ -222,8 +222,9 @@
     @include('partials.footer_admin')
     
     <script>
-        let currentDate  = new Date();
-        let modoVista    = 'dia';
+        const API          = '/api';
+        let   currentDate  = new Date();
+        let   modoVista    = 'dia';
 
         // Array visible actual (el que muestra el grid y usa el modal)
         let reservasGlobales = [];
@@ -337,6 +338,11 @@
                 const horaElem = clone.querySelector('.js-hora');
                 horaElem.textContent = r.hora_inicio.substring(0,5);
                 horaElem.style.color = estilos.text;
+                
+                // Integración Fase 5: Evidencia de Subconsulta DB para verificar en tiempo real si el cliente ya fue asignado a mesa física
+                if (r.mesa_asignada_fisicamente > 0) {
+                     horaElem.innerHTML += ' <i class="bi bi-person-check-fill ms-2 text-success shadow-sm" style="font-size: 1.1rem; padding: 2px 5px; border-radius: 4px; background: rgba(0,255,0,0.1);" title="¡Cliente en Mesa Física!"></i>';
+                }
 
                 const badge = clone.querySelector('.js-badge');
                 badge.textContent = datePrefix + estilos.label;
@@ -451,7 +457,7 @@
             if (!silencioso) mostrarSpinner();
             try {
                 const token = localStorage.getItem('token');
-                const url   = `/api/gerente/reservaciones?desde=${desde}&hasta=${hasta}&t=${Date.now()}`;
+                const url   = `${API}/gerente/reservaciones?desde=${desde}&hasta=${hasta}&t=${Date.now()}`;
                 const res   = await fetch(url, {
                     headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
                 });
@@ -499,7 +505,7 @@
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
                 btn.disabled = true;
 
-                const res = await fetch(`/api/gerente/mi-cafeteria`, {
+                const res = await fetch(`${API}/gerente/mi-cafeteria`, {
                     headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
                 });
                 
@@ -559,17 +565,16 @@
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
                 btn.disabled = true;
 
-                // El update de la cafeteria usa FormData por el soporte a multimedia en otras ramas, aunque aqui sea config pura
-                const formData = new FormData();
-                formData.append('_method', 'PUT');
-                formData.append('duracion_reserva_min', document.getElementById('conf_duracion').value);
-                formData.append('intervalo_reserva_min', document.getElementById('conf_intervalo').value);
-                formData.append('porcentaje_reservas', document.getElementById('conf_porcentaje').value);
+                const payload = {
+                    duracion_reserva_min: document.getElementById('conf_duracion').value,
+                    intervalo_reserva_min: document.getElementById('conf_intervalo').value,
+                    porcentaje_reservas: document.getElementById('conf_porcentaje').value
+                };
 
-                const res = await fetch(`/api/gerente/mi-cafeteria`, {
+                const res = await fetch(`${API}/gerente/mi-cafeteria`, {
                     method: 'POST', 
-                    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
-                    body: formData
+                    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ _method: 'PUT', ...payload })
                 });
                 
                 btn.innerHTML = prev;

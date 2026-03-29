@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class CafeteriaPerfilController extends Controller
 {
@@ -86,6 +87,74 @@ class CafeteriaPerfilController extends Controller
             $cafeteria,
             'Cafetería actualizada correctamente'
         );
+    }
+
+    // Endpoint analítico api-first de Vistas
+    public function metricasDiarias(Request $request)
+    {
+        $cafeteria = $request->user()->cafeteria;
+        if (!$cafeteria) {
+            return ApiResponse::success(new \stdClass(), 'Métricas vacías, el gerente no tiene cafetería');
+        }
+
+        // Lee directo la VISTA NATIVA
+        $metricas = DB::table('vw_reporte_diario')
+            ->where('cafe_id', $cafeteria->id)
+            ->where('fecha', now()->toDateString())
+            ->first();
+
+        // Estructura base
+        $data = [
+            'cafe_id' => $cafeteria->id,
+            'fecha' => now()->toDateString(),
+            'total_reservas' => $metricas ? (int)$metricas->total_reservas : 0,
+            'reservas_completadas' => $metricas ? (int)$metricas->reservas_completadas : 0,
+            'reservas_canceladas' => $metricas ? (int)$metricas->reservas_canceladas : 0,
+            'no_shows' => $metricas ? (int)$metricas->no_shows : 0,
+            'total_comensales_esperados' => $metricas ? (int)$metricas->total_comensales_esperados : 0
+        ];
+
+        // LÓGICA DE NEGOCIO Y DERIVADOS (API-FIRST)
+        $totales = $data['total_reservas'];
+        $bajas = $data['reservas_canceladas'] + $data['no_shows'];
+        
+        $data['porcentaje_ocupacion'] = $totales > 0 ? round(($data['reservas_completadas'] / $totales) * 100, 2) : 0;
+        $data['porcentaje_cancelacion'] = $totales > 0 ? round(($bajas / $totales) * 100, 2) : 0;
+
+        // INSIGHTS UX
+        if ($data['porcentaje_ocupacion'] >= 70) {
+            $data['insight_ocupacion'] = '🔥 Excelente afluencia';
+        } elseif ($data['porcentaje_ocupacion'] <= 30 && $totales > 0) {
+            $data['insight_ocupacion'] = '📉 Baja ocupación esperada';
+        } else {
+            $data['insight_ocupacion'] = '☕ Operación estable';
+        }
+
+        if ($data['porcentaje_cancelacion'] >= 20) {
+            $data['insight_cancelacion'] = '⚠️ Nivel crítico de bajas';
+        } else {
+            $data['insight_cancelacion'] = '✅ Retención estable';
+        }
+
+        return ApiResponse::success($data, 'Métricas diarias de MySQL con Insights');
+    }
+
+    // Endpoint analítico api-first (MENSUALES - Vista Materializada)
+    public function metricasMensuales(Request $request)
+    {
+        $cafeteria = $request->user()->cafeteria;
+        if (!$cafeteria) {
+            return ApiResponse::success([], 'Sin datos, el gerente no tiene cafetería');
+        }
+
+        $metricas = DB::table('mv_metricas_mensuales')
+            ->where('cafe_id', $cafeteria->id)
+            ->orderByDesc('anio')
+            ->orderByDesc('mes')
+            ->take(12)
+            ->get();
+
+        return ApiResponse::success($metricas, 'Métricas mensuales Materializadas');
     }
 
 }

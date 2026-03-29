@@ -385,13 +385,17 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- URL global del backend API (configurable por entorno) -->
+<script>
+    window.APP_API_URL = window.location.origin;
+</script>
 <script>
     window.escapeHTML = function(str) {
         if (str === null || str === undefined) return '';
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     };
 
-    const API_BASE = "{{ url('/api') }}";
+    const API_URL = '/api';
     let selectedPlanId = null;
     let registeredCafeteriaId = null;
 
@@ -503,7 +507,7 @@
 
     window.cargarPlanes = async function() {
         try {
-            const res = await fetch(`${API_BASE}/planes-publicos`);
+            const res = await fetch(`${API_URL}/planes-publicos`);
             const json = await res.json();
             const planesData = json.data || [];
             renderPlanes(planesData);
@@ -730,7 +734,7 @@
         };
 
         try {
-            const res = await fetch(`${API_BASE}/registro-negocio`, {
+            const res = await fetch(`${API_URL}/registro-negocio`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify(payload)
             });
@@ -974,7 +978,7 @@
         const details = document.getElementById('pago-details-wizard');
         
         try {
-            const res = await fetch(`${API_BASE}/configuracion-pago`);
+            const res = await fetch(`${API_URL}/configuracion-pago`);
             const json = await res.json();
             
             if(res.ok && json.data) {

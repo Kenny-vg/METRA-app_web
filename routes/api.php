@@ -178,11 +178,8 @@ Route::middleware([
 //VER COMPROBANTE
 Route::get(
     '/admin/comprobante/{cafeteria:id}',
-[RegistroNegocioController::class , 'verComprobante']
+    [RegistroNegocioController::class , 'verComprobante']
 )->middleware('auth:sanctum');
-
-
-
 /* |------------------------------------------ | RUTAS GERENTE |------------------------------------------ */
 Route::middleware([
     'auth:sanctum',
@@ -194,6 +191,8 @@ Route::middleware([
     Route::get('mi-cafeteria', [CafeteriaPerfilController::class , 'show']);
     Route::post('mi-cafeteria', [CafeteriaPerfilController::class , 'update']);
     Route::put('mi-cafeteria', [CafeteriaPerfilController::class , 'update']);
+    Route::get('metricas/diarias', [CafeteriaPerfilController::class , 'metricasDiarias']);
+    Route::get('metricas/mensuales', [CafeteriaPerfilController::class , 'metricasMensuales']);
 
 
     Route::apiResource('zonas', ZonaController::class); //crud zonas
