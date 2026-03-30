@@ -199,10 +199,18 @@ class ReservacionController extends Controller
 
             $folio = $this->generarFolio();
 
+            // Vincular automáticamente por UserID si el cliente está autenticado
+            // O si existe un usuario registrado con ese correo (back-link)
+            $userId = auth('sanctum')->check() ? auth('sanctum')->id() : null;
+            if (!$userId && $request->email) {
+                $userMatch = \App\Models\User::where('email', $request->email)->where('role', 'cliente')->first();
+                if ($userMatch) $userId = $userMatch->id;
+            }
+
             $reservacion = Reservacion::create([
                 'folio' => $folio,
                 'cafe_id' => $cafeteria->id,
-                'user_id' => auth('sanctum')->check() ? auth('sanctum')->id() : null,
+                'user_id' => $userId,
 
                 'nombre_cliente' => $request->nombre_cliente,
                 'telefono' => $request->telefono,
@@ -254,13 +262,22 @@ class ReservacionController extends Controller
             return ApiResponse::error('Debe iniciar sesión', 401);
         }
 
+        $user = auth()->user();
+
+        // Sin restringir a 'activa' para que el cliente siempre vea su historial
+        // Se busca por user_id O por correo electrónico para capturar reservas hechas como invitado
         $reservas = Reservacion::withoutGlobalScope(\App\Models\Scopes\CafeScope::class)
             ->select('reservaciones.*')
             ->join('cafeterias', 'reservaciones.cafe_id', '=', 'cafeterias.id')
-            ->with(['cafeteria:id,nombre', 'zona', 'promocion', 'ocasionEspecial'])
-            ->where('cafeterias.estado', 'activa')
-            ->where('reservaciones.user_id', auth()->id())
+            ->with(['cafeteria:id,nombre,calle,colonia,ciudad', 'zona', 'promocion', 'ocasionEspecial'])
+            ->where(function($q) use ($user) {
+                $q->where('reservaciones.user_id', $user->id);
+                if ($user->email) {
+                    $q->orWhere('reservaciones.email', $user->email);
+                }
+            })
             ->orderBy('reservaciones.fecha', 'desc')
+            ->orderBy('reservaciones.hora_inicio', 'desc')
             ->get()
             ->map(fn($r) => $this->formatReservacion($r));
 

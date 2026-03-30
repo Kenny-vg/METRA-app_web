@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        window.API_URL = "{{ url('/api') }}";
+        window.FILE_URL = "{{ url('/') }}";
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .upload-area {
@@ -116,7 +120,6 @@
     </div>
 
 <script>
-    const API_BASE = "/api";
     const cafeteriaId = "{{ $id }}";
 
     function previewFile(input) {
@@ -203,43 +206,27 @@
         btnLd.classList.remove('d-none');
         btnEnviar.disabled = true;
 
-        const formData = new FormData();
-        formData.append('comprobante', input.files[0]);
-
         try {
-            const response = await fetch(`${API_BASE}/registro-negocio/${cafeteriaId}/comprobante`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json'
-                },
-                body: formData
+            const formData = new FormData();
+            formData.append('comprobante', input.files[0]);
+            
+            const result = await MetraAPI.post(`/registro-negocio/${cafeteriaId}/comprobante`, formData);
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Comprobante enviado',
+                text: 'Tu solicitud será revisada por el superadmin.',
+                confirmButtonColor: '#382C26'
+            }).then(() => {
+                window.location.href = '/login';
             });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Comprobante enviado',
-                    text: 'Tu solicitud será revisada por el superadmin.',
-                    confirmButtonColor: '#382C26'
-                }).then(() => {
-                    window.location.href = '/login';
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: result.message || 'Error al subir el comprobante. Inténtalo más tarde.',
-                    confirmButtonColor: '#382C26'
-                });
-            }
         } catch (error) {
             console.error(error);
+            const dt = error.data || {};
             Swal.fire({
                 icon: 'error',
-                title: 'Error de conexión',
-                text: 'Fallo al comunicarse con el servidor.',
+                title: 'Error',
+                text: dt.message || 'Error al subir el comprobante. Inténtalo más tarde.',
                 confirmButtonColor: '#382C26'
             });
         } finally {
@@ -258,10 +245,9 @@
         container.style.display = 'block';
 
         try {
-            const response = await fetch(`${API_BASE}/configuracion-pago`);
-            const result = await response.json();
+            const result = await MetraAPI.get('/configuracion-pago');
 
-            if (response.ok && result.data) {
+            if (result.data) {
                 const d = result.data;
                 document.getElementById('pago-banco').textContent = d.banco || 'No especificado';
                 document.getElementById('pago-clabe').textContent = d.clabe || 'No especificado';
@@ -302,9 +288,8 @@
 
     async function cargarInfoCafeteria() {
         try {
-            const response = await fetch(`${API_BASE}/cafeterias-publicas-id/${cafeteriaId}`);
-            const result = await response.json();
-            if (response.ok && result.data) {
+            const result = await MetraAPI.get(`/cafeterias-publicas-id/${cafeteriaId}`);
+            if (result.data) {
                 const el = document.getElementById('negocio-nombre');
                 el.textContent = result.data.nombre;
                 el.style.display = 'block';

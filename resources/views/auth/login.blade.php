@@ -11,9 +11,10 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- URL global del backend API (configurable por entorno) -->
     <script>
-        window.APP_API_URL = window.location.origin;
+        window.API_URL = "{{ url('/api') }}";
+        window.FILE_URL = "{{ url('/') }}";
     </script>
-<script>
+    <script>
 document.addEventListener('DOMContentLoaded', () => {
     // Limpiar estado de wizard de registro si se accede al login (ej. tras logout)
     localStorage.removeItem('wizard_form_data');
@@ -144,69 +145,49 @@ function decodeJwtResponse(token) {
 }
 
 window.handleCredentialResponse = async function(response) {
-    const API_URL = '/api';
+    const data = decodeJwtResponse(response.credential);
     try {
-        const res = await fetch(`${API_URL}/auth/google`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                email: data.email,
-                name: data.name,
-                google_id: data.sub,
-                avatar: data.picture
-            })
+        const result = await MetraAPI.post('/auth/google', {
+            email: data.email,
+            name: data.name,
+            google_id: data.sub,
+            avatar: data.picture
         });
 
-        if (res.ok) {
-            const result = await res.json();
-            try {
-                localStorage.setItem('token', result.data.token);
-                sessionStorage.setItem('token', result.data.token);
-                if (result.data.usuario?.nombre_cafeteria) {
-                    localStorage.setItem('nombre_cafeteria', result.data.usuario.nombre_cafeteria);
-                }
-                if (result.data.usuario?.name) {
-                    localStorage.setItem('user_name', result.data.usuario.name);
-                }
-                if (result.data.usuario?.dias_restantes !== undefined && result.data.usuario?.dias_restantes !== null) {
-                    localStorage.setItem('dias_restantes', result.data.usuario.dias_restantes);
-                }
-                if (result.data.usuario?.cafe_id) {
-                    localStorage.setItem('cafe_id', result.data.usuario.cafe_id);
-                }
-                const role = result.data.usuario.role;
-                if(role === 'superadmin') window.location.href = '/superadmin/dashboard';
-                else if(role === 'gerente') window.location.href = '/admin/dashboard';
-                else if(role === 'personal') window.location.href = '/staff-app';
-                else window.location.href = '/public/perfil';
-            } catch(e) {}
-        } else {
-            console.error('Error Google Login backend');
-            if (res.status === 422) {
-                const json = await res.json();
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Atención',
-                    text: json.message || 'Primero debes crear tu cuenta usando el formulario de registro.',
-                    confirmButtonColor: '#382C26',
-                    confirmButtonText: 'Entendido'
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error de Autenticación',
-                    text: 'Fallo al iniciar sesión con Google.',
-                    confirmButtonColor: '#382C26',
-                    confirmButtonText: 'Aceptar'
-                });
+        try {
+            localStorage.setItem('token', result.data.token);
+            sessionStorage.setItem('token', result.data.token);
+            if (result.data.usuario?.nombre_cafeteria) {
+                localStorage.setItem('nombre_cafeteria', result.data.usuario.nombre_cafeteria);
             }
-        }
+            if (result.data.usuario?.name) {
+                localStorage.setItem('user_name', result.data.usuario.name);
+            }
+            if (result.data.usuario?.dias_restantes !== undefined && result.data.usuario?.dias_restantes !== null) {
+                localStorage.setItem('dias_restantes', result.data.usuario.dias_restantes);
+            }
+            if (result.data.usuario?.cafe_id) {
+                localStorage.setItem('cafe_id', result.data.usuario.cafe_id);
+            }
+            const role = result.data.usuario.role;
+            if(role === 'superadmin') window.location.href = '/superadmin/dashboard';
+            else if(role === 'gerente') window.location.href = '/admin/dashboard';
+            else if(role === 'personal') window.location.href = '/staff-app';
+            else window.location.href = '/public/perfil';
+        } catch(e) {}
     } catch (error) {
         console.error('API Error', error);
-        Swal.fire('Error de conexión', 'Fallo al comunicarse con el servidor.', 'error');
+        if (error.status === 422) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atención',
+                text: error.data?.message || 'Primero debes crear tu cuenta usando el formulario de registro.',
+                confirmButtonColor: '#382C26',
+                confirmButtonText: 'Entendido'
+            });
+        } else {
+            Swal.fire('Error de conexión', 'Fallo al comunicarse con el servidor o error de Google.', 'error');
+        }
     }
 }
 
@@ -216,19 +197,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!email) return;
 
         try {
-                const API_URL = '/api';
-            const res = await fetch(`${API_URL}/registro-pendiente`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ email })
-            });
+            const result = await MetraAPI.post('/registro-pendiente', { email });
             
-            const result = await res.json();
-            
-            if (res.ok && result.data && result.data.cafeteria_id) {
+            if (result.data && result.data.cafeteria_id) {
                 window.location.href = '/subir-comprobante/' + result.data.cafeteria_id;
             } else {
                 Swal.fire({
@@ -242,8 +213,8 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error(error);
             Swal.fire({
                 icon: 'error',
-                title: 'Error de conexión',
-                text: 'Fallo de conexión al servidor.',
+                title: 'Error',
+                text: error.message || 'Fallo de conexión al servidor.',
                 confirmButtonColor: '#382C26'
             });
         }
@@ -306,18 +277,58 @@ document.addEventListener('DOMContentLoaded', function() {
             let isRateLimited = false;
 
             try {
-                    const API_URL = '/api';
-                const response = await fetch(`${API_URL}/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
-                });
+                const result = await MetraAPI.post('/login', { email, password });
 
-                // Caso: 429 Too Many Requests (Rate Limiting)
-                if (response.status === 429) {
+                localStorage.setItem('token', result.data.token);
+                sessionStorage.setItem('token', result.data.token);
+                
+                const role = result.data.usuario.role;
+                document.cookie = `metra_role=${role}; path=/; max-age=86400`;
+
+                if (result.data.usuario?.nombre_cafeteria) {
+                    localStorage.setItem('nombre_cafeteria', result.data.usuario.nombre_cafeteria);
+                }
+                if (result.data.usuario?.name) {
+                    localStorage.setItem('user_name', result.data.usuario.name);
+                }
+                if (result.data.usuario?.dias_restantes !== undefined && result.data.usuario?.dias_restantes !== null) {
+                    localStorage.setItem('dias_restantes', result.data.usuario.dias_restantes);
+                }
+                if (result.data.usuario?.cafe_id) {
+                    localStorage.setItem('cafe_id', result.data.usuario.cafe_id);
+                }
+                
+                submitBtn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Redirigiendo...';
+                
+                if(role === 'superadmin') window.location.href = '/superadmin/dashboard';
+                else if(role === 'gerente') window.location.href = '/admin/dashboard';
+                else if(role === 'personal') window.location.href = '/staff-app';
+                else window.location.href = '/public/perfil';
+
+            } catch (error) {
+                // Reactivar botón (si no fue Rate Limit)
+                if (error.status !== 429) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+
+                if (!error.status) {
+                    console.error('Fallo la API', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de Conexión',
+                        text: 'Fallo de conexión al servidor. Revisa tu internet.',
+                        confirmButtonColor: '#382C26',
+                        confirmButtonText: 'Entendido'
+                    });
+                    return;
+                }
+
+                const errorData = error.data || {};
+                const errorMsg = errorData.message || error.message || '';
+                const msgLower = errorMsg.toLowerCase();
+
+                if (error.status === 429) {
                     isRateLimited = true;
                     Swal.fire({
                         icon: 'warning',
@@ -339,156 +350,95 @@ document.addEventListener('DOMContentLoaded', function() {
                             isRateLimited = false;
                         }
                     }, 1000);
-                    return; // Detener ejecución para mantener el botón bloqueado
                 }
-
-                if (response.ok) {
-                    const result = await response.json();
-                    try {
-                        localStorage.setItem('token', result.data.token);
-                        sessionStorage.setItem('token', result.data.token);
-                        
-                        const role = result.data.usuario.role;
-                        document.cookie = `metra_role=${role}; path=/; max-age=86400`;
-
-                        if (result.data.usuario?.nombre_cafeteria) {
-                            localStorage.setItem('nombre_cafeteria', result.data.usuario.nombre_cafeteria);
-                        }
-                        if (result.data.usuario?.name) {
-                            localStorage.setItem('user_name', result.data.usuario.name);
-                        }
-                        if (result.data.usuario?.dias_restantes !== undefined && result.data.usuario?.dias_restantes !== null) {
-                            localStorage.setItem('dias_restantes', result.data.usuario.dias_restantes);
-                        }
-                        if (result.data.usuario?.cafe_id) {
-                            localStorage.setItem('cafe_id', result.data.usuario.cafe_id);
-                        }
-                        
-                        submitBtn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Redirigiendo...';
-                        
-                        if(role === 'superadmin') window.location.href = '/superadmin/dashboard';
-                        else if(role === 'gerente') window.location.href = '/admin/dashboard';
-                        else if(role === 'personal') window.location.href = '/staff-app';
-                        else window.location.href = '/public/perfil';
-                    } catch (err) {}
-                } else {
-                    const errorData = await response.json();
-                    const errorMsg = errorData.message || '';
-                    const msgLower = errorMsg.toLowerCase();
-
-                    // Caso: 401 Credenciales incorrectas
-                    if (response.status === 401) {
-                         Swal.fire({
-                             icon: 'error',
-                             title: 'Credenciales Incorrectas',
-                             text: errorMsg || 'Tu correo o contraseña son inválidos.',
-                             confirmButtonColor: '#382C26',
-                             confirmButtonText: 'Reintentar'
-                         });
-                         passwordInput.value = ''; // Limpiar contraseña por seguridad
-                    }
-                    // Caso: 403 Rechazado o Inactivo
-                    else if (response.status === 403) {
-                        if (msgLower.includes('inactivo')) {
-                            Swal.fire({
-                                icon: 'info',
-                                title: 'Cuenta inactiva',
-                                text: errorMsg || 'Tu cuenta está pendiente de aprobación o ha sido inhabilitada.',
-                                confirmButtonColor: '#382C26',
-                                confirmButtonText: 'Entendido'
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Acceso Denegado',
-                                text: errorMsg || 'Tu registro ha sido rechazado. Por favor contacta a soporte.',
-                                confirmButtonColor: '#D32F2F',
-                                confirmButtonText: 'Entendido'
-                            });
-                        }
-                    }
-                    // Caso: 423 Pendiente / Suscripción Vencida
-                    else if (response.status === 423) {
-                        if (msgLower.includes('subir tu comprobante')) {
-                            Swal.fire({
-                                icon: 'info',
-                                title: 'Comprobante requerido',
-                                text: errorMsg,
-                                showCancelButton: true,
-                                confirmButtonText: 'Subir comprobante',
-                                cancelButtonText: 'Cancelar',
-                                confirmButtonColor: '#382C26'
-                            }).then((result) => {
-                                if(result.isConfirmed) continuarSubida(email);
-                            });
-                        } else if (msgLower.includes('espera la validación')) {
-                            Swal.fire({
-                                icon: 'info',
-                                title: 'Solicitud en revisión',
-                                text: errorMsg,
-                                confirmButtonColor: '#382C26',
-                                confirmButtonText: 'Entendido'
-                            });
-                        } else if (msgLower.includes('no tiene una suscripción activa')) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Suscripción inactiva',
-                                text: errorMsg,
-                                showCancelButton: true,
-                                confirmButtonText: 'Renovar Suscripción',
-                                cancelButtonText: 'Entendido',
-                                confirmButtonColor: '#c62828',
-                                cancelButtonColor: '#382C26'
-                            }).then((result) => {
-                                if(result.isConfirmed) {
-                                    abrirModalRenovar();
-                                    window.tempLoginEmail = email;
-                                }
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'info',
-                                title: 'Atención',
-                                text: errorMsg || 'Acceso restringido por suscripción o estado.',
-                                confirmButtonColor: '#382C26',
-                                confirmButtonText: 'Entendido'
-                            });
-                        }
-                    }
-                    // Errores Genéricos y de Validación Laravel (422, 500)
-                    else {
-                        let displayMsg = errorData.message || 'Credenciales inválidas o error de servidor.';
-                        if (errorData.errors) {
-                            displayMsg = `<ul class="text-start mb-0" style="color: #D32F2F;">`;
-                            Object.values(errorData.errors).forEach(errArray => {
-                                errArray.forEach(err => { displayMsg += `<li>${err}</li>`; });
-                            });
-                            displayMsg += `</ul>`;
-                            Swal.fire({ icon: 'error', title: 'Error', html: displayMsg, confirmButtonColor: '#382C26' });
-                        } else {
-                            Swal.fire({ icon: 'error', title: 'Error', text: displayMsg, confirmButtonColor: '#382C26' });
-                        }
-                    }
-
-                    // Reactivar botón si falló (y no es RateLimit)
-                    if (!isRateLimited) {
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = originalBtnText;
+                else if (error.status === 401) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Credenciales Incorrectas',
+                        text: errorMsg || 'Tu correo o contraseña son inválidos.',
+                        confirmButtonColor: '#382C26',
+                        confirmButtonText: 'Reintentar'
+                    });
+                    passwordInput.value = '';
+                }
+                else if (error.status === 403) {
+                    if (msgLower.includes('inactivo')) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Cuenta inactiva',
+                            text: errorMsg || 'Tu cuenta está pendiente de aprobación o ha sido inhabilitada.',
+                            confirmButtonColor: '#382C26',
+                            confirmButtonText: 'Entendido'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Acceso Denegado',
+                            text: errorMsg || 'Tu registro ha sido rechazado. Por favor contacta a soporte.',
+                            confirmButtonColor: '#D32F2F',
+                            confirmButtonText: 'Entendido'
+                        });
                     }
                 }
-            } catch (error) {
-                console.error('Fallo la API', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error de Conexión',
-                    text: 'Fallo de conexión al servidor. Revisa tu internet.',
-                    confirmButtonColor: '#382C26',
-                    confirmButtonText: 'Entendido'
-                });
-                
-                if (!isRateLimited) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalBtnText;
+                else if (error.status === 423) {
+                    if (msgLower.includes('subir tu comprobante')) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Comprobante requerido',
+                            text: errorMsg,
+                            showCancelButton: true,
+                            confirmButtonText: 'Subir comprobante',
+                            cancelButtonText: 'Cancelar',
+                            confirmButtonColor: '#382C26'
+                        }).then((result) => {
+                            if(result.isConfirmed) continuarSubida(email);
+                        });
+                    } else if (msgLower.includes('espera la validación')) {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Solicitud en revisión',
+                            text: errorMsg,
+                            confirmButtonColor: '#382C26',
+                            confirmButtonText: 'Entendido'
+                        });
+                    } else if (msgLower.includes('no tiene una suscripción activa')) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Suscripción inactiva',
+                            text: errorMsg,
+                            showCancelButton: true,
+                            confirmButtonText: 'Renovar Suscripción',
+                            cancelButtonText: 'Entendido',
+                            confirmButtonColor: '#c62828',
+                            cancelButtonColor: '#382C26'
+                        }).then((result) => {
+                            if(result.isConfirmed) {
+                                abrirModalRenovar();
+                                window.tempLoginEmail = email;
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Atención',
+                            text: errorMsg || 'Acceso restringido por suscripción o estado.',
+                            confirmButtonColor: '#382C26',
+                            confirmButtonText: 'Entendido'
+                        });
+                    }
+                }
+                else {
+                    let displayMsg = errorMsg || 'Credenciales inválidas o error de servidor.';
+                    if (errorData.errors) {
+                        displayMsg = `<ul class="text-start mb-0" style="color: #D32F2F;">`;
+                        Object.values(errorData.errors).forEach(errArray => {
+                            errArray.forEach(err => { displayMsg += `<li>${err}</li>`; });
+                        });
+                        displayMsg += `</ul>`;
+                        Swal.fire({ icon: 'error', title: 'Error', html: displayMsg, confirmButtonColor: '#382C26' });
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Error', text: displayMsg, confirmButtonColor: '#382C26' });
+                    }
                 }
             }
         });
@@ -524,12 +474,10 @@ window.abrirModalRenovar = async function(estado = '') {
     
     if (!isRevision) {
         try {
-                const API_URL = '/api';
-            const res = await fetch(`${API_URL}/planes-publicos`, { headers: { 'Accept': 'application/json' } });
-            const json = await res.json();
-            if (res.ok) {
+            const result = await MetraAPI.get('/planes-publicos');
+            if (result.data) {
                 selectPlan.innerHTML = '<option value="">Selecciona un plan...</option>' + 
-                    json.data.map(p => `<option value="${p.id}">${p.nombre_plan} ($${p.precio})</option>`).join('');
+                    result.data.map(p => `<option value="${p.id}">${p.nombre_plan} ($${p.precio})</option>`).join('');
             }
         } catch (e) {
             console.error('Error cargando planes modal', e);
@@ -569,33 +517,20 @@ document.addEventListener('DOMContentLoaded', function() {
             if (window.tempLoginEmail) formData.append('email', window.tempLoginEmail);
 
             try {
-                    const API_URL = '/api';
-                let authToken = localStorage.getItem('token') || '';
-                
-                // Usar el endpoint de renovación
-                const res = await fetch(`${API_URL}/gerente/renovar-suscripcion`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${authToken}`, 'Accept': 'application/json' },
-                    body: formData
-                });
-
-                const json = await res.json();
-
-                if (!res.ok) {
-                    throw new Error(json.message || 'Error al enviar la solicitud.');
-                }
+                // Usar el endpoint de renovación y formData (MetraAPI lo maneja automáticamente enviando nulo en Content-Type)
+                const result = await MetraAPI.post('/gerente/renovar-suscripcion', formData);
 
                 bootstrap.Modal.getInstance(document.getElementById('modalRenovar')).hide();
 
                 Swal.fire({
                     title: '¡Solicitud Enviada!',
-                    text: json.message || 'Tu comprobante está en revisión por el administrador.',
+                    text: result.message || 'Tu comprobante está en revisión por el administrador.',
                     icon: 'success',
                     confirmButtonColor: '#212529'
                 });
 
             } catch(err) {
-                Swal.fire({ title: 'Error', text: err.message, icon: 'error', confirmButtonColor: '#382C26' });
+                Swal.fire({ title: 'Error', text: err.data?.message || err.message, icon: 'error', confirmButtonColor: '#382C26' });
             } finally {
                 submitBtn.innerHTML = 'Enviar Renovación';
                 submitBtn.disabled = false;

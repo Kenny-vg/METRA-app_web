@@ -9,8 +9,10 @@
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
     <script>
-        window.APP_API_URL = window.location.origin;
+        window.API_URL = "{{ url('/api') }}";
+        window.FILE_URL = "{{ url('/') }}";
     </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body style="background: var(--off-white); min-height: 100vh; display: flex; align-items: center; justify-content: center;">
 
@@ -62,7 +64,6 @@
 </div>
 
 <script>
-    const API_URL = '/api/staff';
     const token = localStorage.getItem('token');
 
     if(!token) {
@@ -71,18 +72,13 @@
 
     async function testEndpoint(endpoint) {
         const resEl = document.getElementById('api-result');
-        resEl.textContent = `Petición a ${API_URL}${endpoint}...`;
+        resEl.textContent = `Petición a /api/staff${endpoint}...`;
         try {
-            const res = await fetch(`${API_URL}${endpoint}`, {
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            const data = await res.json();
-            resEl.textContent = `Status: ${res.status}\n\n` + JSON.stringify(data, null, 2);
+            const data = await MetraAPI.get(`/staff${endpoint}`);
+            resEl.textContent = `Status: OK\n\n` + JSON.stringify(data, null, 2);
         } catch (error) {
-            resEl.textContent = `Error de red: ${error.message}`;
+            const dt = error.data || {};
+            resEl.textContent = `Error: ${error.status}\n\n` + JSON.stringify(dt, null, 2);
         }
     }
 

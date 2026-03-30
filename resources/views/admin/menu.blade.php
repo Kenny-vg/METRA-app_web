@@ -11,6 +11,10 @@
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        window.API_URL = "{{ url('/api') }}";
+        window.FILE_URL = "{{ url('/') }}";
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Custom Scrollbar -->

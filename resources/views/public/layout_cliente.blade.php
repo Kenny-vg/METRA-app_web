@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        window.API_URL = "{{ url('/api') }}";
+        window.FILE_URL = "{{ url('/') }}";
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body style="background-color: var(--off-white); font-family: 'Inter', sans-serif;">
@@ -70,26 +74,15 @@
         if (token) {
             document.getElementById('nav-profile-btn').style.setProperty('display', 'flex', 'important');
             try {
-                const API_URL = '';
-                const response = await fetch('/api/mi-perfil', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    const user = data.data.usuario;
-                    
-                    const layoutName = document.getElementById('clientName');
-                    const layoutAvatar = document.getElementById('clientAvatar');
-                    
-                    if (layoutName) layoutName.textContent = user.name;
-                    if (layoutAvatar) {
-                        layoutAvatar.src = user.avatar ? user.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=0A0A0A&color=FFFFFF`;
-                    }
+                const data = await MetraAPI.get('/mi-perfil');
+                const user = data.data.usuario;
+                
+                const layoutName = document.getElementById('clientName');
+                const layoutAvatar = document.getElementById('clientAvatar');
+                
+                if (layoutName) layoutName.textContent = user.name;
+                if (layoutAvatar) {
+                    layoutAvatar.src = user.avatar ? user.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=0A0A0A&color=FFFFFF`;
                 }
             } catch (error) {
                 console.error('Error fetching global profile data:', error);

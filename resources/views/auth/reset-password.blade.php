@@ -11,7 +11,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- URL global del backend API (configurable por entorno) -->
     <script>
-        window.APP_API_URL = window.location.origin;
+        window.API_URL = "{{ url('/api') }}";
+        window.FILE_URL = "{{ url('/') }}";
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -122,46 +123,27 @@
                 btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Procesando...';
 
                 try {
-                    const API_URL = '/api';
-                    const response = await fetch(`${API_URL}/reset-password`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({ 
-                            email, 
-                            token, 
-                            password, 
-                            password_confirmation 
-                        })
+                    const result = await MetraAPI.post('/reset-password', {
+                        email, 
+                        token, 
+                        password, 
+                        password_confirmation 
                     });
 
-                    const result = await response.json();
-
-                    if (response.ok) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: '¡Éxito!',
-                            text: result.message || 'Su contraseña ha sido actualizada correctamente.',
-                            confirmButtonColor: '#382C26'
-                        }).then(() => {
-                            window.location.href = "{{ route('login') }}";
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: result.message || 'Hubo un problema al restablecer la contraseña. El enlace puede haber expirado.',
-                            confirmButtonColor: '#382C26'
-                        });
-                    }
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: result.message || 'Su contraseña ha sido actualizada correctamente.',
+                        confirmButtonColor: '#382C26'
+                    }).then(() => {
+                        window.location.href = "{{ route('login') }}";
+                    });
                 } catch (error) {
-                    console.error('API Error:', error);
+                    const errData = error.data || error;
                     Swal.fire({
                         icon: 'error',
-                        title: 'Error de red',
-                        text: 'No se pudo conectar con el servidor.',
+                        title: 'Error',
+                        text: errData.message || 'Hubo un problema al restablecer la contraseña. El enlace puede haber expirado.',
                         confirmButtonColor: '#382C26'
                     });
                 } finally {

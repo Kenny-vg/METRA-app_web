@@ -9,9 +9,9 @@
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- URL global del backend API (configurable por entorno) -->
     <script>
-        window.APP_API_URL = window.location.origin;
+        window.API_URL = "{{ url('/api') }}";
+        window.FILE_URL = "{{ url('/') }}";
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -348,7 +348,7 @@
                 <p class="text-muted mx-auto" style="max-width: 520px;">Estos negocios ya digitalizan sus reservas con METRA. Sus clientes reservan directamente en el sistema del negocio.</p>
             </div>
             <div class="row g-4" id="cafeterias-container">
-                <div class="col-12 text-center text-muted py-4">
+                <div class="col-12 text-center text-muted py-4" id="cafeterias-loading">
                     <div class="spinner-border spinner-border-sm me-2"></div> Cargando cafeterías...
                 </div>
             </div>
@@ -368,13 +368,13 @@
 
     async function cargarCafeterias() {
         try {
-            const API_URL = '/api';
             const BASE_URL = "{{ url('/') }}";
-            const STORAGE_URL = "{{ url('/storage') }}";
-            const res = await fetch(`${API_URL}/cafeterias-publicas`);
-            const json = await res.json();
+            const json = await MetraAPI.get('/cafeterias-publicas?t=' + new Date().getTime());
             const cafeterias = Array.isArray(json) ? json : (json.data || []);
             const container = document.getElementById('cafeterias-container');
+            const loading = document.getElementById('cafeterias-loading');
+            
+            if (loading) loading.style.display = 'none';
 
             if (!cafeterias.length) {
                 container.innerHTML = '<div class="col-12 text-center text-muted py-4"><i class="bi bi-shop fs-1 d-block mb-2 opacity-25"></i>Próximamente habrá cafeterías disponibles.</div>';
@@ -388,7 +388,7 @@
                              onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 40px rgba(0,0,0,0.12)'"
                              onmouseout="this.style.transform='';this.style.boxShadow=''">
                             ${cafe.foto_url
-                                ? `<img src="/storage/${cafe.foto_url}?v=${new Date().getTime()}" alt="${cafe.nombre}" style="width:100%; height:180px; object-fit:cover;">`
+                                ? `<img src="${MetraAPI.getFileUrl(cafe.foto_url)}?v=${new Date().getTime()}" alt="${cafe.nombre}" style="width:100%; height:180px; object-fit:cover;">`
                                 : `<div style="height: 180px; background: linear-gradient(135deg, var(--black-primary), #2d3748); display: flex; align-items: center; justify-content: center;"><i class="bi bi-cup-hot-fill" style="font-size: 3.5rem; color: var(--accent-gold); opacity: 0.8;"></i></div>`
                             }
                             <div class="card-body p-4">
@@ -409,7 +409,7 @@
                 </div>
             `).join('');
         } catch (e) {
-            document.getElementById('cafeterias-container').innerHTML = '<div class="col-12 text-center text-muted">No se pudo cargar la información.</div>';
+            document.getElementById('cafeterias-container').innerHTML = '<div class="col-12 text-center text-muted py-4">No se pudo cargar la información.</div>';
         }
     }
     document.addEventListener('DOMContentLoaded', cargarCafeterias);

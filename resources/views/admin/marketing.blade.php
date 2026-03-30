@@ -300,13 +300,7 @@
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
 <script>
-const token = localStorage.getItem('token');
-const API_URL = '/api/gerente';
-const headers = () => ({
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'Authorization': `Bearer ${token}`
-});
+
 
 const showToast = (icon, title) => {
     Swal.fire({
@@ -331,10 +325,7 @@ const formatPrice = (price) => {
 
 async function loadPromociones() {
     try {
-        const res = await fetch(`${API_URL}/promociones`, { headers: headers() });
-        if (!res.ok) throw new Error('Error al cargar promociones');
-        
-        const response = await res.json();
+        const response = await MetraAPI.get('/gerente/promociones');
         const promos = Array.isArray(response) ? response : (response.data || []);
         
         const tbody = document.getElementById('tabla-promos-body');
@@ -431,11 +422,9 @@ let ocasionesCargadas = [];
 
 async function loadOcasionesForSelect() {
     try {
-        const res = await fetch(`${API_URL}/ocasiones`, { headers: headers() });
-        if (res.ok) {
-            const data = await res.json();
-            const ocasiones = Array.isArray(data) ? data : (data.data || []);
-            ocasionesCargadas = ocasiones.filter(o => o.activo);
+        const response = await MetraAPI.get('/gerente/ocasiones');
+        const ocasiones = Array.isArray(response) ? response : (response.data || []);
+        ocasionesCargadas = ocasiones.filter(o => o.activo);
             
             const select = document.getElementById('promoTipo');
             select.innerHTML = '';
@@ -598,31 +587,30 @@ async function guardarPromo() {
     const url = promoEditandoId ? `${API_URL}/promociones/${promoEditandoId}` : `${API_URL}/promociones`;
 
     try {
-        const res = await fetch(url, {
-            method,
-            headers: headers(),
-            body: JSON.stringify(data)
-        });
+        await MetraAPI[promoEditandoId ? 'put' : 'post'](
+            promoEditandoId ? `/gerente/promociones/${promoEditandoId}` : '/gerente/promociones',
+            data
+        );
 
-        if (res.ok) {
-            Swal.fire({
-                icon: 'success',
-                title: promoEditandoId ? 'Promoción actualizada' : 'Promoción creada',
-                text: promoEditandoId ? 'Los datos han sido guardados.' : 'La promoción fue registrada correctamente.',
-                confirmButtonColor: '#28a745'
-            });
-            modalPromoInst.hide();
-            loadPromociones();
+        Swal.fire({
+            icon: 'success',
+            title: promoEditandoId ? 'Promoción actualizada' : 'Promoción creada',
+            text: promoEditandoId ? 'Los datos han sido guardados.' : 'La promoción fue registrada correctamente.',
+            confirmButtonColor: '#28a745'
+        });
+        modalPromoInst.hide();
+        loadPromociones();
+    } catch (error) {
+        let errorMsg = 'Error al guardar promoción. Verifica los datos.';
+        if (error.data?.errors) {
+            errorMsg = Object.values(error.data.errors).flat().join('\n');
+        } else if (error.data?.message) {
+            errorMsg = error.data.message;
         } else {
-            const errorData = await res.json();
-            let errorMsg = 'Error al guardar promoción. Verifica los datos.';
-            if (errorData.errors) {
-                errorMsg = Object.values(errorData.errors).flat().join('\n');
-            } else if (errorData.message) {
-                errorMsg = errorData.message;
-            }
-            Swal.fire('Error', errorMsg, 'error');
+             errorMsg = error.message;
         }
+        Swal.fire('Error', errorMsg, 'error');
+    }
     } catch (error) {
         Swal.fire('Error', 'Error de conexión', 'error');
     }
@@ -641,16 +629,11 @@ async function deletePromocion(id) {
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                const res = await fetch(`${API_URL}/promociones/${id}`, { method: 'DELETE', headers: headers() });
-                if (res.ok) {
-                    showToast('success', 'Promoción desactivada');
-                    loadPromociones();
-                } else {
-                    const err = await res.json();
-                    Swal.fire('Error', err.message || 'Error al desactivar promoción', 'error');
-                }
+                await MetraAPI.delete(`/gerente/promociones/${id}`);
+                showToast('success', 'Promoción desactivada');
+                loadPromociones();
             } catch (error) {
-                Swal.fire('Error', 'Error de conexión', 'error');
+                Swal.fire('Error', error.data?.message || 'Error al desactivar promoción', 'error');
             }
         }
     });
@@ -669,16 +652,11 @@ async function reactivatePromocion(id) {
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                const res = await fetch(`${API_URL}/promociones/${id}/activar`, { method: 'PATCH', headers: headers() });
-                if (res.ok) {
-                    Swal.fire('Reactivada', 'Promoción reactivada', 'success');
-                    loadPromociones();
-                } else {
-                    const err = await res.json();
-                    Swal.fire('Error', err.message || 'Error al reactivar promoción', 'error');
-                }
+                await MetraAPI.post(`/gerente/promociones/${id}/activar`, {}, { 'X-HTTP-Method-Override': 'PATCH' });
+                Swal.fire('Reactivada', 'Promoción reactivada', 'success');
+                loadPromociones();
             } catch (error) {
-                Swal.fire('Error', 'Error de conexión', 'error');
+                Swal.fire('Error', error.data?.message || 'Error al reactivar promoción', 'error');
             }
         }
     });
@@ -690,10 +668,7 @@ let modalOcasionInst;
 
 async function loadOcasiones() {
     try {
-        const res = await fetch(`${API_URL}/ocasiones`, { headers: headers() });
-        if (!res.ok) throw new Error('Error al cargar ocasiones especiales');
-        
-        const response = await res.json();
+        const response = await MetraAPI.get('/gerente/ocasiones');
         const ocasiones = Array.isArray(response) ? response : (response.data || []);
         
         const tbody = document.getElementById('tabla-ocasiones-body');
@@ -783,23 +758,17 @@ document.getElementById('formOcasion').addEventListener('submit', async (e) => {
     const url = id ? `${API_URL}/ocasiones/${id}` : `${API_URL}/ocasiones`;
 
     try {
-        const res = await fetch(url, {
-            method,
-            headers: headers(),
-            body: JSON.stringify({ nombre, descripcion })
-        });
-
-        if (res.ok) {
-            showToast('success', id ? 'Ocasión actualizada' : 'Ocasión creada');
-            modalOcasionInst.hide();
-            await loadOcasiones();
-            await loadOcasionesForSelect();
-        } else {
-            const errorData = await res.json();
-            Swal.fire('Error', errorData.message || 'Error al guardar ocasión especial', 'error');
-        }
+        await MetraAPI[id ? 'put' : 'post'](
+            id ? `/gerente/ocasiones/${id}` : '/gerente/ocasiones',
+            { nombre, descripcion }
+        );
+        showToast('success', id ? 'Ocasión actualizada' : 'Ocasión creada');
+        modalOcasionInst.hide();
+        await loadOcasiones();
+        await loadOcasionesForSelect();
     } catch (error) {
-        Swal.fire('Error', 'Error de conexión', 'error');
+        const errorData = error.data || error;
+        Swal.fire('Error', errorData.message || 'Error al guardar ocasión especial', 'error');
     }
 });
 
@@ -816,17 +785,12 @@ async function deleteOcasion(id) {
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                const res = await fetch(`${API_URL}/ocasiones/${id}`, { method: 'DELETE', headers: headers() });
-                if (res.ok) {
-                    showToast('success', 'Ocasión desactivada');
-                    await loadOcasiones();
-                    await loadOcasionesForSelect();
-                } else {
-                    const err = await res.json();
-                    Swal.fire('Error', err.message || 'Error al desactivar ocasión', 'error');
-                }
+                await MetraAPI.delete(`/gerente/ocasiones/${id}`);
+                showToast('success', 'Ocasión desactivada');
+                await loadOcasiones();
+                await loadOcasionesForSelect();
             } catch (error) {
-                Swal.fire('Error', 'Error de conexión', 'error');
+                Swal.fire('Error', error.data?.message || 'Error al desactivar ocasión', 'error');
             }
         }
     });
@@ -845,17 +809,12 @@ async function reactivateOcasion(id) {
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                const res = await fetch(`${API_URL}/ocasiones/${id}/activar`, { method: 'PATCH', headers: headers() });
-                if (res.ok) {
-                    showToast('success', 'Ocasión reactivada');
-                    await loadOcasiones();
-                    await loadOcasionesForSelect();
-                } else {
-                    const err = await res.json();
-                    Swal.fire('Error', err.message || 'Error al reactivar ocasión', 'error');
-                }
+                await MetraAPI.post(`/gerente/ocasiones/${id}/activar`, {}, { 'X-HTTP-Method-Override': 'PATCH' });
+                showToast('success', 'Ocasión reactivada');
+                await loadOcasiones();
+                await loadOcasionesForSelect();
             } catch (error) {
-                Swal.fire('Error', 'Error de conexión', 'error');
+                Swal.fire('Error', error.data?.message || 'Error al reactivar ocasión', 'error');
             }
         }
     });

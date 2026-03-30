@@ -139,29 +139,17 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-const API = '';
-let authToken = localStorage.getItem('token') || '';
-
-if (!authToken) {
+if (!localStorage.getItem('token')) {
     window.location.href = '/login';
-}
-
-function authHeaders() {
-    return {
-        'Authorization': `Bearer ${authToken}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-    };
 }
 
 
 
 async function cargarConfiguracion() {
     try {
-        const res = await fetch(`${API}/configuracion-pago`, { headers: authHeaders() });
-        const json = await res.json();
-        if (res.ok && json.data) {
-            const config = json.data;
+        const res = await MetraAPI.get(`/configuracion-pago`);
+        if (res.data) {
+            const config = res.data;
             document.getElementById('conf_banco').value = config.banco || '';
             document.getElementById('conf_clabe').value = config.clabe || '';
             document.getElementById('conf_beneficiario').value = config.beneficiario || '';
@@ -190,22 +178,13 @@ async function guardarConfiguracion() {
     };
 
     try {
-        const res = await fetch(`${API}/superadmin/configuracion-pago`, {
-            method: 'PUT',
-            headers: authHeaders(),
-            body: JSON.stringify(data)
-        });
-        const json = await res.json();
+        await MetraAPI.put(`/superadmin/configuracion-pago`, data);
         overlay.style.setProperty('display', 'none', 'important');
-
-        if (!res.ok) {
-            Swal.fire({ icon: 'error', title: 'Error', text: json.message || 'Error al guardar', confirmButtonColor: '#0d6efd' });
-        } else {
-            Swal.fire({ icon: 'success', title: 'Guardado', text: 'Configuración actualizada.', confirmButtonColor: '#28a745', timer: 2000, showConfirmButton: false });
-        }
+        Swal.fire({ icon: 'success', title: 'Guardado', text: 'Configuración actualizada.', confirmButtonColor: '#28a745', timer: 2000, showConfirmButton: false });
     } catch (e) {
         overlay.style.setProperty('display', 'none', 'important');
-        Swal.fire({ icon: 'error', title: 'Error de Red', text: 'Problema de conexión.', confirmButtonColor: '#0d6efd' });
+        const fallbackMsg = e.data?.message || Object.values(e.data?.errors || {}).join(' | ') || e.message || 'Problema de conexión.';
+        Swal.fire({ icon: 'error', title: 'Error', text: fallbackMsg, confirmButtonColor: '#0d6efd' });
     }
 }
 

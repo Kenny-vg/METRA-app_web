@@ -65,7 +65,7 @@
     @include('partials.footer_admin')
 
     <script>
-        const API = '/api';
+
         let todasResenas = [];
         let filtroActual = 'todas';
 
@@ -166,18 +166,8 @@
             grid.innerHTML = '<div class="col-12 text-center py-5"><div class="spinner-border text-muted"></div><p class="mt-2 text-muted fw-bold small">CARGANDO RESEÑAS...</p></div>';
 
             try {
-                const token = localStorage.getItem('token');
-                const res = await fetch(`${API}/gerente/resenas`, {
-                    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-                });
-
-                if (!res.ok) {
-                    if (res.status === 401 || res.status === 403) { window.location.href = '/login'; return; }
-                    throw new Error('Error de red');
-                }
-
-                const json = await res.json();
-                todasResenas = json.data || [];
+                const res = await MetraAPI.get('/gerente/resenas');
+                todasResenas = res.data || [];
                 actualizarStats();
                 aplicarFiltro();
             } catch (e) {
@@ -188,27 +178,20 @@
 
         async function cambiarEstado(id, accion) {
             try {
-                const token = localStorage.getItem('token');
-                const res = await fetch(`${API}/gerente/resenas/${id}/${accion}`, {
-                    method: 'PATCH',
-                    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-                });
+                const res = await MetraAPI.post(`/gerente/resenas/${id}/${accion}`, {}, { 'X-HTTP-Method-Override': 'PATCH' });
 
-                if (!res.ok) throw new Error('Error al actualizar');
-
-                const json = await res.json();
-                if (json.success) {
+                if (res.success || res.status === 'success' || res.data) {
                     // Actualizar en memoria
                     const idx = todasResenas.findIndex(r => r.id === id);
                     if (idx !== -1) {
-                        todasResenas[idx].estado = json.data.estado;
+                        todasResenas[idx].estado = res.data?.estado || (accion === 'aprobar' ? 'publicada' : 'oculta');
                     }
                     actualizarStats();
                     aplicarFiltro();
 
                     Swal.fire({
                         icon: 'success',
-                        title: json.message || 'Actualizado',
+                        title: res.message || 'Actualizado',
                         timer: 1500,
                         showConfirmButton: false,
                         toast: true,
@@ -217,7 +200,7 @@
                 }
             } catch (e) {
                 console.error(e);
-                Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo actualizar la reseña.' });
+                Swal.fire({ icon: 'error', title: 'Error', text: e.data?.message || e.message || 'No se pudo actualizar la reseña.' });
             }
         }
 

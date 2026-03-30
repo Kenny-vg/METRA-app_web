@@ -385,9 +385,9 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<!-- URL global del backend API (configurable por entorno) -->
 <script>
-    window.APP_API_URL = window.location.origin;
+    window.API_URL = "{{ url('/api') }}";
+    window.FILE_URL = "{{ url('/') }}";
 </script>
 <script>
     window.escapeHTML = function(str) {
@@ -395,7 +395,6 @@
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     };
 
-    const API_URL = '/api';
     let selectedPlanId = null;
     let registeredCafeteriaId = null;
 
@@ -507,8 +506,7 @@
 
     window.cargarPlanes = async function() {
         try {
-            const res = await fetch(`${API_URL}/planes-publicos`);
-            const json = await res.json();
+            const json = await MetraAPI.get('/planes-publicos');
             const planesData = json.data || [];
             renderPlanes(planesData);
             renderPlanSelector(planesData);
@@ -734,61 +732,14 @@
         };
 
         try {
-            const res = await fetch(`${API_URL}/registro-negocio`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const json = await res.json();
-            
+            const json = await MetraAPI.post('/registro-negocio', payload);
             console.log("registro response:", json);
-            
             clearValidationErrors();
-
-            if (!res.ok) {
-                if (res.status === 422 && json.errors) {
-                    showValidationErrors(json.errors);
-                    showAlert('Revisa los campos marcados en rojo.');
-                } else if (res.status === 403) {
-                    // Rechazado
-                    showAlert(json.message || 'Tu registro ha sido rechazado. Contacta a soporte.', 'error');
-                } else if (res.status === 409) {
-                    // Ya tiene comprobante
-                    showAlert(json.message || 'Tu comprobante ya fue enviado y está en revisión.', 'info');
-                    
-                    // Limpiar local storage
-                    localStorage.removeItem('registro_cafeteria_id');
-                    localStorage.removeItem('wizard_form_data');
-
-                    // Destruir el wizard completamente mostrando la pantalla de bloque
-                    const wizardCard = document.getElementById('wizard-form');
-                    if (wizardCard) {
-                        wizardCard.innerHTML = `
-                            <div class="text-center py-5">
-                                <i class="bi bi-shield-lock-fill mb-3" style="font-size: 5rem; color: var(--accent-gold);"></i>
-                                <h2 class="fw-bold mb-3" style="color: var(--black-primary);">Comprobante en Revisión</h2>
-                                <p class="text-muted mx-auto mb-4" style="max-width: 450px; line-height: 1.6;">
-                                    Hemos detectado que ya subiste el comprobante para esta cuenta. Por favor, espera a que nuestro equipo administrativo valide el formato oficial de tus credenciales de acceso.
-                                </p>
-                                <a href="${window.location.origin}" class="btn-metra-main px-4 py-2 mt-2">Volver al inicio</a>
-                            </div>
-                        `;
-                    }
-                    return;
-                } else {
-                    let errorMsg = 'Algo salió mal al procesar tu solicitud. Intenta de nuevo más tarde.';
-                    if (res.status === 400 || json.message) {
-                        errorMsg = json.message || errorMsg;
-                    }
-                    showAlert(errorMsg);
-                }
-                return;
-            }
             
             if (json.data && json.data.cafeteria_id) {
                 registeredCafeteriaId = json.data.cafeteria_id;
                 localStorage.setItem('registro_cafeteria_id', registeredCafeteriaId);
                 
-                // Si es un registro existente que aún no tiene comprobante (o recarga de datos)
                 if (json.data.registro_existente) {
                     console.log("Registro existente detectado, avanzando a paso 3");
                 }
@@ -798,8 +749,46 @@
             } else {
                 showAlert('No se pudo obtener el ID del negocio. Contacta a soporte.');
             }
-        } catch (e) { 
-            showAlert('Error de conexión. ' + e.message); 
+        } catch(error) {
+            clearValidationErrors();
+            const status = error.status;
+            const data = error.data || {};
+
+            if (status === 422 && data.errors) {
+                showValidationErrors(data.errors);
+                showAlert('Revisa los campos marcados en rojo.');
+            } else if (status === 403) {
+                // Rechazado
+                showAlert(data.message || 'Tu registro ha sido rechazado. Contacta a soporte.', 'error');
+            } else if (status === 409) {
+                // Ya tiene comprobante
+                showAlert(data.message || 'Tu comprobante ya fue enviado y está en revisión.', 'info');
+                
+                // Limpiar local storage
+                localStorage.removeItem('registro_cafeteria_id');
+                localStorage.removeItem('wizard_form_data');
+
+                // Destruir el wizard completamente mostrando la pantalla de bloque
+                const wizardCard = document.getElementById('wizard-form');
+                if (wizardCard) {
+                    wizardCard.innerHTML = `
+                        <div class="text-center py-5">
+                            <i class="bi bi-shield-lock-fill mb-3" style="font-size: 5rem; color: var(--accent-gold);"></i>
+                            <h2 class="fw-bold mb-3" style="color: var(--black-primary);">Comprobante en Revisión</h2>
+                            <p class="text-muted mx-auto mb-4" style="max-width: 450px; line-height: 1.6;">
+                                Hemos detectado que ya subiste el comprobante para esta cuenta. Por favor, espera a que nuestro equipo administrativo valide el formato oficial de tus credenciales de acceso.
+                            </p>
+                            <a href="${window.location.origin}" class="btn-metra-main px-4 py-2 mt-2">Volver al inicio</a>
+                        </div>
+                    `;
+                }
+            } else {
+                let errorMsg = 'Algo salió mal al procesar tu solicitud. Intenta de nuevo más tarde.';
+                if (status === 400 || data.message) {
+                    errorMsg = data.message || errorMsg;
+                }
+                showAlert(errorMsg);
+            }
         } 
         finally { btnTxt.classList.remove('d-none'); btnLd.classList.add('d-none'); }
     }
@@ -883,43 +872,7 @@
         console.log("URL comprobante:", `/api/registro-negocio/${registeredCafeteriaId}/comprobante`);
 
         try {
-            const res = await fetch(`/api/registro-negocio/${registeredCafeteriaId}/comprobante`, {
-                method: 'POST', 
-                headers: { 'Accept': 'application/json' }, 
-                body: fd
-            });
-            
-            const json = await res.json();
-            
-            if (!res.ok) {
-                if (res.status === 409) {
-                    showAlert(json.message || 'Tu comprobante ya fue enviado y está en revisión', 'info');
-                    
-                    // Limpiar local storage
-                    localStorage.removeItem('registro_cafeteria_id');
-                    localStorage.removeItem('wizard_form_data');
-
-                    // Destruir el wizard completamente mostrando la pantalla de bloque
-                    const wizardCard = document.getElementById('wizard-form');
-                    if (wizardCard) {
-                        wizardCard.innerHTML = `
-                            <div class="text-center py-5">
-                                <i class="bi bi-shield-lock-fill mb-3" style="font-size: 5rem; color: var(--accent-gold);"></i>
-                                <h2 class="fw-bold mb-3" style="color: var(--black-primary);">Comprobante en Revisión</h2>
-                                <p class="text-muted mx-auto mb-4" style="max-width: 450px; line-height: 1.6;">
-                                    Hemos detectado que ya subiste el comprobante para esta cuenta. Por favor, espera a que nuestro equipo administrativo valide el formato oficial de tus credenciales de acceso.
-                                </p>
-                                <a href="${window.location.origin}" class="btn-metra-main px-4 py-2 mt-2">Volver al inicio</a>
-                            </div>
-                        `;
-                    }
-                    return;
-                }
-                if (res.status === 422 && json.errors && json.errors.comprobante) {
-                    throw new Error(json.errors.comprobante[0]);
-                }
-                throw new Error(json.message || 'Ocurrió un error general en el servidor. (HTTP ' + res.status + ')');
-            }
+            const json = await MetraAPI.post(`/registro-negocio/${registeredCafeteriaId}/comprobante`, fd);
             
             // Éxito! Limpiar estado local y avanzar
             localStorage.removeItem('registro_cafeteria_id');
@@ -929,8 +882,36 @@
             document.getElementById('step-success').classList.add('active');
             document.querySelectorAll('.step-dot').forEach(d => { d.classList.remove('active'); d.classList.add('done'); });
             
-        } catch(e) { 
-            showAlert(e.message); 
+        } catch(error) { 
+            const status = error.status;
+            const data = error.data || {};
+
+            if (status === 409) {
+                showAlert(data.message || 'Tu comprobante ya fue enviado y está en revisión', 'info');
+                
+                // Limpiar local storage
+                localStorage.removeItem('registro_cafeteria_id');
+                localStorage.removeItem('wizard_form_data');
+
+                // Destruir el wizard completamente mostrando la pantalla de bloque
+                const wizardCard = document.getElementById('wizard-form');
+                if (wizardCard) {
+                    wizardCard.innerHTML = `
+                        <div class="text-center py-5">
+                            <i class="bi bi-shield-lock-fill mb-3" style="font-size: 5rem; color: var(--accent-gold);"></i>
+                            <h2 class="fw-bold mb-3" style="color: var(--black-primary);">Comprobante en Revisión</h2>
+                            <p class="text-muted mx-auto mb-4" style="max-width: 450px; line-height: 1.6;">
+                                Hemos detectado que ya subiste el comprobante para esta cuenta. Por favor, espera a que nuestro equipo administrativo valide el formato oficial de tus credenciales de acceso.
+                            </p>
+                            <a href="${window.location.origin}" class="btn-metra-main px-4 py-2 mt-2">Volver al inicio</a>
+                        </div>
+                    `;
+                }
+            } else if (status === 422 && data.errors && data.errors.comprobante) {
+                showAlert(data.errors.comprobante[0]);
+            } else {
+                showAlert(data.message || 'Ocurrió un error general en el servidor o problema de conexión.');
+            }
         } finally { 
             btnTxt.classList.remove('d-none'); 
             btnLd.classList.add('d-none'); 
@@ -978,10 +959,9 @@
         const details = document.getElementById('pago-details-wizard');
         
         try {
-            const res = await fetch(`${API_URL}/configuracion-pago`);
-            const json = await res.json();
+            const json = await MetraAPI.get('/configuracion-pago');
             
-            if(res.ok && json.data) {
+            if(json.data) {
                 const config = json.data;
                 
                 document.getElementById('dyn-banco').textContent = config.banco || 'No provisto';

@@ -11,7 +11,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <!-- URL global del backend API (configurable por entorno) -->
     <script>
-        window.APP_API_URL = window.location.origin;
+        window.API_URL = "{{ url('/api') }}";
+        window.FILE_URL = "{{ url('/') }}";
     </script>
 </head>
 <body class="zona-comensal">
@@ -254,11 +255,7 @@
             const FALLBACK_IMG = "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&q=80&w=1600";
 
             try {
-                const res = await fetch(`${API_URL}/cafeterias-publicas/${cafeSlug}`);
-                if (!res.ok) {
-                    throw new Error('No encontrado');
-                }
-                const json = await res.json();
+                const json = await MetraAPI.get(`/cafeterias-publicas/${cafeSlug}`);
                 const cafe = json.data;
 
                 // Bind text elements
@@ -365,10 +362,8 @@
                 }
 
                 try {
-                    const resMenu = await fetch(`${API_URL}/cafeterias/${cafe.slug}/menu`);
-                    if(resMenu.ok) {
-                        const jsonMenu = await resMenu.json();
-                        menuOriginalData = jsonMenu.data || [];
+                    const jsonMenu = await MetraAPI.get(`/cafeterias/${cafe.slug}/menu`);
+                    menuOriginalData = jsonMenu.data || [];
                         
                         // Generar botones de filtro
                         const filtrosContainer = document.getElementById('menu-filtros-container');
@@ -377,7 +372,6 @@
                         });
 
                         renderizarContenidoMenu(menuOriginalData);
-                    }
                 } catch (e) {
                     console.error("Error loading menu", e);
                 }
@@ -404,10 +398,8 @@
 
                 async function cargarOcasionesFiltros() {
                     try {
-                        const res = await fetch(`${API_URL}/cafeterias/${cafe.slug}/ocasiones`);
-                        if (res.ok) {
-                            const data = await res.json();
-                            const ocasiones = data.data || [];
+                        const data = await MetraAPI.get(`/cafeterias/${cafe.slug}/ocasiones`);
+                        const ocasiones = data.data || [];
                             if (ocasiones.length > 0) {
                                 document.getElementById('ocasiones-filtros-container').classList.remove('d-none');
                                 const container = document.getElementById('ocasiones-filtros-container');
@@ -415,7 +407,6 @@
                                     container.innerHTML += `<button id="btn-ocasion-${o.id}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill btn-filtro-ocasion fw-medium" onclick="filtrarPromos(${o.id})">${escapeHTML(o.nombre)}</button>`;
                                 });
                             }
-                        }
                     } catch (e) {
                          console.error("Error loading ocasiones", e);
                     }
@@ -428,12 +419,10 @@
                         
                         const url = ocasionId 
                             ? `${API_URL}/cafeterias/${cafe.slug}/ocasiones/${ocasionId}/promociones`
-                            : `${API_URL}/cafeterias/${cafe.slug}/promociones`;
+                            : `/cafeterias/${cafe.slug}/promociones`;
                             
-                        const resPromos = await fetch(url);
-                        if(resPromos.ok) {
-                            const jsonPromos = await resPromos.json();
-                            const promosData = jsonPromos.data || [];
+                        const jsonPromos = await MetraAPI.get(url);
+                        const promosData = jsonPromos.data || [];
                             promosContainer.innerHTML = '';
                             
                             if(promosData.length === 0 && !ocasionId) {
@@ -463,7 +452,6 @@
                                     `;
                                 });
                             }
-                        }
                     } catch (e) {
                          console.error("Error loading promotions", e);
                          promosContainer.innerHTML = '<div class="col-12 text-danger text-center"><small>No se pudieron cargar las promociones.</small></div>';
@@ -475,45 +463,42 @@
                 
                 // --- Load Reseñas ---
                 try {
-                    const resResenas = await fetch(`${API_URL}/cafeterias/${cafe.slug}/resenas`);
-                    if(resResenas.ok) {
-                        const jsonResenas = await resResenas.json();
-                        const resenasList = jsonResenas.data || [];
-                        const resenasContainer = document.getElementById('resenas-container');
-                        const sectionResenas = document.getElementById('sectionResenas');
+                    const jsonResenas = await MetraAPI.get(`/cafeterias/${cafe.slug}/resenas`);
+                    const resenasList = jsonResenas.data || [];
+                    const resenasContainer = document.getElementById('resenas-container');
+                    const sectionResenas = document.getElementById('sectionResenas');
                         
-                        resenasContainer.innerHTML = '';
-                        if(resenasList.length > 0) {
-                            resenasList.forEach(r => {
-                                let starsHtml = '';
-                                for(let i=1; i<=5; i++){
-                                    if(i <= r.calificacion){
-                                        starsHtml += `<i class="bi bi-star-fill text-warning me-1"></i>`;
-                                    } else {
-                                        starsHtml += `<i class="bi bi-star text-muted me-1" style="opacity:0.3;"></i>`;
-                                    }
+                    resenasContainer.innerHTML = '';
+                    if(resenasList.length > 0) {
+                        resenasList.forEach(r => {
+                            let starsHtml = '';
+                            for(let i=1; i<=5; i++){
+                                if(i <= r.calificacion){
+                                    starsHtml += `<i class="bi bi-star-fill text-warning me-1"></i>`;
+                                } else {
+                                    starsHtml += `<i class="bi bi-star text-muted me-1" style="opacity:0.3;"></i>`;
                                 }
-                                
-                                resenasContainer.innerHTML += `
-                                    <div class="col-12 col-md-6 mb-3">
-                                        <div class="p-4 rounded-4 shadow-sm h-100" style="background: var(--off-white); border: 1px solid var(--border-light);">
-                                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                                <div class="small fw-bold text-muted">${r.fecha}</div>
-                                                <div>${starsHtml}</div>
-                                            </div>
-                                            <p class="mb-0 text-muted" style="line-height: 1.5; font-size: 0.95rem;">"${escapeHTML(r.comentario || 'Excelente servicio.')}"</p>
+                            }
+                            
+                            resenasContainer.innerHTML += `
+                                <div class="col-12 col-md-6 mb-3">
+                                    <div class="p-4 rounded-4 shadow-sm h-100" style="background: var(--off-white); border: 1px solid var(--border-light);">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <div class="small fw-bold text-muted">${r.fecha}</div>
+                                            <div>${starsHtml}</div>
                                         </div>
+                                        <p class="mb-0 text-muted" style="line-height: 1.5; font-size: 0.95rem;">"${escapeHTML(r.comentario || 'Excelente servicio.')}"</p>
                                     </div>
-                                `;
-                            });
-                        } else {
-                            resenasContainer.innerHTML = `
-                                <div class="col-12 text-center py-4">
-                                    <i class="bi bi-chat-square-text display-5 d-block mb-3" style="color: var(--border-light);"></i>
-                                    <p class="text-muted mb-0">Este negocio aún no tiene reseñas. ¡Sé el primero en compartir tu experiencia!</p>
                                 </div>
                             `;
-                        }
+                        });
+                    } else {
+                        resenasContainer.innerHTML = `
+                            <div class="col-12 text-center py-4">
+                                <i class="bi bi-chat-square-text display-5 d-block mb-3" style="color: var(--border-light);"></i>
+                                <p class="text-muted mb-0">Este negocio aún no tiene reseñas. ¡Sé el primero en compartir tu experiencia!</p>
+                            </div>
+                        `;
                     }
                 } catch (e) {
                     console.error("Error loading resenas", e);
@@ -521,10 +506,8 @@
 
                 // --- Horarios de Atención (informativo, no reservaciones) ---
                 try {
-                    const resHorarios = await fetch(`${API_URL}/cafeterias/${cafe.slug}/horarios`);
-                    if (resHorarios.ok) {
-                        const jsonHorarios = await resHorarios.json();
-                        const horariosList = (jsonHorarios.data || []).filter(h => h.activo !== false && h.activo !== 0);
+                    const jsonHorarios = await MetraAPI.get(`/cafeterias/${cafe.slug}/horarios`);
+                    const horariosList = (jsonHorarios.data || []).filter(h => h.activo !== false && h.activo !== 0);
 
                         if (horariosList.length > 0) {
                             const fmt24 = t => t ? t.substring(0, 5) : '--:--';
@@ -561,7 +544,6 @@
                                 </span>
                             `;
                         }
-                    }
                 } catch (e) {
                     console.error('Error loading horarios públicos', e);
                     document.getElementById('horarios-slots-container').innerHTML = '<small class="text-muted">Horarios no disponibles temporalmente.</small>';

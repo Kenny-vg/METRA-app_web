@@ -27,19 +27,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-const API = '';
-let authToken = localStorage.getItem('token') || '';
-
-if (!authToken) {
+if (!localStorage.getItem('token')) {
     window.location.href = '/login';
-}
-
-function authHeaders() {
-    return {
-        'Authorization': `Bearer ${authToken}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-    };
 }
 
 let planesData = [];
@@ -48,13 +37,10 @@ async function cargarPlanes() {
     const overlay = document.getElementById('overlay-loading');
     overlay.style.setProperty('display', 'flex', 'important');
     try {
-        const res = await fetch(`${API}/superadmin/planes`, { headers: authHeaders() });
-        const json = await res.json();
-        if (res.ok) {
-            planesData = json.data || [];
+        const res = await MetraAPI.get(`/superadmin/planes`);
+        if (res.data) {
+            planesData = res.data || [];
             renderPlanes();
-        } else {
-            console.error('Error al cargar planes:', json.message);
         }
     } catch (e) {
         console.error('Error loading planes:', e);
@@ -204,24 +190,16 @@ async function guardarPlan(id) {
     };
 
     try {
-        const res = await fetch(`${API}/superadmin/planes/${id}`, {
-            method: 'PUT',
-            headers: authHeaders(),
-            body: JSON.stringify(data)
-        });
-        const json = await res.json();
+        await MetraAPI.put(`/superadmin/planes/${id}`, data);
         overlay.style.setProperty('display', 'none', 'important');
 
-        if (!res.ok) {
-            const fallbackMsg = json.message || Object.values(json.errors || {}).join(' | ');
-            Swal.fire({ icon: 'error', title: 'Error al Guardar', text: fallbackMsg, confirmButtonColor: '#0d6efd' });
-        } else {
-            Swal.fire({ icon: 'success', title: 'Plan Actualizado', text: `El plan "${nombre_plan}" se actualizó exitosamente.`, confirmButtonColor: '#28a745', timer: 2000, showConfirmButton: false });
-            cargarPlanes(); // Refresh
-        }
+        Swal.fire({ icon: 'success', title: 'Plan Actualizado', text: `El plan "${nombre_plan}" se actualizó exitosamente.`, confirmButtonColor: '#28a745', timer: 2000, showConfirmButton: false });
+        cargarPlanes(); // Refresh
+        
     } catch (e) {
         overlay.style.setProperty('display', 'none', 'important');
-        Swal.fire({ icon: 'error', title: 'Error de Red', text: 'Ocurrió un problema de conexión.', confirmButtonColor: '#0d6efd' });
+        const fallbackMsg = e.data?.message || Object.values(e.data?.errors || {}).join(' | ') || e.message || 'Ocurrió un problema de conexión.';
+        Swal.fire({ icon: 'error', title: 'Error al Guardar', text: fallbackMsg, confirmButtonColor: '#0d6efd' });
     }
 }
 
@@ -246,24 +224,16 @@ async function crearPlan() {
     };
 
     try {
-        const res = await fetch(`${API}/superadmin/planes`, {
-            method: 'POST',
-            headers: authHeaders(),
-            body: JSON.stringify(data)
-        });
-        const json = await res.json();
+        await MetraAPI.post(`/superadmin/planes`, data);
         overlay.style.setProperty('display', 'none', 'important');
 
-        if (!res.ok) {
-            const fallbackMsg = json.message || Object.values(json.errors || {}).join(' | ');
-            Swal.fire({ icon: 'error', title: 'Error al Crear', text: fallbackMsg, confirmButtonColor: '#0d6efd' });
-        } else {
-            Swal.fire({ icon: 'success', title: 'Plan Creado', text: `El nuevo plan "${nombre_plan}" se creó correctamente.`, confirmButtonColor: '#28a745', timer: 2000, showConfirmButton: false });
-            cargarPlanes();
-        }
+        Swal.fire({ icon: 'success', title: 'Plan Creado', text: `El nuevo plan "${nombre_plan}" se creó correctamente.`, confirmButtonColor: '#28a745', timer: 2000, showConfirmButton: false });
+        cargarPlanes();
+        
     } catch (e) {
         overlay.style.setProperty('display', 'none', 'important');
-        Swal.fire({ icon: 'error', title: 'Error de Red', text: 'Ocurrió un problema de conexión.', confirmButtonColor: '#0d6efd' });
+        const fallbackMsg = e.data?.message || Object.values(e.data?.errors || {}).join(' | ') || e.message || 'Ocurrió un problema de conexión.';
+        Swal.fire({ icon: 'error', title: 'Error al Crear', text: fallbackMsg, confirmButtonColor: '#0d6efd' });
     }
 }
 

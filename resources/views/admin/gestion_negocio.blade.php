@@ -333,7 +333,7 @@
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted">CONTRASEÑA</label>
                             <div class="position-relative">
-                                <input type="password" id="staff-password" class="form-control border-0 shadow-sm rounded-3 pe-5" style="background: var(--off-white);" placeholder="Mínimo 8 caracteres">
+                                <input type="password" id="staff-password" autocomplete="new-password" class="form-control border-0 shadow-sm rounded-3 pe-5" style="background: var(--off-white);" placeholder="Mínimo 8 caracteres">
                                 <i class="bi bi-eye-slash toggle-staff-pw position-absolute top-50 end-0 translate-middle-y me-3 text-muted" style="cursor: pointer; z-index: 10;"></i>
                             </div>
                             <small class="text-muted" id="staff-password-help" style="display: none;">Dejar en blanco para mantener la contraseña actual.</small>
@@ -342,7 +342,7 @@
                         <div class="mb-4" id="staff-password-confirm-group">
                             <label class="form-label small fw-bold text-muted">CONFIRMAR CONTRASEÑA</label>
                             <div class="position-relative">
-                                <input type="password" id="staff-password-confirm" class="form-control border-0 shadow-sm rounded-3 pe-5" style="background: var(--off-white);" placeholder="Repite la contraseña">
+                                <input type="password" id="staff-password-confirm" autocomplete="new-password" class="form-control border-0 shadow-sm rounded-3 pe-5" style="background: var(--off-white);" placeholder="Repite la contraseña">
                                 <i class="bi bi-eye-slash toggle-staff-pw position-absolute top-50 end-0 translate-middle-y me-3 text-muted" style="cursor: pointer; z-index: 10;"></i>
                             </div>
                         </div>
@@ -470,23 +470,7 @@
             loadStaff();
         });
 
-        const API_URL = '/api/gerente';
-        const getToken = () => localStorage.getItem('token');
 
-        const headers = () => ({
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${getToken()}`
-        });
-
-        // Redirige al login si el token expiró o fue revocado
-        const handleAuthError = (res) => {
-            if (res.status === 401 || res.status === 403) {
-                window.location.href = '/login';
-                return true;
-            }
-            return false;
-        };
 
         const showToast = (icon, title) => {
             Swal.fire({
@@ -502,12 +486,7 @@
         // --- ZONAS ---
         async function loadZonas() {
             try {
-                const res = await fetch(`${API_URL}/zonas`, { headers: headers() });
-                if (handleAuthError(res)) return;
-                if (!res.ok) throw new Error('Error al cargar zonas');
-                
-                const response = await res.json();
-                // Extract array depending on how API is structuring it (often response.data)
+                const response = await MetraAPI.get('/gerente/zonas');
                 const zonas = Array.isArray(response) ? response : (response.data || []);
                 
                 const tbody = document.getElementById('tabla-zonas-body');
@@ -611,25 +590,17 @@
             const url = id ? `${API_URL}/zonas/${id}` : `${API_URL}/zonas`;
 
             try {
-                const res = await fetch(url, {
-                    method,
-                    headers: headers(),
-                    body: JSON.stringify({ nombre_zona })
-                });
-
-                if (handleAuthError(res)) return;
-                if (res.ok) {
-                    showToast('success', id ? 'Zona actualizada' : 'Zona creada');
-                    modalZonaInst.hide();
-                    loadZonas();
-                    loadMesas(); // Mesas could depend on it
-                } else {
-                    const errorData = await res.json();
-                    Swal.fire('Error', errorData.message || 'Error al guardar zona', 'error');
-                }
+                await MetraAPI[id ? 'put' : 'post'](
+                    id ? `/gerente/zonas/${id}` : '/gerente/zonas',
+                    { nombre_zona }
+                );
+                showToast('success', id ? 'Zona actualizada' : 'Zona creada');
+                modalZonaInst.hide();
+                loadZonas();
+                loadMesas();
             } catch (error) {
-                console.error(error);
-                Swal.fire('Error', 'Error de conexión', 'error');
+                const errorData = error.data || error;
+                Swal.fire('Error', errorData.message || 'Error al guardar zona', 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalText;
@@ -650,18 +621,12 @@
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
-                        const res = await fetch(`${API_URL}/zonas/${id}`, { method: 'DELETE', headers: headers() });
-                        if (handleAuthError(res)) return;
-                        if (res.ok) {
-                            showToast('success', 'Zona desactivada');
-                            loadZonas();
-                            loadMesas();
-                        } else {
-                            const err = await res.json();
-                            Swal.fire('Error', err.message || 'Error al desactivar zona', 'error');
-                        }
+                        await MetraAPI.delete(`/gerente/zonas/${id}`);
+                        showToast('success', 'Zona desactivada');
+                        loadZonas();
+                        loadMesas();
                     } catch (error) {
-                        Swal.fire('Error', 'Error de conexión', 'error');
+                        Swal.fire('Error', error.data?.message || 'Error al desactivar zona', 'error');
                     }
                 }
             });
@@ -680,18 +645,12 @@
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
-                        const res = await fetch(`${API_URL}/zonas/${id}/activar`, { method: 'PATCH', headers: headers() });
-                        if (handleAuthError(res)) return;
-                        if (res.ok) {
-                            showToast('success', 'Zona reactivada');
-                            loadZonas();
-                            loadMesas();
-                        } else {
-                            const err = await res.json();
-                            Swal.fire('Error', err.message || 'Error al reactivar zona', 'error');
-                        }
+                        await MetraAPI.post(`/gerente/zonas/${id}/activar`, {}, { 'X-HTTP-Method-Override': 'PATCH' });
+                        showToast('success', 'Zona reactivada');
+                        loadZonas();
+                        loadMesas();
                     } catch (error) {
-                        Swal.fire('Error', 'Error de conexión', 'error');
+                        Swal.fire('Error', error.data?.message || 'Error al reactivar zona', 'error');
                     }
                 }
             });
@@ -700,11 +659,7 @@
         // --- MESAS ---
         async function loadMesas() {
             try {
-                const res = await fetch(`${API_URL}/mesas`, { headers: headers() });
-                if (handleAuthError(res)) return;
-                if (!res.ok) throw new Error('Error al cargar mesas');
-                
-                const response = await res.json();
+                const response = await MetraAPI.get('/gerente/mesas');
                 const mesas = Array.isArray(response) ? response : (response.data || []);
                 
                 const tbody = document.getElementById('tabla-mesas-body');
@@ -805,23 +760,16 @@
             const url = id ? `${API_URL}/mesas/${id}` : `${API_URL}/mesas`;
 
             try {
-                const res = await fetch(url, {
-                    method,
-                    headers: headers(),
-                    body: JSON.stringify(data)
-                });
-
-                if (handleAuthError(res)) return;
-                if (res.ok) {
-                    showToast('success', id ? 'Mesa actualizada' : 'Mesa creada');
-                    modalMesaInst.hide();
-                    loadMesas();
-                } else {
-                    const errorData = await res.json();
-                    Swal.fire('Error', errorData.message || 'Error al guardar mesa', 'error');
-                }
+                await MetraAPI[id ? 'put' : 'post'](
+                    id ? `/gerente/mesas/${id}` : '/gerente/mesas',
+                    data
+                );
+                showToast('success', id ? 'Mesa actualizada' : 'Mesa creada');
+                modalMesaInst.hide();
+                loadMesas();
             } catch (error) {
-                Swal.fire('Error', 'Error de conexión', 'error');
+                const errorData = error.data || error;
+                Swal.fire('Error', errorData.message || 'Error al guardar mesa', 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalText;
@@ -842,17 +790,11 @@
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
-                        const res = await fetch(`${API_URL}/mesas/${id}`, { method: 'DELETE', headers: headers() });
-                        if (handleAuthError(res)) return;
-                        if (res.ok) {
-                            showToast('success', 'Mesa desactivada');
-                            loadMesas();
-                        } else {
-                            const err = await res.json();
-                            Swal.fire('Error', err.message || 'Error al desactivar mesa', 'error');
-                        }
+                        await MetraAPI.delete(`/gerente/mesas/${id}`);
+                        showToast('success', 'Mesa desactivada');
+                        loadMesas();
                     } catch (error) {
-                        Swal.fire('Error', 'Error de conexión', 'error');
+                        Swal.fire('Error', error.data?.message || 'Error al desactivar mesa', 'error');
                     }
                 }
             });
@@ -871,17 +813,11 @@
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
-                        const res = await fetch(`${API_URL}/mesas/${id}/activar`, { method: 'PATCH', headers: headers() });
-                        if (handleAuthError(res)) return;
-                        if (res.ok) {
-                            showToast('success', 'Mesa reactivada');
-                            loadMesas();
-                        } else {
-                            const err = await res.json();
-                            Swal.fire('Error', err.message || 'Error al reactivar mesa. Verifica la zona', 'error');
-                        }
+                        await MetraAPI.post(`/gerente/mesas/${id}/activar`, {}, { 'X-HTTP-Method-Override': 'PATCH' });
+                        showToast('success', 'Mesa reactivada');
+                        loadMesas();
                     } catch (error) {
-                        Swal.fire('Error', 'Error de conexión', 'error');
+                        Swal.fire('Error', error.data?.message || 'Error al reactivar mesa. Verifica la zona', 'error');
                     }
                 }
             });
@@ -890,11 +826,7 @@
         // --- HORARIOS ---
         async function loadHorarios() {
             try {
-                const res = await fetch(`${API_URL}/horarios`, { headers: headers() });
-                if (handleAuthError(res)) return;
-                if (!res.ok) throw new Error('Error al cargar horarios');
-                
-                const response = await res.json();
+                const response = await MetraAPI.get('/gerente/horarios');
                 const horarios = Array.isArray(response) ? response : (response.data || []);
                 
                 const container = document.getElementById('horarios-container');
@@ -1036,23 +968,16 @@
             const url = id ? `${API_URL}/horarios/${id}` : `${API_URL}/horarios`;
 
             try {
-                const res = await fetch(url, {
-                    method,
-                    headers: headers(),
-                    body: JSON.stringify(data)
-                });
-
-                if (handleAuthError(res)) return;
-                if (res.ok) {
-                    showToast('success', id ? 'Horario actualizado' : 'Horario creado');
-                    modalHorarioInst.hide();
-                    loadHorarios();
-                } else {
-                    const errorData = await res.json();
-                    Swal.fire('Error', errorData.message || 'Error al guardar horario (quizá ya existe)', 'error');
-                }
+                await MetraAPI[id ? 'put' : 'post'](
+                    id ? `/gerente/horarios/${id}` : '/gerente/horarios',
+                    data
+                );
+                showToast('success', id ? 'Horario actualizado' : 'Horario creado');
+                modalHorarioInst.hide();
+                loadHorarios();
             } catch (error) {
-                Swal.fire('Error', 'Error de conexión', 'error');
+                const errorData = error.data || error;
+                Swal.fire('Error', errorData.message || 'Error al guardar horario (quizá ya existe)', 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalText;
@@ -1073,17 +998,11 @@
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
-                        const res = await fetch(`${API_URL}/horarios/${id}`, { method: 'DELETE', headers: headers() });
-                        if (handleAuthError(res)) return;
-                        if (res.ok) {
-                            showToast('success', 'Horario desactivado');
-                            loadHorarios();
-                        } else {
-                            const err = await res.json();
-                            Swal.fire('Error', err.message || 'Error al desactivar horario', 'error');
-                        }
+                        await MetraAPI.delete(`/gerente/horarios/${id}`);
+                        showToast('success', 'Horario desactivado');
+                        loadHorarios();
                     } catch (error) {
-                        Swal.fire('Error', 'Error de conexión', 'error');
+                        Swal.fire('Error', error.data?.message || 'Error al desactivar horario', 'error');
                     }
                 }
             });
@@ -1102,17 +1021,11 @@
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
-                        const res = await fetch(`${API_URL}/horarios/${id}/activar`, { method: 'PATCH', headers: headers() });
-                        if (handleAuthError(res)) return;
-                        if (res.ok) {
-                            showToast('success', 'Horario reactivado');
-                            loadHorarios();
-                        } else {
-                            const err = await res.json();
-                            Swal.fire('Error', err.message || 'Error al reactivar horario', 'error');
-                        }
+                        await MetraAPI.post(`/gerente/horarios/${id}/activar`, {}, { 'X-HTTP-Method-Override': 'PATCH' });
+                        showToast('success', 'Horario reactivado');
+                        loadHorarios();
                     } catch (error) {
-                        Swal.fire('Error', 'Error de conexión', 'error');
+                        Swal.fire('Error', error.data?.message || 'Error al reactivar horario', 'error');
                     }
                 }
             });
@@ -1121,11 +1034,7 @@
         // --- STAFF (PERSONAL) ---
         async function loadStaff() {
             try {
-                const res = await fetch(`${API_URL}/staff`, { headers: headers() });
-                if (handleAuthError(res)) return;
-                if (!res.ok) throw new Error('Error al cargar personal');
-                
-                const response = await res.json();
+                const response = await MetraAPI.get('/gerente/staff');
                 const staff = Array.isArray(response) ? response : (response.data || []);
                 
                 const tbody = document.getElementById('tabla-staff-body');
@@ -1254,24 +1163,15 @@
             submitBtn.disabled = true;
 
             try {
-                const res = await fetch(url, {
-                    method,
-                    headers: headers(),
-                    body: JSON.stringify(data)
-                });
-
-                if (handleAuthError(res)) return;
-                const result = await res.json();
-
-                if (res.ok && result.success) {
-                    showToast('success', result.message || (id ? 'Personal actualizado' : 'Personal creado'));
-                    modalStaffInst.hide();
-                    loadStaff();
-                } else {
-                    Swal.fire('Error', result.message || 'Error al guardar personal', 'error');
-                }
+                const result = await MetraAPI[id ? 'put' : 'post'](
+                    id ? `/gerente/staff/${id}` : '/gerente/staff',
+                    data
+                );
+                showToast('success', result.message || (id ? 'Personal actualizado' : 'Personal creado'));
+                modalStaffInst.hide();
+                loadStaff();
             } catch (error) {
-                Swal.fire('Error', 'Error de conexión', 'error');
+                Swal.fire('Error', error.data?.message || 'Error al guardar personal', 'error');
             } finally {
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
@@ -1291,18 +1191,11 @@
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
-                        const res = await fetch(`${API_URL}/staff/${id}`, { method: 'DELETE', headers: headers() });
-                        if (handleAuthError(res)) return;
-                        const data = await res.json();
-                        
-                        if (res.ok && data.success !== false) {
-                            showToast('success', data.message || 'Personal desactivado');
-                            loadStaff();
-                        } else {
-                            Swal.fire('Error', data.message || 'Error al desactivar personal', 'error');
-                        }
+                        const data = await MetraAPI.delete(`/gerente/staff/${id}`);
+                        showToast('success', data.message || 'Personal desactivado');
+                        loadStaff();
                     } catch (error) {
-                        Swal.fire('Error', 'Error de conexión', 'error');
+                        Swal.fire('Error', error.data?.message || 'Error al desactivar personal', 'error');
                     }
                 }
             });
@@ -1321,18 +1214,11 @@
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
-                        const res = await fetch(`${API_URL}/staff/${id}/activar`, { method: 'PATCH', headers: headers() });
-                        if (handleAuthError(res)) return;
-                        const data = await res.json();
-                        
-                        if (res.ok && data.success !== false) {
-                            showToast('success', data.message || 'Personal reactivado');
-                            loadStaff();
-                        } else {
-                            Swal.fire('Error', data.message || 'Error al reactivar personal', 'error');
-                        }
+                        const data = await MetraAPI.post(`/gerente/staff/${id}/activar`, {}, { 'X-HTTP-Method-Override': 'PATCH' });
+                        showToast('success', data.message || 'Personal reactivado');
+                        loadStaff();
                     } catch (error) {
-                        Swal.fire('Error', 'Error de conexión', 'error');
+                        Swal.fire('Error', error.data?.message || 'Error al reactivar personal', 'error');
                     }
                 }
             });

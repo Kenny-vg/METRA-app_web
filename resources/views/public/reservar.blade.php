@@ -11,9 +11,10 @@
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <script>
-        window.APP_API_URL = window.location.origin;
-        console.log("METRA Frontend initialized with API_URL:", window.APP_API_URL);
+        window.API_URL = "{{ url('/api') }}";
+        window.FILE_URL = "{{ url('/') }}";
     </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
@@ -399,70 +400,54 @@
             // --- LLAMADAS INICIALES A LA API PARA CONFIGURAR DOM ---
             try {
                 // Fetch the actual ID from slug 
-                const resC = await fetch(`${window.location.origin}/api/cafeterias-publicas/${cafeSlug}`);
-                if(resC.ok){
-                    const jsonC = await resC.json();
-                    document.getElementById('cafe_id').value = jsonC.data.id;
-                }
+                const jsonC = await MetraAPI.get(`/cafeterias-publicas/${cafeSlug}`);
+                document.getElementById('cafe_id').value = jsonC.data.id;
 
                 // 1. Horarios Iniciales
-                const resH = await fetch(getApiUrl('horarios'));
-                if(resH.ok){
-                    const jsonH = await resH.json();
-                    let operacionHorariosInicial = jsonH.data || [];
-                    // Guardamos los horarios para usarlos al generar slots adicionales
-                    schedulesData = operacionHorariosInicial;
-                    
-                    const activeDaysNames = operacionHorariosInicial.map(h => normalizarStr(h.dia_semana));
-                    disabledDaysNumerico = [];
-                    Object.keys(diasMap).forEach(num => {
-                        const strDay = normalizarStr(diasMap[num]);
-                        if(!activeDaysNames.includes(strDay)) {
-                            disabledDaysNumerico.push(parseInt(num));
-                        }
-                    });
+                const jsonH = await MetraAPI.get(`/cafeterias/${cafeSlug}/horarios?t=${new Date().getTime()}`);
+                let operacionHorariosInicial = jsonH.data || [];
+                // Guardamos los horarios para usarlos al generar slots adicionales
+                schedulesData = operacionHorariosInicial;
+                
+                const activeDaysNames = operacionHorariosInicial.map(h => normalizarStr(h.dia_semana));
+                disabledDaysNumerico = [];
+                Object.keys(diasMap).forEach(num => {
+                    const strDay = normalizarStr(diasMap[num]);
+                    if(!activeDaysNames.includes(strDay)) {
+                        disabledDaysNumerico.push(parseInt(num));
+                    }
+                });
 
-                    flatpickrInstance = flatpickr(fechaInput, {
-                        locale: "es",
-                        minDate: "today",
-                        disable: [
-                            function(date) {
-                                return disabledDaysNumerico.includes(date.getDay());
-                            }
-                        ],
-                        onChange: function(selectedDates, dateStr, instance) {
-                            fechaInput.classList.remove('is-invalid');
-                            cargarHorasDisponibles();
-                            cargarPromocionesDisponibles();
-                            checkFormValidity();
+                flatpickrInstance = flatpickr(fechaInput, {
+                    locale: "es",
+                    minDate: "today",
+                    disable: [
+                        function(date) {
+                            return disabledDaysNumerico.includes(date.getDay());
                         }
-                    });
-                }
+                    ],
+                    onChange: function(selectedDates, dateStr, instance) {
+                        fechaInput.classList.remove('is-invalid');
+                        cargarHorasDisponibles();
+                        cargarPromocionesDisponibles();
+                        checkFormValidity();
+                    }
+                });
 
                 // 2. Capacidad Máxima (REAL TIME Sin Cache)
-                const resM = await fetch(getApiUrl('mesas-capacidad'));
-                if(resM.ok){
-                    const jsonM = await resM.json();
-                    const max = jsonM.data.max_capacidad || 1;
-                    paxSelect.innerHTML = '<option value="">Opciones de capacidad...</option>';
-                    for(let i=1; i<=max; i++) {
-                        paxSelect.innerHTML += `<option value="${i}">${i} Persona${i>1?'s':''}</option>`;
-                    }
-                    // Si ya hay algo seleccionado o si el usuario elige una opcion, buscaremos el horario
+                const jsonM = await MetraAPI.get(`/cafeterias/${cafeSlug}/mesas-capacidad?t=${new Date().getTime()}`);
+                const max = jsonM.data.max_capacidad || 1;
+                paxSelect.innerHTML = '<option value="">Opciones de capacidad...</option>';
+                for(let i=1; i<=max; i++) {
+                    paxSelect.innerHTML += `<option value="${i}">${i} Persona${i>1?'s':''}</option>`;
                 }
 
                 // 3. Zonas y Ocasiones (Datos estáticos de catálogo)
-                const resO = await fetch(getApiUrl('ocasiones'));
-                if(resO.ok){
-                    const jsonO = await resO.json();
-                    jsonO.data.forEach(o => { ocasionSelect.innerHTML += `<option value="${o.id}">${escapeHTML(o.nombre)}</option>`});
-                }
+                const jsonO = await MetraAPI.get(`/cafeterias/${cafeSlug}/ocasiones?t=${new Date().getTime()}`);
+                jsonO.data.forEach(o => { ocasionSelect.innerHTML += `<option value="${o.id}">${escapeHTML(o.nombre)}</option>`});
 
-                const resZ = await fetch(getApiUrl('zonas'));
-                if(resZ.ok){
-                    const jsonZ = await resZ.json();
-                    jsonZ.data.forEach(z => { zonaSelect.innerHTML += `<option value="${z.id}">${escapeHTML(z.nombre_zona)}</option>`});
-                }
+                const jsonZ = await MetraAPI.get(`/cafeterias/${cafeSlug}/zonas?t=${new Date().getTime()}`);
+                jsonZ.data.forEach(z => { zonaSelect.innerHTML += `<option value="${z.id}">${escapeHTML(z.nombre_zona)}</option>`});
 
                 // 4. Limpieza: Se ha eliminado el pre-llenado asumiendo perfiles de usuario/gerente,
                 // asegurando que los datos de cliente siempre deban ingresarse limpios a petición.
@@ -499,10 +484,8 @@
                 horaSpinner.classList.remove('d-none');
 
                 try {
-                    const url = `/api/cafeterias/${cafeSlug}/horarios-disponibles?fecha=${fecha}&numero_personas=${pax}`;
-                    const resH = await fetch(url);
-                    if (!resH.ok) throw new Error('Error al consultar horarios');
-                    const jsonH = await resH.json();
+                    const url = `/cafeterias/${cafeSlug}/horarios-disponibles?fecha=${fecha}&numero_personas=${pax}`;
+                    const jsonH = await MetraAPI.get(url);
                     
                     console.log('Horarios recibidos:', jsonH.data);
                     let horarios = jsonH.data || [];
@@ -599,11 +582,10 @@
                 pCont.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-gold spinner-border-sm"></div><div class="mt-2 text-muted x-small">Buscando beneficios...</div></div>';
                 
                 try {
-                    let url = `${window.location.origin}/api/cafeterias/${cafeSlug}/promociones?fecha=${fecha}&hora=${hora}`;
+                    let url = `/cafeterias/${cafeSlug}/promociones?fecha=${fecha}&hora=${hora}`;
                     if(ocasionId) url += `&ocasion_id=${ocasionId}`;
                     
-                    const resP = await fetch(url + `&t=${new Date().getTime()}`);
-                    const jsonP = await resP.json();
+                    const jsonP = await MetraAPI.get(url + `&t=${new Date().getTime()}`);
                     const promos = jsonP.data || [];
 
                     if(promos.length === 0){
@@ -693,25 +675,9 @@
                 };
 
                 try {
-                    // Endpoint correcto
-                    const token = getToken();
-                    const headers = {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    };
-                    if (token) {
-                        headers['Authorization'] = `Bearer ${token}`;
-                    }
-
-                    const res = await fetch(`${window.location.origin}/api/cafeterias/${cafeSlug}/reservaciones`, {
-                        method: 'POST',
-                        headers: headers,
-                        body: JSON.stringify(payload)
-                    });
+                    const json = await MetraAPI.post(`/cafeterias/${cafeSlug}/reservaciones`, payload);
                     
-                    const json = await res.json();
-                    
-                    if(res.ok && json.success) {
+                    if(json.success) {
                         // Mostrar pantalla de confirmación tal como se pidió
                         const rsv = json.data;
                         const cafeNombre = escapeHTML(rsv.cafeteria ? rsv.cafeteria.nombre : 'La Cafetería');
@@ -772,18 +738,20 @@
                     } else {
                         btnSubmit.disabled = false;
                         btnSubmit.innerHTML = originalText;
-                        errorContainer.innerHTML = '<strong>Error en tu solicitud:</strong> ' + (json.message || 'Ocurrió un error en la validación.');
-                        if(json.data) {
-                            errorContainer.innerHTML += '<ul class="mb-0 mt-2">' + Object.values(json.data).map(err => `<li>${err[0]}</li>`).join('') + '</ul>';
-                        }
+                        errorContainer.innerHTML = '<strong>Error en tu solicitud:</strong> ' + 'Ocurrió un error en la validación.';
                         errorContainer.classList.remove('d-none');
                         errorContainer.scrollIntoView({behavior: 'smooth', block: 'center'});
                     }
                 } catch(error) {
                     btnSubmit.disabled = false;
                     btnSubmit.innerHTML = originalText;
-                    errorContainer.innerHTML = 'Error de conexión con el servidor. Se ha perdido la comunicación con METRA.';
+                    const errData = error.data || error;
+                    errorContainer.innerHTML = '<strong>Error:</strong> ' + (errData.message || 'Ocurrió un error en la validación.');
+                    if(errData.errors) {
+                        errorContainer.innerHTML += '<ul class="mb-0 mt-2">' + Object.values(errData.errors).map(err => `<li>${err[0]}</li>`).join('') + '</ul>';
+                    }
                     errorContainer.classList.remove('d-none');
+                    errorContainer.scrollIntoView({behavior: 'smooth', block: 'center'});
                 }
             });
 

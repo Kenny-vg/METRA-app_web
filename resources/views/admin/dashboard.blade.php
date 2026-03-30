@@ -176,27 +176,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        const token = localStorage.getItem('token');
-        const API = '/api';
         let chartRef = null;
 
-        if (!token) {
+        if (!localStorage.getItem('token')) {
             window.location.href = '/login';
-        }
-
-        function authHeaders() {
-            return {
-                'Authorization': `Bearer ${token}`,
-                'Accept': 'application/json'
-            };
         }
 
         async function cargarDashboard() {
             try {
-                const res = await fetch('/api/gerente/mi-cafeteria', { headers: authHeaders() });
-
-                if (!res.ok) return;
-                const json = await res.json();
+                const json = await MetraAPI.get('/gerente/mi-cafeteria');
                 const cafe = json.data;
                 cafeteriaId = cafe.id;
 
@@ -326,9 +314,8 @@
                 if(formRenovar) formRenovar.classList.remove('d-none');
 
                 try {
-                    const res = await fetch('/api/planes-publicos', { headers: authHeaders() });
-                    const json = await res.json();
-                    if (res.ok) {
+                    const json = await MetraAPI.get('/planes-publicos');
+                    if (json.data) {
                         selectPlan.innerHTML = '<option value="">Selecciona un plan...</option>' + 
                             json.data.map(p => `<option value="${p.id}">${p.nombre_plan} ($${p.precio})</option>`).join('');
                     }
@@ -369,18 +356,7 @@
             if (emailInput && emailInput.value) formData.append('email', emailInput.value);
 
             try {
-                // Usar el endpoint dedicado de renovación (requiere auth)
-                const res = await fetch('/api/gerente/renovar-suscripcion', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
-                    body: formData
-                });
-
-                const json = await res.json();
-
-                if (!res.ok) {
-                    throw new Error(json.message || 'Error al enviar la solicitud.');
-                }
+                const json = await MetraAPI.post('/gerente/renovar-suscripcion', formData);
 
                 bootstrap.Modal.getInstance(document.getElementById('modalRenovar')).hide();
 
@@ -392,7 +368,7 @@
                 }).then(() => cargarDashboard());
 
             } catch(err) {
-                Swal.fire({ title: 'Error', text: err.message, icon: 'error', confirmButtonColor: '#382C26' });
+                Swal.fire({ title: 'Error', text: err.data?.message || err.message, icon: 'error', confirmButtonColor: '#382C26' });
             } finally {
                 submitBtn.innerHTML = document.getElementById('btn-submit-renovar').dataset.label || 'Enviar Renovación';
                 submitBtn.disabled = false;
@@ -405,10 +381,9 @@
                 const off = new Date().getTimezoneOffset();
                 const hoyIso = new Date(Date.now() - off * 60000).toISOString().split('T')[0];
 
-                const resR = await fetch(`/api/gerente/reservaciones?modo=todo&desde=${hoyIso}`, { headers: authHeaders() });
-                if(resR.ok) {
-                    const reservas = (await resR.json()).data || [];
-                    const reservasHoy = reservas.filter(r => r.fecha === hoyIso);
+                const resR = await MetraAPI.get(`/gerente/reservaciones?modo=todo&desde=${hoyIso}`);
+                const reservas = resR.data || [];
+                const reservasHoy = reservas.filter(r => r.fecha === hoyIso);
 
                     const now = new Date();
                     const pendientes = reservas.filter(r => {
@@ -419,8 +394,33 @@
 
                     if (pendientes.length > 0) {
                         const pr = pendientes[0];
+                        
+                        // Determinar el día relativo o fecha
+                        const prFechaStr = pr.fecha;
+                        let diaTexto = '';
+                        
+                        if (prFechaStr === hoyIso) {
+                            diaTexto = 'Hoy';
+                        } else {
+                            const mañanaReq = new Date(Date.now() - (off * 60000) + 86400000);
+                            const mañanaIso = mañanaReq.toISOString().split('T')[0];
+                            
+                            if (prFechaStr === mañanaIso) {
+                                diaTexto = 'Mañana';
+                            } else {
+                                const d = new Date(`${prFechaStr}T00:00:00`);
+                                diaTexto = d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+                                diaTexto = diaTexto.charAt(0).toUpperCase() + diaTexto.slice(1);
+                            }
+                        }
+
                         document.getElementById('dash_proxima_hora').innerHTML = `${pr.hora_inicio.substring(0,5)}<span class="fs-5 fw-normal" style="color: rgba(255,255,255,0.6);">Hrs</span>`;
-                        document.getElementById('dash_proxima_nombre').textContent = `${pr.nombre_cliente} | ${pr.numero_personas} Personas`;
+                        document.getElementById('dash_proxima_nombre').innerHTML = `
+                            <span class="d-block mb-1" style="color: var(--white-pure); opacity: 0.8; font-size: 0.8rem; font-weight: 500;">
+                                <i class="bi bi-calendar-event me-1 text-warning"></i>${diaTexto}
+                            </span>
+                            ${escapeHTML(pr.nombre_cliente)} | ${pr.numero_personas} Pers.
+                        `;
                     } else {
                         document.getElementById('dash_proxima_hora').innerHTML = `--:--`;
                         document.getElementById('dash_proxima_nombre').textContent = `Sin próximas llegadas`;
@@ -450,7 +450,6 @@
                     } else {
                         llegadasPanel.innerHTML = '<p class="text-muted text-center mt-3 fw-bold">No hay llegadas pendientes hoy.</p>';
                     }
-                }
             } catch(e) { console.error('Error al cargar llegadas:', e); }
         }
 
@@ -514,11 +513,9 @@
 
         async function cargarVistasAnaliticas() {
             try {
-                const url = `/api/gerente/metricas/diarias?t=${Date.now()}`;
-                const res = await fetch(url, { headers: authHeaders() });
-                if(res.ok) {
-                    const json = await res.json();
-                    if(json.success && json.data) {
+                const url = `/gerente/metricas/diarias?t=${Date.now()}`;
+                const json = await MetraAPI.get(url);
+                if(json.success && json.data) {
                         const completadas = parseInt(json.data.reservas_completadas) || 0;
                         const canceladas = (parseInt(json.data.reservas_canceladas) || 0) + (parseInt(json.data.no_shows) || 0);
                         const totales = parseInt(json.data.total_reservas) || 0;
@@ -551,17 +548,14 @@
 
                         renderChart(completadas, pendientes > 0 ? pendientes : 0, canceladas);
                     }
-                }
             } catch(e) { console.error('Error fetching Vistas DB', e); }
         }
 
         async function cargarMetricasMensuales() {
             try {
-                const res = await fetch('/api/gerente/metricas/mensuales', { headers: authHeaders() });
-                if(res.ok) {
-                    const json = await res.json();
-                    const tbody = document.getElementById('tabla_historico');
-                    if(json.data && json.data.length > 0) {
+                const json = await MetraAPI.get('/gerente/metricas/mensuales');
+                const tbody = document.getElementById('tabla_historico');
+                if(json.data && json.data.length > 0) {
                         const meses = ['-', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
                         
                         tbody.innerHTML = json.data.map((m, i) => {
@@ -603,20 +597,21 @@
                             </tr>
                         `;
                     }
-                }
             } catch(e) { console.error('Error fetching Histórico', e); }
         }
 
         // Init
-        if(token) {
-            cargarDashboard();
-            cargarLlegadas();
-            cargarVistasAnaliticas();
-            cargarMetricasMensuales();
-            setInterval(() => {
+        document.addEventListener('DOMContentLoaded', () => {
+            if(localStorage.getItem('token')) {
+                cargarDashboard();
                 cargarLlegadas();
                 cargarVistasAnaliticas();
-            }, 60000); // 1 minuto
-        }
+                cargarMetricasMensuales();
+                setInterval(() => {
+                    cargarLlegadas();
+                    cargarVistasAnaliticas();
+                }, 60000); // 1 minuto
+            }
+        });
     </script>
 @endsection

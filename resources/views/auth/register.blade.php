@@ -11,7 +11,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- URL global del backend API (configurable por entorno) -->
     <script>
-        window.APP_API_URL = window.location.origin;
+        window.API_URL = "{{ url('/api') }}";
+        window.FILE_URL = "{{ url('/') }}";
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -106,54 +107,41 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             try {
-                const API_URL = '/api';
-                const response = await fetch(`${API_URL}/register-cliente`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ name, email, password })
+                const response = await MetraAPI.post('/register-cliente', { name, email, password });
+                
+                Swal.fire({
+                    title: '¡Cuenta creada!',
+                    text: 'Ahora puedes iniciar sesión para continuar.',
+                    icon: 'success',
+                    confirmButtonText: 'Ir al Login',
+                    confirmButtonColor: 'var(--black-primary)'
+                }).then(() => {
+                    registerForm.reset();
+                    window.location.href = '/login';
                 });
-
-                if (response.ok) {
+            } catch (error) {
+                const errorData = error.data || error;
+                let errorMsg = errorData.message || 'Datos inválidos.';
+                if (errorData.errors) {
+                    errorMsg = `<ul class="text-start mb-0" style="color: #D32F2F;">`;
+                    Object.values(errorData.errors).forEach(errArray => {
+                        errArray.forEach(err => {
+                            errorMsg += `<li>${err}</li>`;
+                        });
+                    });
+                    errorMsg += `</ul>`;
                     Swal.fire({
-                        title: '¡Cuenta creada!',
-                        text: 'Ahora puedes iniciar sesión para continuar.',
-                        icon: 'success',
-                        confirmButtonText: 'Ir al Login',
-                        confirmButtonColor: 'var(--black-primary)'
-                    }).then(() => {
-                        registerForm.reset();
-                        window.location.href = '/login';
+                        title: 'Error en el registro',
+                        html: errorMsg,
+                        icon: 'error',
+                        confirmButtonColor: '#382C26'
                     });
                 } else {
-                    const errorData = await response.json();
-                    let errorMsg = errorData.message || 'Datos inválidos.';
-                    if (errorData.errors) {
-                        errorMsg = `<ul class="text-start mb-0" style="color: #D32F2F;">`;
-                        Object.values(errorData.errors).forEach(errArray => {
-                            errArray.forEach(err => {
-                                errorMsg += `<li>${err}</li>`;
-                            });
-                        });
-                        errorMsg += `</ul>`;
-                        Swal.fire({
-                            title: 'Error en el registro',
-                            html: errorMsg,
-                            icon: 'error',
-                            confirmButtonColor: '#382C26'
-                        });
-                    } else {
-                        Swal.fire('Error en el registro', errorMsg, 'error');
-                    }
-                    btnSubmit.disabled = false;
+                    Swal.fire('Error en el registro', errorMsg, 'error');
                 }
-            } catch (error) {
-                console.error('Fallo la API', error);
-                Swal.fire('Error', 'Fallo de conexión al servidor.', 'error');
                 btnSubmit.disabled = false;
             }
+
         });
     }
 });

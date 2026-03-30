@@ -140,8 +140,6 @@
     @include('partials.footer_admin')
 
     <script>
-        const API_URL = '';
-        let authToken = localStorage.getItem('token');
         let cafeteriaId = null;
         let estadosMunicipiosData = {};
 
@@ -183,23 +181,12 @@
             }
         }
 
-        function authHeaders() {
-            return {
-                'Authorization': `Bearer ${authToken}`,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            };
-        }
+
 
         async function cargarPerfil() {
-            if(!authToken) return;
             try {
-                const res = await fetch('/api/gerente/mi-cafeteria', { headers: authHeaders() });
-                if (!res.ok) return;
-                const json = await res.json();
-                
-                // Usually wrapped in `data` depending on the controller
-                const cafe = json.data || json; 
+                const res = await MetraAPI.get('/gerente/mi-cafeteria');
+                const cafe = res.data || res; 
                 cafeteriaId = cafe.id;
                 
                 // Populate fields
@@ -291,22 +278,11 @@
                 formData.append('foto', fotoInput.files[0]);
             }
 
-            // *** Authorization header only — NO Content-Type (el browser lo pone automático con boundary) ***
             try {
-                const res = await fetch('/api/gerente/mi-cafeteria', {
-                    method: 'POST',   // Laravel necesita POST + _method=PUT para FormData
-                    headers: { 'Authorization': `Bearer ${authToken}`, 'Accept': 'application/json' },
-                    body: formData
-                });
-                
-                const json = await res.json();
-                
-                if(!res.ok) {
-                    throw new Error(json.message || 'Error al actualizar');
-                }
+                const res = await MetraAPI.post('/gerente/mi-cafeteria', formData);
 
                 // Actualizar preview con la foto guardada (si la API devuelve foto_url)
-                const cafe = json.data || json;
+                const cafe = res.data || res;
                 if (cafe.foto_url) {
                     document.getElementById('previewFoto').src = `/storage/${cafe.foto_url}?v=` + new Date().getTime();
                     fotoInput.value = ''; // resetear input
@@ -323,7 +299,7 @@
             } catch (e) {
                 Swal.fire({
                     title: 'Error',
-                    text: e.message,
+                    text: e.data?.message || Object.values(e.data?.errors || {}).join(' | ') || e.message || 'Error al actualizar',
                     icon: 'error',
                     confirmButtonColor: '#212529'
                 });
@@ -333,12 +309,10 @@
             }
         });
 
-        async function init() {
+        document.addEventListener('DOMContentLoaded', async () => {
             await cargarEstadosMunicipios();
             cargarPerfil();
-        }
-
-        init();
+        });
 
     </script>
 

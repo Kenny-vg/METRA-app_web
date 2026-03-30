@@ -11,7 +11,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- URL global del backend API (configurable por entorno) -->
     <script>
-        window.APP_API_URL = window.location.origin;
+        window.API_URL = "{{ url('/api') }}";
+        window.FILE_URL = "{{ url('/') }}";
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -65,42 +66,23 @@
             btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
 
             try {
-                const API_URL = '/api';
-                const response = await fetch(`${API_URL}/forgot-password`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ email })
+                const result = await MetraAPI.post('/forgot-password', { email });
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Enviado',
+                    text: result.message || 'Si el correo existe, se enviará un enlace de recuperación.',
+                    confirmButtonColor: '#382C26',
+                    confirmButtonText: 'Entendido'
+                }).then(() => {
+                    window.location.href = "{{ route('login') }}";
                 });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Enviado',
-                        text: result.message || 'Si el correo existe, se enviará un enlace de recuperación.',
-                        confirmButtonColor: '#382C26',
-                        confirmButtonText: 'Entendido'
-                    }).then(() => {
-                        window.location.href = "{{ route('login') }}";
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: result.message || 'Ocurrió un problema al procesar su solicitud.',
-                        confirmButtonColor: '#382C26'
-                    });
-                }
             } catch (error) {
-                console.error('API Error:', error);
+                const errData = error.data || error;
                 Swal.fire({
                     icon: 'error',
-                    title: 'Fallo de conexión',
-                    text: 'No se pudo contactar al servidor.',
+                    title: 'Error',
+                    text: errData.message || 'Ocurrió un problema al procesar su solicitud.',
                     confirmButtonColor: '#382C26'
                 });
             } finally {

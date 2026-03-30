@@ -10,6 +10,10 @@
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        window.API_URL = "{{ url('/api') }}";
+        window.FILE_URL = "{{ url('/') }}";
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body {
@@ -180,8 +184,7 @@
     @include('partials.footer')
 
 <script>
-    const API_BASE = '/api';
-    const folio    = '{{ $folio }}';
+    const folio = '{{ $folio }}';
 
     const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 
@@ -202,9 +205,8 @@
 
     async function cargarReservacion() {
         try {
-            const res = await fetch(`${API_BASE}/reservaciones/folio/${folio}`);
-            if (!res.ok) throw new Error('not found');
-            const { data: r } = await res.json();
+            const json = await MetraAPI.get(`/reservaciones/folio/${folio}`);
+            const r = json.data;
 
             // Población de datos
             document.getElementById('card-folio').textContent   = r.folio;
@@ -265,22 +267,18 @@
         if (!confirm.isConfirmed) return;
 
         try {
-            const res = await fetch(`${API_BASE}/reservaciones/folio/${folio}`, { method: 'DELETE' });
-            const json = await res.json();
-
-            if (res.ok) {
-                await Swal.fire({
-                    icon: 'success',
-                    title: 'Reservación cancelada',
-                    text: 'Tu reservación ha sido cancelada exitosamente.',
-                    confirmButtonColor: '#111'
-                });
-                window.location.reload();
-            } else {
-                Swal.fire({ icon: 'error', title: 'No se pudo cancelar', text: json.message, confirmButtonColor: '#111' });
-            }
-        } catch(e) {
-            Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'Intenta de nuevo más tarde.', confirmButtonColor: '#111' });
+            const json = await MetraAPI.delete(`/reservaciones/folio/${folio}`);
+            
+            await Swal.fire({
+                icon: 'success',
+                title: 'Reservación cancelada',
+                text: 'Tu reservación ha sido cancelada exitosamente.',
+                confirmButtonColor: '#111'
+            });
+            window.location.reload();
+        } catch(error) {
+            const data = error.data || {};
+            Swal.fire({ icon: 'error', title: 'Error', text: data.message || 'Intenta de nuevo.', confirmButtonColor: '#111' });
         }
     }
 

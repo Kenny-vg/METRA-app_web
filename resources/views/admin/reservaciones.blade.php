@@ -222,7 +222,6 @@
     @include('partials.footer_admin')
     
     <script>
-        const API          = '/api';
         let   currentDate  = new Date();
         let   modoVista    = 'dia';
 
@@ -456,18 +455,10 @@
         async function fetchReservaciones(desde, hasta, silencioso = false) {
             if (!silencioso) mostrarSpinner();
             try {
-                const token = localStorage.getItem('token');
-                const url   = `${API}/gerente/reservaciones?desde=${desde}&hasta=${hasta}&t=${Date.now()}`;
-                const res   = await fetch(url, {
-                    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-                });
+                const url = `/gerente/reservaciones?desde=${desde}&hasta=${hasta}&t=${Date.now()}`;
+                const res = await MetraAPI.get(url);
 
-                if (!res.ok) {
-                    if (res.status === 401 || res.status === 403) { window.location.href = '/login'; return; }
-                    throw new Error('Error de red');
-                }
-
-                const data = (await res.json()).data || [];
+                const data = res.data || [];
                 actualizarMetricas(data);
                 renderizarTarjetas(data);
 
@@ -497,24 +488,17 @@
 
         async function abrirModalConfigReservas() {
             try {
-                const token = localStorage.getItem('token');
-                if(!token) return;
-                
                 const btn = document.querySelector('button[onclick="abrirModalConfigReservas()"]');
                 const prev = btn.innerHTML;
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
                 btn.disabled = true;
 
-                const res = await fetch(`${API}/gerente/mi-cafeteria`, {
-                    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-                });
-                
-                btn.innerHTML = prev;
-                btn.disabled = false;
+                try {
+                    const res = await MetraAPI.get('/gerente/mi-cafeteria');
+                    btn.innerHTML = prev;
+                    btn.disabled = false;
 
-                if(res.ok) {
-                    const json = await res.json();
-                    const cafe = json.data || json;
+                    const cafe = res.data || res;
                     cafeConfigId = cafe.id;
                     
                     document.getElementById('conf_duracion').value = cafe.duracion_reserva_min || 90;
@@ -529,8 +513,12 @@
                     document.getElementById('configWarning').classList.remove('d-flex');
 
                     new bootstrap.Modal(document.getElementById('modalConfigReservas')).show();
+                } catch(e) {
+                    btn.innerHTML = prev;
+                    btn.disabled = false;
+                    console.error('Error al cargar config:', e);
                 }
-            } catch(e) { console.error('Error al abrir configuracion:', e); }
+            } catch(e) { console.error('Error general:', e); }
         }
 
         function updatePorcentajeModalUI(val) {
@@ -558,7 +546,6 @@
 
         async function guardarConfigReservas() {
             try {
-                const token = localStorage.getItem('token');
                 const btn = document.getElementById('btnGuardarConfigReservas');
                 const prev = btn.innerHTML;
                 
@@ -571,16 +558,12 @@
                     porcentaje_reservas: document.getElementById('conf_porcentaje').value
                 };
 
-                const res = await fetch(`${API}/gerente/mi-cafeteria`, {
-                    method: 'POST', 
-                    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json', 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ _method: 'PUT', ...payload })
-                });
-                
-                btn.innerHTML = prev;
-                btn.disabled = false;
+                try {
+                    await MetraAPI.put('/gerente/mi-cafeteria', payload);
+                    
+                    btn.innerHTML = prev;
+                    btn.disabled = false;
 
-                if(res.ok) {
                     bootstrap.Modal.getInstance(document.getElementById('modalConfigReservas')).hide();
                     
                     Swal.fire({
@@ -590,9 +573,11 @@
                         timer: 2000,
                         showConfirmButton: false
                     });
-                } else {
-                    const json = await res.json();
-                    throw new Error(json.message || 'Error al guardar');
+                } catch (e) {
+                    btn.innerHTML = prev;
+                    btn.disabled = false;
+                    const fallbackMsg = e.data?.message || Object.values(e.data?.errors || {}).join(' | ') || e.message || 'Error al guardar';
+                    Swal.fire('Error', fallbackMsg, 'error');
                 }
             } catch(e) {
                 Swal.fire('Error', e.message, 'error');

@@ -115,19 +115,8 @@
 }
 </style>
 <script>
-const API = '';
-let authToken = localStorage.getItem('token') || '';
-
-if (!authToken) {
+if (!localStorage.getItem('token')) {
     window.location.href = '/login';
-}
-
-function authHeaders() {
-    return {
-        'Authorization': `Bearer ${authToken}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-    };
 }
 
 async function cargarSuscripciones() {
@@ -135,11 +124,8 @@ async function cargarSuscripciones() {
         // Cargar pendientes
         cargarPendientes();
 
-        const res = await fetch(`${API}/superadmin/suscripciones`, { headers: authHeaders() });
-        const json = await res.json();
-        if (!res.ok) throw new Error("Error del servidor");
-
-        renderTabla(json.data || []);
+        const res = await MetraAPI.get(`/superadmin/suscripciones`);
+        renderTabla(res.data || []);
     } catch (e) {
         document.getElementById('tabla-suscripciones').innerHTML = 
             '<tr><td colspan="6" class="text-danger text-center py-4">Ocurrió un problema al procesar la solicitud. Intenta nuevamente.</td></tr>';
@@ -152,11 +138,10 @@ async function cargarPendientes() {
     const contador = document.getElementById('contador-pendientes');
 
     try {
-        const res = await fetch(`${API}/superadmin/suscripciones-pendientes`, { headers: authHeaders() });
-        const json = await res.json();
+        const res = await MetraAPI.get(`/superadmin/suscripciones-pendientes`);
         
-        if (res.ok && json.data && json.data.length > 0) {
-            const pendientes = json.data;
+        if (res.data && res.data.length > 0) {
+            const pendientes = res.data;
             contador.innerText = pendientes.length;
             seccion.classList.remove('d-none');
             
@@ -282,17 +267,9 @@ async function cambiarEstado(cafeteriaId, nuevoEstado) {
             document.getElementById('overlay-loading').style.setProperty('display', 'flex', 'important');
             try {
                 const endpointAccion = nuevoEstado === 'suspendida' ? 'rechazar' : 'aprobar';
-                const res  = await fetch(`${API}/superadmin/solicitudes/${cafeteriaId}/${endpointAccion}`, {
-                    method: 'PATCH',
-                    headers: authHeaders()
+                await MetraAPI.post(`/superadmin/solicitudes/${cafeteriaId}/${endpointAccion}`, {}, {
+                    'X-HTTP-Method-Override': 'PATCH'
                 });
-                
-                if (!res.ok) { 
-                    if(res.status >= 500) {
-                        throw new Error('Ocurrió un problema al procesar la solicitud. Intenta nuevamente.');
-                    }
-                    throw new Error('Algo salió mal. Intenta de nuevo.');
-                }
                 
                 await cargarSuscripciones();
                 Swal.fire('¡Éxito!', `Cafetería ${accion.toLowerCase()} correctamente.`, 'success');
@@ -316,14 +293,9 @@ async function verDetalle(cafeteriaId) {
     modal.show();
 
     try {
-        const res = await fetch(`${API}/superadmin/cafeterias/${cafeteriaId}`, { headers: authHeaders() });
-        const json = await res.json();
-        if (!res.ok) {
-            body.innerHTML = '<p class="text-danger">Algo salió mal. Intenta de nuevo.</p>';
-            return;
-        }
-
-        const c = json.data;
+        const res = await MetraAPI.get(`/superadmin/cafeterias/${cafeteriaId}`);
+        const c = res.data;
+        
         const gerente = c.gerente ? escapeHTML(c.gerente.name) + ' (' + escapeHTML(c.gerente.email) + ')' : 'Sin gerente';
         const plan = escapeHTML(c.suscripcion_actual?.plan?.nombre_plan || 'Sin plan');
         
@@ -364,8 +336,9 @@ async function verComprobante(cafeteriaId) {
     body.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Cargando comprobante...</p></div>';
     
     try {
-        const url = `${API}/superadmin/cafeterias/${cafeteriaId}/comprobante`;
-        const response = await fetch(url, { headers: authHeaders() });
+        const url = `${window.API_URL}/superadmin/cafeterias/${cafeteriaId}/comprobante`;
+        const token = localStorage.getItem('token');
+        const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
         
         if (!response.ok) throw new Error('Error al cargar el comprobante');
         
@@ -407,8 +380,9 @@ async function verComprobanteSub(suscripcionId) {
     modal.show();
     
     try {
-        const url = `${API}/superadmin/suscripciones/${suscripcionId}/comprobante`;
-        const response = await fetch(url, { headers: authHeaders() });
+        const url = `${window.API_URL}/superadmin/suscripciones/${suscripcionId}/comprobante`;
+        const token = localStorage.getItem('token');
+        const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
         
         if (!response.ok) throw new Error('Error al cargar el comprobante');
         
@@ -450,11 +424,8 @@ async function verHistorial(cafeteriaId, nombre) {
     modal.show();
 
     try {
-        const res = await fetch(`${API}/superadmin/suscripciones?cafe_id=${cafeteriaId}`, { headers: authHeaders() });
-        const json = await res.json();
-        if (!res.ok) throw new Error("Error del servidor");
-        
-        const historial = json.data || [];
+        const res = await MetraAPI.get(`/superadmin/suscripciones?cafe_id=${cafeteriaId}`);
+        const historial = res.data || [];
         
         if (!historial.length) {
             tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">No hay historial registrado para esta cafetería.</td></tr>';
@@ -524,8 +495,9 @@ async function verComprobanteHis(historialId) {
     modal.show();
     
     try {
-        const url = `${API}/superadmin/suscripciones-historial/${historialId}/comprobante`;
-        const response = await fetch(url, { headers: authHeaders() });
+        const url = `${window.API_URL}/superadmin/suscripciones-historial/${historialId}/comprobante`;
+        const token = localStorage.getItem('token');
+        const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
         
         if (!response.ok) throw new Error('Error al cargar el comprobante histórico');
         
@@ -560,7 +532,9 @@ async function verComprobanteHis(historialId) {
 }
 
 // Init
-cargarSuscripciones();
+document.addEventListener('DOMContentLoaded', () => {
+    cargarSuscripciones();
+});
 
 async function aprobarRenovacion(suscripcionId) {
     const result = await Swal.fire({
@@ -577,17 +551,14 @@ async function aprobarRenovacion(suscripcionId) {
 
     document.getElementById('overlay-loading').style.setProperty('display', 'flex', 'important');
     try {
-        const res = await fetch(`${API}/superadmin/suscripciones/${suscripcionId}/aprobar-renovacion`, {
-            method: 'PATCH',
-            headers: authHeaders()
+        const res = await MetraAPI.post(`/superadmin/suscripciones/${suscripcionId}/aprobar-renovacion`, {}, {
+            'X-HTTP-Method-Override': 'PATCH'
         });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.message || 'Error al aprobar.');
 
         await cargarSuscripciones();
-        Swal.fire('¡Aprobado!', json.message || 'Renovación aprobada correctamente.', 'success');
+        Swal.fire('¡Aprobado!', res.message || 'Renovación aprobada correctamente.', 'success');
     } catch (e) {
-        Swal.fire('Error', e.message, 'error');
+        Swal.fire('Error', e.data?.message || e.message, 'error');
     } finally {
         document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
     }

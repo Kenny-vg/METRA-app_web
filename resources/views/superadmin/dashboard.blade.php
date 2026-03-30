@@ -130,19 +130,8 @@
 </div>
 
 <script>
-const API = '';
-let authToken = localStorage.getItem('token') || '';
-
-if (!authToken) {
+if (!localStorage.getItem('token')) {
     window.location.href = '/login';
-}
-
-function authHeaders() {
-    return {
-        'Authorization': `Bearer ${authToken}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-    };
 }
 
 // ────────────────────────────────────────────
@@ -151,25 +140,12 @@ function authHeaders() {
 async function cargarDashboard() {
     try {
         const [resCafes, resSols] = await Promise.all([
-            fetch(`${API}/superadmin/cafeterias`, { headers: authHeaders() }),
-            fetch(`${API}/superadmin/solicitudes`, { headers: authHeaders() })
+            MetraAPI.get(`/superadmin/cafeterias`),
+            MetraAPI.get(`/superadmin/solicitudes`)
         ]);
 
-        if (resCafes.status === 401 || resSols.status === 401) {
-             localStorage.removeItem('token');
-             window.location.href = '/login';
-             return;
-        }
-
-        if (!resCafes.ok || !resSols.ok) {
-             throw new Error("El servidor respondió con un error");
-        }
-
-        const jsonCafes = await resCafes.json();
-        const jsonSols  = await resSols.json();
-        
-        const todos = jsonCafes.data || [];
-        const enRevision = jsonSols.data || [];
+        const todos = resCafes.data || [];
+        const enRevision = resSols.data || [];
 
         // Stats
         const activas    = todos.filter(c => c.estado_dinamico === 'activa').length;
@@ -344,17 +320,9 @@ function accionSolicitud(cafeteriaId, accion) {
         if (result.isConfirmed) {
             document.getElementById('overlay-loading').style.setProperty('display', 'flex', 'important');
             try {
-                const res = await fetch(`${API}/superadmin/solicitudes/${cafeteriaId}/${endpointAccion}`, {
-                    method: 'PATCH',
-                    headers: authHeaders()
+                await MetraAPI.post(`/superadmin/solicitudes/${cafeteriaId}/${endpointAccion}`, {}, {
+                    'X-HTTP-Method-Override': 'PATCH'
                 });
-                
-                if (!res.ok) { 
-                    if(res.status >= 500) {
-                        throw new Error('Ocurrió un problema al procesar la solicitud. Intenta nuevamente.');
-                    }
-                    throw new Error('Algo salió mal. Intenta de nuevo.');
-                }
                 
                 await cargarDashboard();
                 Swal.fire('¡Listo!', `Cafetería ${finalTexto === 'Aprobar' ? 'aprobada' : (finalTexto === 'Suspender' ? 'suspendida' : 'rechazada')} correctamente.`, 'success');
@@ -384,15 +352,12 @@ async function verComprobante(cafeteriaId) {
     modal.show();
 
     try {
-        const url = `${API}/superadmin/cafeterias/${cafeteriaId}/comprobante`;
+        const url = `${window.API_URL}/superadmin/cafeterias/${cafeteriaId}/comprobante`;
         
-        // Since the backend now handles the authorized view and returns the file,
-        // we can fetch with auth headers to check if it exists, then use the URL with a blob or just an iframe/image
-        // However, for simplicity and since we are using Bearer tokens, we might need a blob approach
-        // or just rely on the backend returning the secure Cloudinary URL in a JSON if we update it.
-        // BUT the requirement says: "consumir endpoint de backend para ver comprobante."
-        
-        const response = await fetch(url, { headers: authHeaders() });
+        // El endpoint requiere autorización, por lo que usamos fetch directamente
+        // ya que MetraAPI actualmente espera JSON y aquí necesitamos un Blob.
+        const token = localStorage.getItem('token');
+        const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
         if (!response.ok) {
             throw new Error('Error al cargar el comprobante');
         }
@@ -440,24 +405,10 @@ async function crearNegocioManual() {
     document.getElementById('overlay-loading').style.setProperty('display', 'flex', 'important');
 
     try {
-        const res  = await fetch(`${API}/superadmin/cafeterias`, {
-            method: 'POST',
-            headers: authHeaders(),
-            body: JSON.stringify({ nombre, gerente: { name, email } }),
-        });
+        const res = await MetraAPI.post(`/superadmin/cafeterias`, { nombre, gerente: { name, email } });
+        const cafeId = res.data.cafeteria.id;
         
-        if (!res.ok) {
-            if(res.status >= 500) throw new Error('Ocurrió un problema al procesar la solicitud. Intenta nuevamente.');
-            throw new Error('Algo salió mal. Intenta de nuevo.');
-        }
-
-        const json = await res.json();
-        const cafeId = json.data.cafeteria.id;
-        const resPlan = await fetch(`${API}/superadmin/suscripciones`, {
-            method: 'POST',
-            headers: authHeaders(),
-            body: JSON.stringify({ cafe_id: cafeId, plan_id: plan_id })
-        });
+        await MetraAPI.post(`/superadmin/suscripciones`, { cafe_id: cafeId, plan_id: plan_id });
 
         bootstrap.Modal.getInstance(document.getElementById('nuevoNegocio')).hide();
         document.getElementById('m-nombre').value = '';
@@ -478,12 +429,11 @@ async function crearNegocioManual() {
 
 async function cargarPlanesModal() {
     try {
-        const res = await fetch(`${API}/superadmin/planes`, { headers: authHeaders() });
-        const json = await res.json();
-        if (res.ok) {
+        const res = await MetraAPI.get(`/superadmin/planes`);
+        if (res.data) {
             const select = document.getElementById('m-plan');
             if (select) {
-                const planesActivos = json.data.filter(p => p.estado === true || p.estado === 1);
+                const planesActivos = res.data.filter(p => p.estado === true || p.estado === 1);
                 select.innerHTML = '<option value="">Selecciona un plan...</option>' + 
                     planesActivos.map(p => `<option value="${p.id}">${p.nombre_plan} ($${p.precio})</option>`).join('');
             }
@@ -503,23 +453,12 @@ async function manualRefresh(btn) {
     
     try {
         const [resCafes, resSols] = await Promise.all([
-            fetch(`${API}/superadmin/cafeterias`, { headers: authHeaders() }),
-            fetch(`${API}/superadmin/solicitudes`, { headers: authHeaders() })
+            MetraAPI.get(`/superadmin/cafeterias`),
+            MetraAPI.get(`/superadmin/solicitudes`)
         ]);
 
-        if (resCafes.status === 401 || resSols.status === 401) {
-             localStorage.removeItem('token');
-             window.location.href = '/login';
-             return;
-        }
-
-        if (!resCafes.ok || !resSols.ok) throw new Error("Error de servidor");
-
-        const jsonCafes = await resCafes.json();
-        const jsonSols  = await resSols.json();
-        
-        const todos = jsonCafes.data || [];
-        const enRevision = jsonSols.data || [];
+        const todos = resCafes.data || [];
+        const enRevision = resSols.data || [];
 
         const activas    = todos.filter(c => c.estado_dinamico === 'activa').length;
         const pendientes = todos.filter(c => c.estado_dinamico === 'pendiente').length;
@@ -556,8 +495,10 @@ async function manualRefresh(btn) {
 }
 
 // Init
-cargarDashboard();
-cargarPlanesModal();
+document.addEventListener('DOMContentLoaded', () => {
+    cargarDashboard();
+    cargarPlanesModal();
+});
 </script>
 
 @endsection

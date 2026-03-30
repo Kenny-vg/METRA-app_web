@@ -61,7 +61,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-const API_URL  = '/api';
 const BASE_URL = "{{ url('/') }}";
 const MESES    = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 
@@ -161,11 +160,7 @@ async function cargarReservaciones() {
     const token = getToken();
     if (!token) return;
     try {
-        const res = await fetch(`${API_URL}/reservaciones`, {
-            headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-        });
-        if (!res.ok) throw new Error();
-        const json = await res.json();
+        const json = await MetraAPI.get('/reservaciones');
         // Ordenar: primero próximas (asc), luego pasadas (desc)
         const data = (json.data || []).sort((a, b) => {
             const da = new Date(`${a.fecha}T${a.hora_inicio}`);
@@ -200,19 +195,12 @@ window.cancelarReservacion = async function(id, folio, fecha, hora) {
 
     const token = getToken();
     try {
-        const res = await fetch(`${API_URL}/reservaciones/${id}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
-        });
-        const json = await res.json();
-        if (res.ok) {
-            await Swal.fire({ icon: 'success', title: 'Cancelada', text: 'Tu reservación fue cancelada.', confirmButtonColor: '#111' });
-            cargarReservaciones(); // Recargar lista
-        } else {
-            Swal.fire({ icon: 'error', title: 'Error', text: json.message || 'No se pudo cancelar.', confirmButtonColor: '#111' });
-        }
-    } catch(e) {
-        Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'Intenta de nuevo.', confirmButtonColor: '#111' });
+        const json = await MetraAPI.delete(`/reservaciones/${id}`);
+        await Swal.fire({ icon: 'success', title: 'Cancelada', text: 'Tu reservación fue cancelada.', confirmButtonColor: '#111' });
+        cargarReservaciones(); // Recargar lista
+    } catch(error) {
+        const data = error.data || {};
+        Swal.fire({ icon: 'error', title: 'Error', text: data.message || 'Intenta de nuevo.', confirmButtonColor: '#111' });
     }
 };
 
@@ -225,22 +213,13 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Cargar perfil
     try {
-        const response = await fetch(`${API_URL}/mi-perfil`, {
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${token}` }
-        });
-        if (response.ok) {
-            const data = await response.json();
-            const user = data.data.usuario;
-            document.getElementById('profileName').textContent  = user.name;
-            document.getElementById('profileEmail').textContent = user.email;
-            document.getElementById('profileAvatar').src = user.avatar
-                ? user.avatar
-                : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=0A0A0A&color=FFFFFF`;
-        } else {
-            localStorage.removeItem('token');
-            window.location.href = `${BASE_URL}/login`;
-            return;
-        }
+        const data = await MetraAPI.get('/mi-perfil');
+        const user = data.data.usuario;
+        document.getElementById('profileName').textContent  = user.name;
+        document.getElementById('profileEmail').textContent = user.email;
+        document.getElementById('profileAvatar').src = user.avatar
+            ? user.avatar
+            : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=0A0A0A&color=FFFFFF`;
     } catch (error) {
         console.error('Error cargando perfil:', error);
     }
@@ -254,10 +233,7 @@ document.getElementById('btnCerrarSesionCliente')?.addEventListener('click', asy
     const token = getToken();
     if (token) {
         try {
-            await fetch(`${API_URL}/logout`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${token}` }
-            });
+            await MetraAPI.post('/logout', {});
         } catch (e) { console.error('Error API Logout', e); }
     }
     localStorage.clear();

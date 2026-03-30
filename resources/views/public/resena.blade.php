@@ -8,9 +8,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <script>
-        window.APP_API_URL = window.location.origin;
+        window.API_URL = "{{ url('/api') }}";
+        window.FILE_URL = "{{ url('/') }}";
     </script>
-    
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
@@ -272,10 +273,9 @@
 
             // Fetch visit details
             try {
-                const response = await fetch(`${window.location.origin}/api/resena/${token}`);
-                const data = await response.json();
+                const data = await MetraAPI.get(`/resena/${token}`);
 
-                if (!response.ok || !data.success) {
+                if (!data.success) {
                     throw new Error(data.message || 'Error al cargar los datos');
                 }
 
@@ -295,7 +295,8 @@
             } catch (error) {
                 loadingState.style.display = 'none';
                 errorState.style.display = 'block';
-                document.getElementById('error-message').textContent = error.message;
+                const errData = error.data || {};
+                document.getElementById('error-message').textContent = errData.message || error.message;
             }
 
             // Enable submit button only when a rating is selected
@@ -320,21 +321,12 @@
                 submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
 
                 try {
-                    const response = await fetch(`${window.location.origin}/api/resena/${token}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            calificacion: parseInt(calificacion),
-                            comentario: comentario
-                        })
+                    const data = await MetraAPI.post(`/resena/${token}`, {
+                        calificacion: parseInt(calificacion),
+                        comentario: comentario
                     });
 
-                    const data = await response.json();
-
-                    if (response.ok && data.success) {
+                    if (data.success) {
                         formState.style.display = 'none';
                         successState.style.display = 'block';
                     } else {
@@ -343,7 +335,8 @@
                 } catch (error) {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalText;
-                    alert(error.message);
+                    const errData = error.data || {};
+                    alert(errData.message || error.message);
                 }
             });
         });

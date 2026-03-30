@@ -159,20 +159,12 @@
 
     <script>
         let modalProductoInst, modalCategoriasInst;
-        const API_URL = '/api/gerente';
         let categoriasLocales = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             modalProductoInst = new bootstrap.Modal(document.getElementById('modalProducto'));
             modalCategoriasInst = new bootstrap.Modal(document.getElementById('modalGestionCategorias'));
             loadTodo();
-        });
-
-        const getToken = () => sessionStorage.getItem('token') || localStorage.getItem('token');
-
-        const authHeaders = () => ({
-            'Authorization': `Bearer ${getToken()}`,
-            'Accept': 'application/json'
         });
 
         const showToast = (icon, title) => {
@@ -193,10 +185,8 @@
 
         async function loadCategorias() {
             try {
-                const res = await fetch(`${API_URL}/menu-categorias`, { headers: authHeaders() });
-                if (!res.ok) throw new Error();
-                const json = await res.json();
-                categoriasLocales = json.data || [];
+                const response = await MetraAPI.get('/gerente/menu-categorias');
+                categoriasLocales = response.data || [];
                 
                 // 1. Poblar select del producto
                 const select = document.getElementById('producto-categoria');
@@ -228,11 +218,8 @@
 
         async function loadProductos() {
             try {
-                const res = await fetch(`${API_URL}/menu`, { headers: authHeaders() });
-                if (!res.ok) throw new Error('Error al cargar menú');
-                
-                const response = await res.json();
-                const categoriasConProductos = response.data || [];
+                const response = await MetraAPI.get('/gerente/menu');
+                const categoriasConProductos = response.data || response || [];
                 
                 const container = document.getElementById('carta-container');
                 container.innerHTML = '';
@@ -322,7 +309,6 @@
         async function saveCategoria(e) {
             e.preventDefault();
             const id = document.getElementById('categoria-id').value;
-            const url = id ? `${API_URL}/menu-categorias/${id}` : `${API_URL}/menu-categorias`;
             
             const payload = {
                 nombre: document.getElementById('categoria-nombre').value,
@@ -330,40 +316,30 @@
             };
 
             try {
-                const res = await fetch(url, {
-                    method: id ? 'PUT' : 'POST',
-                    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+                await MetraAPI[id ? 'put' : 'post'](
+                    id ? `/gerente/menu-categorias/${id}` : '/gerente/menu-categorias',
+                    payload
+                );
 
-                if (res.ok) {
-                    showToast('success', 'Categoría guardada');
-                    resetFormCategoria();
-                    loadTodo();
-                } else {
-                    const err = await res.json();
-                    Swal.fire('Error', err.message || 'Error al guardar', 'error');
-                }
-            } catch (e) {
-                Swal.fire('Error', 'Problema de conexión', 'error');
+                showToast('success', 'Categoría guardada');
+                resetFormCategoria();
+                loadTodo();
+            } catch (error) {
+                Swal.fire('Error', error.data?.message || 'Error al guardar', 'error');
             }
         }
 
         async function toggleEstadoCategoria(id, activoActual) {
             try {
-                const res = await fetch(`${API_URL}/menu-categorias/${id}`, {
-                    method: 'PUT',
-                    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ activo: !activoActual })
-                });
-                if (res.ok) {
-                    showToast('success', 'Estado de categoría actualizado');
-                    loadTodo();
-                } else {
-                    const err = await res.json();
-                    Swal.fire('Error', err.message || 'Error al actualizar categoría', 'error');
-                }
-            } catch (e) { console.error(e); }
+                await MetraAPI.put(
+                    `/gerente/menu-categorias/${id}`,
+                    { activo: !activoActual }
+                );
+                showToast('success', 'Estado de categoría actualizado');
+                loadTodo();
+            } catch (error) {
+                Swal.fire('Error', error.data?.message || 'Error al actualizar categoría', 'error');
+            }
         }
 
         // --- Gestión de Productos ---
@@ -408,29 +384,25 @@
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>';
 
             const id = document.getElementById('producto-id').value;
-            const url = id ? `${API_URL}/menu/${id}` : `${API_URL}/menu`;
             const formData = new FormData();
             formData.append('nombre_producto', document.getElementById('producto-nombre').value);
             formData.append('descripcion', document.getElementById('producto-descripcion').value);
             formData.append('categoria_id', document.getElementById('producto-categoria').value);
             formData.append('precio', document.getElementById('producto-precio').value);
             
-            if (id) formData.append('_method', 'PUT');
+            if (id) formData.append('_method', 'PUT'); // required by Laravel
 
             const fileInput = document.getElementById('producto-imagen');
             if (fileInput.files.length > 0) formData.append('imagen_url', fileInput.files[0]);
 
             try {
-                const res = await fetch(url, { method: 'POST', headers: authHeaders(), body: formData });
-                if (res.ok) {
-                    showToast('success', 'Producto guardado');
-                    modalProductoInst.hide();
-                    loadProductos();
-                } else {
-                    const err = await res.json();
-                    Swal.fire('Error', err.message || 'Error', 'error');
-                }
-            } catch (error) { Swal.fire('Error', 'Error de conexión', 'error'); } 
+                await MetraAPI.post(id ? `/gerente/menu/${id}` : '/gerente/menu', formData);
+                showToast('success', 'Producto guardado');
+                modalProductoInst.hide();
+                loadProductos();
+            } catch (error) {
+                Swal.fire('Error', error.data?.message || 'Error al guardar', 'error');
+            } 
             finally {
                 btn.disabled = false;
                 btn.innerText = 'Guardar Producto';
@@ -440,24 +412,23 @@
         async function deleteProducto(id) {
             if (await confirmAction('¿Desactivar producto?', 'warning')) {
                 try {
-                    const res = await fetch(`${API_URL}/menu/${id}`, { method: 'DELETE', headers: authHeaders() });
-                    if (res.ok) { showToast('success', 'Desactivado'); loadProductos(); }
-                } catch (e) { console.error(e); }
+                    await MetraAPI.delete(`/gerente/menu/${id}`);
+                    showToast('success', 'Desactivado');
+                    loadProductos();
+                } catch (e) {
+                    Swal.fire('Error', e.data?.message || 'Error al desactivar', 'error');
+                }
             }
         }
 
         async function reactivateProducto(id) {
             try {
-                const res = await fetch(`${API_URL}/menu/${id}/activar`, { 
-                    method: 'PATCH', 
-                    headers: authHeaders()
-                });
-                if (res.ok) { showToast('success', 'Reactivado'); loadProductos(); }
-                else {
-                    const err = await res.json();
-                    Swal.fire('Error', err.message || 'Error al reactivar', 'error');
-                }
-            } catch (e) { console.error(e); }
+                await MetraAPI.post(`/gerente/menu/${id}/activar`, {}, { 'X-HTTP-Method-Override': 'PATCH' });
+                showToast('success', 'Reactivado');
+                loadProductos();
+            } catch (error) {
+                Swal.fire('Error', error.data?.message || 'Error al reactivar', 'error');
+            }
         }
 
         async function confirmAction(title, icon) {
