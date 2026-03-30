@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/responsive_tables.css') }}?v={{ time() }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         window.API_URL = "{{ url('/api') }}";
@@ -16,41 +18,58 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
 </head>
-<body class="zona-superadmin bg-light">
+<body class="zona-superadmin" style="background-color: var(--off-white); font-family: 'Inter', sans-serif;">
+    
+    <!-- Overlay para navegación móvil -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
     <!-- Header móvil elegante -->
-    <div class="d-md-none p-3 text-dark d-flex justify-content-between align-items-center bg-white border-bottom shadow-sm" style="position: sticky; top: 0; z-index: 1020;">
-        <h4 class="fw-bold m-0" style="color: var(--black-primary);">METRA <small style="font-size: 0.6rem; color: var(--accent-gold) !important;" class="text-muted">SaaS</small></h4>
-        <button class="btn btn-light border-0" onclick="document.querySelector('.sidebar-super').classList.toggle('active')">
-            <i class="bi bi-list fs-4"></i>
+    <div class="d-lg-none p-3 text-dark d-flex justify-content-between align-items-center bg-white border-bottom shadow-sm" style="position: sticky; top: 0; z-index: 1100;">
+        <h4 class="fw-bold m-0 d-flex align-items-center" style="color: var(--black-primary); letter-spacing: -0.5px;">
+            <i class="bi bi-hexagon-fill me-2" style="color: var(--accent-gold); font-size: 1.2rem;"></i>METRA
+            <small style="font-size: 0.65rem; color: var(--text-muted) !important;" class="ms-1 text-uppercase fw-bold">SaaS</small>
+        </h4>
+        <button class="btn btn-light border-0" onclick="toggleSidebar()">
+            <i class="bi bi-list fs-3"></i>
         </button>
     </div>
 
-    <aside class="sidebar-super">
-        <div class="p-4 text-white d-none d-md-block">
-            <h2 class="fw-bold m-0" style="color: var(--white-pure);">METRA</h2>
-            <span class="badge rounded-pill" style="font-size: 0.65rem; background-color: var(--accent-gold); color: var(--black-primary); font-weight: 700;">SaaS Master</span>
+    <!-- Sidebar SaaS -->
+    <aside class="sidebar d-flex flex-column min-vh-100" style="background-color: var(--black-primary); border-right: 1px solid var(--gray-dark);">
+        <div class="d-flex flex-column align-items-center justify-content-center mb-4 mt-3 d-none d-lg-flex">
+            <h2 class="fw-bold m-0 d-flex align-items-center text-white" style="letter-spacing: -1px;">
+                <i class="bi bi-hexagon-fill me-2" style="color: var(--accent-gold); font-size: 1.5rem;"></i>METRA
+            </h2>
+            <span class="badge rounded-pill mt-2" style="font-size: 0.65rem; background: rgba(181,146,126,0.15); color: var(--accent-gold); font-weight: 700; letter-spacing: 1px; padding: 5px 12px;">SAAS MASTER</span>
         </div>
-        <nav class="mt-4">
-            <a href="/superadmin/dashboard" class="nav-link-super {{ request()->is('superadmin/dashboard') ? 'active' : '' }}">
-                <i class="bi bi-grid-fill me-2"></i> Dashboard
+        <nav class="d-flex flex-column gap-2 px-3 flex-grow-1">
+            <span class="small fw-bold text-uppercase mt-2 mb-2 ms-3" style="color: var(--text-muted); font-size: 0.7rem; letter-spacing: 1px;">Administración</span>
+            
+            <a href="/superadmin/dashboard" class="nav-link-admin {{ request()->is('superadmin/dashboard') ? 'active' : '' }}">
+                <i class="bi bi-grid-fill me-3"></i>Dashboard
             </a>
-            <a href="/superadmin/suscripciones" class="nav-link-super {{ request()->is('superadmin/suscripciones') ? 'active' : '' }}">
-                <i class="bi bi-wallet2 me-2"></i> Suscripciones
+            <a href="/superadmin/suscripciones" class="nav-link-admin {{ request()->is('superadmin/suscripciones') ? 'active' : '' }}">
+                <i class="bi bi-wallet2 me-3"></i>Suscripciones
             </a>
-            <a href="/superadmin/planes" class="nav-link-super {{ request()->is('superadmin/planes') ? 'active' : '' }}">
-                <i class="bi bi-stack me-2"></i> Planes de Suscripción
+            <a href="/superadmin/planes" class="nav-link-admin {{ request()->is('superadmin/planes') ? 'active' : '' }}">
+                <i class="bi bi-stack me-3"></i>Planes
             </a>
-            <a href="/superadmin/ajustes" class="nav-link-super {{ request()->is('superadmin/ajustes') ? 'active' : '' }}">
-                <i class="bi bi-gear me-2"></i> Ajustes Sistema
-            </a>
-           <a href="/logout" id="btnCerrarSesion" class="btn-logout">
-                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+            <a href="/superadmin/ajustes" class="nav-link-admin {{ request()->is('superadmin/ajustes') ? 'active' : '' }}">
+                <i class="bi bi-gear me-3"></i>Ajustes Sistema
             </a>
         </nav>
+        
+        <div class="mt-auto p-3">
+            <a href="/logout" id="btnCerrarSesion" class="btn btn-outline-danger d-flex align-items-center justify-content-center w-100" style="padding: 12px; border-radius: 8px; font-weight: 500; transition: all 0.2s;">
+                <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+            </a>
+        </div>
     </aside>
 
-    <main style="margin-left: 280px;" class="p-4 p-md-5">
-        @yield('content')
+    <main class="main-content-admin">
+        <div class="p-4 p-md-5">
+            @yield('content')
+        </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -62,29 +81,21 @@
             }[tag] || tag));
         };
 
-        document.addEventListener('click', function(event) {
-            const sidebar = document.querySelector('.sidebar-super');
-            const toggleBtn = document.querySelector('.d-md-none .btn');
-            
-            if (window.innerWidth < 768 && 
-                !sidebar.contains(event.target) && 
-                !toggleBtn.contains(event.target) && 
-                sidebar.classList.contains('active')) {
-                sidebar.classList.remove('active');
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
             }
+        }
+
+        document.getElementById('btnCerrarSesion')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = '/logout';
         });
     </script>
-    <script>
-document.getElementById('btnCerrarSesion')?.addEventListener('click', function(e) {
-    e.preventDefault();
-    
-    // 1. Borramos el rastro de la API
-    localStorage.removeItem('token');
-    localStorage.clear();
-    
-    // 2. Nos vamos a la ruta de Laravel para cerrar la sesión del servidor
-    window.location.href = '/logout';
-});
-</script>
 </body>
 </html>

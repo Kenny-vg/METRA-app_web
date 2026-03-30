@@ -34,6 +34,11 @@ return new class extends Migration
             $table->dateTime('fecha_validacion')->nullable();
             $table->boolean('en_revision')->default(false);
 
+            $table->index('cafe_id');
+            $table->index('plan_id');
+            $table->index('user_id');
+            $table->index('estado_pago');
+
             $table->timestamps();
         });
     }

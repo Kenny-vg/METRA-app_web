@@ -41,38 +41,38 @@
 
         <div class="row g-4 mb-5">
             <!-- Sección Superior: System/Status -->
-            <div class="col-12">
-                <div class="row g-4">
+            <div class="col-12 mb-4 mb-md-0">
+                <div class="row g-3 g-md-4">
                     <!-- Estado del Sistema -->
                     <div class="col-12 col-md-6">
-                        <div class="card bg-white border-0 shadow-sm rounded-4 h-100 p-4">
+                        <div class="card bg-white border-0 shadow-sm rounded-4 p-3 p-md-4">
                             <h5 class="fw-bold mb-3 text-danger"><i class="bi bi-shield-exclamation me-2"></i>Modo Mantenimiento</h5>
                             <div class="form-check form-switch p-0 m-0 d-flex justify-content-between align-items-center mb-3">
-                                <label class="form-check-label fw-bold" for="maintenanceMode">Activar Mantenimiento general</label>
+                                <label class="form-check-label fw-bold small text-uppercase" for="maintenanceMode" style="letter-spacing: 0.5px;">Acceso Restringido</label>
                                 <input class="form-check-input ms-0" type="checkbox" role="switch" id="maintenanceMode" style="width: 3em; height: 1.5em;">
                             </div>
                             <p class="small text-muted mb-0">
-                                Si activas esto, solo los Superadmins podrán acceder. Los restaurantes y clientes interactuarán con una página de "En Mantenimiento".
+                                Solo Superadmins podrán acceder. Clientes verán página de "Mantenimiento".
                             </p>
                         </div>
                     </div>
 
                     <!-- Información Técnica -->
                     <div class="col-12 col-md-6">
-                        <div class="card bg-white border-0 shadow-sm rounded-4 h-100 p-4">
+                        <div class="card bg-white border-0 shadow-sm rounded-4 p-3 p-md-4">
                             <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-server me-2"></i>Build Info</h5>
                             <ul class="list-group list-group-flush small">
-                                <li class="list-group-item d-flex justify-content-between px-0 border-0 bg-transparent text-muted">
-                                    <span>Versión Laravel</span>
+                                <li class="list-group-item d-flex justify-content-between px-0 border-0 bg-transparent text-muted py-1">
+                                    <span>Versión</span>
                                     <span class="fw-bold text-dark">11.x</span>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between px-0 border-0 bg-transparent text-muted">
+                                <li class="list-group-item d-flex justify-content-between px-0 border-0 bg-transparent text-muted py-1">
                                     <span>Entorno</span>
-                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-3 py-2">Producción</span>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-2 py-1" style="font-size: 0.65rem;">Producción</span>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between px-0 border-0 bg-transparent text-muted">
-                                    <span>Último Despliegue</span>
-                                    <span class="fw-bold text-dark">09 Feb, 2026</span>
+                                <li class="list-group-item d-flex justify-content-between px-0 border-0 bg-transparent text-muted py-1">
+                                    <span>Build</span>
+                                    <span class="fw-bold text-dark">09.Feb.26</span>
                                 </li>
                             </ul>
                         </div>
@@ -81,11 +81,11 @@
             </div>
 
             <!-- Configuración Sistema: Pagos y Soporte -->
-            <div class="col-12">
-                <div class="d-flex align-items-center mb-4 mt-2">
-                    <h4 class="fw-bold text-dark m-0"><i class="bi bi-wallet2 me-2 text-primary"></i>Configuración de Pagos y Soporte</h4>
+            <div class="col-12 mt-4 mt-md-2">
+                <div class="d-flex align-items-center mb-4">
+                    <h4 class="fw-bold text-dark m-0"><i class="bi bi-wallet2 me-2 text-primary"></i>Pagos y Soporte</h4>
                 </div>
-                <div class="card bg-white border-0 shadow-sm rounded-4 p-4">
+                <div class="card bg-white border-0 shadow-sm rounded-4 p-3 p-md-4">
                     <form id="form-configuracion" onsubmit="event.preventDefault(); guardarConfiguracion();">
                         <div class="row g-4">
                             <!-- Datos de Pago -->
@@ -96,38 +96,38 @@
                                     <input type="text" class="form-control bg-light border-0" id="conf_banco" placeholder="Ej. BBVA">
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">CLABE Interbancaria</label>
+                                    <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">CLABE</label>
                                     <input type="text" class="form-control bg-light border-0" id="conf_clabe" placeholder="18 dígitos" maxlength="18" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Beneficiario</label>
-                                    <input type="text" class="form-control bg-light border-0" id="conf_beneficiario" placeholder="Nombre completo o Razón Social">
+                                    <input type="text" class="form-control bg-light border-0" id="conf_beneficiario" placeholder="Nombre completo">
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Instrucciones de Pago</label>
-                                    <textarea class="form-control bg-light border-0" id="conf_instrucciones" rows="3" placeholder="Instrucciones adicionales para el cliente..."></textarea>
+                                    <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Instrucciones</label>
+                                    <textarea class="form-control bg-light border-0" id="conf_instrucciones" rows="3" placeholder="Instrucciones adicionales..."></textarea>
                                 </div>
                             </div>
                             <!-- Datos de Soporte -->
                             <div class="col-12 col-md-6">
-                                <h5 class="fw-bold mb-3 text-secondary border-bottom pb-2">Contacto y Soporte</h5>
+                                <h5 class="fw-bold mb-3 text-secondary border-bottom pb-2">Contacto</h5>
                                 <div class="mb-3">
-                                    <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Email de Soporte</label>
+                                    <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Email</label>
                                     <input type="email" class="form-control bg-light border-0" id="conf_email" placeholder="soporte@metra.com">
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Teléfono de Soporte</label>
+                                    <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Teléfono</label>
                                     <input type="text" class="form-control bg-light border-0" id="conf_telefono" placeholder="+52 238 000 0000" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 43" oninput="this.value = this.value.replace(/[^0-9+]/g, '');">
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">WhatsApp de Soporte</label>
+                                    <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">WhatsApp</label>
                                     <input type="text" class="form-control bg-light border-0" id="conf_whatsapp" placeholder="+52 238 000 0000" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 43" oninput="this.value = this.value.replace(/[^0-9+]/g, '');">
                                 </div>
                             </div>
                         </div>
-                        <div class="mt-4 text-end">
-                            <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-sm">
-                                <i class="bi bi-save2-fill me-2"></i>Guardar Configuración
+                        <div class="mt-4 text-center text-md-end">
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-sm w-100 w-md-auto">
+                                <i class="bi bi-save2-fill me-2"></i>Guardar Cambios
                             </button>
                         </div>
                     </form>

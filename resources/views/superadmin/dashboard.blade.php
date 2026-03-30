@@ -21,53 +21,50 @@
     </div>
 </div>
 
-<header class="mb-5">
+<header class="mb-4 mb-md-5">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
         <div>
-            <h2 class="fw-bold">Panel de Control Maestro</h2>
-            <p class="text-muted mb-0">Gestiona los negocios registrados en METRA.</p>
+            <h2 class="fw-bold text-dark mb-1">Panel Maestro</h2>
+            <p class="text-muted mb-0 small text-uppercase fw-bold" style="letter-spacing: 1px; font-size: 0.7rem;">Gestión Global METRA</p>
         </div>
-        <div class="text-start text-md-end mt-3 mt-md-0">
-            <button class="btn btn-outline-dark rounded-pill fw-bold shadow-sm px-4" onclick="manualRefresh(this)">
+        <div class="w-100 w-md-auto d-flex gap-2">
+            <button class="btn btn-outline-dark rounded-pill fw-bold shadow-sm px-4 py-2 flex-grow-1 flex-md-grow-0" onclick="manualRefresh(this)">
                 <i class="bi bi-arrow-clockwise me-1"></i> Actualizar
             </button>
-            <div class="mt-2 d-none d-md-block">
-                <small class="text-muted" style="font-size: 0.75rem;"><i class="bi bi-info-circle me-1"></i>Actualiza manualmente para ver nuevas solicitudes de cafeterías.</small>
-            </div>
         </div>
     </div>
 </header>
 
 <!-- STATS -->
-<div class="row g-4 mb-5" id="stats-row">
+<div class="row g-2 g-md-4 mb-4 mb-md-5" id="stats-row">
     <div class="col-6 col-md-3">
         <a href="javascript:void(0)" onclick="window.filtrarTabla('todos', true);" class="text-decoration-none">
-            <div class="stat-card bg-white shadow-sm border-0 border-start border-4" style="border-color: var(--black-primary) !important;">
-                <p class="text-muted small mb-2 fw-bold text-uppercase" style="letter-spacing: 0.5px;">Total cafeterías</p>
+            <div class="stat-card bg-white shadow-sm border-0 border-start border-4 p-3 p-md-4 h-100" style="border-color: var(--black-primary) !important;">
+                <p class="text-muted small mb-2 fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.65rem;">Total</p>
                 <h2 id="stat-total" class="text-dark"><span class="spinner-border spinner-border-sm text-secondary" role="status" aria-hidden="true"></span></h2>
             </div>
         </a>
     </div>
     <div class="col-6 col-md-3">
         <a href="javascript:void(0)" onclick="window.filtrarTabla('activa', true);" class="text-decoration-none">
-            <div class="stat-card bg-white shadow-sm border-0 border-start border-4 border-success">
-                <p class="small mb-2 fw-bold text-uppercase text-success" style="letter-spacing: 0.5px;">Activas</p>
+            <div class="stat-card bg-white shadow-sm border-0 border-start border-4 border-success p-3 p-md-4 h-100">
+                <p class="small mb-2 fw-bold text-uppercase text-success" style="letter-spacing: 0.5px; font-size: 0.65rem;">Activas</p>
                 <h2 id="stat-activas" class="text-dark"><span class="spinner-border spinner-border-sm text-success" role="status" aria-hidden="true"></span></h2>
             </div>
         </a>
     </div>
     <div class="col-6 col-md-3">
         <a href="javascript:void(0)" onclick="window.filtrarTabla('pendiente', true);" class="text-decoration-none">
-            <div class="stat-card bg-white shadow-sm border-0 border-start border-4 border-warning">
-                <p class="small mb-2 fw-bold text-uppercase text-warning" style="letter-spacing: 0.5px;">Pendientes</p>
+            <div class="stat-card bg-white shadow-sm border-0 border-start border-4 border-warning p-3 p-md-4 h-100">
+                <p class="small mb-2 fw-bold text-uppercase text-warning" style="letter-spacing: 0.5px; font-size: 0.65rem;">Pendientes</p>
                 <h2 id="stat-pendientes" class="text-dark"><span class="spinner-border spinner-border-sm text-warning" role="status" aria-hidden="true"></span></h2>
             </div>
         </a>
     </div>
     <div class="col-6 col-md-3">
         <a href="#seccion-revision" class="text-decoration-none">
-            <div class="stat-card bg-white shadow-sm border-0 border-start border-4 border-danger">
-                <p class="small mb-2 fw-bold text-uppercase text-danger" style="letter-spacing: 0.5px;">En Revisión</p>
+            <div class="stat-card bg-white shadow-sm border-0 border-start border-4 border-danger p-3 p-md-4 h-100">
+                <p class="small mb-2 fw-bold text-uppercase text-danger" style="letter-spacing: 0.5px; font-size: 0.65rem;">En Revisión</p>
                 <h2 id="stat-revision" class="text-dark"><span class="spinner-border spinner-border-sm text-danger" role="status" aria-hidden="true"></span></h2>
             </div>
         </a>
@@ -208,10 +205,10 @@ function renderTablaRevision(cafeterias) {
     }
     el.innerHTML = `
     <div class="table-responsive">
-    <table class="table table-hover align-middle">
-        <thead class="table-light">
+    <table class="table table-hover align-middle table-responsive-stack">
+        <thead class="table-light d-none d-md-table-header-group">
             <tr class="small text-muted text-uppercase">
-                <th>Negocio</th><th>Gerente</th><th>Plan</th><th>Comprobante</th><th class="text-end">Acciones</th>
+                <th>Negocio</th><th>Gerente</th><th class="d-none d-lg-table-cell">Plan</th><th>Comprobante</th><th class="text-end">Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -220,21 +217,23 @@ function renderTablaRevision(cafeterias) {
                 const plan    = escapeHTML(c.suscripcion_actual?.plan?.nombre_plan || c.ultima_suscripcion?.plan?.nombre_plan || '—');
                 const comp    = c.comprobante_url
                     ? `<button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="verComprobante(${c.id})">
-                        <i class="bi bi-receipt me-1"></i>Ver
+                        <i class="bi bi-receipt me-1"></i>Ver Ticket
                        </button>`
                     : '<span class="text-muted small">No subido</span>';
                 return `<tr>
-                    <td class="fw-bold">${escapeHTML(c.nombre)}</td>
-                    <td>${gerente}</td>
-                    <td>${plan}</td>
-                    <td>${comp}</td>
+                    <td data-label="Negocio" class="fw-bold">${escapeHTML(c.nombre)}</td>
+                    <td data-label="Gerente">${gerente}</td>
+                    <td data-label="Plan" class="d-none d-lg-table-cell">${plan}</td>
+                    <td data-label="Ticket">${comp}</td>
                     <td class="text-end">
-                        <button type="button" class="btn btn-sm btn-success rounded-pill px-3 me-1" onclick="accionSolicitud(${c.id}, 'aprobar')">
-                            <i class="bi bi-check2 me-1"></i>Aprobar
-                        </button>
-                        <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" onclick="accionSolicitud(${c.id}, 'rechazar')">
-                            <i class="bi bi-x me-1"></i>Rechazar
-                        </button>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-sm btn-success rounded-pill px-3" onclick="accionSolicitud(${c.id}, 'aprobar')">
+                                <i class="bi bi-check2 me-1"></i>Aprobar
+                            </button>
+                            <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" onclick="accionSolicitud(${c.id}, 'rechazar')">
+                                <i class="bi bi-x me-1"></i>Rechazar
+                            </button>
+                        </div>
                     </td>
                 </tr>`;
             }).join('')}
@@ -249,27 +248,34 @@ function renderTablaTodos(cafeterias) {
         tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No hay cafeterías registradas.</td></tr>';
         return;
     }
+    
+    // Asegurar que la tabla tenga la clase responsiva
+    const tableElement = tbody.closest('table');
+    if (tableElement) tableElement.classList.add('table-responsive-stack');
+
     tbody.innerHTML = cafeterias.map(c => {
         const gerente = c.gerente ? escapeHTML(c.gerente.name) : '—';
         const plan    = escapeHTML(c.suscripcion_actual?.plan?.nombre_plan || c.ultima_suscripcion?.plan?.nombre_plan || '—');
         return `<tr>
-            <td class="fw-bold">${escapeHTML(c.nombre)}</td>
-            <td>${gerente}</td>
-            <td>${plan}</td>
-            <td>${badgeEstado(c.estado_dinamico)}</td>
+            <td data-label="Negocio" class="fw-bold">${escapeHTML(c.nombre)}</td>
+            <td data-label="Gerente">${gerente}</td>
+            <td data-label="Plan" class="d-none d-lg-table-cell">${plan}</td>
+            <td data-label="Estado">${badgeEstado(c.estado_dinamico)}</td>
             <td class="text-end">
-                ${c.estado_dinamico === 'en_revision'
-                    ? `<button type="button" class="btn btn-sm btn-success rounded-pill px-3 me-1" onclick="accionSolicitud(${c.id},'aprobar')">
-                           <i class="bi bi-check2 me-1"></i>Aprobar
-                       </button>
-                       <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" onclick="accionSolicitud(${c.id},'rechazar')">
-                           <i class="bi bi-x me-1"></i>Rechazar
-                       </button>`
-                    : `<button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3"
-                              onclick="accionSolicitud(${c.id},'${c.estado_dinamico === 'activa' ? 'suspender' : 'aprobar'}')">
-                           ${c.estado_dinamico === 'activa' ? 'Suspender' : 'Activar'}
-                       </button>`
-                }
+                <div class="d-flex justify-content-end gap-2">
+                    ${c.estado_dinamico === 'en_revision'
+                        ? `<button type="button" class="btn btn-sm btn-success rounded-pill px-3" onclick="accionSolicitud(${c.id},'aprobar')">
+                               <i class="bi bi-check2 me-1"></i>Aprobar
+                           </button>
+                           <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" onclick="accionSolicitud(${c.id},'rechazar')">
+                               <i class="bi bi-x me-1"></i>Rechazar
+                           </button>`
+                        : `<button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                                  onclick="accionSolicitud(${c.id},'${c.estado_dinamico === 'activa' ? 'suspender' : 'aprobar'}')">
+                               ${c.estado_dinamico === 'activa' ? 'Suspender' : 'Activar'}
+                           </button>`
+                    }
+                </div>
             </td>
         </tr>`;
     }).join('');

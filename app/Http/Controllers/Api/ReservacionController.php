@@ -33,18 +33,18 @@ class ReservacionController extends Controller
 
         $query = Reservacion::with(['ocasionEspecial', 'promocion', 'zona'])
             ->select(
-                'reservaciones.id', 'reservaciones.folio', 'reservaciones.nombre_cliente', 
-                'reservaciones.telefono', 'reservaciones.email', 'reservaciones.fecha', 
-                'reservaciones.hora_inicio', 'reservaciones.hora_fin', 'reservaciones.numero_personas', 
-                'reservaciones.estado', 'reservaciones.comentarios', 'reservaciones.fecha_checkin', 
-                'reservaciones.fecha_checkout', 'reservaciones.cafe_id', 'reservaciones.ocasion_especial_id', 
-                'reservaciones.promocion_id', 'reservaciones.zona_id', 'reservaciones.tipo', 'reservaciones.duracion_min'
+                'reservaciones.*',
+                'detalle_ocupaciones.mesa_asignada_fisicamente'
             )
-            ->addSelect([
-                'mesa_asignada_fisicamente' => DB::table('detalle_ocupaciones')
-                    ->selectRaw('count(*)')
-                    ->whereColumn('reservacion_id', 'reservaciones.id')
-            ])
+            ->leftJoinSub(
+                DB::table('detalle_ocupaciones')
+                    ->select('reservacion_id', DB::raw('count(*) as mesa_asignada_fisicamente'))
+                    ->groupBy('reservacion_id'),
+                'detalle_ocupaciones',
+                'detalle_ocupaciones.reservacion_id',
+                '=',
+                'reservaciones.id'
+            )
             ->whereBetween('reservaciones.fecha', [$desde, $hasta])
             ->orderBy('reservaciones.fecha')
             ->orderBy('reservaciones.hora_inicio');
@@ -268,7 +268,7 @@ class ReservacionController extends Controller
         // Se busca por user_id O por correo electrónico para capturar reservas hechas como invitado
         $reservas = Reservacion::withoutGlobalScope(\App\Models\Scopes\CafeScope::class)
             ->select('reservaciones.*')
-            ->join('cafeterias', 'reservaciones.cafe_id', '=', 'cafeterias.id')
+            ->leftJoin('cafeterias', 'reservaciones.cafe_id', '=', 'cafeterias.id')
             ->with(['cafeteria:id,nombre,calle,colonia,ciudad', 'zona', 'promocion', 'ocasionEspecial'])
             ->where(function($q) use ($user) {
                 $q->where('reservaciones.user_id', $user->id);

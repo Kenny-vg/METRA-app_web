@@ -12,6 +12,7 @@ use App\Models\Horario;
 use App\Models\Mesa;
 use App\Helpers\ApiResponse;
 use App\Models\Resena;
+use Illuminate\Support\Facades\DB;
 
 class PublicCafeteriaController extends Controller
 {
@@ -22,15 +23,22 @@ class PublicCafeteriaController extends Controller
     {
         $cafeterias = Cafeteria::where('estado', 'activa')
             ->select(
-            'id',
-            'slug',
-            'nombre',
-            'descripcion',
-            'calle',
-            'num_exterior',
-            'colonia',
-            'foto_url'
-        )
+                'id', 'slug', 'nombre', 'descripcion', 'calle', 'num_exterior', 'colonia', 'foto_url'
+            )
+            // 1. Subconsulta en SELECT (Calculada): Promedio de calificación
+            ->addSelect([
+                'promedio_calificacion' => DB::table('resenas')
+                    ->selectRaw('COALESCE(AVG(calificacion), 0)')
+                    ->whereColumn('cafe_id', 'cafeterias.id')
+                    ->where('estado', 'publicada')
+            ])
+            // 2. Subconsulta en WHERE (EXISTS): Solo cafeterías con zonas activas
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('zonas')
+                    ->whereColumn('zonas.cafe_id', 'cafeterias.id')
+                    ->where('zonas.activo', true);
+            })
             ->get();
 
         return ApiResponse::success($cafeterias);

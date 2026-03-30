@@ -34,6 +34,7 @@ use App\Http\Controllers\Api\Gerente\PromocionController;
 use App\Http\Controllers\Api\Gerente\RenovarSuscripcionController;
 use App\Http\Controllers\Api\Gerente\StaffController;
 use App\Http\Controllers\Api\Gerente\MenuCategoriaController;
+use App\Http\Controllers\Api\Gerente\AnalyticsController;
 use App\Http\Controllers\Api\Publico\PublicCafeteriaController;
 
 /* |------------------------------------------ | RUTAS PÚBLICAS |------------------------------------------ */
@@ -193,6 +194,13 @@ Route::middleware([
     Route::put('mi-cafeteria', [CafeteriaPerfilController::class , 'update']);
     Route::get('metricas/diarias', [CafeteriaPerfilController::class , 'metricasDiarias']);
     Route::get('metricas/mensuales', [CafeteriaPerfilController::class , 'metricasMensuales']);
+    
+    // Analítica Avanzada
+    Route::get('analytics/stats', [AnalyticsController::class , 'stats']);
+    if (!Route::has('gerente.analytics.hourly')) {
+        Route::get('analytics/demand-hourly', [AnalyticsController::class , 'hourlyDemand']);
+    }
+    Route::get('analytics/trends-weekly', [AnalyticsController::class , 'weeklyTrends']);
 
 
     Route::apiResource('zonas', ZonaController::class); //crud zonas

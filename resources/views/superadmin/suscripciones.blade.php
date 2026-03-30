@@ -39,8 +39,8 @@
         </div>
 
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
+            <table class="table table-hover align-middle table-responsive-stack">
+                <thead class="table-light d-none d-md-table-header-group">
                     <tr class="small text-muted text-uppercase">
                         <th>Negocio</th>
                         <th>Plan Actual</th>
@@ -52,7 +52,7 @@
                     </tr>
                 </thead>
                 <tbody id="tabla-suscripciones">
-                    <tr><td colspan="6" class="text-center text-muted py-4"><div class="spinner-border spinner-border-sm me-2"></div>Cargando...</td></tr>
+                    <tr><td colspan="7" class="text-center text-muted py-4"><div class="spinner-border spinner-border-sm me-2"></div>Cargando...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -128,7 +128,7 @@ async function cargarSuscripciones() {
         renderTabla(res.data || []);
     } catch (e) {
         document.getElementById('tabla-suscripciones').innerHTML = 
-            '<tr><td colspan="6" class="text-danger text-center py-4">Ocurrió un problema al procesar la solicitud. Intenta nuevamente.</td></tr>';
+            '<tr><td colspan="7" class="text-danger text-center py-4">Ocurrió un problema al procesar la solicitud. Intenta nuevamente.</td></tr>';
     }
 }
 
@@ -185,7 +185,7 @@ async function cargarPendientes() {
 function renderTabla(suscripciones) {
     const tbody = document.getElementById('tabla-suscripciones');
     if (!suscripciones.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No hay suscripciones registradas.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">No hay suscripciones registradas.</td></tr>';
         return;
     }
     
@@ -222,27 +222,27 @@ function renderTabla(suscripciones) {
         }
 
         return `<tr class="${s.estado_pago === 'cancelado' ? 'opacity-75' : ''}">
-            <td class="fw-bold cafe-name-cell" style="color: var(--black-primary); cursor: pointer;" onclick="verDetalle(${s.cafe_id})">${cafe}</td>
-            <td>${badgePlan}</td>
-            <td class="fw-bold" style="color: var(--black-primary);">${monto}</td>
-            <td style="color: var(--text-muted);">${fechaFin}</td>
-            <td>${badgeEstado}</td>
-            <td class="text-center">
+            <td data-label="Negocio" class="fw-bold cafe-name-cell" style="color: var(--black-primary); cursor: pointer;" onclick="verDetalle(${s.cafe_id})">${cafe}</td>
+            <td data-label="Plan Actual">${badgePlan}</td>
+            <td data-label="Monto" class="fw-bold" style="color: var(--black-primary);">${monto}</td>
+            <td data-label="Vence" style="color: var(--text-muted);">${fechaFin}</td>
+            <td data-label="Estado">${badgeEstado}</td>
+            <td data-label="Historial" class="text-center">
                 <button type="button" class="btn btn-sm btn-outline-primary rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Historial" onclick="verHistorial(${s.cafe_id}, '${safeName}')"><i class="bi bi-clock-history"></i></button>
             </td>
             <td class="text-center pe-4">
-                <div class="d-flex justify-content-center gap-3 text-nowrap">
+                <div class="d-flex justify-content-center justify-content-md-end gap-2 text-nowrap">
                     ${
                           // Registro inicial pendiente de aprobar
-                          (s.cafeteria?.estado === 'en_revision')
-                            ? `<span class="btn btn-sm btn-outline-warning rounded-pill px-3 disabled" style="width: 110px; opacity: 0.8; pointer-events: none; border-color: #ffc107; color: #ffc107;">Pendiente</span>`
+                           (s.cafeteria?.estado === 'en_revision')
+                            ? `<span class="btn btn-sm btn-outline-warning rounded-pill px-3 disabled" style="width: 110px; opacity: 0.8; pointer-events: none; border-color: #ffc107; color: #ffc107;">En Revisión</span>`
                           // Cualquier suscripción pendiente (renovación o vencida) → botón Aprobar Pago
                           : (s.estado_pago === 'pendiente')
-                            ? `<button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3" style="width: 130px;" onclick="aprobarRenovacion(${s.id})"><i class="bi bi-check-circle me-1"></i>Aprobar Pago</button>`
+                            ? `<button type="button" class="btn btn-sm btn-success rounded-pill px-3" style="min-width: 120px;" onclick="aprobarRenovacion(${s.id})"><i class="bi bi-check-circle me-1"></i>Aprobar Pago</button>`
                           // Sin suscripción activa -> suspendida o cancelada
                           : (s.estado_pago !== 'cancelado' && s.cafeteria?.estado !== 'suspendida'
-                            ? `<button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" style="width: 110px;" onclick="cambiarEstado(${s.cafe_id}, 'suspendida')">Suspender</button>`
-                            : `<button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3" style="width: 110px;" onclick="cambiarEstado(${s.cafe_id}, 'activa')">Reactivar</button>`)
+                            ? `<button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" style="min-width: 100px;" onclick="cambiarEstado(${s.cafe_id}, 'suspendida')">Suspender</button>`
+                            : `<button type="button" class="btn btn-sm btn-success rounded-pill px-3" style="min-width: 100px;" onclick="cambiarEstado(${s.cafe_id}, 'activa')">Reactivar</button>`)
                         }
                     </div>
                 </td>

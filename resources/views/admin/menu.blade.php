@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/responsive_tables.css') }}?v={{ time() }}">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -42,19 +43,22 @@
 </head>
 <body class="zona-admin" style="background-color: var(--off-white); font-family: 'Inter', sans-serif;">
 
+    <!-- Overlay para navegación móvil -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
     <!-- Navbar Móvil -->
-    <div class="d-md-none p-3 text-white d-flex justify-content-between align-items-center" style="background-color: var(--black-primary); border-bottom: 1px solid var(--gray-dark);">
+    <div class="d-lg-none p-3 text-white d-flex justify-content-between align-items-center mb-0" style="background-color: var(--black-primary); position: sticky; top:0; z-index: 1100;">
         <h4 class="fw-bold m-0 d-flex align-items-center" style="letter-spacing: -0.5px;">
             <i class="bi bi-hexagon-fill me-2" style="color: var(--accent-gold); font-size: 1.2rem;"></i>METRA
         </h4>
-        <button class="btn btn-sm btn-outline-light border-0" onclick="document.querySelector('.sidebar').classList.toggle('active')">
+        <button class="btn btn-sm btn-outline-light border-0" onclick="toggleSidebar()">
             <i class="bi bi-list fs-3"></i>
         </button>
     </div>
 
     <!-- Sidebar SaaS -->
     <aside class="sidebar d-flex flex-column min-vh-100" style="background-color: var(--black-primary); border-right: 1px solid var(--gray-dark);">
-        <div class="d-flex flex-column align-items-center justify-content-center mb-4 mt-3 d-none d-md-flex">
+        <div class="d-flex flex-column align-items-center justify-content-center mb-4 mt-3 d-none d-lg-flex">
             <h2 class="fw-bold m-0 d-flex align-items-center text-white" style="letter-spacing: -1px;">
                 <i class="bi bi-hexagon-fill me-2" style="color: var(--accent-gold); font-size: 1.5rem;"></i>METRA
             </h2>
@@ -118,6 +122,15 @@
             }[tag] || tag));
         };
 
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            }
+        }
+
         // Data in sidebar
         const nombreCafe = localStorage.getItem('nombre_cafeteria');
         if (nombreCafe) {
@@ -135,20 +148,6 @@
                 upill.classList.remove('d-none');
             }
         }
-
-        // Adaptación móvil
-        document.addEventListener('click', function(event) {
-            const sidebar = document.querySelector('.sidebar');
-            const toggleBtn = document.querySelector('.d-md-none .btn');
-            
-            if (window.innerWidth < 768 && 
-                sidebar && toggleBtn &&
-                !sidebar.contains(event.target) && 
-                !toggleBtn.contains(event.target) &&
-                sidebar.classList.contains('active')) {
-                sidebar.classList.remove('active');
-            }
-        });
 
         // Limpieza de sesión
         document.getElementById('btnCerrarSesion')?.addEventListener('click', function(e) {

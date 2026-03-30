@@ -25,6 +25,20 @@ class DashboardController extends Controller
             'suscripciones_activas'=>
                 Suscripcion::where('fecha_fin','>',now())->count(),
 
+            // 3. Subconsulta en FROM (Inline View): Distribución de planes actuales
+            // Usamos una subquery para obtener la última suscripción de cada cafetería
+            // y luego agrupamos por plan sobre ese conjunto filtrado.
+            'distribucion_planes' => DB::table(function ($query) {
+                $query->select('cafe_id', DB::raw('MAX(id) as last_id'))
+                    ->from('suscripciones')
+                    ->groupBy('cafe_id');
+            }, 'ultimas_suscripciones')
+            ->join('suscripciones as s', 's.id', '=', 'ultimas_suscripciones.last_id')
+            ->join('planes as p', 'p.id', '=', 's.plan_id')
+            ->select('p.nombre', DB::raw('count(*) as total'))
+            ->groupBy('p.nombre')
+            ->get(),
+
         ], 'Dashboard superadmin cargado correctamente');
     }
 

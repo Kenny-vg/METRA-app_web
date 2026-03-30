@@ -51,6 +51,12 @@ return new class extends Migration
             $table->foreignId('mesa_id')
                 ->constrained('mesas')
                 ->cascadeOnDelete();
+            
+            $table->index('reservacion_id');
+            $table->index('cafe_id');
+            $table->index('user_id');
+            $table->index('mesa_id');
+            $table->index('estado');
 
             $table->timestamps();
         });

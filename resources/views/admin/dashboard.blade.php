@@ -16,18 +16,18 @@
     </div>
 
 
-    <div class="row g-4 mb-5">
+    <div class="row g-4 mb-5 text-center">
         <div class="col-12 col-sm-6 col-xl-3">
             <div class="card border-0 p-4 h-100 premium-card">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <span class="small fw-bold text-uppercase" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.7rem;">Reservas de Hoy</span>
                     <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: var(--off-white); color: var(--black-primary);">
-                        <i class="bi bi-people-fill fs-5"></i>
+                        <i class="bi bi-calendar-check-fill fs-5"></i>
                     </div>
                 </div>
                 <h3 class="fw-bold mb-1" id="dash_reservas_hoy" style="color: var(--black-primary); font-size: 2.2rem; letter-spacing: -1px;">...</h3>
-                <div class="d-flex align-items-center mt-2">
-                    <span class="small" style="color: var(--text-muted); font-size: 0.75rem;">Reservaciones activas de hoy</span>
+                <div class="d-flex align-items-center mt-2 justify-content-center">
+                    <span id="dash_comensales_label" class="small" style="color: var(--text-muted); font-size: 0.75rem;">Cargando...</span>
                 </div>
             </div>
         </div>
@@ -35,14 +35,14 @@
         <div class="col-12 col-sm-6 col-xl-3">
              <div class="card border-0 p-4 h-100 premium-card">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="small fw-bold text-uppercase" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.7rem;">Completadas</span>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: var(--off-white); color: #2E7D32;">
-                        <i class="bi bi-check-circle-fill fs-5"></i>
+                    <span class="small fw-bold text-uppercase" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.7rem;">Ocupación Real</span>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(56, 44, 38, 0.05); color: var(--black-primary);">
+                        <i class="bi bi-house-door-fill fs-5"></i>
                     </div>
                 </div>
-                <h3 class="fw-bold mb-1" id="dash_completadas" style="color: var(--black-primary); font-size: 2.2rem; letter-spacing: -1px;">...</h3>
-                <div id="badge_ocupacion_container" class="d-flex align-items-center mt-2">
-                    <span class="small" style="color: var(--text-muted); font-size: 0.75rem;">Calculando insight...</span>
+                <h3 class="fw-bold mb-1" id="dash_ocupacion_real" style="color: var(--black-primary); font-size: 2.2rem; letter-spacing: -1px;">0%</h3>
+                <div class="mt-2 text-center">
+                    <span id="dash_insight_ocupacion" class="badge rounded-pill" style="background: rgba(46, 125, 50, 0.1); color: #2E7D32; border: 1px solid rgba(46, 125, 50, 0.2); font-weight: 700;">Calculando...</span>
                 </div>
             </div>
         </div>
@@ -50,50 +50,63 @@
         <div class="col-12 col-sm-6 col-xl-3">
              <div class="card border-0 p-4 h-100 premium-card">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="small fw-bold text-uppercase" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.7rem;">Bajas / No Show</span>
+                    <span class="small fw-bold text-uppercase" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.7rem;">Tasa No-Show</span>
                     <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: var(--off-white); color: #c62828;">
-                        <i class="bi bi-x-circle-fill fs-5"></i>
+                        <i class="bi bi-person-x-fill fs-5"></i>
                     </div>
                 </div>
-                <h3 class="fw-bold mb-1" id="dash_bajas" style="color: var(--black-primary); font-size: 2.2rem; letter-spacing: -1px;">...</h3>
-                <div id="badge_cancelacion_container" class="d-flex align-items-center mt-2">
-                    <span class="small" style="color: var(--text-muted); font-size: 0.75rem;">Calculando riesgo...</span>
+                <h3 class="fw-bold mb-1" id="dash_noshow_rate" style="color: var(--black-primary); font-size: 2.2rem; letter-spacing: -1px;">0%</h3>
+                <div class="mt-2 text-center">
+                    <span id="dash_insight_noshow" class="badge rounded-pill" style="background: rgba(108, 117, 125, 0.1); color: #6c757d; font-weight: 700;">Dato 30 días</span>
                 </div>
             </div>
         </div>
 
         <div class="col-12 col-sm-6 col-xl-3">
-             <div class="card border-0 p-4 h-100 position-relative overflow-hidden" style="background: var(--black-primary); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
-                <!-- Decoración -->
-                <div style="position: absolute; right: -20px; top: -20px; width: 100px; height: 100px; background: var(--accent-gold); border-radius: 50%; opacity: 0.1; filter: blur(20px);"></div>
-                
-                <div class="d-flex justify-content-between align-items-center mb-3 position-relative z-1">
-                    <span class="small fw-bold text-uppercase" style="color: rgba(255,255,255,0.6); letter-spacing: 1px; font-size: 0.7rem;">Próxima Llegada</span>
+             <div class="card border-0 p-4 h-100 premium-card" style="background: var(--black-primary); border-radius: 16px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="small fw-bold text-uppercase" style="color: rgba(255,255,255,0.6); letter-spacing: 1px; font-size: 0.7rem;">Fidelidad</span>
                     <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); color: var(--accent-gold);">
-                        <i class="bi bi-clock-history fs-5"></i>
+                        <i class="bi bi-award-fill fs-5"></i>
                     </div>
                 </div>
-                <h3 id="dash_proxima_hora" class="fw-bold mb-1 position-relative z-1" style="color: var(--white-pure); font-size: 2.2rem; letter-spacing: -1px;">--:--</h3>
-                <div class="d-flex align-items-center mt-2 position-relative z-1">
-                    <span id="dash_proxima_nombre" class="small" style="color: var(--accent-gold); font-size: 0.75rem; font-weight: 600;">-</span>
+                <h3 class="fw-bold mb-1" id="dash_fidelidad_rate" style="color: var(--white-pure); font-size: 2.2rem; letter-spacing: -1px;">0%</h3>
+                <div class="mt-2 text-center">
+                    <span id="dash_insight_fidelidad" class="small fw-bold" style="color: var(--accent-gold); font-size: 0.7rem;">Recurrentes vs Nuevos</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Sección de Gráficos y Tablas -->
+    <!-- Sección de Gráficos de Inteligencia -->
     <div class="row g-4 mb-5">
-        <div class="col-12 col-xl-7">
+        <div class="col-12 col-xl-8">
             <div class="card border-0 p-4 p-lg-5 h-100 premium-card">
-                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center border-bottom pb-4 mb-4 gap-3" style="border-color: var(--border-light) !important;">
-                    <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Tendencia Operativa al Cierre</h5>
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center border-bottom pb-4 mb-4 gap-3">
+                    <h5 class="fw-bold m-0"><i class="bi bi-graph-up me-2 text-primary"></i>Tendencia Semanal de Gestión</h5>
+                    <span class="small text-muted">Últimos 7 días activos</span>
                 </div>
-                <div class="text-center py-3" style="position: relative; height:300px; width:100%; display:flex; justify-content:center; align-items:center;">
-                    <canvas id="chartReservas" style="max-height: 100%;"></canvas>
+                <div style="height: 320px;">
+                    <canvas id="chartTendenciaSemanal"></canvas>
                 </div>
             </div>
         </div>
 
+        <div class="col-12 col-xl-4">
+             <div class="card border-0 p-4 p-lg-5 h-100 premium-card">
+                <div class="d-flex flex-column border-bottom pb-4 mb-4">
+                    <h5 class="fw-bold m-0"><i class="bi bi-clock-history me-2 text-warning"></i>Horas Pico de Demanda</h5>
+                    <span class="small text-muted mt-1">Afluencia por bloque horario</span>
+                </div>
+                <div style="height: 320px;">
+                    <canvas id="chartHorasPico"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de Control Diario -->
+    <div class="row g-4 mb-5">
         <div class="col-12 col-xl-5">
              <div class="card border-0 p-4 p-lg-5 h-100 premium-card">
                 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center border-bottom pb-4 mb-4 gap-3" style="border-color: var(--border-light) !important;">
@@ -101,26 +114,23 @@
                     <a href="/admin/reservaciones" class="small fw-bold text-decoration-none" style="color: var(--text-muted);">Ver todo →</a>
                 </div>
 
-                <div id="dash_panel_llegadas" class="d-flex flex-column gap-3 overflow-auto pe-2" style="max-height: 400px;">
+                <div id="dash_panel_llegadas" class="d-flex flex-column gap-3 overflow-auto pe-2" style="max-height: 480px;">
                     <p class="text-muted text-center mt-3">Cargando llegadas...</p>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Tendencia Mensual (MV) -->
-    <div class="row g-4 mb-5">
-        <div class="col-12">
-            <div class="card border-0 p-4 p-lg-5 premium-card shadow-sm">
+        <div class="col-12 col-xl-7">
+             <div class="card border-0 p-4 p-lg-5 premium-card shadow-sm h-100">
                 <div class="d-flex justify-content-between align-items-center border-bottom pb-4 mb-4" style="border-color: var(--border-light) !important;">
-                    <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;"><i class="bi bi-clock-history me-2 text-warning"></i>Tendencia Operativa Mensual</h5>
+                    <h5 class="fw-bold m-0"><i class="bi bi-list-stars me-2 text-info"></i>Historial Operativo Mensual</h5>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead style="background: var(--off-white);">
                             <tr>
                                 <th class="text-secondary small fw-bold text-uppercase border-0 py-3 rounded-start">Periodo</th>
-                                <th class="text-secondary small fw-bold text-uppercase border-0 py-3 text-center">Reservas Totales</th>
+                                <th class="text-secondary small fw-bold text-uppercase border-0 py-3 text-center">Reservas</th>
                                 <th class="text-secondary small fw-bold text-uppercase border-0 py-3 text-center">Cancelaciones</th>
                                 <th class="text-secondary small fw-bold text-uppercase border-0 py-3 text-center">Efectividad</th>
                                 <th class="text-secondary small fw-bold text-uppercase border-0 py-3 rounded-end text-end">Tendencia</th>
@@ -128,7 +138,7 @@
                         </thead>
                         <tbody id="tabla_historico">
                             <tr>
-                                <td colspan="5" class="text-center py-4 text-muted">Cargando registro histórico del servidor...</td>
+                                <td colspan="5" class="text-center py-4 text-muted">Cargando registros...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -414,19 +424,26 @@
                             }
                         }
 
-                        document.getElementById('dash_proxima_hora').innerHTML = `${pr.hora_inicio.substring(0,5)}<span class="fs-5 fw-normal" style="color: rgba(255,255,255,0.6);">Hrs</span>`;
-                        document.getElementById('dash_proxima_nombre').innerHTML = `
+                        // Actualizar solo si los elementos existen (opcional en el nuevo diseño)
+                        const elHora = document.getElementById('dash_proxima_hora');
+                        const elNombre = document.getElementById('dash_proxima_nombre');
+                        if (elHora) elHora.innerHTML = `${pr.hora_inicio.substring(0,5)}<span class="fs-5 fw-normal" style="color: rgba(255,255,255,0.6);">Hrs</span>`;
+                        if (elNombre) elNombre.innerHTML = `
                             <span class="d-block mb-1" style="color: var(--white-pure); opacity: 0.8; font-size: 0.8rem; font-weight: 500;">
                                 <i class="bi bi-calendar-event me-1 text-warning"></i>${diaTexto}
                             </span>
                             ${escapeHTML(pr.nombre_cliente)} | ${pr.numero_personas} Pers.
                         `;
                     } else {
-                        document.getElementById('dash_proxima_hora').innerHTML = `--:--`;
-                        document.getElementById('dash_proxima_nombre').textContent = `Sin próximas llegadas`;
+                        const elHora = document.getElementById('dash_proxima_hora');
+                        const elNombre = document.getElementById('dash_proxima_nombre');
+                        if (elHora) elHora.innerHTML = `--:--`;
+                        if (elNombre) elNombre.textContent = `Sin próximas llegadas`;
                     }
 
                     const llegadasPanel = document.getElementById('dash_panel_llegadas');
+                    if (!llegadasPanel) return;
+
                     const proximasMostrar = reservasHoy
                         .filter(r => ['pendiente', 'en_curso'].includes(r.estado))
                         .sort((a,b) => new Date(`${a.fecha}T${a.hora_inicio}`) - new Date(`${b.fecha}T${b.hora_inicio}`))
@@ -511,44 +528,95 @@
             });
         }
 
-        async function cargarVistasAnaliticas() {
+        async function cargarAnaliticaAvanzada() {
             try {
-                const url = `/gerente/metricas/diarias?t=${Date.now()}`;
-                const json = await MetraAPI.get(url);
-                if(json.success && json.data) {
-                        const completadas = parseInt(json.data.reservas_completadas) || 0;
-                        const canceladas = (parseInt(json.data.reservas_canceladas) || 0) + (parseInt(json.data.no_shows) || 0);
-                        const totales = parseInt(json.data.total_reservas) || 0;
-                        const pendientes = totales - (completadas + canceladas);
+                // 1. Cargar Estadísticas Generales (Tarjetas)
+                const resStats = await MetraAPI.get('/gerente/analytics/stats');
+                if (resStats.success && resStats.data) {
+                    const d = resStats.data;
+                    
+                    // Actualizar Tarjetas
+                    document.getElementById('dash_reservas_hoy').innerText = d.comensales_hoy || 0;
+                    document.getElementById('dash_comensales_label').innerText = `Comensales atendidos / cargando...`;
+                    
+                    document.getElementById('dash_ocupacion_real').innerText = `${d.ocupacion_real}%`;
+                    document.getElementById('dash_insight_ocupacion').innerText = d.insights.ocupacion;
+                    
+                    document.getElementById('dash_noshow_rate').innerText = `${d.no_show_rate}%`;
+                    document.getElementById('dash_insight_noshow').innerText = d.insights.no_show;
+                    
+                    document.getElementById('dash_fidelidad_rate').innerText = `${d.fidelidad_rate}%`;
+                    document.getElementById('dash_insight_fidelidad').innerText = `${d.clientes_recurrentes} Recurrentes | ${d.clientes_nuevos} Nuevos`;
+                }
 
-                        // BINDING UX SIN LOGICA MATEMÁTICA EN JS (Puro API)
-                        const totalHtml = totales > 0 ? totales : '<span class="fs-5 text-muted fw-normal" style="letter-spacing:0;">Aún sin llegadas</span>';
-                        const completadasHtml = completadas > 0 ? completadas : '<span class="fs-5 text-muted fw-normal" style="letter-spacing:0;">Sin actividad</span>';
-                        const bajasHtml = canceladas > 0 ? canceladas : '<span class="fs-5 text-muted fw-normal" style="letter-spacing:0;">0 bajas registradas</span>';
+                // 2. Gráfico: Horas Pico
+                const resHours = await MetraAPI.get('/gerente/analytics/demand-hourly');
+                if (resHours.success) renderChartHoras(resHours.data);
 
-                        // Si hay 0 reservas, desactivamos los insights para no mostrar Badges engañosos
-                        if (totales === 0) {
-                            document.getElementById('badge_ocupacion_container').innerHTML = `<span class="small text-muted"><i class="bi bi-clock me-1"></i>Esperando primeras reservas</span>`;
-                            document.getElementById('badge_cancelacion_container').innerHTML = `<span class="small text-muted"><i class="bi bi-clock me-1"></i>Aún sin tendencias</span>`;
-                        } else {
-                            // Badge UX original restaurado (Píldora verde para ocupación, y roja-suave para bajas si hay riesgo)
-                            document.getElementById('badge_ocupacion_container').innerHTML = `
-                                <span class="badge rounded-pill" style="background: rgba(46, 125, 50, 0.1); color: #2E7D32; border: 1px solid rgba(46, 125, 50, 0.2); font-weight: 700;">${json.data.porcentaje_ocupacion}%</span>
-                                <span class="small ms-2" style="color: var(--text-muted); font-size: 0.75rem;">${json.data.insight_ocupacion}</span>
-                            `;
-                            
-                            const colorCancel = json.data.porcentaje_cancelacion > 20 ? 'c62828' : '6c757d';
-                            const bgCancel = json.data.porcentaje_cancelacion > 20 ? 'rgba(198,40,40,0.1)' : 'rgba(108,117,125,0.1)';
-                            
-                            document.getElementById('badge_cancelacion_container').innerHTML = `
-                                <span class="badge rounded-pill" style="background: ${bgCancel}; color: #${colorCancel}; border: 1px solid rgba(0,0,0,0.05); font-weight: 700;">${json.data.porcentaje_cancelacion}%</span>
-                                <span class="small ms-2" style="color: var(--text-muted); font-size: 0.75rem;">${json.data.insight_cancelacion}</span>
-                            `;
-                        }
+                // 3. Gráfico: Tendencia Semanal
+                const resTrends = await MetraAPI.get('/gerente/analytics/trends-weekly');
+                if (resTrends.success) renderChartTendencia(resTrends.data);
 
-                        renderChart(completadas, pendientes > 0 ? pendientes : 0, canceladas);
-                    }
-            } catch(e) { console.error('Error fetching Vistas DB', e); }
+            } catch (e) { console.error('Error Analítica:', e); }
+        }
+
+        function renderChartHoras(data) {
+            const ctx = document.getElementById('chartHorasPico').getContext('2d');
+            const labels = data.map(d => `${d.hora}:00`);
+            const values = data.map(d => d.total_reservas);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Reservas',
+                        data: values,
+                        backgroundColor: 'rgba(212, 175, 55, 0.6)',
+                        borderColor: 'rgba(212, 175, 55, 1)',
+                        borderWidth: 1,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { display: false } } }
+                }
+            });
+        }
+
+        function renderChartTendencia(data) {
+            const ctx = document.getElementById('chartTendenciaSemanal').getContext('2d');
+            const labels = data.map(d => {
+                const date = new Date(d.fecha + 'T00:00:00');
+                return date.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' });
+            });
+            const values = data.map(d => d.total);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Reservas',
+                        data: values,
+                        fill: true,
+                        backgroundColor: 'rgba(56, 44, 38, 0.05)',
+                        borderColor: '#382C26',
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#D4AF37'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#f0f0f0' } } }
+                }
+            });
         }
 
         async function cargarMetricasMensuales() {
@@ -605,11 +673,11 @@
             if(localStorage.getItem('token')) {
                 cargarDashboard();
                 cargarLlegadas();
-                cargarVistasAnaliticas();
+                cargarAnaliticaAvanzada();
                 cargarMetricasMensuales();
                 setInterval(() => {
                     cargarLlegadas();
-                    cargarVistasAnaliticas();
+                    cargarAnaliticaAvanzada();
                 }, 60000); // 1 minuto
             }
         });

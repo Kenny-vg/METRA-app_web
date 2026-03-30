@@ -33,6 +33,9 @@ return new class extends Migration
 
             $table->integer('dias_vigencia')->virtualAs('DATEDIFF(fecha_fin, fecha_inicio)')->nullable();
 
+            $table->index('cafe_id');
+            $table->index('activo'); // equivalente al estado
+
             $table->timestamps();
         });
     }

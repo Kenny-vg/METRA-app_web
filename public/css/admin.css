@@ -27,27 +27,77 @@
     position: fixed;
     top: 0;
     left: 0;
-    padding: 40px 25px;
+    padding: 30px 20px;
+    z-index: 1050; /* Por encima del overlay */
+    transition: transform 0.4s ease;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* Oscurecido sólido sin blur */
     z-index: 1040;
-    transition: transform 0.3s ease;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    display: block;
+    opacity: 1;
 }
 
 .main-content-admin {
     margin-left: 280px;
     min-height: 100vh;
-    transition: margin-left 0.3s ease;
+    transition: margin-left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    background-color: var(--off-white);
+    transform: translateZ(0);
 }
 
-@media (max-width: 767.98px) {
+/* --- RESPONSIVIDAD PREMIUM --- */
+@media (max-width: 991.98px) {
     .sidebar {
-        transform: translateX(-100%);
+        transform: translateX(-100%) translateZ(0);
+        box-shadow: 15px 0 40px rgba(0,0,0,0.2);
     }
     .sidebar.active {
-        transform: translateX(0);
+        transform: translateX(0) translateZ(0);
     }
     .main-content-admin {
         margin-left: 0 !important;
     }
+    .main-content-admin > .p-4, 
+    .main-content-admin > .p-5,
+    .main-content-admin > div {
+        padding: 1.5rem !important;
+    }
+    
+    /* Tipografía móvil */
+    h2 { font-size: 1.5rem !important; }
+    h4 { font-size: 1.25rem !important; }
+}
+
+/* --- UTILIDADES MÓVILES --- */
+@media (max-width: 576px) {
+    .text-mobile-center { text-align: center !important; }
+    .btn-mobile-full { width: 100% !important; margin-bottom: 0.5rem; }
+    .p-mobile-3 { padding: 1rem !important; }
+    
+    .stat-card h2 { font-size: 1.75rem !important; }
+    .stat-card p { font-size: 0.65rem !important; }
+    
+    .gap-mobile-2 { gap: 0.5rem !important; }
+}
+
+/* Optimización de nitidez */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 /* --- BOTONES DE PERFIL Y ACCIÓN --- */
