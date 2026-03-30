@@ -86,7 +86,7 @@
 
         .btn-metra-main { 
             background: linear-gradient(135deg, #2a2a2a 0%, #111 100%);
-            color: #d4af37; 
+            color: #d4af37 !important; /* Ensure gold text is always visible */
             border-radius: 10px; 
             font-weight: 600; 
             padding: 1.1rem; 
@@ -100,7 +100,7 @@
         
         .btn-metra-main:hover:not(:disabled) { 
             background: #111; 
-            color: #fff;
+            color: #ffffff !important;
             transform: translateY(-2px);
             box-shadow: 0 15px 25px rgba(0,0,0,0.2);
             border-color: #000;

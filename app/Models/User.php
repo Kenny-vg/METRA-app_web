@@ -27,6 +27,7 @@ class User extends Authenticatable
         'activation_token',
         'estatus_registro',
     ];
+    protected $appends = ['avatar_full_url'];
 
     //campos que no se devuelven en respuestas JSON
     protected $hidden = [
@@ -54,5 +55,17 @@ class User extends Authenticatable
         return $this->belongsTo(Cafeteria::class , 'cafe_id');
     }
 
+    public function getAvatarFullUrlAttribute()
+    {
+        $value = $this->attributes['avatar'] ?? null;
+        if (!$value) {
+            return null;
+        }
 
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            return $value;
+        }
+
+        return asset('storage/' . $value);
+    }
 }

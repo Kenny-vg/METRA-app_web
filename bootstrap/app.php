@@ -14,18 +14,25 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->prependToGroup('api', \App\Http\Middleware\ForceJsonResponse::class);
+
         $middleware->alias([
             'role'=>\App\Http\Middleware\RoleMiddleware::class,
             'check.suscripcion' => \App\Http\Middleware\CheckSuscripcionActiva::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //Cuando una ruta API no esté autenticada se devuelve json
-        $exceptions->render(function(AuthenticationException $e,
-        $request
-        ){
-            if($request->is('api/*') ){
+        // Cuando una ruta API falle, devolvemos siempre JSON
+        $exceptions->shouldRenderJsonWhen(function ($request, $e) {
+            if ($request->is('api/*')) {
+                return true;
+            }
+
+            return $request->expectsJson();
+        });
+
+        $exceptions->render(function(AuthenticationException $e, $request) {
+            if ($request->is('api/*')) {
                 return ApiResponse::error('No autenticado', 401);
             } 
         });

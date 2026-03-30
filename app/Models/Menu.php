@@ -17,6 +17,7 @@ class Menu extends Model
         'cafe_id',
         'categoria_id'
     ];
+    protected $appends = ['imagen_full_url'];
 
     protected static function booted()
     {
@@ -33,8 +34,9 @@ class Menu extends Model
         return $this->belongsTo(MenuCategoria::class, 'categoria_id');
     }
 
-    public function getImagenUrlAttribute($value)
+    public function getImagenFullUrlAttribute()
     {
+        $value = $this->attributes['imagen_url'] ?? null;
         if (!$value) {
             return null;
         }

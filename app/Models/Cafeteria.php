@@ -28,7 +28,7 @@ class Cafeteria extends Model
         'porcentaje_reservas'
     ];
 
-    protected $appends = ['estado_dinamico'];
+    protected $appends = ['estado_dinamico', 'foto_full_url', 'comprobante_full_url', 'plan_activo'];
 
     protected static function booted()
     {
@@ -137,7 +137,7 @@ class Cafeteria extends Model
         return $value;
     }
 
-    public function planActivo()
+    public function getPlanActivoAttribute()
     {
         return $this->suscripcionActual()->first()?->plan;
     }

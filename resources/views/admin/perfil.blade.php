@@ -18,6 +18,15 @@
         }
     </style>
     <form id="formPerfil" style="max-width: 1100px;">
+        <!-- Alerta visual de cambios sin guardar -->
+        <div id="dirtyAlert" class="alert alert-warning border-0 rounded-4 p-3 mb-4 d-none align-items-center shadow-sm" style="background: #fff8e1; color: #b78a00;">
+            <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
+            <div>
+                <h6 class="fw-bold mb-0">Tienes cambios sin guardar</h6>
+                <p class="small mb-0 opacity-75">No olvides presionar el botón "Guardar Cambios" al final de la página.</p>
+            </div>
+        </div>
+
         <div class="row g-4">
             <div class="col-12 col-xl-7">
                 <!-- Información General -->
@@ -142,6 +151,33 @@
     <script>
         let cafeteriaId = null;
         let estadosMunicipiosData = {};
+        let isDirty = false;
+
+        // Detectar cambios en el formulario
+        document.getElementById('formPerfil').addEventListener('input', () => {
+            if (!isDirty) {
+                isDirty = true;
+                const alert = document.getElementById('dirtyAlert');
+                alert.classList.remove('d-none');
+                alert.classList.add('d-flex');
+            }
+        });
+        document.getElementById('formPerfil').addEventListener('change', () => {
+            if (!isDirty) {
+                isDirty = true;
+                const alert = document.getElementById('dirtyAlert');
+                alert.classList.remove('d-none');
+                alert.classList.add('d-flex');
+            }
+        });
+
+        // Alerta de cambios sin guardar
+        window.addEventListener('beforeunload', (e) => {
+            if (isDirty) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
 
         async function cargarEstadosMunicipios() {
             try {
@@ -295,6 +331,11 @@
                     timer: 2200,
                     showConfirmButton: false
                 });
+                
+                isDirty = false; // Resetear bandera al guardar exitosamente
+                const alert = document.getElementById('dirtyAlert');
+                alert.classList.add('d-none');
+                alert.classList.remove('d-flex');
                 
             } catch (e) {
                 Swal.fire({
