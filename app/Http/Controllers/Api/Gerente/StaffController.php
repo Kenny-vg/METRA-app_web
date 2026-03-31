@@ -43,14 +43,15 @@ class StaffController extends Controller
         ]);
 
         // Obtener plan actual
-        $plan = $gerente->cafeteria->planActivo();
+        $plan = $gerente->cafeteria->plan_activo;
 
         if (!$plan) {
             return ApiResponse::error('La cafetería no tiene un plan activo.', 403);
         }
 
-        // Contar staff activos
-        $staffActual = User::where('role', 'personal')
+        // Contar staff activos de esta cafetería
+        $staffActual = User::where('cafe_id', $gerente->cafe_id)
+            ->where('role', 'personal')
             ->where('estado', true)
             ->count();
 
@@ -147,10 +148,11 @@ class StaffController extends Controller
 
         // Obtener plan actual y verificar límite de usuarios
         $gerente = $request->user();
-        $plan = $gerente->cafeteria->planActivo();
+        $plan = $gerente->cafeteria->plan_activo;
 
         if ($plan) {
-            $staffActual = User::where('role', 'personal')
+            $staffActual = User::where('cafe_id', $gerente->cafe_id)
+                ->where('role', 'personal')
                 ->where('estado', true)
                 ->count();
 
