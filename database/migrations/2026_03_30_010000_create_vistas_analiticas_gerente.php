@@ -21,10 +21,12 @@ return new class extends Migration
                 (SELECT SUM(capacidad) FROM mesas WHERE cafe_id = c.id AND activo = 1) AS capacidad_total,
                 (SELECT COUNT(DISTINCT email) FROM reservaciones WHERE cafe_id = c.id AND email IS NOT NULL) AS clientes_unicos,
                 (SELECT COUNT(*) FROM (
-                    SELECT email FROM reservaciones 
-                    WHERE cafe_id = c.id AND email IS NOT NULL 
-                    GROUP BY email HAVING COUNT(*) > 1
-                ) AS recurrentes) AS clientes_recurrentes,
+                    SELECT email, cafe_id
+                    FROM reservaciones 
+                    WHERE email IS NOT NULL 
+                    GROUP BY cafe_id, email 
+                    HAVING COUNT(*) > 1
+                ) AS sub WHERE sub.cafe_id = c.id) AS clientes_recurrentes,
                 (SELECT COUNT(*) FROM reservaciones WHERE cafe_id = c.id AND estado = 'no_show' AND fecha >= DATE_SUB(NOW(), INTERVAL 30 DAY)) AS no_shows_30_dias,
                 (SELECT COUNT(*) FROM reservaciones WHERE cafe_id = c.id AND fecha >= DATE_SUB(NOW(), INTERVAL 30 DAY)) AS total_reservas_30_dias
             FROM cafeterias c;

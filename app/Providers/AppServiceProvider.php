@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Log;
 use App\Models\ConfiguracionSistema;
 
 
@@ -30,6 +31,8 @@ class AppServiceProvider extends ServiceProvider
         // Compartir la configuración de sistema con todas las vistas
         $configuracionSistema = rescue(fn () => ConfiguracionSistema::first(), null, false);
         View::share('configuracionSistema', $configuracionSistema);
+
+        Log::info("METRA API: Sistema iniciado correctamente. Entorno: " . config('app.env'));
     }
 
 }

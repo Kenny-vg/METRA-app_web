@@ -38,6 +38,15 @@ use App\Http\Controllers\Api\Gerente\AnalyticsController;
 use App\Http\Controllers\Api\Publico\PublicCafeteriaController;
 
 /* |------------------------------------------ | RUTAS PÚBLICAS |------------------------------------------ */
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'online',
+        'api_name' => 'METRA REST API',
+        'php_version' => phpversion(),
+        'timestamp' => now()
+    ]);
+});
+
 Route::post('/login', [LoginController::class , 'login'])->middleware('throttle:5,1');
 
 // Activar cuenta
