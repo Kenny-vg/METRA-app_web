@@ -581,8 +581,8 @@
 ========================================= */
 
 body.zona-superadmin {
-    background-color: #f0f2f5 !important;
-    /* Fondo gris claro profesional, sobreescribe el crema */
+    background-color: var(--white-pure) !important;
+    /* Fondo blanco puro profesional, sobreescribe el crema */
     font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
@@ -594,10 +594,34 @@ body.zona-superadmin {
     position: fixed;
     top: 0;
     left: 0;
+    padding: 30px 20px;
     color: #e2e8f0;
     box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+    z-index: 1045 !important;
+    transition: transform 0.4s ease;
 }
+
+@media (min-width: 992px) {
+    .sidebar-super {
+        transform: translateX(0) !important;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .sidebar-super {
+        transform: translateX(-100%);
+        padding-top: 85px !important;
+    }
+
+    .sidebar-super.active {
+        transform: translateX(0);
+    }
+}
+
+.zona-superadmin .main-content-admin {
+    background-color: var(--white-pure) !important;
+}
+
 
 .nav-link-super {
     color: #94a3b8;
@@ -620,10 +644,10 @@ body.zona-superadmin {
 }
 
 .nav-link-super.active {
-    background-color: var(--accent-gold);
-    /* Azul corporativo */
-    color: var(--black-primary) !important;
-    box-shadow: 0 4px 12px rgba(197, 160, 89, 0.25);
+    background-color: #3b82f6;
+    /* Azul corporativo profesional */
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
     font-weight: 600;
 }
 

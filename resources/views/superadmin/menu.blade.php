@@ -18,15 +18,15 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
 </head>
-<body class="zona-superadmin" style="background-color: var(--off-white); font-family: 'Inter', sans-serif;">
+<body class="zona-superadmin" style="font-family: 'Inter', sans-serif;">
     
     <!-- Overlay para navegación móvil -->
     <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <!-- Header móvil elegante -->
-    <div class="d-lg-none p-3 text-dark d-flex justify-content-between align-items-center bg-white border-bottom shadow-sm fixed-top" style="z-index: 1050;">
+    <div class="d-lg-none p-3 text-dark d-flex justify-content-between align-items-center bg-white border-bottom shadow-sm fixed-top" style="z-index: 1060;">
         <h4 class="fw-bold m-0 d-flex align-items-center" style="color: var(--black-primary); letter-spacing: -0.5px;">
-            <i class="bi bi-hexagon-fill me-2" style="color: var(--accent-gold); font-size: 1.2rem;"></i>METRA
+            <i class="bi bi-hexagon-fill me-2" style="color: #3b82f6; font-size: 1.2rem;"></i>METRA
             <small style="font-size: 0.65rem; color: var(--text-muted) !important;" class="ms-1 text-uppercase fw-bold">SaaS</small>
         </h4>
         <button class="btn btn-light border-0" onclick="toggleSidebar()">
@@ -35,26 +35,26 @@
     </div>
 
     <!-- Sidebar SaaS -->
-    <aside class="sidebar d-flex flex-column min-vh-100" style="background-color: var(--black-primary); border-right: 1px solid var(--gray-dark);">
+    <aside class="sidebar-super d-flex flex-column min-vh-100" style="border-right: 1px solid var(--gray-dark);">
         <div class="d-flex flex-column align-items-center justify-content-center mb-4 mt-3 d-none d-lg-flex">
             <h2 class="fw-bold m-0 d-flex align-items-center text-white" style="letter-spacing: -1px;">
-                <i class="bi bi-hexagon-fill me-2" style="color: var(--accent-gold); font-size: 1.5rem;"></i>METRA
+                <i class="bi bi-hexagon-fill me-2" style="color: #3b82f6; font-size: 1.5rem;"></i>METRA
             </h2>
-            <span class="badge rounded-pill mt-2" style="font-size: 0.65rem; background: rgba(181,146,126,0.15); color: var(--accent-gold); font-weight: 700; letter-spacing: 1px; padding: 5px 12px;">SAAS MASTER</span>
+            <span class="badge rounded-pill mt-2" style="font-size: 0.65rem; background: rgba(59,130,246,0.15); color: #3b82f6; font-weight: 700; letter-spacing: 1px; padding: 5px 12px;">SAAS MASTER</span>
         </div>
         <nav class="d-flex flex-column gap-2 px-3 flex-grow-1">
             <span class="small fw-bold text-uppercase mt-2 mb-2 ms-3" style="color: var(--text-muted); font-size: 0.7rem; letter-spacing: 1px;">Administración</span>
             
-            <a href="/superadmin/dashboard" class="nav-link-admin {{ request()->is('superadmin/dashboard') ? 'active' : '' }}">
+            <a href="/superadmin/dashboard" class="nav-link-super {{ request()->is('superadmin/dashboard') ? 'active' : '' }}">
                 <i class="bi bi-grid-fill me-3"></i>Dashboard
             </a>
-            <a href="/superadmin/suscripciones" class="nav-link-admin {{ request()->is('superadmin/suscripciones') ? 'active' : '' }}">
+            <a href="/superadmin/suscripciones" class="nav-link-super {{ request()->is('superadmin/suscripciones') ? 'active' : '' }}">
                 <i class="bi bi-wallet2 me-3"></i>Suscripciones
             </a>
-            <a href="/superadmin/planes" class="nav-link-admin {{ request()->is('superadmin/planes') ? 'active' : '' }}">
+            <a href="/superadmin/planes" class="nav-link-super {{ request()->is('superadmin/planes') ? 'active' : '' }}">
                 <i class="bi bi-stack me-3"></i>Planes
             </a>
-            <a href="/superadmin/ajustes" class="nav-link-admin {{ request()->is('superadmin/ajustes') ? 'active' : '' }}">
+            <a href="/superadmin/ajustes" class="nav-link-super {{ request()->is('superadmin/ajustes') ? 'active' : '' }}">
                 <i class="bi bi-gear me-3"></i>Ajustes Sistema
             </a>
         </nav>
@@ -82,7 +82,7 @@
         };
 
         function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
+            const sidebar = document.querySelector('.sidebar-super');
             const overlay = document.querySelector('.sidebar-overlay');
             if (sidebar && overlay) {
                 sidebar.classList.toggle('active');

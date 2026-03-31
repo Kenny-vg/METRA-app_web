@@ -447,9 +447,10 @@ async function loadOcasionesForSelect() {
                 noResultsText: 'No se encontraron resultados',
                 noChoicesText: 'No hay opciones disponibles'
             });
+        } catch (e) {
+            console.error('Error cargando ocasiones para el modal', e);
         }
-    } catch (e) { console.error('Error cargando ocasiones para el modal', e); }
-}
+    }
 
 async function abrirModalNuevaPromo() {
     // Si no hay ocasiones cargadas o no se ha inicializado el selector, intentar cargar
@@ -610,9 +611,6 @@ async function guardarPromo() {
              errorMsg = error.message;
         }
         Swal.fire('Error', errorMsg, 'error');
-    }
-    } catch (error) {
-        Swal.fire('Error', 'Error de conexión', 'error');
     }
 }
 
