@@ -66,7 +66,7 @@
 
 .btn-admin-primary {
     background: var(--black-primary);
-    color: var(--white-pure);
+    color: var(--white-pure) !important;
     border: none;
     padding: 10px 20px;
     border-radius: 8px;

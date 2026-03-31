@@ -119,11 +119,11 @@
 
         .btn-metra-main {
             background: linear-gradient(135deg, #2a2a2a 0%, #111 100%);
-            color: #d4af37;
+            color: #ffffff !important; /* Blanco puro para máxima visibilidad */
             border-radius: 12px;
             font-weight: 600;
             padding: 1rem;
-            border: 1px solid #111;
+            border: 1px solid #d4af37;
             transition: all 0.3s ease;
             letter-spacing: 0.5px;
             text-transform: uppercase;
@@ -134,16 +134,16 @@
 
         .btn-metra-main:hover:not(:disabled) {
             background: #111;
-            color: #fff;
+            color: #d4af37 !important;
             transform: translateY(-2px);
             box-shadow: 0 15px 25px rgba(0,0,0,0.2);
-            border-color: #000;
+            border-color: #d4af37;
         }
 
         .btn-metra-main:disabled {
-            background: #e2e8f0;
-            color: #94a3b8;
-            border-color: #e2e8f0;
+            background: #2a2a2a;
+            color: rgba(212, 175, 55, 0.4) !important; /* Oro opaco en el fondo oscuro */
+            border-color: #2a2a2a;
             box-shadow: none;
             cursor: not-allowed;
             transform: none;

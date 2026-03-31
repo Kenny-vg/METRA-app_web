@@ -81,7 +81,7 @@
 
         <nav class="d-flex flex-column gap-2 px-3 flex-grow-1 custom-scrollbar">
 
-            <span class="small fw-bold text-uppercase mt-2 mb-2 ms-3">Operaciones</span>
+            <span class="small fw-bold text-uppercase mt-2 mb-2 ms-3" style="color: rgba(255,255,255,0.5);">Operaciones</span>
 
             <a href="/admin/dashboard" class="nav-link-admin {{ request()->is('admin/dashboard') ? 'active' : '' }}">
                 <i class="bi bi-speedometer2 me-3"></i>Métricas
@@ -109,7 +109,7 @@
                 <i class="bi bi-megaphone me-3"></i>Eventos y Promos
             </a>
 
-            <span class="small fw-bold text-uppercase mt-4 mb-2 ms-3">Configuración</span>
+            <span class="small fw-bold text-uppercase mt-4 mb-2 ms-3" style="color: rgba(255,255,255,0.5);">Configuración</span>
 
             <a href="/admin/perfil" class="nav-link-admin {{ request()->is('admin/perfil') ? 'active' : '' }}">
                 <i class="bi bi-person-circle me-3"></i>Cuenta

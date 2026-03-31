@@ -13,12 +13,17 @@ class CafeteriaSeeder extends Seeder
      */
     public function run(): void
     {
-        // 0. Obtener usuarios de prueba
-        $gerente = \App\Models\User::where('email', 'gerente@metra.com')->first();
-        $staff = \App\Models\User::where('email', 'staff@metra.com')->first();
-        if (!$gerente || !$staff) return;
+        // 0. Obtener usuarios para cada cafetería
+        $gerenteMetra = \App\Models\User::where('email', 'gerente@metra.com')->first();
+        $staffMetra = \App\Models\User::where('email', 'staff@metra.com')->first();
+        
+        $gerenteSabroso = \App\Models\User::where('email', 'sabroso@metra.com')->first();
+        $staffSabroso = \App\Models\User::where('email', 'staff_sabroso@metra.com')->first();
 
-        $this->seedCafeteria($gerente, $staff, [
+        if (!$gerenteMetra || !$gerenteSabroso) return;
+
+        // Sembrar METRA Luxury
+        $this->seedCafeteria($gerenteMetra, $staffMetra, [
             'nombre' => 'METRA Luxury Coffee',
             'slug' => 'metra-luxury',
             'descripcion' => 'Experiencia premium de café de especialidad y alta repostería.',
@@ -32,7 +37,8 @@ class CafeteriaSeeder extends Seeder
             ]
         ]);
 
-        $this->seedCafeteria($gerente, $staff, [
+        // Sembrar Café Sabroso
+        $this->seedCafeteria($gerenteSabroso, $staffSabroso, [
             'nombre' => 'Café Sabroso',
             'slug' => 'cafe-sabroso',
             'descripcion' => 'El sabor de la tradición en cada taza. Ambiente familiar y acogedor.',

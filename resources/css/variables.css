@@ -7,6 +7,15 @@
     --texto-p: #3E2723;
     --texto-s: #795548;
     --verde: #689F38;
+
+    /* --- NUEVOS DISEÑOS PREMIUM --- */
+    --black-primary: #0A0A0A;
+    --white-pure: #ffffff;
+    --accent-gold: #D4AF37;
+    --off-white: #F8F9FA;
+    --border-light: rgba(0, 0, 0, 0.08);
+    --gray-dark: #1a1a1a;
+    --text-muted: #666666;
 }
 
 body {

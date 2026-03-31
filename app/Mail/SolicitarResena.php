@@ -25,7 +25,7 @@ class SolicitarResena extends Mailable
         return $this->subject('Cuéntanos tu experiencia en METRA')
             ->view('emails.solicitar-resena')
             ->with([
-            'nombre' => $this->ocupacion->nombre_cliente ?? 'Cliente',
+            'nombre' => $this->ocupacion->nombre_cliente ?? ($this->ocupacion->reservacion->nombre_cliente ?? 'Cliente'),
             'url' => $this->url
         ]);
     }

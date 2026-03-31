@@ -13,14 +13,22 @@ class SubscriptionSeeder extends Seeder
      */
     public function run(): void
     {
-        //
-        Suscripcion::updateOrCreate([
-            'cafe_id' => 1,
-            'plan_id' => 1,
-            'fecha_inicio' => now(),
-            'fecha_fin' => now()->addDays(30),
-            'estado_pago' => 'pagado',
-            'monto'=>799,
-        ]);
+        $plan = \App\Models\Plan::first();
+        if (!$plan) return;
+
+        $cafeterias = \App\Models\Cafeteria::all();
+
+        foreach ($cafeterias as $cafe) {
+            Suscripcion::updateOrCreate(
+                ['cafe_id' => $cafe->id],
+                [
+                    'plan_id' => $plan->id,
+                    'fecha_inicio' => now(),
+                    'fecha_fin' => now()->addDays(30),
+                    'estado_pago' => 'pagado',
+                    'monto' => $plan->precio,
+                ]
+            );
+        }
     }
 }
