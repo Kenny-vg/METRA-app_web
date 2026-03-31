@@ -529,6 +529,34 @@
     border-bottom: 2px solid var(--cafe-medio);
 }
 
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        background: var(--white-pure);
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        border: 1px solid var(--border-light);
+    }
+
+    .navbar-collapse .nav-link,
+    .navbar-collapse .nav-link-custom,
+    .navbar-collapse a {
+        color: var(--black-primary) !important;
+    }
+    
+    .nav-link-custom {
+        padding: 12px 15px;
+        border-bottom: 1px solid var(--border-light);
+    }
+    
+    .nav-link-custom:hover {
+        border-bottom: 1px solid var(--accent-gold);
+        background: var(--off-white);
+        border-radius: 8px;
+    }
+}
+
 /* BOTÓN "TERMINAR RESERVA" EN EL MENÚ */
 .btn-nav-reserva {
     background-color: var(--ambar) !important;

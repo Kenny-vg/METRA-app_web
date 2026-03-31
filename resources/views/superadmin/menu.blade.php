@@ -6,9 +6,9 @@
     <title>METRA SaaS - @yield('title')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/variables.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/estilos.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ time() }}">
     <link rel="stylesheet" href="{{ asset('css/responsive_tables.css') }}?v={{ time() }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -24,7 +24,7 @@
     <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <!-- Header móvil elegante -->
-    <div class="d-lg-none p-3 text-dark d-flex justify-content-between align-items-center bg-white border-bottom shadow-sm" style="position: sticky; top: 0; z-index: 1100;">
+    <div class="d-lg-none p-3 text-dark d-flex justify-content-between align-items-center bg-white border-bottom shadow-sm fixed-top" style="z-index: 1050;">
         <h4 class="fw-bold m-0 d-flex align-items-center" style="color: var(--black-primary); letter-spacing: -0.5px;">
             <i class="bi bi-hexagon-fill me-2" style="color: var(--accent-gold); font-size: 1.2rem;"></i>METRA
             <small style="font-size: 0.65rem; color: var(--text-muted) !important;" class="ms-1 text-uppercase fw-bold">SaaS</small>

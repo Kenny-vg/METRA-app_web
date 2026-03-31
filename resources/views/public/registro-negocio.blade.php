@@ -31,9 +31,9 @@
         </div>
         <div class="collapse navbar-collapse order-lg-2" id="navRegistro">
             <ul class="navbar-nav ms-auto align-items-lg-center gap-2 gap-lg-4 mt-3 mt-lg-0 me-lg-4">
-                <li class="nav-item"><a href="{{ url('/') }}" class="nav-link nav-link-custom">Inicio</a></li>
-                <li class="nav-item"><a href="{{ url('/#cafeterias') }}" class="nav-link nav-link-custom">Ver Cafeterías</a></li>
-                <li class="nav-item"><a href="{{ url('/registro-negocio') }}" class="nav-link nav-link-custom">Sumar Cafetería</a></li>
+                <li class="nav-item"><a href="{{ url('/') }}" class="nav-link nav-link-custom" style="color: #111111 !important;">Inicio</a></li>
+                <li class="nav-item"><a href="{{ url('/#cafeterias') }}" class="nav-link nav-link-custom" style="color: #111111 !important;">Ver Cafeterías</a></li>
+                <li class="nav-item"><a href="{{ url('/registro-negocio') }}" class="nav-link nav-link-custom" style="color: #111111 !important;">Sumar Cafetería</a></li>
             </ul>
         </div>
     </div>
@@ -1016,14 +1016,16 @@
     }
 
     // Render inicial del plan seleccionado después de cargar planes
-    const originalRenderPlanSelector = renderPlanSelector;
-    renderPlanSelector = function(planes) {
+    const originalRenderPlanSelector = window.renderPlanSelector;
+    window.renderPlanSelector = function(planes) {
         originalRenderPlanSelector(planes);
         if (selectedPlanId) selectPlan(selectedPlanId); // Reaplicar clase visual si había uno guardado en localStorage
     };
 
-    cargarPlanes();
-    cargarConfiguracionPago();
+    document.addEventListener("DOMContentLoaded", function() {
+        cargarPlanes();
+        cargarConfiguracionPago();
+    });
 </script>
 </body>
 </html>

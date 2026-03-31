@@ -6,8 +6,8 @@
     <title>METRA - Sistema de Reservas para tu Negocio</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/variables.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/estilos.css') }}?v={{ time() }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         window.API_URL = "{{ url('/api') }}";
@@ -31,9 +31,9 @@
             </div>
             <div class="collapse navbar-collapse order-lg-2" id="navBienvenida">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-2 gap-lg-4 mt-3 mt-lg-0 me-lg-4">
-                    <li class="nav-item"><a href="{{ url('/') }}" class="nav-link nav-link-custom">Inicio</a></li>
-                    <li class="nav-item"><a href="{{ url('/#cafeterias') }}" class="nav-link nav-link-custom">Ver Cafeterías</a></li>
-                    <li class="nav-item"><a href="{{ url('/registro-negocio') }}" class="nav-link nav-link-custom">Sumar Cafetería</a></li>
+                    <li class="nav-item"><a href="{{ url('/') }}" class="nav-link nav-link-custom" style="color: #111111 !important;">Inicio</a></li>
+                    <li class="nav-item"><a href="{{ url('/#cafeterias') }}" class="nav-link nav-link-custom" style="color: #111111 !important;">Ver Cafeterías</a></li>
+                    <li class="nav-item"><a href="{{ url('/registro-negocio') }}" class="nav-link nav-link-custom" style="color: #111111 !important;">Sumar Cafetería</a></li>
                 </ul>
             </div>
         </div>

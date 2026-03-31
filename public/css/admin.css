@@ -1,6 +1,4 @@
-/* public/css/admin.css */
-
-/* --- LOGIN (Centrado total) --- */
+/* --- LOGIN --- */
 .login-container {
     min-height: 100vh;
     display: flex;
@@ -19,7 +17,7 @@
     text-align: center;
 }
 
-/* --- SIDEBAR Y MAIN --- */
+/* --- SIDEBAR --- */
 .sidebar {
     width: 280px;
     height: 100vh;
@@ -28,97 +26,106 @@
     top: 0;
     left: 0;
     padding: 30px 20px;
-    z-index: 1050; /* Por encima del overlay */
+    z-index: 1045 !important;
     transition: transform 0.4s ease;
 }
 
+/* DESKTOP: siempre visible */
+@media (min-width: 992px) {
+    .sidebar {
+        transform: translateX(0) !important;
+    }
+}
+
+/* MOBILE */
+@media (max-width: 991.98px) {
+    .sidebar {
+        transform: translateX(-100%);
+        box-shadow: 15px 0 40px rgba(0, 0, 0, 0.2);
+        padding-top: 85px !important;
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+}
+
+/* --- OVERLAY FIX --- */
 .sidebar-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6); /* Oscurecido sólido sin blur */
-    z-index: 1040;
-    display: none;
+
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1040 !important;
+
+    display: block;
     opacity: 0;
+    pointer-events: none;
+
     transition: opacity 0.3s ease;
 }
 
 .sidebar-overlay.active {
-    display: block;
     opacity: 1;
+    pointer-events: auto;
 }
 
+/* --- MAIN --- */
 .main-content-admin {
     margin-left: 280px;
     min-height: 100vh;
-    transition: margin-left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: margin-left 0.4s ease;
     background-color: var(--off-white);
-    transform: translateZ(0);
+    position: relative;
 }
 
-/* --- RESPONSIVIDAD PREMIUM --- */
 @media (max-width: 991.98px) {
-    .sidebar {
-        transform: translateX(-100%) translateZ(0);
-        box-shadow: 15px 0 40px rgba(0,0,0,0.2);
-    }
-    .sidebar.active {
-        transform: translateX(0) translateZ(0);
-    }
     .main-content-admin {
         margin-left: 0 !important;
+        padding-top: 76px;
     }
-    .main-content-admin > .p-4, 
-    .main-content-admin > .p-5,
-    .main-content-admin > div {
-        padding: 1.5rem !important;
-    }
-    
-    /* Tipografía móvil */
-    h2 { font-size: 1.5rem !important; }
-    h4 { font-size: 1.25rem !important; }
 }
 
-/* --- UTILIDADES MÓVILES --- */
+/* --- RESPONSIVE --- */
 @media (max-width: 576px) {
-    .text-mobile-center { text-align: center !important; }
-    .btn-mobile-full { width: 100% !important; margin-bottom: 0.5rem; }
-    .p-mobile-3 { padding: 1rem !important; }
-    
-    .stat-card h2 { font-size: 1.75rem !important; }
-    .stat-card p { font-size: 0.65rem !important; }
-    
-    .gap-mobile-2 { gap: 0.5rem !important; }
+    h2 {
+        font-size: 1.5rem !important;
+    }
+
+    h4 {
+        font-size: 1.25rem !important;
+    }
 }
 
-/* Optimización de nitidez */
-body {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
+/* --- LINKS --- */
+.nav-link-admin {
+    color: #94a3b8;
+    text-decoration: none;
+    display: block;
+    padding: 12px 20px;
+    margin: 4px 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
 }
 
-/* --- BOTONES DE PERFIL Y ACCIÓN --- */
-.btn-metra-main {
-    background-color: var(--ambar) !important;
-    color: var(--cafe-oscuro) !important;
-    border-radius: 50px !important;
-    padding: 14px 35px !important;
-    font-weight: 800;
-    border: none !important;
-    transition: 0.3s;
+.nav-link-admin:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #f8fafc;
+    transform: translateX(3px);
 }
 
-.nav-link-admin.text-danger {
-    color: #ff6b6b !important;
-    font-weight: bold;
-    margin-top: 20px;
+.nav-link-admin.active {
+    background-color: var(--accent-gold);
+    color: var(--black-primary) !important;
+    font-weight: 600;
 }
 
-/* --- NEW PREMIUM ADMIN BUTTONS --- */
-
+/* --- BOTONES --- */
 .btn-admin-primary {
     background: var(--black-primary);
     color: var(--white-pure);
@@ -126,16 +133,6 @@ body {
     padding: 10px 20px;
     border-radius: 8px;
     font-weight: 600;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-admin-primary:hover {
-    background: var(--gray-dark);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .btn-admin-secondary {
@@ -144,16 +141,6 @@ body {
     border: 1px solid var(--border-light);
     padding: 10px 20px;
     border-radius: 8px;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-admin-secondary:hover {
-    background: var(--off-white);
-    border-color: rgba(28, 25, 23, 0.2);
 }
 
 .btn-admin-action {
@@ -164,23 +151,17 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
     background: var(--off-white);
     color: var(--text-muted);
 }
 
-.btn-admin-action:hover {
-    background: var(--border-light);
-    color: var(--black-primary);
-    transform: translateY(-1px);
+/* --- SCROLL --- */
+.custom-scrollbar {
+    overflow-y: auto;
 }
 
-.btn-admin-action.icon-edit:hover {
-    color: var(--accent-gold);
-    background: rgba(197, 160, 89, 0.1);
-}
-
-.btn-admin-action.icon-delete:hover {
-    color: #dc3545;
-    background: rgba(220, 53, 69, 0.1);
+/* --- BODY --- */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }

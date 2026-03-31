@@ -11,3 +11,25 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/*
+ * Fix Bootstrap/Tailwind v4 conflicts:
+ * Tailwind generates .collapse { visibility: collapse } which
+ * overrides Bootstrap's .collapse { display: none } behavior,
+ * making navbar menu items invisible on mobile.
+ */
+.collapse:not(.show) {
+    display: none !important;
+}
+.collapse.show,
+.navbar-collapse.show,
+.navbar-collapse.collapsing {
+    display: block !important;
+    visibility: visible !important;
+}
+.navbar-collapse .nav-link,
+.navbar-collapse .nav-link-custom,
+.navbar-collapse a {
+    color: #111111 !important;
+    visibility: visible !important;
+}

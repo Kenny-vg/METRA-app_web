@@ -26,9 +26,9 @@
             </div>
             <div class="collapse navbar-collapse order-lg-2" id="navPrivacidad">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-2 gap-lg-4 mt-3 mt-lg-0 me-lg-4">
-                    <li class="nav-item"><a href="{{ url('/') }}" class="nav-link nav-link-custom">Inicio</a></li>
-                    <li class="nav-item"><a href="{{ url('/#cafeterias') }}" class="nav-link nav-link-custom">Ver Cafeterías</a></li>
-                    <li class="nav-item"><a href="{{ url('/registro-negocio') }}" class="nav-link nav-link-custom">Sumar Cafetería</a></li>
+                    <li class="nav-item"><a href="{{ url('/') }}" class="nav-link nav-link-custom" style="color: #111111 !important;">Inicio</a></li>
+                    <li class="nav-item"><a href="{{ url('/#cafeterias') }}" class="nav-link nav-link-custom" style="color: #111111 !important;">Ver Cafeterías</a></li>
+                    <li class="nav-item"><a href="{{ url('/registro-negocio') }}" class="nav-link nav-link-custom" style="color: #111111 !important;">Sumar Cafetería</a></li>
                 </ul>
             </div>
         </div>
