@@ -30,3 +30,7 @@
         Header set Cache-Control "public, max-age=31536000, immutable"
     </FilesMatch>
 </IfModule>
+
+# Asegurar tipos MIME para iconos
+AddType image/svg+xml .svg
+AddType image/x-icon .ico

@@ -1,59 +1,64 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# METRA - Sistema SaaS de Gestión de Reservas
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+METRA es una plataforma premium diseñada para digitalizar y optimizar el flujo de reservaciones en cafeterías y restaurantes. Este ecosistema integra un Panel de Administración web para gerentes y una aplicación móvil nativa para el personal de sala (Staff), eliminando el uso de listas físicas y automatizando la ocupación de mesas.
 
-## About Laravel
+## 🚀 Características Principales
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Dashboard Analítico**: Estadísticas en tiempo real de ocupación, fidelidad de clientes y métricas de negocio.
+- **Gestión de Reservas Digital**: Sistema intuitivo para comensales con confirmación vía email.
+- **Panel de Superadmin**: Control global de cafeterías, planes de suscripción y validación de comprobantes.
+- **Integración Staff**: App Android funcional para que el equipo operativo gestione el día a día desde sus dispositivos.
+- **Marketing y Promociones**: Herramientas integradas para crear beneficios dinámicos según fechas y horarios.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🛠️ Requisitos Técnicos
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **PHP**: 8.2+
+- **Framework**: Laravel 11.x
+- **Base de Datos**: MySQL / MariaDB
+- **Frontend**: Vite + CSS Vanilla (Variables) + JS Alpine/Vanilla
+- **Servidor Web**: Apache (Laragon/XAMPP recomendado)
 
-## Learning Laravel
+## 📦 Instalación Rápida
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+1. **Clonar el repositorio**:
+   ```bash
+   git clone https://github.com/Kenny-vg/METRA-app_web.git
+   cd METRA-app_web
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. **Instalar dependencias**:
+   ```bash
+   composer install
+   npm install && npm run build
+   ```
 
-## Laravel Sponsors
+3. **Configuración del Entorno**:
+   - Copia `.env.example` a `.env`.
+   - Genera la Application Key: `php artisan key:generate`.
+   - Configura las credenciales de tu base de datos en el archivo `.env`.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+4. **Base de Datos**:
+   ```bash
+   php artisan migrate --seed
+   ```
 
-### Premium Partners
+5. **Iniciar Servidor**:
+   - Si usas el servidor interno de PHP: `php artisan serve`.
+   - O vía Laragon apuntando al directorio `public/`.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## 🔒 Seguridad y Roles
 
-## Contributing
+La plataforma maneja tres niveles de acceso claramente definidos:
+- **Superadmin**: Gestión global del SaaS.
+- **Gerente**: Dueño del negocio / Cafetería.
+- **Staff (App)**: Operativo del restaurante.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 📬 Contacto y Soporte
 
-## Code of Conduct
+Desarrollado para la mejora operativa de negocios modernos.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- **GitHub**: [Kenny-vg](https://github.com/Kenny-vg)
+- **Repo**: [METRA Project](https://github.com/Kenny-vg/METRA-app_web)
 
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+*© 2026 METRA Platform. Todos los derechos reservados.*

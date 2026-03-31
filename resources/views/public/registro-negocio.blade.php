@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suma tu Cafetería | METRA</title>
+    <link rel='icon' href='{{ asset('favicon.png') }}?v=6' type='image/png'>
+    <link rel='icon' href='{{ asset('favicon.svg') }}?v=6' type='image/svg+xml'>
     <meta name="description" content="Contrata METRA para gestionar reservas, mesas y clientes de tu cafetería con elegancia. Elige un plan hoy.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
