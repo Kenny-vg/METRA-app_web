@@ -38,21 +38,7 @@
                     </a>
                 </div>
 
-                <!-- TEST ENPOINTS PANEL -->
-                <div class="mt-5 border-top pt-4 text-start">
-                    <h5 class="fw-bold"><i class="bi bi-bug me-2"></i>Testing API Staff</h5>
-                    <p class="small text-muted mb-3">Verifica que los endpoints exclusivos de staff respondan correctamente con el token actual.</p>
-                    
-                    <div class="d-flex flex-wrap gap-2 mb-3">
-                        <button class="btn btn-sm btn-outline-primary fw-bold" onclick="testEndpoint('/mesas')">GET /mesas</button>
-                        <button class="btn btn-sm btn-outline-success fw-bold" onclick="testEndpoint('/zonas')">GET /zonas</button>
-                        <button class="btn btn-sm btn-outline-danger fw-bold" onclick="testEndpoint('/promociones')">GET /promociones</button>
-                        <button class="btn btn-sm btn-outline-warning fw-bold text-dark" onclick="testEndpoint('/horarios')">GET /horarios</button>
-                    </div>
-
-                    <pre id="api-result" class="bg-light p-3 rounded border text-start" style="font-size:0.75rem; max-height:200px; overflow-y:auto; color:#d63384;">Esperando acción...</pre>
-                </div>
-
+                
                 <div class="mt-5 border-top pt-4">
                     <a href="#" onclick="logout()" class="text-decoration-none fw-semibold" style="color: var(--text-muted);">
                         <i class="bi bi-box-arrow-right me-1"></i> Cerrar Sesión
@@ -64,24 +50,7 @@
 </div>
 
 <script>
-    const token = localStorage.getItem('token');
-
-    if(!token) {
-        document.getElementById('api-result').textContent = 'Error: No hay token Sanctum en localStorage.';
-    }
-
-    async function testEndpoint(endpoint) {
-        const resEl = document.getElementById('api-result');
-        resEl.textContent = `Petición a /api/staff${endpoint}...`;
-        try {
-            const data = await MetraAPI.get(`/staff${endpoint}`);
-            resEl.textContent = `Status: OK\n\n` + JSON.stringify(data, null, 2);
-        } catch (error) {
-            const dt = error.data || {};
-            resEl.textContent = `Error: ${error.status}\n\n` + JSON.stringify(dt, null, 2);
-        }
-    }
-
+   
     function logout() {
         localStorage.clear();
         sessionStorage.clear();

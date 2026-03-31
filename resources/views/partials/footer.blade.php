@@ -31,28 +31,20 @@
             <div class="col-md-4">
                 <h5 class="fw-bold mb-3" style="color: var(--accent-gold);">Contacto</h5>
                 <ul class="list-unstyled">
-                    <li class="mb-3 d-flex align-items-start">
-                        <i class="bi bi-geo-alt-fill me-2 mt-1" style="color: var(--accent-gold);"></i>
-                        <span class="opacity-75">Calle Independencia 123, Centro<br>Tehuacán, Puebla</span>
-                    </li>
+                    
                     <li class="mb-3 d-flex align-items-center">
                         <i class="bi bi-telephone-fill me-2" style="color: var(--accent-gold);"></i>
-                        <span class="opacity-75">+52 238 100 0000</span>
+                        <span class="opacity-75">{{ $configuracionSistema->telefono_soporte ?? '+52 238 100 0000' }}</span>
                     </li>
                     <li class="mb-3 d-flex align-items-center">
                         <i class="bi bi-whatsapp me-2" style="color: var(--success);"></i>
-                        <span class="opacity-75">+52 238 100 0000</span>
+                        <span class="opacity-75">{{ $configuracionSistema->whatsapp_soporte ?? '+52 238 100 0000' }}</span>
                     </li>
                     <li class="mb-3 d-flex align-items-center">
                         <i class="bi bi-envelope-fill me-2" style="color: var(--accent-gold);"></i>
-                        <span class="opacity-75">soporte@metra-app.com</span>
+                        <span class="opacity-75">{{ $configuracionSistema->email_soporte ?? 'soporte@metra-app.com' }}</span>
                     </li>
                 </ul>
-                <div class="d-flex gap-3 mt-4">
-                    <a href="#" class="btn btn-outline-light rounded-circle btn-sm d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="btn btn-outline-light rounded-circle btn-sm d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="btn btn-outline-light rounded-circle btn-sm d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;"><i class="bi bi-twitter-x"></i></a>
-                </div>
             </div>
         </div>
 

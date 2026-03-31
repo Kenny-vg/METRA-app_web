@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\View;
+use App\Models\ConfiguracionSistema;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -25,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
             \URL::forceScheme('https');
         }
 
+        // Compartir la configuración de sistema con todas las vistas
+        $configuracionSistema = rescue(fn () => ConfiguracionSistema::first(), null, false);
+        View::share('configuracionSistema', $configuracionSistema);
     }
 
 }

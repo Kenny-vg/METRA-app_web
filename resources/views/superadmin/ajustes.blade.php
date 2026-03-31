@@ -117,11 +117,11 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Teléfono</label>
-                                    <input type="text" class="form-control bg-light border-0" id="conf_telefono" placeholder="+52 238 000 0000" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 43" oninput="this.value = this.value.replace(/[^0-9+]/g, '');">
+                                    <input type="tel" class="form-control bg-light border-0" id="conf_telefono" placeholder="2380000000" maxlength="10" minlength="10" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">WhatsApp</label>
-                                    <input type="text" class="form-control bg-light border-0" id="conf_whatsapp" placeholder="+52 238 000 0000" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 43" oninput="this.value = this.value.replace(/[^0-9+]/g, '');">
+                                    <input type="tel" class="form-control bg-light border-0" id="conf_whatsapp" placeholder="2380000000" maxlength="10" minlength="10" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                                 </div>
                             </div>
                         </div>
