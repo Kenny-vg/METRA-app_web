@@ -326,7 +326,16 @@ const formatPrice = (price) => {
 async function loadPromociones() {
     try {
         const response = await MetraAPI.get('/gerente/promociones');
-        const promos = Array.isArray(response) ? response : (response.data || []);
+        // El API retorna {success: true, data: [...]}
+        // Pero el controlador usa get() ahora, por lo que data es un array directo.
+        let promos = [];
+        if (Array.isArray(response)) {
+            promos = response;
+        } else if (response && response.data) {
+            // Si es un objeto paginador, los items están en response.data.data
+            // Si es un ApiResponse wrapper, los items están en response.data
+            promos = Array.isArray(response.data) ? response.data : (response.data.data || []);
+        }
         
         const tbody = document.getElementById('tabla-promos-body');
         tbody.innerHTML = '';
@@ -608,8 +617,9 @@ async function guardarPromo() {
         } else if (error.data?.message) {
             errorMsg = error.data.message;
         } else {
-             errorMsg = error.message;
+             errorMsg = error.message || 'Error desconocido';
         }
+        console.error('Error al guardar:', error);
         Swal.fire('Error', errorMsg, 'error');
     }
 }

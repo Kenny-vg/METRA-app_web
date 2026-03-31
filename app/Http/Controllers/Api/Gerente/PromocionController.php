@@ -19,7 +19,7 @@ class PromocionController extends Controller
      */
     public function index()
     {
-        $promociones = Promocion::with('ocasiones')->orderBy('nombre_promocion')->paginate(15);
+        $promociones = Promocion::with('ocasiones')->orderBy('nombre_promocion')->get();
 
         return ApiResponse::success($promociones);
     }
@@ -114,7 +114,7 @@ class PromocionController extends Controller
             'descripcion'=>'nullable|string|max:255',
             'precio'=>'required|numeric|min:0',
             'ocasiones'=>'nullable|array',
-            'fecha_inicio'=>'nullable|date|after_or_equal:today',
+            'fecha_inicio'=>'nullable|date',
             'fecha_fin'=>'nullable|date|after_or_equal:fecha_inicio',
             'hora_inicio'=>'nullable|date_format:H:i',
             'hora_fin'=>'nullable|date_format:H:i|after:hora_inicio',
@@ -123,7 +123,7 @@ class PromocionController extends Controller
 
         $promocion->update([
             'nombre_promocion' => $request->nombre_promocion,
-            'descripcion'      => $request->input('descripcion', $promocion->descripcion),
+            'descripcion'      => $request->descripcion,
             'precio'           => $request->precio,
             'fecha_inicio'     => $request->fecha_inicio,
             'fecha_fin'        => $request->fecha_fin,
