@@ -31,7 +31,9 @@ class Reservacion extends Model
         'cafe_id',
         'ocasion_especial_id',
         'promocion_id',
-        'zona_id'
+        'zona_id',
+        'cancelado_por_id',
+        'cancelado_por_rol'
     ];
 
     protected static function booted()

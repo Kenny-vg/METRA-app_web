@@ -135,7 +135,6 @@
                     </div>
                 </div>
 
-
             </div> 
         </div>
 
@@ -248,6 +247,7 @@
                     }
                 }
                 if (cafe.telefono) document.querySelector('input[name="telefono"]').value = cafe.telefono;
+                
                 if (cafe.foto_url) {
                     document.getElementById('previewFoto').src = `/storage/${cafe.foto_url}?v=` + new Date().getTime();
                     document.getElementById('previewFoto').classList.remove('d-none');

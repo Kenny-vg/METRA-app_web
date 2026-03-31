@@ -13,6 +13,8 @@ use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ReservaConfirmada;
+use App\Mail\ReservaCancelada;
+use App\Mail\ReservaNoShow;
 
 class ReservacionController extends Controller
 {
@@ -291,26 +293,47 @@ class ReservacionController extends Controller
      */
     public function cancelar($id)
     {
-        $reservacion = Reservacion::findOrFail($id);
+        $reservacion = Reservacion::with('cafeteria')->findOrFail($id);
+        $user = auth()->user();
 
-        if (auth()->check() && $reservacion->user_id !== auth()->id()) {
-            return ApiResponse::error('No autorizado', 403);
+        // 1. Autorización Básica
+        // Clientes solo pueden cancelar lo suyo. Staff/Gerente cualquier cosa de su café.
+        if ($user->role === 'cliente' && $reservacion->user_id !== $user->id) {
+            return ApiResponse::error('No autorizado para cancelar esta reservación', 403);
         }
 
-        if (in_array($reservacion->estado, [Reservacion::STATUS_ENCURSO, Reservacion::STATUS_FINALIZADA])) {
-            return ApiResponse::error('No se puede cancelar una reservación en curso o finalizada');
+        // 2. Validación de Estado
+        // Solo se puede cancelar si está pendiente.
+        if ($reservacion->estado !== Reservacion::STATUS_PENDIENTE) {
+            return ApiResponse::error("No se puede cancelar una reservación en estado: {$reservacion->estado}", 422);
         }
 
+        // 3. Validación de Tiempo (Tolerancia No-Show)
         $inicio = Carbon::parse($reservacion->fecha . ' ' . $reservacion->hora_inicio);
+        $tolerancia = $reservacion->cafeteria->tolerancia_reserva_min ?? 15;
+        $limiteCancelacion = $inicio->copy()->addMinutes($tolerancia);
 
-        if ($inicio->isPast()) {
-            return ApiResponse::error('La reservación ya comenzó');
+        if (now()->gt($limiteCancelacion)) {
+            return ApiResponse::error('El tiempo de tolerancia ha expirado. La reservación ahora debe gestionarse como No-Show.', 422);
         }
 
-        $reservacion->estado = Reservacion::STATUS_CANCELADA;
-        $reservacion->save();
+        // 4. Ejecutar Cancelación con Auditoría
+        $reservacion->update([
+            'estado' => Reservacion::STATUS_CANCELADA,
+            'cancelado_por_id' => $user->id,
+            'cancelado_por_rol' => $user->role
+        ]);
 
-        return ApiResponse::success(null, 'Reservación cancelada');
+        // 5. Notificar al cliente
+        if ($reservacion->email) {
+            try {
+                Mail::to($reservacion->email)->send(new ReservaCancelada($reservacion));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Error enviando correo de cancelación (ID: {$reservacion->id}): " . $e->getMessage());
+            }
+        }
+
+        return ApiResponse::success(null, 'Reservación cancelada correctamente');
     }
 
 
@@ -444,25 +467,6 @@ class ReservacionController extends Controller
         return ApiResponse::success(null, 'Reservación cancelada correctamente.');
     }
 
-    /**
-     * Cancelar una reservación por ID (gerente).
-     */
-    public function cancelarGerente($id)
-    {
-        $reservacion = Reservacion::findOrFail($id);
-
-        if (in_array($reservacion->estado, [Reservacion::STATUS_ENCURSO, Reservacion::STATUS_FINALIZADA])) {
-            return ApiResponse::error('No se puede cancelar una reservación en curso o finalizada');
-        }
-
-        $reservacion->estado = Reservacion::STATUS_CANCELADA;
-        $reservacion->save();
-
-        return ApiResponse::success(
-            null,
-            'Reservación cancelada por el gerente'
-        );
-    }
 
     /**
      * Formatear reservación para respuestas JSON consistentes

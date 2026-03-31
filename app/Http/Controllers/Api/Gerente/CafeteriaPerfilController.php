@@ -67,6 +67,7 @@ class CafeteriaPerfilController extends Controller
             'porcentaje_reservas' => 'sometimes|integer|min:0|max:100',
             'duracion_reserva_min' => 'sometimes|integer|min:15|max:240',
             'intervalo_reserva_min' => 'sometimes|integer|min:15|max:120',
+            'tolerancia_reserva_min' => 'sometimes|integer|min:5|max:60',
         ]);
 
         if ($request->hasFile('foto')) {

@@ -47,6 +47,8 @@ return new class extends Migration
             // Comprobante de pago subido por el gerente
             $table->string('comprobante_url')->nullable();
             
+            $table->integer('tolerancia_reserva_min')->default(15);
+            
             $table->index('user_id');
 
             $table->timestamps();

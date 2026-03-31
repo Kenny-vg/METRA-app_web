@@ -11,6 +11,7 @@ use App\Helpers\ApiResponse;
 use App\Mail\SolicitarResena;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class OcupacionController extends Controller
 {
@@ -45,13 +46,13 @@ class OcupacionController extends Controller
             'comentarios' => 'nullable|string|max:255'
         ]);
 
-        return \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+        return DB::transaction(function () use ($request) {
             $reservacion = null;
 
             if ($request->reservacion_id) {
                 $reservacion = Reservacion::find($request->reservacion_id);
 
-                if (!$reservacion || !in_array($reservacion->estado, [Reservacion::STATUS_PENDIENTE, Reservacion::STATUS_ENCURSO]))  {
+                if (!$reservacion || !in_array($reservacion->estado, [Reservacion::STATUS_PENDIENTE, Reservacion::STATUS_ENCURSO])) {
                     return ApiResponse::error('La reservación no está disponible para ocupar');
                 }
 
@@ -134,7 +135,7 @@ class OcupacionController extends Controller
             'hora_salida' => now()
         ]);
 
-         // Actualizar reservación si existe
+        // Actualizar reservación si existe
         $reservacion = $ocupacion->reservacion;
 
         if ($reservacion && $reservacion->estado === Reservacion::STATUS_ENCURSO) {
@@ -158,11 +159,11 @@ class OcupacionController extends Controller
     {
         $mesas = Mesa::with('zona')->get()->map(function ($mesa) {
             return [
-            'id' => $mesa->id,
-            'numero' => $mesa->numero_mesa,
-            'capacidad' => $mesa->capacidad,
-            'zona' => $mesa->zona->nombre_zona,
-            'estado' => $mesa->esta_ocupada ? 'ocupada' : 'libre'
+                'id' => $mesa->id,
+                'numero' => $mesa->numero_mesa,
+                'capacidad' => $mesa->capacidad,
+                'zona' => $mesa->zona->nombre_zona,
+                'estado' => $mesa->esta_ocupada ? 'ocupada' : 'libre'
             ];
         });
 

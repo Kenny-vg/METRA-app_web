@@ -180,7 +180,19 @@
                         <option value="60">60 minutos</option>
                         <option value="90">90 minutos</option>
                         <option value="120">120 minutos</option>
+                        <option value="150">150 minutos</option>
+                        <option value="180">180 minutos</option>
                     </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Tolerancia No-Show</label>
+                    <div class="input-group">
+                        <span class="input-group-text border-0" style="background: #eee;"><i class="bi bi-hourglass-split"></i></span>
+                        <input type="number" id="conf_tolerancia" class="form-control border-0 shadow-sm p-3 fw-bold" style="background: var(--off-white); color: var(--black-primary);" min="5" max="60" onchange="marcarCambiosConfig()">
+                        <span class="input-group-text border-0 fw-bold" style="background: #eee; font-size: 0.8rem;">MIN</span>
+                    </div>
+                    <small class="text-muted mt-2 d-block" style="font-size: 0.7rem;">Tiempo de espera antes de marcar como No-Show y liberar mesa.</small>
                 </div>
 
                 <div class="mb-4">
@@ -503,6 +515,7 @@
                     
                     document.getElementById('conf_duracion').value = cafe.duracion_reserva_min || 90;
                     document.getElementById('conf_intervalo').value = cafe.intervalo_reserva_min || 30;
+                    document.getElementById('conf_tolerancia').value = cafe.tolerancia_reserva_min || 15;
                     
                     const pct = cafe.porcentaje_reservas !== null && cafe.porcentaje_reservas !== undefined ? cafe.porcentaje_reservas : 50;
                     document.getElementById('conf_porcentaje').value = pct;
@@ -555,7 +568,8 @@
                 const payload = {
                     duracion_reserva_min: document.getElementById('conf_duracion').value,
                     intervalo_reserva_min: document.getElementById('conf_intervalo').value,
-                    porcentaje_reservas: document.getElementById('conf_porcentaje').value
+                    porcentaje_reservas: document.getElementById('conf_porcentaje').value,
+                    tolerancia_reserva_min: document.getElementById('conf_tolerancia').value
                 };
 
                 try {

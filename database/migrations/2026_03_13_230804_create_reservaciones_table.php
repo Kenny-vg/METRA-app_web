@@ -74,6 +74,13 @@ return new class extends Migration
             $table->index('user_id');
             $table->index(['cafe_id', 'fecha', 'estado']);
 
+            $table->foreignId('cancelado_por_id')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
+            
+            $table->string('cancelado_por_rol', 50)->nullable();
+
             $table->timestamps();
         });
     }

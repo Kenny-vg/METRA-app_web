@@ -25,7 +25,8 @@ class Cafeteria extends Model
         'comprobante_url',
         'duracion_reserva_min',
         'intervalo_reserva_min',
-        'porcentaje_reservas'
+        'porcentaje_reservas',
+        'tolerancia_reserva_min'
     ];
 
     protected $appends = ['estado_dinamico', 'foto_full_url', 'comprobante_full_url', 'plan_activo'];
