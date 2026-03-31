@@ -30,9 +30,15 @@ class PublicCafeteriaController extends Controller
                 'promedio_calificacion' => DB::table('resenas')
                     ->selectRaw('COALESCE(AVG(calificacion), 0)')
                     ->whereColumn('cafe_id', 'cafeterias.id')
-                    ->where('estado', 'publicada')
+                    ->where('estado', 'publicada'),
+                
+                // 2. Subconsulta en SELECT (Anidado): Total de reservaciones finalizadas
+                'total_reservas_exito' => DB::table('reservaciones')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('cafe_id', 'cafeterias.id')
+                    ->where('estado', 'finalizada')
             ])
-            // 2. Subconsulta en WHERE (EXISTS): Solo cafeterías con zonas activas
+            // 3. Subconsulta en WHERE (EXISTS): Solo cafeterías con zonas activas
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
                     ->from('zonas')
