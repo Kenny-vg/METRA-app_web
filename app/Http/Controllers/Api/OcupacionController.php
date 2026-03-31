@@ -21,7 +21,7 @@ class OcupacionController extends Controller
     public function index()
     {
         $ocupaciones = DetalleOcupacion::with('mesa')
-            ->where('estado', 'activa')
+            ->where('estado', DetalleOcupacion::STATUS_ACTIVA)
             ->get();
 
         return ApiResponse::success($ocupaciones, 'Mesas ocupadas');
@@ -45,71 +45,76 @@ class OcupacionController extends Controller
             'comentarios' => 'nullable|string|max:255'
         ]);
 
-        $reservacion = null;
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+            $reservacion = null;
 
-        if ($request->reservacion_id) {
-            $reservacion = Reservacion::find($request->reservacion_id);
+            if ($request->reservacion_id) {
+                $reservacion = Reservacion::find($request->reservacion_id);
 
-        if (!$reservacion || !in_array($reservacion->estado, ['pendiente', 'en_curso']))  {
-                return ApiResponse::error('La reservación no está disponible para ocupar');
+                if (!$reservacion || !in_array($reservacion->estado, [Reservacion::STATUS_PENDIENTE, Reservacion::STATUS_ENCURSO]))  {
+                    return ApiResponse::error('La reservación no está disponible para ocupar');
+                }
+
+                $yaOcupada = DetalleOcupacion::where('reservacion_id', $request->reservacion_id)
+                    ->where('estado', DetalleOcupacion::STATUS_ACTIVA)
+                    ->exists();
+
+                if ($yaOcupada) {
+                    return ApiResponse::error('Esta reservación ya está en uso');
+                }
             }
 
-            $yaOcupada = DetalleOcupacion::where('reservacion_id', $request->reservacion_id)
-                ->where('estado', 'activa')
+            // Bloquear filas de las mesas para evitar condiciones de carrera
+            $mesas = Mesa::whereIn('id', $request->mesa_ids)
+                ->lockForUpdate()
+                ->get();
+
+            // Validar capacidad total
+            $capacidadTotalMesas = $mesas->sum('capacidad');
+
+            if ($request->numero_personas > $capacidadTotalMesas) {
+                return ApiResponse::error('Las mesas no tienen capacidad suficiente');
+            }
+
+            // Validar que no estén ocupadas (físicamente o por estado activa)
+            $mesasOcupadas = DetalleOcupacion::whereIn('mesa_id', $request->mesa_ids)
+                ->where('estado', DetalleOcupacion::STATUS_ACTIVA)
                 ->exists();
 
-            if ($yaOcupada) {
-                return ApiResponse::error('Esta reservación ya está en uso');
+            if ($mesasOcupadas) {
+                return ApiResponse::error('Una o más mesas ya están ocupadas');
             }
-        }
 
-        $mesas = Mesa::whereIn('id', $request->mesa_ids)->get();
+            $ocupaciones = [];
+            $personasPorMesa = ceil($request->numero_personas / count($request->mesa_ids));
 
-        // Validar capacidad total
-        $capacidadTotalMesas = $mesas->sum('capacidad');
+            foreach ($request->mesa_ids as $mesaId) {
+                $ocupaciones[] = DetalleOcupacion::create([
+                    'mesa_id' => $mesaId,
+                    'numero_personas' => $personasPorMesa,
+                    'reservacion_id' => $request->reservacion_id,
+                    'tipo' => $request->reservacion_id ? 'reservacion' : 'walkin',
+                    'nombre_cliente' => $request->nombre_cliente,
+                    'email' => $request->email,
+                    'comentarios' => $request->comentarios,
+                    'hora_entrada' => now(),
+                    'estado' => DetalleOcupacion::STATUS_ACTIVA,
+                    'token_resena' => ($request->email || ($reservacion && $reservacion->email)) ? Str::random(40) : null,
+                    'cafe_id' => auth()->user()->cafe_id,
+                    'user_id' => auth()->id()
+                ]);
+            }
 
-        if ($request->numero_personas > $capacidadTotalMesas) {
-            return ApiResponse::error('Las mesas no tienen capacidad suficiente');
-        }
+            // Actualizar reservación si existe
+            if ($reservacion) {
+                $reservacion->update([
+                    'estado' => Reservacion::STATUS_ENCURSO,
+                    'fecha_checkin' => now()
+                ]);
+            }
 
-        // Validar que no estén ocupadas
-        $mesasOcupadas = DetalleOcupacion::whereIn('mesa_id', $request->mesa_ids)
-            ->where('estado', 'activa')
-            ->exists();
-
-        if ($mesasOcupadas) {
-            return ApiResponse::error('Una o más mesas ya están ocupadas');
-        }
-
-        $ocupaciones = [];
-
-        $personasPorMesa = ceil($request->numero_personas / count($request->mesa_ids));
-
-        foreach ($request->mesa_ids as $mesaId) {
-            $ocupaciones[] = DetalleOcupacion::create([
-                'mesa_id' => $mesaId,
-                'numero_personas' => $personasPorMesa,
-                'reservacion_id' => $request->reservacion_id,
-                'tipo' => $request->reservacion_id ? 'reservacion' : 'walkin',
-                'nombre_cliente' => $request->nombre_cliente,
-                'email' => $request->email,
-                'comentarios' => $request->comentarios,
-                'hora_entrada' => now(),
-                'estado' => 'activa',
-                'token_resena' => ($request->email || ($reservacion && $reservacion->email)) ? Str::random(40) : null,
-                'cafe_id' => auth()->user()->cafe_id,
-                'user_id' => auth()->id()
-            ]);
-        }
-        // Actualizar reservación si existe
-        if ($reservacion) {
-            $reservacion->update([
-                'estado' => 'en_curso',
-                'fecha_checkin' => now()
-            ]);
-        }
-
-        return ApiResponse::success($ocupaciones, 'Mesas abiertas');
+            return ApiResponse::success($ocupaciones, 'Mesas abiertas');
+        });
     }
 
     /**
@@ -119,22 +124,22 @@ class OcupacionController extends Controller
     {
         $ocupacion = DetalleOcupacion::findOrFail($id);
 
-        if ($ocupacion->estado !== 'activa') {
+        if ($ocupacion->estado !== DetalleOcupacion::STATUS_ACTIVA) {
             return ApiResponse::error('La mesa ya está cerrada');
         }
 
         //cerrar ocupacion
         $ocupacion->update([
-            'estado' => 'finalizada',
+            'estado' => DetalleOcupacion::STATUS_FINALIZADA,
             'hora_salida' => now()
         ]);
 
          // Actualizar reservación si existe
         $reservacion = $ocupacion->reservacion;
 
-        if ($reservacion && $reservacion->estado === 'en_curso') {
+        if ($reservacion && $reservacion->estado === Reservacion::STATUS_ENCURSO) {
             $reservacion->update([
-                'estado' => 'finalizada',
+                'estado' => Reservacion::STATUS_FINALIZADA,
                 'fecha_checkout' => now()
             ]);
         }
@@ -151,15 +156,13 @@ class OcupacionController extends Controller
 
     public function estadoMesas()
     {
-        $ocupadas = DetalleOcupacion::where('estado', 'activa')->pluck('mesa_id')->toArray();
-
-        $mesas = Mesa::with('zona')->get()->map(function ($mesa) use ($ocupadas) {
+        $mesas = Mesa::with('zona')->get()->map(function ($mesa) {
             return [
             'id' => $mesa->id,
-            'numero' => $mesa->numero,
+            'numero' => $mesa->numero_mesa,
             'capacidad' => $mesa->capacidad,
-            'zona' => $mesa->zona->nombre,
-            'estado' => in_array($mesa->id, $ocupadas) ? 'ocupada' : 'libre'
+            'zona' => $mesa->zona->nombre_zona,
+            'estado' => $mesa->esta_ocupada ? 'ocupada' : 'libre'
             ];
         });
 

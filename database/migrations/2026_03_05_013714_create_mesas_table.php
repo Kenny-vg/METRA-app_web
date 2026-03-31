@@ -18,6 +18,7 @@ return new class extends Migration
             $table->tinyInteger('capacidad');
 
             $table->boolean('activo')->default(true);
+            $table->boolean('esta_ocupada')->default(false);
 
             $table->foreignId('zona_id')
                     ->constrained('zonas')
@@ -32,6 +33,7 @@ return new class extends Migration
 
             $table->index(['zona_id', 'cafe_id']);
             $table->index('activo'); // equivalente al estado
+            $table->index('esta_ocupada');
 
             $table->timestamps();
         });

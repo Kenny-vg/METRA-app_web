@@ -7,6 +7,12 @@ use App\Models\Scopes\CafeScope;
 
 class Reservacion extends Model
 {
+    const STATUS_PENDIENTE = 'pendiente';
+    const STATUS_ENCURSO = 'en_curso';
+    const STATUS_FINALIZADA = 'finalizada';
+    const STATUS_NOSHOW = 'no_show';
+    const STATUS_CANCELADA = 'cancelada';
+
     protected $table = 'reservaciones';
 
     protected $fillable = [

@@ -8,6 +8,11 @@ use Illuminate\Support\Str;
 
 class DetalleOcupacion extends Model
 {
+    const STATUS_ACTIVA = 'activa';
+    const STATUS_FINALIZADA = 'finalizada';
+    const STATUS_CANCELADA = 'cancelada';
+    const STATUS_NOSHOW = 'no_show';
+
     protected $table = 'detalle_ocupaciones';
 
     protected $fillable = [

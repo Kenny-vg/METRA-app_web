@@ -28,7 +28,7 @@ class MarcarReservacionesNoShow extends Command
     public function handle()
     {
         // Marcar reservaciones pendientes como no show si ya pasaron más de 20 minutos de la hora de inicio
-        Reservacion::where('estado', 'pendiente')
+        Reservacion::where('estado', Reservacion::STATUS_PENDIENTE)
             ->get()
             ->each(function ($reservacion) {
 
@@ -38,7 +38,7 @@ class MarcarReservacionesNoShow extends Command
 
             if (now()->greaterThan($hora)) {
                 $reservacion->update([
-                    'estado' => 'no_show'
+                    'estado' => Reservacion::STATUS_NOSHOW
                 ]);
             }
         });

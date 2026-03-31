@@ -190,7 +190,7 @@ class ReservacionController extends Controller
                 }
             }
             )
-                ->whereIn('estado', ['pendiente', 'en_curso'])
+                ->whereIn('estado', [Reservacion::STATUS_PENDIENTE, Reservacion::STATUS_ENCURSO])
                 ->exists();
 
             if ($duplicada) {
@@ -227,7 +227,7 @@ class ReservacionController extends Controller
                 'promocion_id' => $request->promocion_id,
                 'zona_id' => $request->zona_id,
 
-                'estado' => 'pendiente'
+                'estado' => Reservacion::STATUS_PENDIENTE
             ]);
 
             try {
@@ -297,7 +297,7 @@ class ReservacionController extends Controller
             return ApiResponse::error('No autorizado', 403);
         }
 
-        if (in_array($reservacion->estado, ['en_curso', 'finalizada'])) {
+        if (in_array($reservacion->estado, [Reservacion::STATUS_ENCURSO, Reservacion::STATUS_FINALIZADA])) {
             return ApiResponse::error('No se puede cancelar una reservación en curso o finalizada');
         }
 
@@ -307,7 +307,7 @@ class ReservacionController extends Controller
             return ApiResponse::error('La reservación ya comenzó');
         }
 
-        $reservacion->estado = 'cancelada';
+        $reservacion->estado = Reservacion::STATUS_CANCELADA;
         $reservacion->save();
 
         return ApiResponse::success(null, 'Reservación cancelada');
@@ -349,7 +349,7 @@ class ReservacionController extends Controller
                 ->where('hora_fin', '>', $inicio);
 
         })
-            ->whereIn('estado', ['pendiente', 'en_curso'])
+            ->whereIn('estado', [Reservacion::STATUS_PENDIENTE, Reservacion::STATUS_ENCURSO])
             ->sum('numero_personas');
 
 
@@ -375,12 +375,12 @@ class ReservacionController extends Controller
             return ApiResponse::error('Aún faltan más de 15 minutos para la reserva. No puedes marcar llegada aún.');
         }
 
-        if ($reservacion->estado !== 'pendiente') {
+        if ($reservacion->estado !== Reservacion::STATUS_PENDIENTE) {
             return ApiResponse::error('Solo reservaciones pendientes pueden marcarse como llegada');
         }
 
         $reservacion->update([
-            'estado' => 'en_curso',
+            'estado' => Reservacion::STATUS_ENCURSO,
             'fecha_checkin' => now()
         ]);
 
@@ -426,11 +426,11 @@ class ReservacionController extends Controller
             ->where('folio', $folio)
             ->firstOrFail();
 
-        if ($r->estado === 'cancelada') {
+        if ($r->estado === Reservacion::STATUS_CANCELADA) {
             return ApiResponse::error('Esta reservación ya fue cancelada.', 409);
         }
 
-        if (in_array($r->estado, ['en_curso', 'finalizada'])) {
+        if (in_array($r->estado, [Reservacion::STATUS_ENCURSO, Reservacion::STATUS_FINALIZADA])) {
             return ApiResponse::error('No se puede cancelar una reservación en curso o finalizada.', 409);
         }
 
@@ -439,7 +439,7 @@ class ReservacionController extends Controller
             return ApiResponse::error('No se puede cancelar una reservación cuya fecha u hora ya pasaron.', 409);
         }
 
-        $r->update(['estado' => 'cancelada']);
+        $r->update(['estado' => Reservacion::STATUS_CANCELADA]);
 
         return ApiResponse::success(null, 'Reservación cancelada correctamente.');
     }
@@ -451,11 +451,11 @@ class ReservacionController extends Controller
     {
         $reservacion = Reservacion::findOrFail($id);
 
-        if (in_array($reservacion->estado, ['en_curso', 'finalizada'])) {
+        if (in_array($reservacion->estado, [Reservacion::STATUS_ENCURSO, Reservacion::STATUS_FINALIZADA])) {
             return ApiResponse::error('No se puede cancelar una reservación en curso o finalizada');
         }
 
-        $reservacion->estado = 'cancelada';
+        $reservacion->estado = Reservacion::STATUS_CANCELADA;
         $reservacion->save();
 
         return ApiResponse::success(

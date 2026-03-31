@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Models\Reservacion;
 
 class AnalyticsController extends Controller
 {
@@ -27,7 +28,7 @@ class AnalyticsController extends Controller
         $comensalesHoy = DB::table('reservaciones')
             ->where('cafe_id', $cafeteria->id)
             ->where('fecha', now()->toDateString())
-            ->whereIn('estado', ['finalizada', 'en_curso'])
+            ->whereIn('estado', [Reservacion::STATUS_FINALIZADA, Reservacion::STATUS_ENCURSO])
             ->sum('numero_personas');
 
         $capacidadTotal = $analitica ? (int)$analitica->capacidad_total : 0;

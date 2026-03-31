@@ -62,35 +62,45 @@ return new class extends Migration
         });
 
         // Triggers for Mesas automation
-        DB::unprepared('
+        DB::unprepared("
             CREATE TRIGGER trg_ocupar_mesa_insert
             AFTER INSERT ON detalle_ocupaciones
             FOR EACH ROW
             BEGIN
-                UPDATE mesas SET activo = false WHERE id = NEW.mesa_id;
+                IF NEW.estado = 'activa' THEN
+                    UPDATE mesas SET esta_ocupada = true WHERE id = NEW.mesa_id;
+                END IF;
             END
-        ');
+        ");
 
-        DB::unprepared('
+        DB::unprepared("
             CREATE TRIGGER trg_mover_mesa_update
             AFTER UPDATE ON detalle_ocupaciones
             FOR EACH ROW
             BEGIN
-                IF OLD.mesa_id != NEW.mesa_id THEN
-                    UPDATE mesas SET activo = true WHERE id = OLD.mesa_id;
-                    UPDATE mesas SET activo = false WHERE id = NEW.mesa_id;
+                -- Liberar mesa antigua si estaba activa anteriormente
+                IF OLD.estado = 'activa' THEN
+                    UPDATE mesas SET esta_ocupada = false WHERE id = OLD.mesa_id;
+                END IF;
+
+                -- Ocupar mesa nueva (o la misma) si el nuevo estado es activa
+                IF NEW.estado = 'activa' THEN
+                    UPDATE mesas SET esta_ocupada = true WHERE id = NEW.mesa_id;
                 END IF;
             END
-        ');
+        ");
 
-        DB::unprepared('
+        DB::unprepared("
             CREATE TRIGGER trg_liberar_mesa_delete
             AFTER DELETE ON detalle_ocupaciones
             FOR EACH ROW
             BEGIN
-                UPDATE mesas SET activo = true WHERE id = OLD.mesa_id;
+                -- Fallback de seguridad por si se elimina un registro activo
+                IF OLD.estado = 'activa' THEN
+                    UPDATE mesas SET esta_ocupada = false WHERE id = OLD.mesa_id;
+                END IF;
             END
-        ');
+        ");
     }
 
     /**
