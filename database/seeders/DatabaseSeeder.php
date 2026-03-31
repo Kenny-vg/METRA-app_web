@@ -22,9 +22,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             PlanSeeder::class,
+            UserSeeder::class,
             CafeteriaSeeder::class,
             SubscriptionSeeder::class,
-            UserSeeder::class,
         ]);
 
         /*User::factory()->create([
