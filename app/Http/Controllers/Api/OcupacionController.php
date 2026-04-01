@@ -63,6 +63,11 @@ class OcupacionController extends Controller
                 if ($yaOcupada) {
                     return ApiResponse::error('Esta reservación ya está en uso');
                 }
+
+                // VALIDACIÓN DE FECHA (Timezone configurado: America/Mexico_City)
+                if (!$reservacion->esParaHoy()) {
+                    return ApiResponse::error('Esta reservación no corresponde al día de hoy. Por favor, selecciona una reservación válida para la fecha actual o marca la llegada como Walk-in.', 422);
+                }
             }
 
             // Bloquear filas de las mesas para evitar condiciones de carrera

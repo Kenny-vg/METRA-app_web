@@ -19,15 +19,15 @@
 </head>
 <body class="zona-comensal">
 
-    <nav class="navbar navbar-expand-lg py-3 py-lg-4" style="background: rgba(248, 249, 250, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-light); position: sticky; top: 0; z-index: 1000;">
-        <div class="container">
-            <a class="navbar-brand fw-bold fs-3" href="{{ url('/') }}" style="color: var(--black-primary); letter-spacing: -0.5px;">
+    <nav class="navbar navbar-expand-lg py-2 py-lg-4" style="background: rgba(248, 249, 250, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-light); position: sticky; top: 0; z-index: 1000;">
+        <div class="container px-3 px-sm-4">
+            <a class="navbar-brand fw-bold fs-3 d-flex align-items-center" href="{{ url('/') }}" style="color: var(--black-primary); letter-spacing: -0.5px;">
                 <i class="bi bi-hexagon-fill me-2" style="color: var(--accent-gold); font-size: 1.2rem;"></i>METRA
             </a>
-            <div class="d-flex align-items-center gap-3 order-lg-3 ms-auto ms-lg-0">
-                <a href="#cafeterias" class="btn btn-outline-dark px-4 py-2 rounded-pill d-none d-md-inline-block" style="font-size: 0.9rem; font-family: 'Inter', sans-serif; font-weight: 600;">Explorar Cafeterías</a>
-                <a href="{{ url('/login') }}" class="btn-metra-main px-4 py-2 rounded-pill" style="font-size: 0.9rem;">Iniciar Sesión</a>
-                <button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navBienvenida">
+            <div class="d-flex align-items-center gap-2 gap-md-3 order-lg-3 ms-auto ms-lg-0">
+                <a href="#cafeterias" class="btn btn-outline-dark px-3 py-2 rounded-pill d-none d-md-inline-block" style="font-size: 0.85rem; font-family: 'Inter', sans-serif; font-weight: 600;">Explorar Cafeterías</a>
+                <a href="{{ url('/login') }}" class="btn-metra-main px-3 px-md-4 py-2 rounded-pill" style="font-size: 0.85rem;">Iniciar Sesión</a>
+                <button class="navbar-toggler border-0 p-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navBienvenida">
                     <i class="bi bi-list fs-2" style="color: var(--black-primary);"></i>
                 </button>
             </div>
@@ -42,34 +42,34 @@
     </nav>
 
     <!-- HERO — orientado a gerentes/dueños -->
-    <main class="hero-container" style="background: linear-gradient(180deg, var(--off-white) 0%, #FFFFFF 100%);">
-        <div class="container py-5">
+    <main class="hero-container py-4 py-lg-5" style="background: linear-gradient(180deg, var(--off-white) 0%, #FFFFFF 100%);">
+        <div class="container px-4 px-lg-5">
             <div class="row align-items-center gy-5">
-                <div class="col-lg-6 text-center text-lg-start pe-lg-5">
+                <div class="col-lg-6 text-center text-lg-start pe-lg-5 order-2 order-lg-1">
                     <span style="display:inline-block; background: rgba(0,0,0,0.04); color: var(--text-muted); font-size: 0.8rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 6px 16px; border-radius: 50px; margin-bottom: 24px; border: 1px solid var(--border-light);">
-                        Sistema SaaS de reservas para cafeterías y restaurantes
+                        Software SaaS para Restaurantes
                     </span>
                     <h1 class="hero-title" style="font-family: 'Inter', sans-serif;">
-                        Digitaliza las reservas<br>
+                        Digitaliza las reservas<br class="d-none d-md-block">
                         <span style="color: var(--accent-gold);">de tu negocio.</span>
                     </h1>
-                    <p class="fs-5 mb-5" style="color: var(--text-muted); max-width: 520px; font-weight: 400; line-height: 1.6;">
-                        METRA es el sistema de gestión de reservas que tu cafetería o restaurante necesita. Sin listas físicas, sin llamadas, sin caos.
+                    <p class="fs-5 mb-5 mx-auto mx-lg-0" style="color: var(--text-muted); max-width: 520px; font-weight: 400; line-height: 1.6;">
+                        METRA es el sistema integral que tu cafetería o restaurante necesita. Sin listas físicas, sin llamadas, sin caos operativo.
                     </p>
-                    <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
-                        <a href="#para-negocios" class="btn-metra-main" style="padding: 16px 36px; font-size: 1.05rem;">
+                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
+                        <a href="{{ url('/registro-negocio') }}" class="btn-metra-main px-4 py-3" style="font-size: 1rem;">
                             Contratar el servicio <i class="bi bi-arrow-right ms-2"></i>
                         </a>
-                        <a href="#como-funciona" class="btn btn-outline-dark rounded-pill" style="padding: 16px 36px; font-size: 1.05rem; font-weight: 600;">
+                        <a href="#como-funciona" class="btn btn-outline-dark rounded-pill px-4 py-3" style="font-size: 1rem; font-weight: 600;">
                             Cómo funciona <i class="bi bi-play-circle ms-2"></i>
                         </a>
                     </div>
                 </div>
-                <div class="col-lg-6">
+                <div class="col-lg-6 order-1 order-lg-2">
                     <div class="image-wrapper text-center position-relative">
                         <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
                              class="img-restaurante img-fluid shadow-lg" alt="Interior de cafetería con METRA"
-                             style="max-width: 100%; height: auto; border-radius: 12px; object-fit: cover; aspect-ratio: 4/3; position: relative; z-index: 2;">
+                             style="max-width: 100%; height: auto; object-fit: cover; aspect-ratio: 4/3; position: relative; z-index: 2;">
                     </div>
                 </div>
             </div>
@@ -78,16 +78,16 @@
 
     <!-- CÓMO FUNCIONA EL ECOSISTEMA -->
     <section id="como-funciona" style="background: #f8f9fa; padding: 70px 0; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);">
-        <div class="container">
+        <div class="container px-4">
             <div class="text-center mb-5">
-                <h2 class="fw-bold" style="color: var(--black-primary); font-size: clamp(1.5rem, 3vw, 2.2rem);">El ecosistema METRA</h2>
+                <h2 class="fw-bold" style="color: var(--black-primary); font-size: clamp(1.5rem, 4vw, 2.2rem);">El ecosistema METRA</h2>
                 <p class="text-muted mx-auto" style="max-width: 560px;">
-                    Un negocio contrata el servicio. Sus clientes reservan dentro de su sistema. El staff opera con la app. Así de directo.
+                    Desde la contratación hasta el seguimiento diario. Un flujo digital pensado para optimizar tu tiempo.
                 </p>
             </div>
 
-            <!-- Flujo visual -->
-            <div class="row g-0 align-items-center justify-content-center mb-5 text-center d-none d-md-flex">
+            <!-- Flujo visual para Desktop -->
+            <div class="row g-0 align-items-center justify-content-center mb-5 text-center d-none d-lg-flex">
                 <div class="col-auto">
                     <div class="rounded-4 p-3 bg-white shadow-sm border" style="min-width: 160px;">
                         <i class="bi bi-building" style="font-size: 2rem; color: var(--black-primary);"></i>
@@ -121,27 +121,47 @@
                 </div>
             </div>
 
+            <!-- Flujo para Móvil (Lista clara) -->
+            <div class="d-flex d-lg-none flex-column gap-3 mb-5 mx-auto" style="max-width: 400px;">
+                <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border">
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;"><i class="bi bi-1-circle-fill text-dark"></i></div>
+                    <div><span class="fw-bold">Dueño:</span> Registra y contrata METRA</div>
+                </div>
+                <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border">
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;"><i class="bi bi-2-circle-fill text-warning"></i></div>
+                    <div><span class="fw-bold">Activación:</span> Validamos tu solicitud</div>
+                </div>
+                <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border">
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;"><i class="bi bi-3-circle-fill text-success"></i></div>
+                    <div><span class="fw-bold">Digital:</span> Clientes reservan en tu sistema</div>
+                </div>
+                <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border">
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;"><i class="bi bi-4-circle-fill text-secondary"></i></div>
+                    <div><span class="fw-bold">Control:</span> Personal opera desde la App</div>
+                </div>
+            </div>
+
             <!-- Cards de beneficios -->
-            <div class="row g-4">
+            <div class="row g-4 pt-3">
                 <div class="col-12 col-md-4">
                     <div class="card border-0 shadow-sm rounded-4 p-4 h-100" style="border-left: 4px solid var(--accent-gold) !important;">
                         <i class="bi bi-calendar2-check-fill mb-3" style="font-size: 2rem; color: var(--accent-gold);"></i>
-                        <h6 class="fw-bold mb-2">Reservas digitales para tu negocio</h6>
-                        <p class="text-muted small mb-0">Tus clientes reservan desde el sistema de tu cafetería. Sin llamadas, sin listas físicas, sin errores de doble reserva.</p>
+                        <h6 class="fw-bold mb-2">Reservas digitales</h6>
+                        <p class="text-muted small mb-0">Tus clientes reservan directamente. Sin llamadas ni errores operativos.</p>
                     </div>
                 </div>
                 <div class="col-12 col-md-4">
                     <div class="card border-0 shadow-sm rounded-4 p-4 h-100" style="border-left: 4px solid var(--black-primary) !important;">
                         <i class="bi bi-speedometer2 mb-3" style="font-size: 2rem; color: var(--black-primary);"></i>
-                        <h6 class="fw-bold mb-2">Panel de control completo</h6>
-                        <p class="text-muted small mb-0">El gerente gestiona horarios, mesas, clientes y suscripción desde un panel web claro y profesional.</p>
+                        <h6 class="fw-bold mb-2">Panel de gestión</h6>
+                        <p class="text-muted small mb-0">Control total de mesas y horarios desde un panel web profesional.</p>
                     </div>
                 </div>
                 <div class="col-12 col-md-4">
                     <div class="card border-0 shadow-sm rounded-4 p-4 h-100" style="border-left: 4px solid #6c757d !important;">
                         <i class="bi bi-phone-fill mb-3" style="font-size: 2rem; color: #6c757d;"></i>
-                        <h6 class="fw-bold mb-2">App móvil para el staff</h6>
-                        <p class="text-muted small mb-0">El personal interno opera el día a día desde la app Android de METRA: reservas activas, ocupaciones y flujo diario.</p>
+                        <h6 class="fw-bold mb-2">App para staff</h6>
+                        <p class="text-muted small mb-0">Tu personal gestiona las llegadas de hoy desde la app móvil Android.</p>
                     </div>
                 </div>
             </div>
@@ -268,39 +288,39 @@
                         La app móvil de METRA es una herramienta de uso interno exclusiva para el personal del negocio. Permite al equipo gestionar el flujo diario de reservas y ocupaciones desde su Android.
                     </p>
                     <div class="row g-3 mb-5">
-                        <div class="col-12 col-sm-6">
-                            <div class="d-flex align-items-start gap-3 p-3 bg-white rounded-3 shadow-sm border">
+                        <div class="col-12 col-md-6">
+                            <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border h-100">
                                 <i class="bi bi-list-check text-primary" style="font-size: 1.4rem; flex-shrink: 0;"></i>
-                                <div>
-                                    <p class="fw-bold mb-0 small">Ver reservaciones activas</p>
-                                    <p class="text-muted mb-0" style="font-size: 0.78rem;">Consulta las reservas del día en tiempo real.</p>
+                                <div class="text-start">
+                                    <p class="fw-bold mb-0 small">Reservas activas</p>
+                                    <p class="text-muted mb-0" style="font-size: 0.72rem;">Consulta en tiempo real.</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-sm-6">
-                            <div class="d-flex align-items-start gap-3 p-3 bg-white rounded-3 shadow-sm border">
+                        <div class="col-12 col-md-6">
+                            <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border h-100">
                                 <i class="bi bi-layout-three-columns text-success" style="font-size: 1.4rem; flex-shrink: 0;"></i>
-                                <div>
-                                    <p class="fw-bold mb-0 small">Gestionar ocupaciones</p>
-                                    <p class="text-muted mb-0" style="font-size: 0.78rem;">Registra y actualiza el estado de mesas y espacios.</p>
+                                <div class="text-start">
+                                    <p class="fw-bold mb-0 small">Ocupaciones</p>
+                                    <p class="text-muted mb-0" style="font-size: 0.72rem;">Gestiona mesas y espacios.</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-sm-6">
-                            <div class="d-flex align-items-start gap-3 p-3 bg-white rounded-3 shadow-sm border">
+                        <div class="col-12 col-md-6">
+                            <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border h-100">
                                 <i class="bi bi-person-workspace text-warning" style="font-size: 1.4rem; flex-shrink: 0;"></i>
-                                <div>
-                                    <p class="fw-bold mb-0 small">Apoyo operativo al equipo</p>
-                                    <p class="text-muted mb-0" style="font-size: 0.78rem;">El personal coordina mejor con información en mano.</p>
+                                <div class="text-start">
+                                    <p class="fw-bold mb-0 small">Operación ágil</p>
+                                    <p class="text-muted mb-0" style="font-size: 0.72rem;">Información en mano siempre.</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-sm-6">
-                            <div class="d-flex align-items-start gap-3 p-3 bg-white rounded-3 shadow-sm border">
+                        <div class="col-12 col-md-6">
+                            <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border h-100">
                                 <i class="bi bi-calendar-week text-danger" style="font-size: 1.4rem; flex-shrink: 0;"></i>
-                                <div>
-                                    <p class="fw-bold mb-0 small">Control del flujo diario</p>
-                                    <p class="text-muted mb-0" style="font-size: 0.78rem;">Vista organizada de todo lo que pasa en el negocio.</p>
+                                <div class="text-start">
+                                    <p class="fw-bold mb-0 small">Control total</p>
+                                    <p class="text-muted mb-0" style="font-size: 0.72rem;">Flujo diario organizado.</p>
                                 </div>
                             </div>
                         </div>
@@ -341,17 +361,17 @@
 
     <!-- CAFETERIAS ACTIVAS -->
     <section id="cafeterias" style="background: #fff; padding: 80px 0; border-top: 1px solid var(--border-light);">
-        <div class="container">
+        <div class="container px-4">
             <div class="text-center mb-5">
                 <span style="display:inline-block; background: rgba(212,175,55,0.1); color: var(--accent-gold); font-size: 0.75rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 6px 18px; border-radius: 50px; margin-bottom: 16px; border: 1px solid rgba(212,175,55,0.3);">
-                    Negocios que ya confían en METRA
+                    Comunidad METRA
                 </span>
-                <h2 class="fw-bold" style="color: var(--black-primary); font-size: clamp(1.5rem, 3vw, 2.2rem);">Cafeterías con METRA activo</h2>
-                <p class="text-muted mx-auto" style="max-width: 520px;">Estos negocios ya digitalizan sus reservas con METRA. Sus clientes reservan directamente en el sistema del negocio.</p>
+                <h2 class="fw-bold" style="color: var(--black-primary); font-size: clamp(1.5rem, 4vw, 2.2rem);">Cafeterías con METRA activo</h2>
+                <p class="text-muted mx-auto" style="max-width: 520px;">Estos negocios ya digitalizan sus reservas con METRA. Haz clic para ver detalles y reservar.</p>
             </div>
-            <div class="row g-4" id="cafeterias-container">
+            <div class="row g-3 g-lg-4" id="cafeterias-container">
                 <div class="col-12 text-center text-muted py-4" id="cafeterias-loading">
-                    <div class="spinner-border spinner-border-sm me-2"></div> Cargando cafeterías...
+                    <div class="spinner-border spinner-border-sm me-2"></div> Cargando comunidad...
                 </div>
             </div>
         </div>

@@ -34,7 +34,7 @@ class CafeteriaPerfilController extends Controller
     //Actualizar mi cafetería
     public function update(Request $request)
     {
-        $camposTexto = ['nombre', 'descripcion', 'calle', 'num_exterior', 'num_interior', 'colonia', 'estado_republica', 'municipio'];
+        $camposTexto = ['nombre', 'descripcion', 'calle', 'num_exterior', 'num_interior', 'colonia', 'estado_republica', 'ciudad'];
         foreach ($camposTexto as $campo) {
             if ($request->has($campo) && !empty($request->$campo)) {
                 $request->merge([$campo => strip_tags($request->$campo)]);
@@ -60,9 +60,9 @@ class CafeteriaPerfilController extends Controller
             'num_interior' => 'nullable|string|max:10',
             'colonia' => 'nullable|string|max:80',
             'estado_republica' => 'nullable|string|max:80',
-            'municipio' => 'nullable|string|max:80',
+            'ciudad' => 'nullable|string|max:80',
             'cp' => 'nullable|string|max:10',
-            'telefono' => 'nullable|string|max:20',
+            'telefono' => 'nullable|regex:/^[0-9]{10}$/',
             'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'porcentaje_reservas' => 'sometimes|integer|min:0|max:100',
             'duracion_reserva_min' => 'sometimes|integer|min:15|max:240',

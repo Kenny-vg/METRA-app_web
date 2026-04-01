@@ -76,4 +76,13 @@ class Reservacion extends Model
     {
         return $this->belongsTo(Zona::class, 'zona_id');
     }
+
+    /**
+     * Verifica si la reservación es para el día de hoy (según el timezone configurado).
+     */
+    public function esParaHoy()
+    {
+        // Carbon::parse ya respeta el timezone configurado en config/app.php ('America/Mexico_City')
+        return \Carbon\Carbon::parse($this->fecha)->isToday();
+    }
 }

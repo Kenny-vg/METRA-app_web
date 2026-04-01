@@ -51,12 +51,12 @@
         <hr class="my-5" style="opacity: 0.1; background-color: var(--off-white);">
 
         <div class="row align-items-center">
-            <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+            <div class="col-md-6 text-center text-md-start mb-4 mb-md-0">
                 <p class="small mb-0 opacity-50">
                     &copy; 2026 V-TECH Software. Todos los derechos reservados.
                 </p>
-                <div class="mt-2">
-                    <a href="{{ url('/login') }}" class="small text-decoration-none fw-bold" style="color: var(--black-primary); background: var(--accent-gold); padding: 2px 8px; border-radius: 4px; font-size: 0.65rem;">
+                <div class="mt-2 d-flex justify-content-center justify-content-md-start">
+                    <a href="{{ url('/login') }}" class="small text-decoration-none fw-bold" style="color: var(--black-primary); background: var(--accent-gold); padding: 4px 12px; border-radius: 4px; font-size: 0.65rem;">
                         <i class="bi bi-lock-fill me-1"></i>SaaS Admin
                     </a>
                 </div>
