@@ -232,20 +232,36 @@
                 if (cafe.num_interior) document.querySelector('input[name="num_interior"]').value = cafe.num_interior;
                 if (cafe.colonia) document.querySelector('input[name="colonia"]').value = cafe.colonia;
                 if (cafe.cp) document.querySelector('input[name="cp"]').value = cafe.cp;
-                if (cafe.ciudad) {
-                    // Esperar un momento a que se carguen los estados en el select antes de asignarlo
-                    setTimeout(() => {
-                        const ciudadSelect = document.querySelector('select[name="ciudad"]');
-                        if (ciudadSelect) ciudadSelect.value = cafe.ciudad;
-                    }, 100);
-                }
                 if (cafe.estado_republica) {
                     const estadoSelect = document.querySelector('select[name="estado_republica"]');
                     if(estadoSelect) {
                         estadoSelect.value = cafe.estado_republica;
+                        // Forzar el disparo del evento manual
                         estadoSelect.dispatchEvent(new Event('change'));
+                        
+                        // Una vez pobladas las ciudades por el evento change, asignamos la ciudad
+                        if (cafe.ciudad) {
+                            setTimeout(() => {
+                                const ciudadSelect = document.querySelector('select[name="ciudad"]');
+                                if (ciudadSelect) {
+                                    ciudadSelect.value = cafe.ciudad;
+                                }
+                            }, 50); // Un pequeño delay para asegurar que el DOM se actualizó tras el dispatch
+                        }
+                    }
+                } else if (cafe.ciudad) {
+                    // Fallback si por alguna razón el estado no viene pero la ciudad sí
+                    const ciudadSelect = document.querySelector('select[name="ciudad"]');
+                    if (ciudadSelect) {
+                        ciudadSelect.disabled = false;
+                        const opt = document.createElement('option');
+                        opt.value = cafe.ciudad;
+                        opt.textContent = cafe.ciudad;
+                        opt.selected = true;
+                        ciudadSelect.appendChild(opt);
                     }
                 }
+
                 if (cafe.telefono) document.querySelector('input[name="telefono"]').value = cafe.telefono;
                 
                 if (cafe.foto_url) {

@@ -51,6 +51,12 @@ class CafeteriaPerfilController extends Controller
             );
         }
 
+        // Limpiar el teléfono antes de validar si existe en el request
+        if ($request->has('telefono') && !empty($request->telefono)) {
+            $request->merge([
+                'telefono' => preg_replace('/[^0-9]/', '', $request->telefono)
+            ]);
+        }
 
         $data = $request->validate([
             'nombre' => 'sometimes|string|max:100',
@@ -62,7 +68,7 @@ class CafeteriaPerfilController extends Controller
             'estado_republica' => 'nullable|string|max:80',
             'ciudad' => 'nullable|string|max:80',
             'cp' => 'nullable|string|max:10',
-            'telefono' => 'nullable|regex:/^[0-9]{10}$/',
+            'telefono' => 'nullable|digits:10',
             'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'porcentaje_reservas' => 'sometimes|integer|min:0|max:100',
             'duracion_reserva_min' => 'sometimes|integer|min:15|max:240',
