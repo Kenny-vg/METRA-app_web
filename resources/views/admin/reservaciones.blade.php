@@ -152,7 +152,10 @@
                  </div>
              </div>
           </div>
-          <div class="modal-footer border-0 p-4 pt-0">
+          <div class="modal-footer border-0 p-4 pt-0 flex-column">
+            <button type="button" id="btnCancelarReserva" class="btn btn-outline-danger w-100 fw-bold py-2 rounded-3 mb-2 shadow-sm d-none" style="border-width: 2px;">
+                <i class="bi bi-x-circle me-2"></i>CANCELAR RESERVACIÓN
+            </button>
             <button type="button" class="btn text-white w-100 fw-bold py-2 rounded-3 shadow-sm" style="background: #111;" data-bs-dismiss="modal">CERRAR DETALLES</button>
           </div>
         </div>
@@ -307,7 +310,61 @@
                 document.getElementById('m_comentarios_box').style.display = 'none';
             }
 
+            // Control de botón cancelar
+            const btnCancel = document.getElementById('btnCancelarReserva');
+            if (r.estado === 'pendiente') {
+                btnCancel.classList.remove('d-none');
+                btnCancel.onclick = () => confirmarCancelacion(r.id);
+            } else {
+                btnCancel.classList.add('d-none');
+            }
+
             new bootstrap.Modal(document.getElementById('modalReserva')).show();
+        }
+
+        async function confirmarCancelacion(id) {
+            const { isConfirmed } = await Swal.fire({
+                title: '¿Confirmar Cancelación?',
+                text: "Se notificará al cliente por correo electrónico y la mesa será liberada.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#212529',
+                confirmButtonText: 'Sí, cancelar ahora',
+                cancelButtonText: 'No, mantener'
+            });
+
+            if (!isConfirmed) return;
+
+            const btn = document.getElementById('btnCancelarReserva');
+            const originalContent = btn.innerHTML;
+            
+            // ACTIVAR SPINNER
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> PROCESANDO...`;
+
+            try {
+                // LLAMADA A LA API UNIFICADA
+                await MetraAPI.put(`/reservaciones/${id}/cancelar`);
+
+                Swal.fire({
+                    title: '¡Cancelada!',
+                    text: 'La reservación ha sido cancelada y el cliente notificado.',
+                    icon: 'success',
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+
+                // Cerrar modal y refrescar grid
+                bootstrap.Modal.getInstance(document.getElementById('modalReserva')).hide();
+                if (modoVista === 'dia') cargarDia(true);
+                else cargarProximas(true);
+
+            } catch (e) {
+                Swal.fire('Error', e.data?.message || 'No se pudo completar la cancelación.', 'error');
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+            }
         }
 
         // ------------------------------------------------------------------
