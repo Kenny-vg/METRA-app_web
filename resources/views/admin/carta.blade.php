@@ -18,6 +18,27 @@
             </div>
         </div>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <!-- SortableJS -->
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+        <style>
+            .sortable-ghost {
+                opacity: 0.3 !important;
+                background-color: var(--off-white) !important;
+                box-shadow: inset 0 0 10px rgba(0,0,0,0.1) !important;
+            }
+            .sortable-drag {
+                cursor: grabbing !important;
+                background-color: #ffffff !important;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.15), 0 5px 5px rgba(0,0,0,0.1) !important;
+                transform: scale(1.01);
+            }
+            .drag-handle {
+                cursor: grab;
+            }
+            .drag-handle:active {
+                cursor: grabbing;
+            }
+        </style>
     </header>
 
     <div id="carta-container">
@@ -113,7 +134,10 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content rounded-4 border-0 p-2">
                 <div class="modal-header border-0 pb-0">
-                    <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Gestionar Categorías</h5>
+                    <div class="d-flex align-items-center gap-3">
+                        <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Gestionar Categorías</h5>
+                        <button id="btnGuardarOrden" class="btn btn-sm btn-success d-none shadow-sm" onclick="guardarNuevoOrden()"><i class="bi bi-check2-circle me-1"></i>Guardar Orden</button>
+                    </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body pt-4">
@@ -141,6 +165,7 @@
                         <table class="table table-hover align-middle border-top">
                             <thead>
                                 <tr class="text-muted small">
+                                    <th style="width: 40px;"></th>
                                     <th>NOMBRE</th>
                                     <th>ORDEN</th>
                                     <th>ESTADO</th>
@@ -198,13 +223,18 @@
                 // 2. Poblar lista en modal de gestión
                 const lista = document.getElementById('categorias-lista-body');
                 lista.innerHTML = '';
+                
+                // Ordenar localmente por si vienen desordenadas
+                categoriasLocales.sort((a,b) => (a.orden || 0) - (b.orden || 0));
+
                 categoriasLocales.forEach(c => {
                     lista.innerHTML += `
-                        <tr>
-                            <td class="fw-bold">${escapeHTML(c.nombre)}</td>
-                            <td><span class="badge bg-light text-dark border">${c.orden}</span></td>
-                            <td><span class="badge ${c.activo ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'} border">${c.activo ? 'Activa' : 'Inactiva'}</span></td>
-                            <td class="text-end">
+                        <tr data-id="${c.id}" style="background: var(--white-pure);">
+                            <td class="drag-handle text-center text-muted" title="Arrastrar para reordenar" style="width: 40px;"><i class="bi bi-arrows-move fs-5"></i></td>
+                            <td class="fw-bold align-middle">${escapeHTML(c.nombre)}</td>
+                            <td class="align-middle"><input type="number" class="form-control form-control-sm border text-center input-orden shadow-none text-muted" style="width: 70px; font-weight: bold; background: var(--off-white);" value="${c.orden || 0}" readonly></td>
+                            <td class="align-middle"><span class="badge ${c.activo ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'} border">${c.activo ? 'Activa' : 'Inactiva'}</span></td>
+                            <td class="text-end align-middle">
                                 <button class="btn btn-sm btn-outline-dark me-1" onclick="editCategoria(${JSON.stringify(c).replace(/"/g, '&quot;')})"><i class="bi bi-pencil"></i></button>
                                 <button class="btn btn-sm ${c.activo ? 'btn-outline-danger' : 'btn-outline-success'}" onclick="toggleEstadoCategoria(${c.id}, ${c.activo})">
                                     <i class="bi ${c.activo ? 'bi-eye-slash' : 'bi-eye'}"></i>
@@ -213,7 +243,75 @@
                         </tr>
                     `;
                 });
+
+                // Inicializar Sortable JS
+                if(window.categoriasSortable) {
+                    window.categoriasSortable.destroy();
+                }
+                window.categoriasSortable = new Sortable(lista, {
+                    handle: '.drag-handle',
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    dragClass: 'sortable-drag',
+                    onEnd: function (evt) {
+                        // Actualizar los inputs de orden visualmente
+                        const rows = lista.querySelectorAll('tr');
+                        rows.forEach((row, index) => {
+                            const input = row.querySelector('.input-orden');
+                            if(input) {
+                                input.value = index + 1; // empezamos orden en 1
+                            }
+                        });
+                        // Mostrar botón para dar aviso visual al usuario de que debe guardar
+                        const btnGuardar = document.getElementById('btnGuardarOrden');
+                        if (btnGuardar) btnGuardar.classList.remove('d-none');
+                    }
+                });
             } catch (e) { console.error('Error loadCategorias', e); }
+        }
+
+        async function guardarNuevoOrden() {
+            const btn = document.getElementById('btnGuardarOrden');
+            const rows = document.querySelectorAll('#categorias-lista-body tr');
+            const btnOriginalText = btn.innerHTML;
+            
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Guardando...';
+            btn.disabled = true;
+
+            const peticiones = [];
+
+            try {
+                // Revisamos cada fila para ver si su orden cambió
+                rows.forEach(row => {
+                    const id = row.getAttribute('data-id');
+                    const nuevoOrden = parseInt(row.querySelector('.input-orden').value);
+                    
+                    const catLocal = categoriasLocales.find(c => c.id == id);
+                    if(catLocal && parseInt(catLocal.orden) !== nuevoOrden) {
+                        const payload = {
+                            nombre: catLocal.nombre, // Requerido por el backend
+                            orden: nuevoOrden
+                        };
+                        peticiones.push(MetraAPI.put(`/gerente/menu-categorias/${id}`, payload));
+                    }
+                });
+
+                if(peticiones.length > 0) {
+                    await Promise.all(peticiones);
+                    showToast('success', 'Orden de categorías actualizado');
+                } else {
+                    showToast('info', 'No hubo cambios de orden');
+                }
+                
+                btn.classList.add('d-none');
+                loadTodo();
+            } catch (error) {
+                console.error(error);
+                Swal.fire('Error', 'Hubo un problema al guardar el nuevo orden', 'error');
+            } finally {
+                btn.innerHTML = btnOriginalText;
+                btn.disabled = false;
+            }
         }
 
         async function loadProductos() {

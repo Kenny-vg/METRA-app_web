@@ -47,6 +47,54 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background-color: var(--accent-gold);
         }
+
+        /* Ajustes de uniformidad para los botones del Sidebar */
+        .sidebar .nav-link-admin {
+            width: 100%;
+            min-height: 50px; /* Crecerá un poco si hay dos líneas, pero con la misma base */
+            display: flex;
+            align-items: center;
+            
+            /* Salto a la siguiente línea elegante en vez de nowrap/scroll */
+            white-space: normal !important;
+            
+            /* Eliminamos los scrollbars residuales */
+            overflow: hidden !important; 
+            overflow-x: hidden !important;
+            overflow-y: hidden !important;
+            scrollbar-width: none !important; /* Firefox */
+            
+            /* Padding uniforme */
+            padding: 12px 20px !important; 
+            font-size: 15px;
+            line-height: 1.3;
+        }
+
+        .sidebar .nav-link-admin::-webkit-scrollbar {
+            display: none !important; /* Chrome/Safari */
+        }
+
+        /* Mantener el ícono en su tamaño original */
+        .sidebar .nav-link-admin i {
+            flex-shrink: 0;
+            width: 25px; /* Fijar el ancho del ícono asegura alineación perfecta del texto */
+            margin-right: 10px !important;
+        }
+        /* Ajustes estructurales definitivos del Sidebar (contenedor) */
+        .sidebar {
+            width: 260px !important;
+            min-width: 260px !important;
+            max-width: 260px !important;
+            box-sizing: border-box !important;
+            overflow-x: hidden !important;
+            overflow-y: auto !important; 
+        }
+
+        /* Asegurarnos también en el nav (que tiene custom-scrollbar) */
+        .sidebar nav.custom-scrollbar {
+            overflow-x: hidden !important;
+            box-sizing: border-box !important;
+        }
     </style>
 </head>
 

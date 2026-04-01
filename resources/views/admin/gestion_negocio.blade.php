@@ -3,28 +3,34 @@
 
 @section('content')
     <header class="mb-5 border-bottom pb-4" style="border-color: var(--border-light) !important;">
-        <h2 class="fw-bold" style="color: var(--black-primary); font-family: 'Inter', sans-serif; letter-spacing: -1px;">Gestión del Negocio</h2>
-        <p class="m-0" style="color: var(--text-muted); font-size: 0.95rem;">Administración de estructura y configuración operativa.</p>
+        <h2 class="fw-bold" style="color: var(--black-primary); font-family: 'Inter', sans-serif; letter-spacing: -1px;">
+            Gestión del Negocio</h2>
+        <p class="m-0" style="color: var(--text-muted); font-size: 0.95rem;">Administración de estructura y configuración
+            operativa.</p>
     </header>
 
     <ul class="nav nav-pills mb-4 gap-2" id="pills-tab" role="tablist">
-    <li class="nav-item">
-        <button class="nav-link active rounded-pill px-4" id="zonas-tab" data-bs-toggle="pill" data-bs-target="#zonas" style="border: 1px solid var(--border-light); font-weight: 600; font-size: 0.9rem;">
-            <i class="bi bi-geo-alt me-2"></i>Zonas
-        </button>
-    </li>
-    <li class="nav-item">
-        <button class="nav-link rounded-pill px-4" id="mesas-tab" data-bs-toggle="pill" data-bs-target="#mesas" style="border: 1px solid var(--border-light); font-weight: 600; font-size: 0.9rem;">
-            <i class="bi bi-layout-three-columns me-2"></i>Mesas
-        </button>
-    </li>
         <li class="nav-item">
-            <button class="nav-link rounded-pill px-4" id="meseros-tab" data-bs-toggle="pill" data-bs-target="#meseros" style="border: 1px solid var(--border-light); font-weight: 600; font-size: 0.9rem;">
+            <button class="nav-link active rounded-pill px-4" id="zonas-tab" data-bs-toggle="pill" data-bs-target="#zonas"
+                style="border: 1px solid var(--border-light); font-weight: 600; font-size: 0.9rem;">
+                <i class="bi bi-geo-alt me-2"></i>Zonas
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link rounded-pill px-4" id="mesas-tab" data-bs-toggle="pill" data-bs-target="#mesas"
+                style="border: 1px solid var(--border-light); font-weight: 600; font-size: 0.9rem;">
+                <i class="bi bi-layout-three-columns me-2"></i>Mesas
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link rounded-pill px-4" id="meseros-tab" data-bs-toggle="pill" data-bs-target="#meseros"
+                style="border: 1px solid var(--border-light); font-weight: 600; font-size: 0.9rem;">
                 <i class="bi bi-people me-2"></i>Personal
             </button>
         </li>
         <li class="nav-item">
-            <button class="nav-link rounded-pill px-4" id="horarios-tab" data-bs-toggle="pill" data-bs-target="#horarios" style="border: 1px solid var(--border-light); font-weight: 600; font-size: 0.9rem;">
+            <button class="nav-link rounded-pill px-4" id="horarios-tab" data-bs-toggle="pill" data-bs-target="#horarios"
+                style="border: 1px solid var(--border-light); font-weight: 600; font-size: 0.9rem;">
                 <i class="bi bi-clock me-2"></i>Horarios
             </button>
         </li>
@@ -34,8 +40,10 @@
         <!-- ZONAS -->
         <div class="tab-pane fade show active" id="zonas">
             <div class="card border-0 p-4 p-md-5 premium-card">
-                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom" style="border-color: var(--border-light) !important;">
-                    <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Distribución de Áreas</h5>
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom"
+                    style="border-color: var(--border-light) !important;">
+                    <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Distribución de
+                        Áreas</h5>
                     <button class="btn-admin-primary" onclick="openModalZona()">
                         <i class="bi bi-plus-lg me-2"></i>Nueva Zona
                     </button>
@@ -58,9 +66,11 @@
 
         <!-- MESAS -->
         <div class="tab-pane fade" id="mesas">
-             <div class="card border-0 p-4 p-md-5 premium-card">
-                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom" style="border-color: var(--border-light) !important;">
-                    <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Inventario de Mesas</h5>
+            <div class="card border-0 p-4 p-md-5 premium-card">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom"
+                    style="border-color: var(--border-light) !important;">
+                    <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Inventario de Mesas
+                    </h5>
                     <button class="btn-admin-primary" onclick="openModalMesa()">
                         <i class="bi bi-plus-lg me-2"></i>Nueva Mesa
                     </button>
@@ -85,9 +95,11 @@
 
         <!-- PERSONAL -->
         <div class="tab-pane fade" id="meseros">
-             <div class="card border-0 p-4 p-md-5 premium-card">
-                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom" style="border-color: var(--border-light) !important;">
-                    <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Panel de Personal</h5>
+            <div class="card border-0 p-4 p-md-5 premium-card">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom"
+                    style="border-color: var(--border-light) !important;">
+                    <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Panel de Personal
+                    </h5>
                     <button class="btn-admin-primary" onclick="openModalStaff()">
                         <i class="bi bi-plus-lg me-2"></i>Nuevo Personal
                     </button>
@@ -112,20 +124,23 @@
 
         <!-- REVIEWS -->
         <div class="tab-pane fade" id="reviews">
-             <!-- ... contenido igual ... -->
+            <!-- ... contenido igual ... -->
         </div>
 
         <!-- HORARIOS -->
         <div class="tab-pane fade" id="horarios">
             <div class="card border-0 p-4 p-md-5 premium-card">
                 <div class="mb-4 pb-3 border-bottom" style="border-color: var(--border-light) !important;">
-                    <h5 class="fw-bold m-0 mb-1" style="color: var(--black-primary); letter-spacing: -0.5px;">Horarios de Atención</h5>
-                    <p class="m-0" style="color: var(--text-muted); font-size: 0.9rem;">Configura los días y horas de operación de tu negocio.</p>
+                    <h5 class="fw-bold m-0 mb-1" style="color: var(--black-primary); letter-spacing: -0.5px;">Horarios de
+                        Atención</h5>
+                    <p class="m-0" style="color: var(--text-muted); font-size: 0.9rem;">Configura los días y horas de
+                        operación de tu negocio.</p>
                 </div>
                 <div class="row g-3" id="horarios-container">
                     <!-- Horarios cargados por JS -->
                 </div>
-                <div class="mt-5 pt-4 border-top d-flex flex-wrap flex-md-nowrap gap-3 justify-content-between" style="border-color: var(--border-light) !important;">
+                <div class="mt-5 pt-4 border-top d-flex flex-wrap flex-md-nowrap gap-3 justify-content-between"
+                    style="border-color: var(--border-light) !important;">
                     <button class="btn-admin-secondary px-4 py-2 w-100 w-md-auto" onclick="openModalHorario()">
                         <i class="bi bi-plus-lg me-2"></i>Añadir Horario
                     </button>
@@ -148,10 +163,13 @@
     <template id="mesa-template">
         <tr class="js-row">
             <td class="fw-bold" style="color: var(--black-primary);">
-                <div class="d-inline-flex align-items-center justify-content-center text-white rounded-circle me-2 shadow-sm js-numero" style="background: var(--black-primary); width: 25px; height: 25px; font-size: 0.75rem;"></div>
+                <div class="d-inline-flex align-items-center justify-content-center text-white rounded-circle me-2 shadow-sm js-numero"
+                    style="background: var(--black-primary); width: 25px; height: 25px; font-size: 0.75rem;"></div>
                 <span class="badge bg-secondary ms-2 js-badge" style="display:none;">Inactiva</span>
             </td>
-            <td><span class="badge js-zona" style="background: var(--off-white); border: 1px solid var(--border-light); color: var(--text-main);"></span></td>
+            <td><span class="badge js-zona"
+                    style="background: var(--off-white); border: 1px solid var(--border-light); color: var(--text-main);"></span>
+            </td>
             <td class="text-muted"><span class="js-capacidad"></span> Personas</td>
             <td class="text-end js-actions"></td>
         </tr>
@@ -159,13 +177,16 @@
 
     <template id="horario-template">
         <div class="col-md-6 col-lg-4">
-            <div class="p-3 rounded-4 d-flex justify-content-between align-items-center h-100 js-card" style="background: var(--off-white); border: 1px solid var(--border-light);">
+            <div class="p-3 rounded-4 d-flex justify-content-between align-items-center h-100 js-card"
+                style="background: var(--off-white); border: 1px solid var(--border-light);">
                 <div>
                     <span class="fw-bold d-block mb-1" style="color: var(--black-primary); font-size: 1.05rem;">
                         <span class="js-dia"></span>
-                        <span class="badge bg-secondary ms-2 js-badge" style="font-size:0.7rem; display:none;">Inactivo</span>
+                        <span class="badge bg-secondary ms-2 js-badge"
+                            style="font-size:0.7rem; display:none;">Inactivo</span>
                     </span>
-                    <span class="small d-block text-muted"><i class="bi bi-clock me-1"></i> <span class="js-horas"></span></span>
+                    <span class="small d-block text-muted"><i class="bi bi-clock me-1"></i> <span
+                            class="js-horas"></span></span>
                 </div>
                 <div class="d-flex gap-2 js-actions"></div>
             </div>
@@ -176,7 +197,8 @@
         <tr class="js-row">
             <td class="fw-bold" style="color: var(--black-primary);">
                 <div class="d-flex align-items-center">
-                    <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center me-3 js-inicial" style="width: 35px; height: 35px; font-size: 14px;"></div>
+                    <div class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center me-3 js-inicial"
+                        style="width: 35px; height: 35px; font-size: 14px;"></div>
                     <span class="js-nombre"></span>
                 </div>
             </td>
@@ -194,7 +216,8 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4 border-0 p-2" style="box-shadow: 0 20px 50px rgba(0,0,0,0.1);">
                 <div class="modal-header border-0 pb-0">
-                    <h5 class="fw-bold m-0" id="modalZonaTitle" style="color: var(--black-primary); letter-spacing: -0.5px;">Nueva Zona de Servicio</h5>
+                    <h5 class="fw-bold m-0" id="modalZonaTitle"
+                        style="color: var(--black-primary); letter-spacing: -0.5px;">Nueva Zona de Servicio</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body pt-3">
@@ -202,8 +225,10 @@
                         <input type="hidden" id="zona-id">
                         <p class="small text-muted mb-4">La zonificación ayuda a distribuir mejor a sus clientes.</p>
                         <div class="mb-4">
-                            <label class="form-label small fw-bold" style="color: var(--text-main); letter-spacing: 0.5px;">DENOMINACIÓN</label>
-                            <input type="text" id="zona-nombre" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="Ej. Balcón Este" required>
+                            <label class="form-label small fw-bold"
+                                style="color: var(--text-main); letter-spacing: 0.5px;">DENOMINACIÓN</label>
+                            <input type="text" id="zona-nombre" class="form-control border-0 shadow-sm rounded-3"
+                                style="background: var(--off-white);" placeholder="Ej. Balcón Este" required>
                         </div>
                         <button type="submit" class="btn-admin-primary w-100 py-3 mt-3">Guardar Zona</button>
                     </form>
@@ -216,7 +241,8 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4 border-0 p-2" style="box-shadow: 0 20px 50px rgba(0,0,0,0.1);">
                 <div class="modal-header border-0 pb-0">
-                    <h5 class="fw-bold m-0" id="modalMesaTitle" style="color: var(--black-primary); letter-spacing: -0.5px;">Añadir Mesa</h5>
+                    <h5 class="fw-bold m-0" id="modalMesaTitle"
+                        style="color: var(--black-primary); letter-spacing: -0.5px;">Añadir Mesa</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body pt-4">
@@ -225,17 +251,24 @@
                         <div class="row g-3 mb-4">
                             <div class="col-6">
                                 <label class="form-label small fw-bold text-muted">NÚMERO</label>
-                                <input type="number" min="1" max="127" id="mesa-numero" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="Ej. 1" onkeydown="return event.keyCode !== 69 && event.keyCode !== 189" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 3);" required>
+                                <input type="number" min="1" max="127" id="mesa-numero"
+                                    class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);"
+                                    placeholder="Ej. 1" onkeydown="return event.keyCode !== 69 && event.keyCode !== 189"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 3);" required>
                             </div>
                             <div class="col-6">
                                 <label class="form-label small fw-bold text-muted">ZONA</label>
-                                <select id="mesa-zona-id" class="form-select border-0 shadow-sm rounded-3" style="background: var(--off-white);" required>
+                                <select id="mesa-zona-id" class="form-select border-0 shadow-sm rounded-3"
+                                    style="background: var(--off-white);" required>
                                     <option value="">Cargando zonas...</option>
                                 </select>
                             </div>
                             <div class="col-12">
                                 <label class="form-label small fw-bold text-muted">CAPACIDAD</label>
-                                <input type="number" min="1" max="127" id="mesa-capacidad" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="Personas" onkeydown="return event.keyCode !== 69 && event.keyCode !== 189" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 3);" required>
+                                <input type="number" min="1" max="127" id="mesa-capacidad"
+                                    class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);"
+                                    placeholder="Personas" onkeydown="return event.keyCode !== 69 && event.keyCode !== 189"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 3);" required>
                             </div>
                         </div>
                         <button type="submit" class="btn-admin-primary w-100 py-3 mt-3">Guardar Mesa</button>
@@ -249,7 +282,8 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4 border-0 p-2" style="box-shadow: 0 20px 50px rgba(0,0,0,0.1);">
                 <div class="modal-header border-0 pb-0">
-                    <h5 class="fw-bold m-0" id="modalHorarioTitle" style="color: var(--black-primary); letter-spacing: -0.5px;">Configurar Horario</h5>
+                    <h5 class="fw-bold m-0" id="modalHorarioTitle"
+                        style="color: var(--black-primary); letter-spacing: -0.5px;">Configurar Horario</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body pt-4">
@@ -257,7 +291,8 @@
                         <input type="hidden" id="horario-id">
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted">DÍA DE LA SEMANA</label>
-                            <select id="horario-dia" class="form-select border-0 shadow-sm rounded-3" style="background: var(--off-white);" required>
+                            <select id="horario-dia" class="form-select border-0 shadow-sm rounded-3"
+                                style="background: var(--off-white);" required>
                                 <option value="">Seleccione día...</option>
                                 <option value="Lunes">Lunes</option>
                                 <option value="Martes">Martes</option>
@@ -273,14 +308,26 @@
                                 <label class="form-label small fw-bold text-muted">APERTURA</label>
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="dropdown w-100">
-                                        <input type="text" class="form-control form-select border-0 shadow-sm rounded-3 text-start w-100" id="btn-apertura-hora" data-bs-toggle="dropdown" aria-expanded="false" style="background: var(--off-white); cursor: text;" placeholder="HH" autocomplete="off" maxlength="2">
-                                        <ul class="dropdown-menu w-100 shadow-sm border-0 py-1" style="max-height: 200px; overflow-y: auto; background: var(--off-white);" id="menu-apertura-hora"></ul>
+                                        <input type="text"
+                                            class="form-control form-select border-0 shadow-sm rounded-3 text-start w-100"
+                                            id="btn-apertura-hora" data-bs-toggle="dropdown" aria-expanded="false"
+                                            style="background: var(--off-white); cursor: text;" placeholder="HH"
+                                            autocomplete="off" maxlength="2">
+                                        <ul class="dropdown-menu w-100 shadow-sm border-0 py-1"
+                                            style="max-height: 200px; overflow-y: auto; background: var(--off-white);"
+                                            id="menu-apertura-hora"></ul>
                                         <input type="hidden" id="horario-apertura-hora">
                                     </div>
                                     <span class="fw-bold" style="color: var(--black-primary);">:</span>
                                     <div class="dropdown w-100">
-                                        <input type="text" class="form-control form-select border-0 shadow-sm rounded-3 text-start w-100" id="btn-apertura-minuto" data-bs-toggle="dropdown" aria-expanded="false" style="background: var(--off-white); cursor: text;" placeholder="MM" autocomplete="off" maxlength="2">
-                                        <ul class="dropdown-menu w-100 shadow-sm border-0 py-1" style="max-height: 200px; overflow-y: auto; background: var(--off-white);" id="menu-apertura-minuto"></ul>
+                                        <input type="text"
+                                            class="form-control form-select border-0 shadow-sm rounded-3 text-start w-100"
+                                            id="btn-apertura-minuto" data-bs-toggle="dropdown" aria-expanded="false"
+                                            style="background: var(--off-white); cursor: text;" placeholder="MM"
+                                            autocomplete="off" maxlength="2">
+                                        <ul class="dropdown-menu w-100 shadow-sm border-0 py-1"
+                                            style="max-height: 200px; overflow-y: auto; background: var(--off-white);"
+                                            id="menu-apertura-minuto"></ul>
                                         <input type="hidden" id="horario-apertura-minuto">
                                     </div>
                                 </div>
@@ -289,14 +336,26 @@
                                 <label class="form-label small fw-bold text-muted">CIERRE</label>
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="dropdown w-100">
-                                        <input type="text" class="form-control form-select border-0 shadow-sm rounded-3 text-start w-100" id="btn-cierre-hora" data-bs-toggle="dropdown" aria-expanded="false" style="background: var(--off-white); cursor: text;" placeholder="HH" autocomplete="off" maxlength="2">
-                                        <ul class="dropdown-menu w-100 shadow-sm border-0 py-1" style="max-height: 200px; overflow-y: auto; background: var(--off-white);" id="menu-cierre-hora"></ul>
+                                        <input type="text"
+                                            class="form-control form-select border-0 shadow-sm rounded-3 text-start w-100"
+                                            id="btn-cierre-hora" data-bs-toggle="dropdown" aria-expanded="false"
+                                            style="background: var(--off-white); cursor: text;" placeholder="HH"
+                                            autocomplete="off" maxlength="2">
+                                        <ul class="dropdown-menu w-100 shadow-sm border-0 py-1"
+                                            style="max-height: 200px; overflow-y: auto; background: var(--off-white);"
+                                            id="menu-cierre-hora"></ul>
                                         <input type="hidden" id="horario-cierre-hora">
                                     </div>
                                     <span class="fw-bold" style="color: var(--black-primary);">:</span>
                                     <div class="dropdown w-100">
-                                        <input type="text" class="form-control form-select border-0 shadow-sm rounded-3 text-start w-100" id="btn-cierre-minuto" data-bs-toggle="dropdown" aria-expanded="false" style="background: var(--off-white); cursor: text;" placeholder="MM" autocomplete="off" maxlength="2">
-                                        <ul class="dropdown-menu w-100 shadow-sm border-0 py-1" style="max-height: 200px; overflow-y: auto; background: var(--off-white);" id="menu-cierre-minuto"></ul>
+                                        <input type="text"
+                                            class="form-control form-select border-0 shadow-sm rounded-3 text-start w-100"
+                                            id="btn-cierre-minuto" data-bs-toggle="dropdown" aria-expanded="false"
+                                            style="background: var(--off-white); cursor: text;" placeholder="MM"
+                                            autocomplete="off" maxlength="2">
+                                        <ul class="dropdown-menu w-100 shadow-sm border-0 py-1"
+                                            style="max-height: 200px; overflow-y: auto; background: var(--off-white);"
+                                            id="menu-cierre-minuto"></ul>
                                         <input type="hidden" id="horario-cierre-minuto">
                                     </div>
                                 </div>
@@ -313,37 +372,47 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4 border-0 p-2" style="box-shadow: 0 20px 50px rgba(0,0,0,0.1);">
                 <div class="modal-header border-0 pb-0">
-                    <h5 class="fw-bold m-0" id="modalStaffTitle" style="color: var(--black-primary); letter-spacing: -0.5px;">Integrar Colaborador</h5>
+                    <h5 class="fw-bold m-0" id="modalStaffTitle"
+                        style="color: var(--black-primary); letter-spacing: -0.5px;">Integrar Colaborador</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body pt-4">
                     <form id="formStaff">
                         <input type="hidden" id="staff-id">
-                        
+
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted">NOMBRE COMPLETO</label>
-                            <input type="text" id="staff-nombre" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="Ej. Juan Pérez" required>
+                            <input type="text" id="staff-nombre" class="form-control border-0 shadow-sm rounded-3"
+                                style="background: var(--off-white);" placeholder="" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted">CORREO ELECTRÓNICO</label>
-                            <input type="email" id="staff-email" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" placeholder="juan@empresa.com" required>
+                            <input type="email" id="staff-email" class="form-control border-0 shadow-sm rounded-3"
+                                style="background: var(--off-white);" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted">CONTRASEÑA</label>
                             <div class="position-relative">
-                                <input type="password" id="staff-password" autocomplete="new-password" class="form-control border-0 shadow-sm rounded-3 pe-5" style="background: var(--off-white);" placeholder="Mínimo 8 caracteres">
-                                <i class="bi bi-eye-slash toggle-staff-pw position-absolute top-50 end-0 translate-middle-y me-3 text-muted" style="cursor: pointer; z-index: 10;"></i>
+                                <input type="password" id="staff-password" autocomplete="new-password"
+                                    class="form-control border-0 shadow-sm rounded-3 pe-5"
+                                    style="background: var(--off-white);" placeholder="Mínimo 8 caracteres">
+                                <i class="bi bi-eye-slash toggle-staff-pw position-absolute top-50 end-0 translate-middle-y me-3 text-muted"
+                                    style="cursor: pointer; z-index: 10;"></i>
                             </div>
-                            <small class="text-muted" id="staff-password-help" style="display: none;">Dejar en blanco para mantener la contraseña actual.</small>
+                            <small class="text-muted" id="staff-password-help" style="display: none;">Dejar en blanco para
+                                mantener la contraseña actual.</small>
                         </div>
 
                         <div class="mb-4" id="staff-password-confirm-group">
                             <label class="form-label small fw-bold text-muted">CONFIRMAR CONTRASEÑA</label>
                             <div class="position-relative">
-                                <input type="password" id="staff-password-confirm" autocomplete="new-password" class="form-control border-0 shadow-sm rounded-3 pe-5" style="background: var(--off-white);" placeholder="Repite la contraseña">
-                                <i class="bi bi-eye-slash toggle-staff-pw position-absolute top-50 end-0 translate-middle-y me-3 text-muted" style="cursor: pointer; z-index: 10;"></i>
+                                <input type="password" id="staff-password-confirm" autocomplete="new-password"
+                                    class="form-control border-0 shadow-sm rounded-3 pe-5"
+                                    style="background: var(--off-white);" placeholder="Repite la contraseña">
+                                <i class="bi bi-eye-slash toggle-staff-pw position-absolute top-50 end-0 translate-middle-y me-3 text-muted"
+                                    style="cursor: pointer; z-index: 10;"></i>
                             </div>
                         </div>
 
@@ -367,27 +436,27 @@
             // Allow typing numbers only and filter live
             input.addEventListener('input', (e) => {
                 let val = e.target.value.replace(/\D/g, '');
-                
+
                 if (isHour && val.length === 2 && parseInt(val) > 23) {
                     val = '23';
                 } else if (!isHour && val.length === 2 && parseInt(val) > 59) {
                     val = '59';
                 }
-                
+
                 e.target.value = val;
-                
+
                 // Reactive filtering & highlighting
                 let exactMatch = false;
                 items.forEach(item => {
                     const itemVal = item.getAttribute('data-value');
-                    
+
                     // Filter dropdown (show if starts with val)
                     if (val === '' || itemVal.startsWith(val)) {
                         item.parentElement.style.display = 'block';
                     } else {
                         item.parentElement.style.display = 'none';
                     }
-                    
+
                     // Highlight (active class)
                     if (val.length > 0 && itemVal === val) {
                         item.classList.add('active', 'bg-primary', 'text-white');
@@ -414,11 +483,11 @@
             // Handle clicking an item from the dropdown
             menu.addEventListener('click', (e) => {
                 e.preventDefault();
-                if(e.target.tagName === 'A') {
+                if (e.target.tagName === 'A') {
                     const value = e.target.getAttribute('data-value');
                     input.value = value;
                     hidden.value = value;
-                    
+
                     // Remove active from all and add to selected
                     items.forEach(item => {
                         item.classList.remove('active', 'bg-primary', 'text-white');
@@ -431,17 +500,17 @@
 
         function buildTimeSelects() {
             let hoursItems = '';
-            for(let i=0; i<24; i++) {
+            for (let i = 0; i < 24; i++) {
                 const h = i.toString().padStart(2, '0');
                 hoursItems += `<li><a class="dropdown-item fw-medium px-3 py-1 text-center" href="#" data-value="${h}">${h}</a></li>`;
             }
-            
+
             let minutesItems = '';
-            for(let i=0; i<60; i++) {
+            for (let i = 0; i < 60; i++) {
                 const m = i.toString().padStart(2, '0');
                 minutesItems += `<li><a class="dropdown-item fw-medium px-3 py-1 text-center" href="#" data-value="${m}">${m}</a></li>`;
             }
-            
+
             ['apertura-hora', 'cierre-hora'].forEach(id => {
                 document.getElementById('menu-' + id).innerHTML = hoursItems;
                 bindDropdownSelection('menu-' + id, 'btn-' + id, 'horario-' + id, true);
@@ -462,12 +531,24 @@
             modalMesaInst = new bootstrap.Modal(document.getElementById('modalMesa'));
             modalHorarioInst = new bootstrap.Modal(document.getElementById('modalHorario'));
             modalStaffInst = new bootstrap.Modal(document.getElementById('modalMesero'));
-            
+
             buildTimeSelects();
             loadZonas();
             loadMesas();
             loadHorarios();
             loadStaff();
+
+            // Guardado automático temporal (draft) para el nuevo personal
+            document.getElementById('staff-nombre').addEventListener('input', (e) => {
+                if(!document.getElementById('staff-id').value) {
+                    localStorage.setItem('draft_staff_nombre', e.target.value);
+                }
+            });
+            document.getElementById('staff-email').addEventListener('input', (e) => {
+                if(!document.getElementById('staff-id').value) {
+                    localStorage.setItem('draft_staff_correo', e.target.value);
+                }
+            });
         });
 
 
@@ -488,10 +569,10 @@
             try {
                 const response = await MetraAPI.get('/gerente/zonas');
                 const zonas = Array.isArray(response) ? response : (response.data || []);
-                
+
                 const tbody = document.getElementById('tabla-zonas-body');
                 tbody.innerHTML = '';
-                
+
                 // Also update Mesas select
                 const selectZona = document.getElementById('mesa-zona-id');
                 selectZona.innerHTML = '<option value="">Seleccione zona...</option>';
@@ -540,7 +621,7 @@
                         actionsCol.appendChild(btnReactivate);
                     }
 
-                    if(z.activo) {
+                    if (z.activo) {
                         const opt = document.createElement('option');
                         opt.value = z.id;
                         opt.textContent = z.nombre_zona;
@@ -549,7 +630,7 @@
 
                     fragment.appendChild(clone);
                 });
-                
+
                 tbody.appendChild(fragment);
             } catch (error) {
                 console.error(error);
@@ -585,7 +666,7 @@
 
             const id = document.getElementById('zona-id').value;
             const nombre_zona = document.getElementById('zona-nombre').value;
-            
+
             const method = id ? 'PUT' : 'POST';
             const url = id ? `${API_URL}/zonas/${id}` : `${API_URL}/zonas`;
 
@@ -661,7 +742,7 @@
             try {
                 const response = await MetraAPI.get('/gerente/mesas');
                 const mesas = Array.isArray(response) ? response : (response.data || []);
-                
+
                 const tbody = document.getElementById('tabla-mesas-body');
                 tbody.innerHTML = '';
 
@@ -713,7 +794,7 @@
 
                     fragment.appendChild(clone);
                 });
-                
+
                 tbody.appendChild(fragment);
             } catch (error) {
                 console.error(error);
@@ -755,7 +836,7 @@
                 zona_id: document.getElementById('mesa-zona-id').value,
                 capacidad: document.getElementById('mesa-capacidad').value
             };
-            
+
             const method = id ? 'PUT' : 'POST';
             const url = id ? `${API_URL}/mesas/${id}` : `${API_URL}/mesas`;
 
@@ -828,7 +909,7 @@
             try {
                 const response = await MetraAPI.get('/gerente/horarios');
                 const horarios = Array.isArray(response) ? response : (response.data || []);
-                
+
                 const container = document.getElementById('horarios-container');
                 container.innerHTML = '';
 
@@ -887,7 +968,7 @@
 
                     fragment.appendChild(clone);
                 });
-                
+
                 container.appendChild(fragment);
             } catch (error) {
                 console.error(error);
@@ -900,12 +981,12 @@
             document.getElementById('formHorario').reset();
             document.getElementById('horario-id').value = '';
             document.getElementById('horario-dia').disabled = false; // Permitir seleccionar día en nuevo
-            
+
             ['apertura-hora', 'apertura-minuto', 'cierre-hora', 'cierre-minuto'].forEach(id => {
-               document.getElementById('horario-' + id).value = '';
-               document.getElementById('btn-' + id).value = '';
+                document.getElementById('horario-' + id).value = '';
+                document.getElementById('btn-' + id).value = '';
             });
-            
+
             document.getElementById('modalHorarioTitle').innerText = 'Añadir Horario';
             modalHorarioInst.show();
         }
@@ -914,21 +995,21 @@
             document.getElementById('horario-id').value = h.id;
             document.getElementById('horario-dia').value = h.dia_semana;
             document.getElementById('horario-dia').disabled = true; // Deshabilitar cambio de día en edición
-            
+
             // Format HH:MM from HH:MM:SS
             const apertura = h.hora_apertura.substring(0, 5).split(':');
             const cierre = h.hora_cierre.substring(0, 5).split(':');
-            
+
             document.getElementById('horario-apertura-hora').value = apertura[0];
             document.getElementById('btn-apertura-hora').value = apertura[0];
             document.getElementById('horario-apertura-minuto').value = apertura[1];
             document.getElementById('btn-apertura-minuto').value = apertura[1];
-            
+
             document.getElementById('horario-cierre-hora').value = cierre[0];
             document.getElementById('btn-cierre-hora').value = cierre[0];
             document.getElementById('horario-cierre-minuto').value = cierre[1];
             document.getElementById('btn-cierre-minuto').value = cierre[1];
-            
+
             document.getElementById('modalHorarioTitle').innerText = 'Editar Horario';
             modalHorarioInst.show();
         }
@@ -949,8 +1030,8 @@
             const mA = document.getElementById('horario-apertura-minuto').value;
             const hC = document.getElementById('horario-cierre-hora').value;
             const mC = document.getElementById('horario-cierre-minuto').value;
-            
-            if(!hA || !mA || !hC || !mC) {
+
+            if (!hA || !mA || !hC || !mC) {
                 Swal.fire('Error', 'Por favor complete correctamente las horas de apertura y cierre seleccionando una hora válida del menú', 'error');
                 btn.disabled = false;
                 btn.innerHTML = originalText;
@@ -963,7 +1044,7 @@
                 hora_apertura: hA + ':' + mA,
                 hora_cierre: hC + ':' + mC
             };
-            
+
             const method = id ? 'PUT' : 'POST';
             const url = id ? `${API_URL}/horarios/${id}` : `${API_URL}/horarios`;
 
@@ -1036,7 +1117,7 @@
             try {
                 const response = await MetraAPI.get('/gerente/staff');
                 const staff = Array.isArray(response) ? response : (response.data || []);
-                
+
                 const tbody = document.getElementById('tabla-staff-body');
                 tbody.innerHTML = '';
 
@@ -1050,7 +1131,7 @@
 
                 staff.forEach(s => {
                     const isActivo = s.estado === true || s.estado === 1 || s.estado === '1' || s.estado === 'true';
-                    
+
                     const clone = template.content.cloneNode(true);
                     const row = clone.querySelector('.js-row');
 
@@ -1093,7 +1174,7 @@
 
                     fragment.appendChild(clone);
                 });
-                
+
                 tbody.appendChild(fragment);
             } catch (error) {
                 console.error(error);
@@ -1106,13 +1187,19 @@
             document.getElementById('formStaff').reset();
             document.getElementById('staff-id').value = '';
             document.getElementById('modalStaffTitle').innerText = 'Añadir Personal';
-            
+
             // Habilitar campos en modo creacion
             document.getElementById('staff-email').disabled = false;
             document.getElementById('staff-password').required = true;
             document.getElementById('staff-password-confirm').required = true;
             document.getElementById('staff-password-help').style.display = 'none';
             document.getElementById('staff-password-confirm-group').style.display = 'block';
+
+            // Recuperar draft de localStorage si existe
+            const draftNombre = localStorage.getItem('draft_staff_nombre');
+            const draftCorreo = localStorage.getItem('draft_staff_correo');
+            if(draftNombre) document.getElementById('staff-nombre').value = draftNombre;
+            if(draftCorreo) document.getElementById('staff-email').value = draftCorreo;
 
             modalStaffInst.show();
         }
@@ -1122,7 +1209,7 @@
             document.getElementById('staff-id').value = s.id;
             document.getElementById('staff-nombre').value = s.name;
             document.getElementById('staff-email').value = s.email;
-            
+
             // Hacer contraseña opcional
             document.getElementById('staff-password').required = false;
             document.getElementById('staff-password-confirm').required = false;
@@ -1138,7 +1225,7 @@
             const id = document.getElementById('staff-id').value;
             const password = document.getElementById('staff-password').value;
             const passwordConfirm = document.getElementById('staff-password-confirm').value;
-            
+
             if (password && password !== passwordConfirm) {
                 Swal.fire('Error', 'Las contraseñas no coinciden', 'error');
                 return;
@@ -1148,12 +1235,12 @@
                 name: document.getElementById('staff-nombre').value,
                 email: document.getElementById('staff-email').value
             };
-            
+
             if (password) {
                 data.password = password;
                 data.password_confirmation = passwordConfirm;
             }
-            
+
             const method = id ? 'PUT' : 'POST';
             const url = id ? `${API_URL}/staff/${id}` : `${API_URL}/staff`;
 
@@ -1168,6 +1255,13 @@
                     data
                 );
                 showToast('success', result.message || (id ? 'Personal actualizado' : 'Personal creado'));
+                
+                // Limpiar draft si fue creación
+                if(!id) {
+                    localStorage.removeItem('draft_staff_nombre');
+                    localStorage.removeItem('draft_staff_correo');
+                }
+
                 modalStaffInst.hide();
                 loadStaff();
             } catch (error) {
@@ -1226,7 +1320,7 @@
 
         // Toggle password visibility
         document.querySelectorAll('.toggle-staff-pw').forEach(icon => {
-            icon.addEventListener('click', function() {
+            icon.addEventListener('click', function () {
                 const input = this.previousElementSibling;
                 if (input.type === 'password') {
                     input.type = 'text';
