@@ -61,10 +61,10 @@ class CafeteriaPerfilController extends Controller
         $data = $request->validate([
             'nombre' => 'sometimes|string|max:100',
             'descripcion' => 'nullable|string|max:255',
-            'calle' => 'nullable|string|max:100',
+            'calle' => 'required|string|max:100',
             'num_exterior' => 'nullable|string|max:10',
             'num_interior' => 'nullable|string|max:10',
-            'colonia' => 'nullable|string|max:80|regex:/^[a-zA-ZÀ-ÿ\s]+$/',
+            'colonia' => 'required|string|max:50|regex:/^[a-zA-ZÀ-ÿ\s]+$/',
             'estado_republica' => 'nullable|string|max:80|regex:/^[a-zA-ZÀ-ÿ\s]+$/',
             'ciudad' => 'nullable|string|max:80|regex:/^[a-zA-ZÀ-ÿ\s]+$/',
             'cp' => 'nullable|digits:5',

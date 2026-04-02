@@ -10,6 +10,26 @@
     </header>
 
     <style>
+        /* Ajuste para evitar salto visual en validaciones */
+        .invalid-feedback {
+            position: absolute;
+            bottom: -5px;
+            left: 12px;
+            margin-top: 0;
+            z-index: 5;
+            line-height: 1.1;
+        }
+
+        .col-md-6,
+        .col-12,
+        .col-md-8,
+        .col-md-4,
+        .col-md-3 {
+            position: relative;
+            padding-bottom: 26px !important;
+            /* Espacio reservado para que no brinque form */
+        }
+
         @keyframes customPulse {
             0% {
                 box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
@@ -74,7 +94,9 @@
                                 <label class="small fw-bold mb-2 text-uppercase text-muted"
                                     style="letter-spacing: 1px; font-size: 0.7rem;">Calle *</label>
                                 <input type="text" name="calle" class="form-control border-0 shadow-sm rounded-3 p-3"
-                                    placeholder="Ej. Av. Reforma" maxlength="100" style="background: var(--off-white);">
+                                    placeholder="Ej. Av. Reforma" maxlength="100" style="background: var(--off-white);"
+                                    required>
+                                <div class="invalid-feedback" style="font-size: 0.75rem;">La calle es obligatoria.</div>
                             </div>
                             <div class="col-12 col-md-3">
                                 <label class="small fw-bold mb-2 text-uppercase text-muted"
@@ -82,8 +104,7 @@
                                 <input type="text" name="num_exterior" class="form-control border-0 shadow-sm rounded-3 p-3"
                                     maxlength="10" pattern="[a-zA-Z0-9\-\s]+" placeholder="Ej. 12-A"
                                     style="background: var(--off-white);" required>
-                                <div class="invalid-feedback" style="font-size: 0.75rem;">Máx 10 caracteres
-                                    (números/letras).</div>
+                                <div class="invalid-feedback" style="font-size: 0.75rem;">Máx 10 letras/núm .</div>
                             </div>
                             <div class="col-12 col-md-3">
                                 <label class="small fw-bold mb-2 text-uppercase text-muted"
@@ -100,9 +121,9 @@
                                 <label class="small fw-bold mb-2 text-uppercase text-muted"
                                     style="letter-spacing: 1px; font-size: 0.7rem;">Colonia *</label>
                                 <input type="text" name="colonia" class="form-control border-0 shadow-sm rounded-3 p-3"
-                                    maxlength="80" pattern="[a-zA-ZÀ-ÿ\s]+" placeholder="Ej. Centro Histórico"
+                                    maxlength="50" pattern="[a-zA-ZÀ-ÿ\s]+" placeholder="Ej. Centro Histórico"
                                     style="background: var(--off-white);" required>
-                                <div class="invalid-feedback" style="font-size: 0.75rem;">Solo letras y espacios.</div>
+                                <div class="invalid-feedback" style="font-size: 0.75rem;">La colonia es obligatoria.</div>
                             </div>
                             <div class="col-md-4">
                                 <label class="small fw-bold mb-2 text-uppercase text-muted"
@@ -143,7 +164,7 @@
                                 class="form-control border-0 shadow-sm rounded-3 p-3" value=""
                                 placeholder="Ej. (443) 123-4567" minlength="14" maxlength="14"
                                 style="background: var(--off-white);" required>
-                            <div class="invalid-feedback" style="font-size: 0.75rem;">Format: (XXX) XXX-XXXX. Solo números.
+                            <div class="invalid-feedback" style="font-size: 0.75rem;">Formato: (XXX) XXX-XXXX. Solo números.
                             </div>
                         </div>
                     </div>
@@ -212,10 +233,11 @@
         let cafeteriaId = null;
         let estadosMunicipiosData = {};
         let isDirty = false;
+        let blockDirty = false;
 
         // Detectar cambios en el formulario
         document.getElementById('formPerfil').addEventListener('input', () => {
-            if (!isDirty) {
+            if (!isDirty && !blockDirty) {
                 isDirty = true;
                 const alert = document.getElementById('dirtyAlert');
                 alert.classList.remove('d-none');
@@ -223,7 +245,7 @@
             }
         });
         document.getElementById('formPerfil').addEventListener('change', () => {
-            if (!isDirty) {
+            if (!isDirty && !blockDirty) {
                 isDirty = true;
                 const alert = document.getElementById('dirtyAlert');
                 alert.classList.remove('d-none');
@@ -307,8 +329,20 @@
 
 
 
+        const trySelectOption = (selectEl, targetValue) => {
+            if (!targetValue) return;
+            selectEl.value = targetValue;
+            if (!selectEl.value) {
+                const sanitizeStr = str => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+                const targetSanitized = sanitizeStr(targetValue);
+                const match = Array.from(selectEl.options).find(opt => sanitizeStr(opt.value) === targetSanitized);
+                if (match) selectEl.value = match.value;
+            }
+        };
+
         async function cargarPerfil() {
             try {
+                blockDirty = true; // Prevenir alerta visual al cargar datos
                 const res = await MetraAPI.get('/gerente/mi-cafeteria');
                 const cafe = res.data || res;
                 cafeteriaId = cafe.id;
@@ -324,18 +358,19 @@
                 if (cafe.estado_republica) {
                     const estadoSelect = document.querySelector('select[name="estado_republica"]');
                     if (estadoSelect) {
-                        estadoSelect.value = cafe.estado_republica;
+                        trySelectOption(estadoSelect, cafe.estado_republica);
                         // Forzar el disparo del evento manual
                         estadoSelect.dispatchEvent(new Event('change'));
 
                         // Una vez pobladas las ciudades por el evento change, asignamos la ciudad
                         if (cafe.ciudad) {
-                            setTimeout(() => {
-                                const ciudadSelect = document.querySelector('select[name="ciudad"]');
-                                if (ciudadSelect) {
-                                    ciudadSelect.value = cafe.ciudad;
-                                }
-                            }, 50); // Un pequeño delay para asegurar que el DOM se actualizó tras el dispatch
+                            const ciudadSelect = document.querySelector('select[name="ciudad"]');
+                            if (ciudadSelect) {
+                                // Microescala de tiempo para que el DOM indexe los nuevos <options>
+                                setTimeout(() => {
+                                    trySelectOption(ciudadSelect, cafe.ciudad);
+                                }, 150);
+                            }
                         }
                     }
                 } else if (cafe.ciudad) {
@@ -348,6 +383,7 @@
                         opt.textContent = cafe.ciudad;
                         opt.selected = true;
                         ciudadSelect.appendChild(opt);
+                        trySelectOption(ciudadSelect, cafe.ciudad);
                     }
                 }
 
@@ -375,6 +411,9 @@
 
             } catch (e) {
                 console.error('Error cargando perfil:', e);
+            } finally {
+                // Pequeño delay para permitir que eventos change propaguen antes de re-habilitar el flag
+                setTimeout(() => { blockDirty = false; }, 100);
             }
         }
 
@@ -403,6 +442,12 @@
             e.preventDefault();
 
             const formObj = e.target;
+
+            // Limpiamos espacios en blanco extremos antes de validar
+            Array.from(formObj.querySelectorAll('input[type="text"], input[type="tel"], textarea')).forEach(el => {
+                if (el.value) el.value = el.value.trim();
+            });
+
             if (!formObj.checkValidity()) {
                 formObj.classList.add('was-validated');
                 Swal.fire('Atención', 'Verifica los campos marcados en rojo en el formulario.', 'warning');
