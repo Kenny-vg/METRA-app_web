@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary as CloudinaryFacade;
+// use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary as CloudinaryFacade;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 
@@ -31,7 +31,7 @@ class CloudinaryService
                 'folder' => $folder,
             ], $defaultTransformations, $transformations);
 
-            $result = CloudinaryFacade::upload($file->getRealPath(), $options);
+            $result = cloudinary()->upload($file->getRealPath(), $options);
 
             return [
                 'url' => $result->getSecurePath(),
@@ -77,7 +77,7 @@ class CloudinaryService
         }
 
         try {
-            CloudinaryFacade::destroy($publicId);
+            cloudinary()->destroy($publicId);
             return true;
         } catch (\Exception $e) {
             Log::error("Error eliminando de Cloudinary ({$publicId}): " . $e->getMessage());

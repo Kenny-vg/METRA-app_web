@@ -18,8 +18,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        window.API_URL = "{{ url('/api') }}";
-        window.FILE_URL = "{{ url('/') }}";
+        window.API_URL = "/api";
+        window.FILE_URL = "";
     </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
