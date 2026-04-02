@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Menu;
 use App\Helpers\ApiResponse;
 use App\Traits\Activable;
-use Illuminate\Support\Facades\Storage;
+use App\Services\CloudinaryService;
 use App\Models\MenuCategoria;
 use Illuminate\Validation\Rule;
 
@@ -63,8 +63,13 @@ class MenuController extends Controller
         ];
 
         if ($request->hasFile('imagen_url')) {
-            $path = $request->file('imagen_url')->store('menus', 'public');
-            $data['imagen_url'] = $path;
+            $uploaded = CloudinaryService::upload($request->file('imagen_url'), 'metra/menus');
+            if ($uploaded) {
+                $data['imagen_url'] = $uploaded['url'];
+                $data['imagen_public_id'] = $uploaded['public_id'];
+            } else {
+                return ApiResponse::error('Error al subir la imagen a la nube', 500);
+            }
         }
 
         $menu = Menu::create($data);
@@ -109,12 +114,18 @@ class MenuController extends Controller
         ];
 
         if ($request->hasFile('imagen_url')) {
-            // borrar vieja si existe
-            if ($menu->imagen_url) {
-                Storage::disk('public')->delete($menu->imagen_url);
+            $uploaded = CloudinaryService::replace(
+                $request->file('imagen_url'),
+                $menu->imagen_public_id,
+                'metra/menus'
+            );
+
+            if ($uploaded) {
+                $data['imagen_url'] = $uploaded['url'];
+                $data['imagen_public_id'] = $uploaded['public_id'];
+            } else {
+                return ApiResponse::error('Error al actualizar la imagen en la nube', 500);
             }
-            $path = $request->file('imagen_url')->store('menus', 'public');
-            $data['imagen_url'] = $path;
         }
 
         $menu->update($data);

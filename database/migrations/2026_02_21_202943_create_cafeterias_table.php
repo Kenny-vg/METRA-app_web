@@ -41,11 +41,13 @@ return new class extends Migration
             ])->default('pendiente');
 
             $table->string('foto_url')->nullable();
+            $table->string('foto_public_id')->nullable();
 
             // Gerente que registró la cafetería
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             // Comprobante de pago subido por el gerente
             $table->string('comprobante_url')->nullable();
+            $table->string('comprobante_public_id')->nullable();
             
             $table->integer('tolerancia_reserva_min')->default(15);
             

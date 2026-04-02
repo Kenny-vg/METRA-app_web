@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('nombre_producto', 100);
             $table->string('descripcion', 255)->nullable();
             $table->string('imagen_url', 255)->nullable();
+            $table->string('imagen_public_id', 255)->nullable();
             $table->decimal('precio', 10, 2)->default(0);
 
             $table->boolean('activo')->default(true);

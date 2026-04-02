@@ -12,7 +12,7 @@ use App\Mail\ActivacionCuentaMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
+use App\Services\CloudinaryService;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -268,22 +268,30 @@ class RegistroNegocioController extends Controller
 
             $file = $request->file('comprobante');
 
-            // Asegurar que use el disco public
-            $path = $file->store('comprobantes');
+            $uploaded = CloudinaryService::upload($file, 'metra/comprobantes');
+
+            if (!$uploaded) {
+                return ApiResponse::error('Error al subir el comprobante a la nube', 500);
+            }
+
+            $path = $uploaded['url'];
+            $publicId = $uploaded['public_id'];
 
             $cafeteria->update([
-                'comprobante_url' => $path
+                'comprobante_url' => $path,
+                'comprobante_public_id' => $publicId
             ]);
 
             $suscripcion = $cafeteria->suscripciones()->latest()->first();
             if ($suscripcion) {
                 $suscripcion->update([
-                    'comprobante_url' => $path
+                    'comprobante_url' => $path,
+                    'comprobante_public_id' => $publicId
                 ]);
             }
 
             return ApiResponse::success(
-            ['comprobante_url' => $path],
+                ['comprobante_url' => $path],
                 'Comprobante subido correctamente.'
             );
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Services\CloudinaryService;
 
 class Cafeteria extends Model
 {
@@ -21,8 +22,10 @@ class Cafeteria extends Model
         'telefono',
         'estado',
         'foto_url',
+        'foto_public_id',
         'user_id',
         'comprobante_url',
+        'comprobante_public_id',
         'duracion_reserva_min',
         'intervalo_reserva_min',
         'porcentaje_reservas',
@@ -42,6 +45,16 @@ class Cafeteria extends Model
         static::updating(function ($cafeteria) {
             if ($cafeteria->isDirty('nombre') && empty($cafeteria->slug)) {
                 $cafeteria->slug = \Illuminate\Support\Str::slug($cafeteria->nombre);
+            }
+        });
+
+        // Limpiar Cloudinary al eliminar registro
+        static::deleting(function ($cafeteria) {
+            if ($cafeteria->foto_public_id) {
+                CloudinaryService::delete($cafeteria->foto_public_id);
+            }
+            if ($cafeteria->comprobante_public_id) {
+                CloudinaryService::delete($cafeteria->comprobante_public_id);
             }
         });
     }
@@ -90,20 +103,12 @@ class Cafeteria extends Model
 
     public function getComprobanteFullUrlAttribute()
     {
-        $value = $this->attributes['comprobante_url'] ?? null;
-
-        return $value
-            ? url('/api/admin/comprobante/' . $this->id)
-            : null;
+        return $this->attributes['comprobante_url'] ?? null;
     }
 
     public function getFotoFullUrlAttribute()
     {
-        $value = $this->attributes['foto_url'] ?? null;
-
-        return $value
-            ? asset('storage/' . $value)
-            : null;
+        return $this->attributes['foto_url'] ?? null;
     }
 
     public function getEstadoDinamicoAttribute()

@@ -18,6 +18,7 @@ class Suscripcion extends Model
         'estado_pago',
         'monto',
         'comprobante_url',
+        'comprobante_public_id',
         'user_id',
         'fecha_validacion',
         'en_revision',

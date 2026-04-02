@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Gerente;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
-use Illuminate\Support\Facades\Storage;
+use App\Services\CloudinaryService;
 use Illuminate\Support\Facades\DB;
 
 class CafeteriaPerfilController extends Controller
@@ -77,14 +77,19 @@ class CafeteriaPerfilController extends Controller
         ]);
 
         if ($request->hasFile('foto')) {
-            // borrar foto anterior
-            if ($cafeteria->foto_url) {
-                Storage::disk('public')->delete($cafeteria->foto_url);
+            $uploaded = CloudinaryService::replace(
+                $request->file('foto'),
+                $cafeteria->foto_public_id,
+                'metra/perfiles',
+                ['crop' => 'fill', 'gravity' => 'center', 'width' => 800, 'height' => 600]
+            );
+
+            if ($uploaded) {
+                $data['foto_url'] = $uploaded['url'];
+                $data['foto_public_id'] = $uploaded['public_id'];
+            } else {
+                return ApiResponse::error('Error al subir la foto a la nube', 500);
             }
-
-            $path = $request->file('foto')->store('cafeterias', 'public');
-
-            $data['foto_url'] = $path;
         }
         $cafeteria->update($data);
 
