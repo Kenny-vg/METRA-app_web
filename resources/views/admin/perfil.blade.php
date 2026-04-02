@@ -3,23 +3,35 @@
 
 @section('content')
     <header class="mb-5 border-bottom pb-4" style="border-color: var(--border-light) !important;">
-        <h2 class="fw-bold" style="color: var(--black-primary); font-family: 'Inter', sans-serif; letter-spacing: -1px;">Configuración de mi Negocio</h2>
-        <p class="m-0" style="color: var(--text-muted); font-size: 0.95rem;">Gestiona la identidad pública y los datos de contacto de tu establecimiento.</p>
+        <h2 class="fw-bold" style="color: var(--black-primary); font-family: 'Inter', sans-serif; letter-spacing: -1px;">
+            Configuración de mi Negocio</h2>
+        <p class="m-0" style="color: var(--text-muted); font-size: 0.95rem;">Gestiona la identidad pública y los datos de
+            contacto de tu establecimiento.</p>
     </header>
 
     <style>
         @keyframes customPulse {
-            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
-            70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(212, 175, 55, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+            }
         }
+
         #btnGuardarPerfil:hover {
             transform: scale(1.03);
         }
     </style>
-    <form id="formPerfil" style="max-width: 1100px;">
+    <form id="formPerfil" style="max-width: 1100px;" novalidate>
         <!-- Alerta visual de cambios sin guardar -->
-        <div id="dirtyAlert" class="alert alert-warning border-0 rounded-4 p-3 mb-4 d-none align-items-center shadow-sm" style="background: #fff8e1; color: #b78a00;">
+        <div id="dirtyAlert" class="alert alert-warning border-0 rounded-4 p-3 mb-4 d-none align-items-center shadow-sm"
+            style="background: #fff8e1; color: #b78a00;">
             <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
             <div>
                 <h6 class="fw-bold mb-0">Tienes cambios sin guardar</h6>
@@ -31,60 +43,92 @@
             <div class="col-12 col-xl-7">
                 <!-- Información General -->
                 <div class="card border-0 p-4 p-md-5 rounded-4 mb-4 premium-card">
-                    <h5 class="fw-bold mb-4 text-dark" style="letter-spacing: -0.5px;"><i class="bi bi-shop me-2" style="color: var(--accent-gold);"></i>Identidad Comercial</h5>
-                    
+                    <h5 class="fw-bold mb-4 text-dark" style="letter-spacing: -0.5px;"><i class="bi bi-shop me-2"
+                            style="color: var(--accent-gold);"></i>Identidad Comercial</h5>
+
                     <div class="mb-4">
-                        <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Nombre del establecimiento</label>
-                        <input type="text" class="form-control border-0 shadow-sm rounded-3 p-3" name="nombre_franquicia" value="" placeholder="Cargando..." maxlength="100" style="background: var(--off-white); font-weight: 500; color: var(--black-primary);">
+                        <label class="small fw-bold mb-2 text-uppercase text-muted"
+                            style="letter-spacing: 1px; font-size: 0.7rem;">Nombre del establecimiento</label>
+                        <input type="text" class="form-control border-0 shadow-sm rounded-3 p-3" name="nombre_franquicia"
+                            value="" placeholder="Cargando..." maxlength="100"
+                            style="background: var(--off-white); font-weight: 500; color: var(--black-primary);">
                     </div>
-                    
+
                     <div class="mb-3">
-                        <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Descripción del establecimiento</label>
-                        <textarea class="form-control border-0 shadow-sm rounded-3 p-3" name="descripcion" rows="4" maxlength="255" placeholder="Escribe aquí la descripción de tu negocio..." style="background: var(--off-white); font-weight: 400; color: var(--text-main); line-height: 1.6;"></textarea>
+                        <label class="small fw-bold mb-2 text-uppercase text-muted"
+                            style="letter-spacing: 1px; font-size: 0.7rem;">Descripción del establecimiento</label>
+                        <textarea class="form-control border-0 shadow-sm rounded-3 p-3" name="descripcion" rows="4"
+                            maxlength="255" placeholder="Escribe aquí la descripción de tu negocio..."
+                            style="background: var(--off-white); font-weight: 400; color: var(--text-main); line-height: 1.6;"></textarea>
                     </div>
                 </div>
 
                 <!-- Ubicación -->
                 <div class="card border-0 p-4 p-md-5 rounded-4 mb-4 premium-card">
-                    <h5 class="fw-bold mb-4 text-dark" style="letter-spacing: -0.5px;"><i class="bi bi-geo-alt me-2" style="color: var(--accent-gold);"></i>Geolocalización Física</h5>
-                    
+                    <h5 class="fw-bold mb-4 text-dark" style="letter-spacing: -0.5px;"><i class="bi bi-geo-alt me-2"
+                            style="color: var(--accent-gold);"></i>Geolocalización Física</h5>
+
                     <div class="mb-4 pb-4 border-bottom" style="border-color: var(--border-light) !important;">
                         <div class="row g-3 align-items-end mb-3">
                             <div class="col-md-6">
-                                <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Calle</label>
-                                <input type="text" name="calle" class="form-control border-0 shadow-sm rounded-3 p-3" placeholder="Ej. Av. Reforma" maxlength="100" style="background: var(--off-white);">
+                                <label class="small fw-bold mb-2 text-uppercase text-muted"
+                                    style="letter-spacing: 1px; font-size: 0.7rem;">Calle *</label>
+                                <input type="text" name="calle" class="form-control border-0 shadow-sm rounded-3 p-3"
+                                    placeholder="Ej. Av. Reforma" maxlength="100" style="background: var(--off-white);">
                             </div>
                             <div class="col-12 col-md-3">
-                                <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Número Exterior</label>
-                                <input type="text" name="num_exterior" class="form-control border-0 shadow-sm rounded-3 p-3" maxlength="10" style="background: var(--off-white);">
+                                <label class="small fw-bold mb-2 text-uppercase text-muted"
+                                    style="letter-spacing: 1px; font-size: 0.7rem;">Número Exterior *</label>
+                                <input type="text" name="num_exterior" class="form-control border-0 shadow-sm rounded-3 p-3"
+                                    maxlength="10" pattern="[a-zA-Z0-9\-\s]+" placeholder="Ej. 12-A"
+                                    style="background: var(--off-white);" required>
+                                <div class="invalid-feedback" style="font-size: 0.75rem;">Máx 10 caracteres
+                                    (números/letras).</div>
                             </div>
                             <div class="col-12 col-md-3">
-                                <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Número Interior (Opcional)</label>
-                                <input type="text" name="num_interior" class="form-control border-0 shadow-sm rounded-3 p-3" maxlength="10" style="background: var(--off-white);">
+                                <label class="small fw-bold mb-2 text-uppercase text-muted"
+                                    style="letter-spacing: 1px; font-size: 0.7rem;">Número Interior (Opcional)</label>
+                                <input type="text" name="num_interior" class="form-control border-0 shadow-sm rounded-3 p-3"
+                                    maxlength="10" pattern="[a-zA-Z0-9\-\s]+" placeholder="Ej. B"
+                                    style="background: var(--off-white);">
+                                <div class="invalid-feedback" style="font-size: 0.75rem;">Máx 10 caracteres.</div>
                             </div>
                         </div>
 
                         <div class="row g-3 mb-3">
                             <div class="col-md-8">
-                                <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Colonia</label>
-                                <input type="text" name="colonia" class="form-control border-0 shadow-sm rounded-3 p-3" maxlength="80" style="background: var(--off-white);">
+                                <label class="small fw-bold mb-2 text-uppercase text-muted"
+                                    style="letter-spacing: 1px; font-size: 0.7rem;">Colonia *</label>
+                                <input type="text" name="colonia" class="form-control border-0 shadow-sm rounded-3 p-3"
+                                    maxlength="80" pattern="[a-zA-ZÀ-ÿ\s]+" placeholder="Ej. Centro Histórico"
+                                    style="background: var(--off-white);" required>
+                                <div class="invalid-feedback" style="font-size: 0.75rem;">Solo letras y espacios.</div>
                             </div>
                             <div class="col-md-4">
-                                <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Código Postal</label>
-                                <input type="text" name="cp" class="form-control border-0 shadow-sm rounded-3 p-3" maxlength="10" style="background: var(--off-white);">
+                                <label class="small fw-bold mb-2 text-uppercase text-muted"
+                                    style="letter-spacing: 1px; font-size: 0.7rem;">Código Postal *</label>
+                                <input type="text" name="cp" class="form-control border-0 shadow-sm rounded-3 p-3"
+                                    maxlength="5" pattern="\d{5}" placeholder="Ej. 44321"
+                                    style="background: var(--off-white);" required>
+                                <div class="invalid-feedback" style="font-size: 0.75rem;">Exactamente 5 números.</div>
                             </div>
                         </div>
 
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Estado</label>
-                                <select name="estado_republica" id="estado_republica" class="form-select border-0 shadow-sm rounded-3 p-3" style="background: var(--off-white);" required>
+                                <label class="small fw-bold mb-2 text-uppercase text-muted"
+                                    style="letter-spacing: 1px; font-size: 0.7rem;">Estado *</label>
+                                <select name="estado_republica" id="estado_republica"
+                                    class="form-select border-0 shadow-sm rounded-3 p-3"
+                                    style="background: var(--off-white);" required>
                                     <option value="">Cargando estados...</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Ciudad / Municipio</label>
-                                <select name="ciudad" id="ciudad" class="form-select border-0 shadow-sm rounded-3 p-3" style="background: var(--off-white);" required disabled>
+                                <label class="small fw-bold mb-2 text-uppercase text-muted"
+                                    style="letter-spacing: 1px; font-size: 0.7rem;">Ciudad / Municipio *</label>
+                                <select name="ciudad" id="ciudad" class="form-select border-0 shadow-sm rounded-3 p-3"
+                                    style="background: var(--off-white);" required disabled>
                                     <option value="">Primero selecciona estado...</option>
                                 </select>
                             </div>
@@ -93,53 +137,70 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="small fw-bold mb-2 text-uppercase text-muted" style="letter-spacing: 1px; font-size: 0.7rem;">Teléfono</label>
-                            <input type="tel" name="telefono" class="form-control border-0 shadow-sm rounded-3 p-3" value="" placeholder="Ej. 238 000 0000" maxlength="20" inputmode="numeric" pattern="[0-9\s\-\+]+" style="background: var(--off-white);">
+                            <label class="small fw-bold mb-2 text-uppercase text-muted"
+                                style="letter-spacing: 1px; font-size: 0.7rem;">Teléfono *</label>
+                            <input type="tel" name="telefono" id="inputTelefono"
+                                class="form-control border-0 shadow-sm rounded-3 p-3" value=""
+                                placeholder="Ej. (443) 123-4567" minlength="14" maxlength="14"
+                                style="background: var(--off-white);" required>
+                            <div class="invalid-feedback" style="font-size: 0.75rem;">Format: (XXX) XXX-XXXX. Solo números.
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div> 
-            
+            </div>
+
             <div class="col-12 col-xl-5">
                 <!-- Portafolio Visual -->
                 <div class="card border-0 p-4 p-md-5 rounded-4 mb-4 premium-card">
-                    <h5 class="fw-bold mb-4 text-dark" style="letter-spacing: -0.5px;"><i class="bi bi-image me-2" style="color: var(--accent-gold);"></i>Imagen Principal del Negocio</h5>
-                    <div id="container-foto" style="position: relative; border-radius: 12px; overflow: hidden; margin-bottom: 16px; background: #f0f0f0; min-height: 200px; cursor: pointer; display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('inputFoto').click()">
-                        <img id="previewFoto"
-                             src=""
-                             class="img-fluid w-100 d-none" style="object-fit: cover; height: 200px; transition: opacity 0.2s;">
-                        
+                    <h5 class="fw-bold mb-4 text-dark" style="letter-spacing: -0.5px;"><i class="bi bi-image me-2"
+                            style="color: var(--accent-gold);"></i>Imagen Principal del Negocio</h5>
+                    <div id="container-foto"
+                        style="position: relative; border-radius: 12px; overflow: hidden; margin-bottom: 16px; background: #f0f0f0; min-height: 200px; cursor: pointer; display: flex; align-items: center; justify-content: center;"
+                        onclick="document.getElementById('inputFoto').click()">
+                        <img id="previewFoto" src="" class="img-fluid w-100 d-none"
+                            style="object-fit: cover; height: 200px; transition: opacity 0.2s;">
+
                         <div id="placeholder-foto" class="text-center p-4">
                             <i class="bi bi-cloud-arrow-up fs-1 text-muted"></i>
-                            <p class="text-muted small fw-bold mt-2">Haz clic para subir una foto <br>de tu establecimiento</p>
+                            <p class="text-muted small fw-bold mt-2">Haz clic para subir una foto <br>de tu establecimiento
+                            </p>
                         </div>
 
-                        <div id="overlay-foto" class="d-none" style="position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.35) 0%, transparent 60%); pointer-events: none;"></div>
-                        <div id="label-foto" class="d-none" style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.55); color: #fff; font-size: 0.78rem; font-weight: 600; padding: 5px 14px; border-radius: 50px; white-space: nowrap; pointer-events: none;">
+                        <div id="overlay-foto" class="d-none"
+                            style="position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.35) 0%, transparent 60%); pointer-events: none;">
+                        </div>
+                        <div id="label-foto" class="d-none"
+                            style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.55); color: #fff; font-size: 0.78rem; font-weight: 600; padding: 5px 14px; border-radius: 50px; white-space: nowrap; pointer-events: none;">
                             <i class="bi bi-pencil me-1"></i>Cambiar imagen
                         </div>
                     </div>
                     <input type="file" id="inputFoto" name="foto" accept="image/jpg,image/jpeg,image/png" class="d-none">
-                    <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i>JPG o PNG · Máx. 2 MB. Esta imagen aparece en la página pública de tu cafetería.</p>
+                    <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1"></i>JPG o PNG · Máx. 2 MB. Esta
+                        imagen aparece en la página pública de tu cafetería.</p>
                 </div>
 
 
 
-                <div class="alert alert-info border-0 rounded-4 p-4 shadow-sm" style="background: rgba(212, 175, 55, 0.08);">
+                <div class="alert alert-info border-0 rounded-4 p-4 shadow-sm"
+                    style="background: rgba(212, 175, 55, 0.08);">
                     <div class="d-flex align-items-center">
                         <i class="bi bi-info-circle-fill fs-4 me-3" style="color: var(--accent-gold);"></i>
                         <div>
                             <h6 class="fw-bold mb-1" style="color: var(--black-primary);">Recordatorio</h6>
-                            <p class="small mb-0 text-muted">Si realizas cualquier cambio en tu información, debes presionar el botón <strong>Guardar Cambios</strong> al final de la página para que se apliquen correctamente.</p>
+                            <p class="small mb-0 text-muted">Si realizas cualquier cambio en tu información, debes presionar
+                                el botón <strong>Guardar Cambios</strong> al final de la página para que se apliquen
+                                correctamente.</p>
                         </div>
                     </div>
                 </div>
 
-            </div> 
+            </div>
         </div>
 
         <div class="d-flex justify-content-start mt-4 mb-5">
-            <button type="submit" id="btnGuardarPerfil" class="btn btn-dark fw-bold px-5 py-3 shadow-lg rounded-pill" style="font-size: 1.15rem; background-color: var(--accent-gold); color: var(--black-primary); border: none; transition: transform 0.2s; animation: customPulse 2s infinite;">
+            <button type="submit" id="btnGuardarPerfil" class="btn btn-dark fw-bold px-5 py-3 shadow-lg rounded-pill"
+                style="font-size: 1.15rem; background-color: var(--accent-gold); color: var(--black-primary); border: none; transition: transform 0.2s; animation: customPulse 2s infinite;">
                 Guardar Cambios <i class="bi bi-check-circle ms-2"></i>
             </button>
         </div>
@@ -171,6 +232,33 @@
         });
 
         // Alerta de cambios sin guardar
+        // Phone Masking Logic (XXX) XXX-XXXX
+        const inputTelefono = document.getElementById('inputTelefono');
+        if (inputTelefono) {
+            inputTelefono.addEventListener('input', function (e) {
+                let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+                e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+            });
+        }
+
+        // Restriction formats for numbers only in CP
+        document.querySelector('input[name="cp"]').addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // Strict letters only for Colonia
+        document.querySelector('input[name="colonia"]').addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
+        });
+
+        // Strict limits for num_exterior and num_interior to block infinite text manually
+        document.querySelector('input[name="num_exterior"]').addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^a-zA-Z0-9\-\s]/g, '').substring(0, 10);
+        });
+        document.querySelector('input[name="num_interior"]').addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^a-zA-Z0-9\-\s]/g, '').substring(0, 10);
+        });
+
         window.addEventListener('beforeunload', (e) => {
             if (isDirty) {
                 e.preventDefault();
@@ -182,28 +270,29 @@
             try {
                 const res = await fetch('/data/estados-municipios.json');
                 estadosMunicipiosData = await res.json();
-                
+
                 const estadoSelect = document.getElementById('estado_republica');
                 const ciudadSelect = document.getElementById('ciudad');
-                
+
                 estadoSelect.innerHTML = '<option value="">Selecciona un estado...</option>';
                 Object.keys(estadosMunicipiosData).sort().forEach(estado => {
                     const option = document.createElement('option');
                     option.value = estado;
-                    option.textContent = estado;
+                    // Truncar si es muy largo (ej. Veracruz de Ignacio de la Llave)
+                    option.textContent = estado.length > 30 ? estado.substring(0, 28) + '...' : estado;
                     estadoSelect.appendChild(option);
                 });
-                
-                estadoSelect.addEventListener('change', function() {
+
+                estadoSelect.addEventListener('change', function () {
                     const estado = this.value;
                     ciudadSelect.innerHTML = '<option value="">Selecciona un municipio...</option>';
-                    
+
                     if (estado && estadosMunicipiosData[estado]) {
                         ciudadSelect.disabled = false;
                         estadosMunicipiosData[estado].sort().forEach(municipio => {
                             const option = document.createElement('option');
                             option.value = municipio;
-                            option.textContent = municipio;
+                            option.textContent = municipio.length > 30 ? municipio.substring(0, 28) + '...' : municipio;
                             ciudadSelect.appendChild(option);
                         });
                     } else {
@@ -211,7 +300,7 @@
                         ciudadSelect.disabled = true;
                     }
                 });
-            } catch(e) {
+            } catch (e) {
                 console.error("Error cargando estados y municipios", e);
             }
         }
@@ -221,9 +310,9 @@
         async function cargarPerfil() {
             try {
                 const res = await MetraAPI.get('/gerente/mi-cafeteria');
-                const cafe = res.data || res; 
+                const cafe = res.data || res;
                 cafeteriaId = cafe.id;
-                
+
                 // Populate fields
                 if (cafe.nombre) document.querySelector('input[name="nombre_franquicia"]').value = cafe.nombre;
                 if (cafe.descripcion) document.querySelector('textarea[name="descripcion"]').value = cafe.descripcion;
@@ -234,11 +323,11 @@
                 if (cafe.cp) document.querySelector('input[name="cp"]').value = cafe.cp;
                 if (cafe.estado_republica) {
                     const estadoSelect = document.querySelector('select[name="estado_republica"]');
-                    if(estadoSelect) {
+                    if (estadoSelect) {
                         estadoSelect.value = cafe.estado_republica;
                         // Forzar el disparo del evento manual
                         estadoSelect.dispatchEvent(new Event('change'));
-                        
+
                         // Una vez pobladas las ciudades por el evento change, asignamos la ciudad
                         if (cafe.ciudad) {
                             setTimeout(() => {
@@ -262,8 +351,15 @@
                     }
                 }
 
-                if (cafe.telefono) document.querySelector('input[name="telefono"]').value = cafe.telefono;
-                
+                if (cafe.telefono) {
+                    let telRaw = cafe.telefono.toString().replace(/\D/g, '');
+                    let x = telRaw.match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+                    if (x) {
+                        let formattedTel = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+                        document.querySelector('input[name="telefono"]').value = formattedTel;
+                    }
+                }
+
                 if (cafe.foto_url) {
                     document.getElementById('previewFoto').src = `/storage/${cafe.foto_url}?v=` + new Date().getTime();
                     document.getElementById('previewFoto').classList.remove('d-none');
@@ -283,7 +379,7 @@
         }
 
         // Live preview al seleccionar foto
-        document.getElementById('inputFoto').addEventListener('change', function() {
+        document.getElementById('inputFoto').addEventListener('change', function () {
             const file = this.files[0];
             if (!file) return;
             if (file.size > 2 * 1024 * 1024) {
@@ -292,7 +388,7 @@
                 return;
             }
             const reader = new FileReader();
-            reader.onload = e => { 
+            reader.onload = e => {
                 const preview = document.getElementById('previewFoto');
                 preview.src = e.target.result;
                 preview.classList.remove('d-none');
@@ -305,7 +401,14 @@
 
         document.getElementById('formPerfil').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
+            const formObj = e.target;
+            if (!formObj.checkValidity()) {
+                formObj.classList.add('was-validated');
+                Swal.fire('Atención', 'Verifica los campos marcados en rojo en el formulario.', 'warning');
+                return;
+            }
+
             const submitBtn = document.getElementById('btnGuardarPerfil');
             const originalContent = submitBtn.innerHTML;
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
@@ -314,16 +417,19 @@
             // Usamos FormData para soportar multipart (foto)
             const formData = new FormData();
             formData.append('_method', 'PUT');
-            formData.append('nombre',          document.querySelector('input[name="nombre_franquicia"]').value);
-            formData.append('descripcion',     document.querySelector('textarea[name="descripcion"]').value);
-            formData.append('calle',           document.querySelector('input[name="calle"]').value);
-            formData.append('num_exterior',    document.querySelector('input[name="num_exterior"]').value);
-            formData.append('num_interior',    document.querySelector('input[name="num_interior"]').value);
-            formData.append('colonia',         document.querySelector('input[name="colonia"]').value);
-            formData.append('cp',              document.querySelector('input[name="cp"]').value);
-            formData.append('ciudad',          document.querySelector('select[name="ciudad"]').value);
-            formData.append('estado_republica',document.querySelector('select[name="estado_republica"]').value);
-            formData.append('telefono',        document.querySelector('input[name="telefono"]').value);
+            formData.append('nombre', document.querySelector('input[name="nombre_franquicia"]').value);
+            formData.append('descripcion', document.querySelector('textarea[name="descripcion"]').value);
+            formData.append('calle', document.querySelector('input[name="calle"]').value);
+            formData.append('num_exterior', document.querySelector('input[name="num_exterior"]').value);
+            formData.append('num_interior', document.querySelector('input[name="num_interior"]').value);
+            formData.append('colonia', document.querySelector('input[name="colonia"]').value);
+            formData.append('cp', document.querySelector('input[name="cp"]').value);
+            formData.append('ciudad', document.querySelector('select[name="ciudad"]').value);
+            formData.append('estado_republica', document.querySelector('select[name="estado_republica"]').value);
+
+            // Enviamos el teléfono completamente limpio al servidor (Puros números)
+            const telRaw = document.querySelector('input[name="telefono"]').value;
+            formData.append('telefono', telRaw.replace(/\D/g, ''));
 
             const fotoInput = document.getElementById('inputFoto');
             if (fotoInput.files.length > 0) {
@@ -347,12 +453,12 @@
                     timer: 2200,
                     showConfirmButton: false
                 });
-                
+
                 isDirty = false; // Resetear bandera al guardar exitosamente
                 const alert = document.getElementById('dirtyAlert');
                 alert.classList.add('d-none');
                 alert.classList.remove('d-flex');
-                
+
             } catch (e) {
                 Swal.fire({
                     title: 'Error',

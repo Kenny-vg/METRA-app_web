@@ -93,6 +93,15 @@ class MetraAPI {
         return this.handleResponse(response);
     }
 
+    static async patch(endpoint, body = {}) {
+        const response = await fetch(`${this.baseUrl}${this.formatEndpoint(endpoint)}`, {
+            method: 'PATCH',
+            headers: this.getHeaders(),
+            body: JSON.stringify(body)
+        });
+        return this.handleResponse(response);
+    }
+
     static async delete(endpoint) {
         const response = await fetch(`${this.baseUrl}${this.formatEndpoint(endpoint)}`, {
             method: 'DELETE',

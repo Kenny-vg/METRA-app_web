@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <i class="bi bi-arrow-left me-2"></i>Volver al Inicio
             </a>
             
-            <div class="w-100 px-4 px-md-5" style="max-width: 480px;">
+            <div class="w-100 px-4 px-md-5 mt-5 mt-lg-0 pt-5 pt-lg-0" style="max-width: 480px;">
                 
                 <div class="text-center mb-5">
                     <a href="/" class="text-decoration-none d-inline-block mb-4">

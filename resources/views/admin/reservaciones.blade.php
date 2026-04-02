@@ -345,7 +345,7 @@
 
             try {
                 // LLAMADA A LA API UNIFICADA
-                await MetraAPI.put(`/reservaciones/${id}/cancelar`);
+                await MetraAPI.patch(`/gerente/reservaciones/${id}/cancelar`);
 
                 Swal.fire({
                     title: '¡Cancelada!',
