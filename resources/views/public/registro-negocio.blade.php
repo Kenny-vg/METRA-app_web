@@ -532,7 +532,7 @@
             <div class="col-md-6 col-lg-4">
                 <div class="plan-card ${featured ? 'featured' : ''}">
                     ${featured ? '<div class="plan-badge-featured"><i class="bi bi-star-fill me-1"></i> Recomendado</div>' : ''}
-                    <h4 class="fw-bold" style="color: var(--black-primary); text-transform: uppercase; font-size:1.1rem; letter-spacing:1px">${escapeHTML(plan.nombre_plan)}</h4>
+                    <h4 class="fw-bold" style="color: var(--black-primary); text-transform: uppercase; font-size:1.1rem; letter-spacing:1px; ${featured ? 'margin-top: 25px;' : ''}">${escapeHTML(plan.nombre_plan)}</h4>
                     <div class="plan-price mt-3 mb-2">
                         ${formatterMXN.format(plan.precio)} MXN<sub class="text-muted"> / mes</sub>
                     </div>
@@ -1029,5 +1029,6 @@
         cargarConfiguracionPago();
     });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

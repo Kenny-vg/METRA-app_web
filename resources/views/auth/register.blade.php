@@ -31,12 +31,12 @@
             <form id="registerForm">
                 <div class="text-start mb-3">
                     <label class="form-label small fw-bold" style="color: var(--black-primary);">Nombre Completo</label>
-                    <input type="text" name="name" class="form-control input-metra" placeholder="Ej. Cristina Juárez" maxlength="50" required oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')">
+                    <input type="text" name="name" class="form-control input-metra"  required oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')">
                 </div>
 
                 <div class="text-start mb-3">
                     <label class="form-label small fw-bold" style="color: var(--black-primary);">Correo Electrónico</label>
-                    <input type="email" name="email" class="form-control input-metra" placeholder="tu@correo.com" maxlength="100" required oninput="this.value = this.value.trim()">
+                    <input type="email" name="email" class="form-control input-metra" maxlength="100" required oninput="this.value = this.value.trim()">
                 </div>
 
                 <div class="text-start mb-3">
