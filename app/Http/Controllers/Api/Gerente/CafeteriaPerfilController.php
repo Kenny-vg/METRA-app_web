@@ -77,18 +77,17 @@ class CafeteriaPerfilController extends Controller
         ]);
 
         if ($request->hasFile('foto')) {
-            $uploaded = CloudinaryService::replace(
-                $request->file('foto'),
-                $cafeteria->foto_public_id,
-                'metra/perfiles',
-                ['crop' => 'fill', 'gravity' => 'center', 'width' => 800, 'height' => 600]
-            );
+            // Borrar anterior si existe
+            if ($cafeteria->foto_url) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($cafeteria->foto_url);
+            }
 
-            if ($uploaded) {
-                $data['foto_url'] = $uploaded['url'];
-                $data['foto_public_id'] = $uploaded['public_id'];
+            $path = $request->file('foto')->store('metra/perfiles', 'public');
+            
+            if ($path) {
+                $data['foto_url'] = $path;
             } else {
-                return ApiResponse::error('Error al subir la foto a la nube', 500);
+                return ApiResponse::error('Error al subir la foto al servidor', 500);
             }
         }
         $cafeteria->update($data);

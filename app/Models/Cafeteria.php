@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Services\CloudinaryService;
+use Illuminate\Support\Facades\Storage;
 
 class Cafeteria extends Model
 {
@@ -48,13 +48,13 @@ class Cafeteria extends Model
             }
         });
 
-        // Limpiar Cloudinary al eliminar registro
+        // Limpiar local al eliminar registro
         static::deleting(function ($cafeteria) {
-            if ($cafeteria->foto_public_id) {
-                CloudinaryService::delete($cafeteria->foto_public_id);
+            if ($cafeteria->foto_url) {
+                Storage::disk('public')->delete($cafeteria->foto_url);
             }
-            if ($cafeteria->comprobante_public_id) {
-                CloudinaryService::delete($cafeteria->comprobante_public_id);
+            if ($cafeteria->comprobante_url) {
+                Storage::disk('public')->delete($cafeteria->comprobante_url);
             }
         });
     }
@@ -103,12 +103,14 @@ class Cafeteria extends Model
 
     public function getComprobanteFullUrlAttribute()
     {
-        return $this->attributes['comprobante_url'] ?? null;
+        if (!$this->comprobante_url) return null;
+        return str_starts_with($this->comprobante_url, 'http') ? $this->comprobante_url : asset('storage/' . $this->comprobante_url);
     }
 
     public function getFotoFullUrlAttribute()
     {
-        return $this->attributes['foto_url'] ?? null;
+        if (!$this->foto_url) return null;
+        return str_starts_with($this->foto_url, 'http') ? $this->foto_url : asset('storage/' . $this->foto_url);
     }
 
     public function getEstadoDinamicoAttribute()

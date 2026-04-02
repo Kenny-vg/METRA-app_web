@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Menu;
 use App\Helpers\ApiResponse;
 use App\Traits\Activable;
-use App\Services\CloudinaryService;
+use Illuminate\Support\Facades\Storage;
 use App\Models\MenuCategoria;
 use Illuminate\Validation\Rule;
 
@@ -63,12 +63,11 @@ class MenuController extends Controller
         ];
 
         if ($request->hasFile('imagen_url')) {
-            $uploaded = CloudinaryService::upload($request->file('imagen_url'), 'metra/menus');
-            if ($uploaded) {
-                $data['imagen_url'] = $uploaded['url'];
-                $data['imagen_public_id'] = $uploaded['public_id'];
+            $path = $request->file('imagen_url')->store('metra/menus', 'public');
+            if ($path) {
+                $data['imagen_url'] = $path;
             } else {
-                return ApiResponse::error('Error al subir la imagen a la nube', 500);
+                return ApiResponse::error('Error al subir la imagen al servidor', 500);
             }
         }
 
@@ -114,17 +113,18 @@ class MenuController extends Controller
         ];
 
         if ($request->hasFile('imagen_url')) {
-            $uploaded = CloudinaryService::replace(
-                $request->file('imagen_url'),
-                $menu->imagen_public_id,
-                'metra/menus'
-            );
 
-            if ($uploaded) {
-                $data['imagen_url'] = $uploaded['url'];
-                $data['imagen_public_id'] = $uploaded['public_id'];
+            // Borrar la anterior si existe
+            if ($menu->imagen_url) {
+                Storage::disk('public')->delete($menu->imagen_url);
+            }
+
+            $path = $request->file('imagen_url')->store('metra/menus', 'public');
+
+            if ($path) {
+                $data['imagen_url'] = $path;
             } else {
-                return ApiResponse::error('Error al actualizar la imagen en la nube', 500);
+                return ApiResponse::error('Error al subir la imagen al servidor', 500);
             }
         }
 

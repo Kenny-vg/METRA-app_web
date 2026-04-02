@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Scopes\CafeScope;
-use App\Services\CloudinaryService;
+use Illuminate\Support\Facades\Storage;
 
 class Menu extends Model
 {
@@ -25,10 +25,10 @@ class Menu extends Model
     {
         static::addGlobalScope(new CafeScope);
 
-        // Limpiar Cloudinary al eliminar registro
+        // Limpiar local al eliminar registro
         static::deleting(function ($menu) {
-            if ($menu->imagen_public_id) {
-                CloudinaryService::delete($menu->imagen_public_id);
+            if ($menu->imagen_url) {
+                Storage::disk('public')->delete($menu->imagen_url);
             }
         });
     }
@@ -45,6 +45,7 @@ class Menu extends Model
 
     public function getImagenFullUrlAttribute()
     {
-        return $this->attributes['imagen_url'] ?? null;
+        if (!$this->imagen_url) return null;
+        return str_starts_with($this->imagen_url, 'http') ? $this->imagen_url : asset('storage/' . $this->imagen_url);
     }
 }
