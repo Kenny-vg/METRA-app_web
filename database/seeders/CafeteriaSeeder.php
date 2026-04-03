@@ -16,6 +16,8 @@ use App\Models\Promocion;
 use App\Models\Reservacion;
 use App\Models\DetalleOcupacion;
 use App\Models\Resena;
+use App\Models\Plan;
+use App\Models\Suscripcion;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 
@@ -182,6 +184,31 @@ class CafeteriaSeeder extends Seeder
             );
             $promosIds[] = $promo->id;
         }
+
+        // 6.5 Asegurar Suscripción Activa
+        $plan = Plan::first();
+        if (!$plan) {
+            $plan = Plan::create([
+                'nombre_plan' => 'Plan Pro',
+                'precio' => 499.00,
+                'duracion_dias' => 30,
+                'max_reservas_mes' => 500,
+                'max_usuarios_admin' => 5,
+                'estado' => true
+            ]);
+        }
+
+        Suscripcion::updateOrCreate(
+            ['cafe_id' => $cafe->id, 'estado_pago' => 'pagado'],
+            [
+                'plan_id' => $plan->id,
+                'user_id' => $gerente->id,
+                'fecha_inicio' => Carbon::now()->subDays(30),
+                'fecha_fin' => Carbon::now()->addDays(30),
+                'monto' => $plan->precio,
+                'fecha_validacion' => Carbon::now()
+            ]
+        );
 
         // 7. HISTORIAL PARA MINERÍA DE DATOS (Últimos 14 días + Próximos 3)
         $this->seedHistoricalData($cafe, $staff, $zonasIds, $ocasionesIds, $promosIds);
