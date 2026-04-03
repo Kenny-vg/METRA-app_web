@@ -149,6 +149,7 @@ Hola <strong>{{ $reservacion->nombre_cliente }}</strong>, tu reservación se ha 
 <p><strong>Fecha:</strong> {{ $reservacion->fecha }}</p>
 <p><strong>Hora:</strong> {{ $reservacion->hora_inicio }}</p>
 <p><strong>Número de personas:</strong> {{ $reservacion->numero_personas }}</p>
+<p><strong>Tolerancia de llegada:</strong> {{ $reservacion->cafeteria->tolerancia_reserva_min ?? 15 }} minutos</p>
 
 @if($reservacion->comentarios)
 <p><strong>Comentarios:</strong> {{ $reservacion->comentarios }}</p>

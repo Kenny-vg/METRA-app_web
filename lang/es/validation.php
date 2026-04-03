@@ -11,6 +11,12 @@ return [
         'string' => 'El campo :attribute no debe ser mayor a :max caracteres.',
     ],
     'confirmed' => 'La confirmación del campo :attribute no coincide.',
+    'digits' => 'El campo :attribute debe tener :digits dígitos.',
+    'numeric' => 'El campo :attribute debe ser un número.',
+    'integer' => 'El campo :attribute debe ser un número entero.',
+    'image' => 'El campo :attribute debe ser una imagen.',
+    'mimes' => 'El campo :attribute debe ser un archivo de tipo: :values.',
+    'regex' => 'El formato del campo :attribute es inválido.',
 
     'custom' => [
         'gerente.email' => [

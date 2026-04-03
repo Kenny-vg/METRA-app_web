@@ -182,13 +182,23 @@
                                     </div>
                                 </div>
                                 
+                                <div id="sidebar-telefono" class="d-none align-items-center gap-3">
+                                    <div style="width: 36px; height: 36px; background: var(--off-white); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="bi bi-telephone-fill" style="color: var(--accent-gold);"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 fw-bold small">Teléfono de atención</p>
+                                        <p class="mb-0 text-muted" id="sidebar-telefono-texto" style="font-size: 0.8rem;"></p>
+                                    </div>
+                                </div>
+
                                 <div class="d-flex align-items-center gap-3">
                                     <div style="width: 36px; height: 36px; background: var(--off-white); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                         <i class="bi bi-clock-fill" style="color: var(--accent-gold);"></i>
                                     </div>
                                     <div>
                                         <p class="mb-0 fw-bold small">Tolerancia de llegada</p>
-                                        <p class="mb-0 text-muted" style="font-size: 0.8rem;">15 minutos después del horario reservado.</p>
+                                        <p class="mb-0 text-muted" id="sidebar-tolerancia-texto" style="font-size: 0.8rem;">15 minutos después del horario reservado.</p>
                                     </div>
                                 </div>
 
@@ -275,6 +285,18 @@
                     document.getElementById('sidebar-direccion').classList.remove('d-none');
                     document.getElementById('sidebar-direccion').classList.add('d-flex');
                 }
+
+                // Bind Phone
+                if (cafe.telefono) {
+                    document.getElementById('sidebar-telefono-texto').textContent = cafe.telefono;
+                    const telCont = document.getElementById('sidebar-telefono');
+                    telCont.classList.remove('d-none');
+                    telCont.classList.add('d-flex');
+                }
+
+                // Bind Tolerance
+                const tolerancia = cafe.tolerancia_reserva_min || 15;
+                document.getElementById('sidebar-tolerancia-texto').textContent = `${tolerancia} minutos después del horario reservado.`;
 
                 // Bind image with cache busting if exists
                 let finalImgUrl = FALLBACK_IMG;

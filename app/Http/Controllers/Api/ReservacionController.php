@@ -494,6 +494,7 @@ class ReservacionController extends Controller
                 'calle' => $r->cafeteria->calle ?? null,
                 'colonia' => $r->cafeteria->colonia ?? null,
                 'ciudad' => $r->cafeteria->ciudad ?? null,
+                'tolerancia' => $r->cafeteria->tolerancia_reserva_min ?? 15,
             ] : null,
             'ocasion' => $r->relationLoaded('ocasionEspecial') && $r->ocasionEspecial ? ['nombre' => $r->ocasionEspecial->nombre] : null,
             'promocion' => $r->relationLoaded('promocion') && $r->promocion ? ['nombre' => $r->promocion->nombre_promocion, 'precio' => $r->promocion->precio] : null,

@@ -723,6 +723,10 @@
                                             <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">Ubicación Preferente</small>
                                             <span class="fw-bold fs-6 cl-dark"><i class="bi bi-geo-alt me-2 text-gold"></i>${zonaP}</span>
                                         </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">Tolerancia de llegada</small>
+                                            <span class="fw-bold fs-6 cl-dark"><i class="bi bi-clock me-2 text-gold"></i>${rsv.cafeteria.tolerancia || 15} minutos</span>
+                                        </div>
                                         <div class="col-12 mt-4 pt-2" style="border-top: 1px dashed #d1c8b3;">
                                             <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">Ocasión Declarada</small>
                                             <span class="badge bg-dark fw-normal px-3 py-2 text-gold" style="font-size: 0.85rem;">${ocasionP}</span>
