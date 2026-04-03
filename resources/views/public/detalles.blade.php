@@ -366,11 +366,11 @@
                         if (categoria.menus && categoria.menus.length > 0) {
                             categoria.menus.forEach(item => {
                                 const timestamp = new Date().getTime();
-                                const imgUrlWithCacheBuster = item.imagen_url.startsWith('http') ? item.imagen_url : `{{ url('storage') }}/${item.imagen_url}?v=${timestamp}`;
-                                const img = item.imagen_url ? imgUrlWithCacheBuster : 'https://placehold.co/300x200/faf6f0/c5a059?text=METRA';
+                                const imgUrl = item.imagen_url ? (item.imagen_url.startsWith('http') ? item.imagen_url : `{{ url('storage') }}/${item.imagen_url}?v=${timestamp}`) : 'https://placehold.co/300x200/faf6f0/c5a059?text=METRA';
+                                
                                 menuContainer.innerHTML += `
                                     <div class="col-6 col-md-4 text-center mb-3">
-                                        <div style="width: 100%; height: 120px; border-radius: 12px; background-image: url('${img}'); background-size: cover; background-position: center; border: 1px solid var(--border-light);" class="mb-2 shadow-sm"></div>
+                                        <div style="width: 100%; height: 120px; border-radius: 12px; background-image: url('${imgUrl}'); background-size: cover; background-position: center; border: 1px solid var(--border-light);" class="mb-2 shadow-sm"></div>
                                         <p class="small fw-bold mb-0 text-truncate" style="color: var(--black-primary);" title="${escapeHTML(item.nombre_producto)}">${escapeHTML(item.nombre_producto)}</p>
                                         <div class="d-flex justify-content-center align-items-center gap-2 mb-1">
                                             <span class="fw-bold text-accent-gold" style="font-size: 0.85rem;">${new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(item.precio || 0)}</span>
@@ -442,7 +442,7 @@
                         promosContainer.innerHTML = '<div class="col-12 text-center text-muted py-3"><div class="spinner-border spinner-border-sm me-2"></div> Cargando...</div>';
                         
                         const url = ocasionId 
-                            ? `${API_URL}/cafeterias/${cafe.slug}/ocasiones/${ocasionId}/promociones`
+                            ? `/cafeterias/${cafe.slug}/ocasiones/${ocasionId}/promociones`
                             : `/cafeterias/${cafe.slug}/promociones`;
                             
                         const jsonPromos = await MetraAPI.get(url);

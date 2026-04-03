@@ -103,6 +103,10 @@ class CafeteriaSeeder extends Seeder
                 ['cat' => 'Antojitos', 'items' => [
                     ['n' => 'Concha con Nata', 'p' => 55, 'd' => 'Pan dulce artesanal con nata natural.'],
                     ['n' => 'Molletes Divorciados', 'p' => 95, 'd' => 'Con salsa verde y roja picante.']
+                ]],
+                ['cat' => 'Desayunos', 'items' => [
+                    ['n' => 'Chilaquiles Verdes', 'p' => 115, 'd' => 'Con pollo, crema y queso cotija.'],
+                    ['n' => 'Huevos a la Mexicana', 'p' => 85, 'd' => 'Acompañados de frijoles refritos.']
                 ]]
             ],
             'ocasiones' => [
