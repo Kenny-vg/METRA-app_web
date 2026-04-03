@@ -27,6 +27,13 @@ class CafeteriaSeeder extends Seeder
             'nombre' => 'METRA Luxury Coffee',
             'slug' => 'metra-luxury',
             'descripcion' => 'Experiencia premium de café de especialidad y alta repostería.',
+            'calle' => 'Av. Presidente Masaryk',
+            'num_exterior' => '123',
+            'colonia' => 'Polanco',
+            'estado_republica' => 'Ciudad de México',
+            'ciudad' => 'Miguel Hidalgo',
+            'cp' => '11560',
+            'telefono' => '5551234567',
             'zonas' => [
                 ['nombre' => 'Salón Interior', 'capacidad' => 2, 'mesas' => 4],
                 ['nombre' => 'Terraza Jardín', 'capacidad' => 4, 'mesas' => 4]
@@ -42,6 +49,13 @@ class CafeteriaSeeder extends Seeder
             'nombre' => 'Café Sabroso',
             'slug' => 'cafe-sabroso',
             'descripcion' => 'El sabor de la tradición en cada taza. Ambiente familiar y acogedor.',
+            'calle' => 'Calle Libertad',
+            'num_exterior' => '456',
+            'colonia' => 'Americana',
+            'estado_republica' => 'Jalisco',
+            'ciudad' => 'Guadalajara',
+            'cp' => '44160',
+            'telefono' => '3339876543',
             'zonas' => [
                 ['nombre' => 'Barra Principal', 'capacidad' => 2, 'mesas' => 3],
                 ['nombre' => 'Patio Tradicional', 'capacidad' => 6, 'mesas' => 5]
@@ -60,6 +74,13 @@ class CafeteriaSeeder extends Seeder
             [
                 'nombre' => $data['nombre'],
                 'descripcion' => $data['descripcion'],
+                'calle' => $data['calle'] ?? null,
+                'num_exterior' => $data['num_exterior'] ?? null,
+                'colonia' => $data['colonia'] ?? null,
+                'estado_republica' => $data['estado_republica'] ?? null,
+                'ciudad' => $data['ciudad'] ?? null,
+                'cp' => $data['cp'] ?? null,
+                'telefono' => $data['telefono'] ?? null,
                 'estado' => 'activa',
                 'user_id' => $gerente->id,
                 'porcentaje_reservas' => 85,

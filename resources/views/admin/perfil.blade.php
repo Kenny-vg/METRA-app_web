@@ -233,11 +233,12 @@
         let cafeteriaId = null;
         let estadosMunicipiosData = {};
         let isDirty = false;
-        let blockDirty = false;
+        let isInitializing = true;
 
         // Detectar cambios en el formulario
         document.getElementById('formPerfil').addEventListener('input', () => {
-            if (!isDirty && !blockDirty) {
+            if (isInitializing) return;
+            if (!isDirty) {
                 isDirty = true;
                 const alert = document.getElementById('dirtyAlert');
                 alert.classList.remove('d-none');
@@ -245,7 +246,8 @@
             }
         });
         document.getElementById('formPerfil').addEventListener('change', () => {
-            if (!isDirty && !blockDirty) {
+            if (isInitializing) return;
+            if (!isDirty) {
                 isDirty = true;
                 const alert = document.getElementById('dirtyAlert');
                 alert.classList.remove('d-none');
@@ -359,17 +361,14 @@
                     const estadoSelect = document.querySelector('select[name="estado_republica"]');
                     if (estadoSelect) {
                         trySelectOption(estadoSelect, cafe.estado_republica);
-                        // Forzar el disparo del evento manual
+                        // Forzar el disparo del evento manual para que se carguen los municipios
                         estadoSelect.dispatchEvent(new Event('change'));
 
                         // Una vez pobladas las ciudades por el evento change, asignamos la ciudad
                         if (cafe.ciudad) {
                             const ciudadSelect = document.querySelector('select[name="ciudad"]');
                             if (ciudadSelect) {
-                                // Microescala de tiempo para que el DOM indexe los nuevos <options>
-                                setTimeout(() => {
-                                    trySelectOption(ciudadSelect, cafe.ciudad);
-                                }, 150);
+                                trySelectOption(ciudadSelect, cafe.ciudad);
                             }
                         }
                     }
@@ -413,8 +412,8 @@
             } catch (e) {
                 console.error('Error cargando perfil:', e);
             } finally {
-                // Pequeño delay para permitir que eventos change propaguen antes de re-habilitar el flag
-                setTimeout(() => { blockDirty = false; }, 100);
+                // Finalizamos la inicialización para permitir el dirty checker
+                setTimeout(() => { isInitializing = false; }, 200);
             }
         }
 
@@ -507,9 +506,17 @@
                 alert.classList.remove('d-flex');
 
             } catch (e) {
+                let errorMsg = 'Error al actualizar';
+                if (e.data?.errors) {
+                    errorMsg = Object.values(e.data.errors).flat().join(' | ');
+                } else if (e.data?.message) {
+                    errorMsg = e.data.message;
+                } else if (e.message) {
+                    errorMsg = e.message;
+                }
                 Swal.fire({
                     title: 'Error',
-                    text: e.data?.message || Object.values(e.data?.errors || {}).join(' | ') || e.message || 'Error al actualizar',
+                    text: errorMsg,
                     icon: 'error',
                     confirmButtonColor: '#212529'
                 });

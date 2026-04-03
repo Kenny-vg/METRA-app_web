@@ -68,12 +68,12 @@ class CafeteriaPerfilController extends Controller
         $data = $request->validate([
             'nombre' => 'sometimes|string|max:100',
             'descripcion' => 'nullable|string|max:255',
-            'calle' => 'required|string|max:100',
+            'calle' => 'sometimes|required|string|max:100',
             'num_exterior' => 'nullable|string|max:10',
             'num_interior' => 'nullable|string|max:10',
-            'colonia' => 'required|string|max:50|regex:/^[a-zA-ZÀ-ÿ\s]+$/',
-            'estado_republica' => 'nullable|string|max:80|regex:/^[a-zA-ZÀ-ÿ\s]+$/',
-            'ciudad' => 'nullable|string|max:80|regex:/^[a-zA-ZÀ-ÿ\s]+$/',
+            'colonia' => 'sometimes|required|string|max:50',
+            'estado_republica' => 'nullable|string|max:80',
+            'ciudad' => 'nullable|string|max:80',
             'cp' => 'nullable|digits:5',
             'telefono' => 'nullable|digits:10',
             'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
@@ -86,7 +86,9 @@ class CafeteriaPerfilController extends Controller
         if ($request->hasFile('foto')) {
             try {
                 // Borrar anterior de Cloudinary si existe
-                $this->cloudinary->delete($cafeteria->foto_public_id);
+                if ($cafeteria->foto_public_id) {
+                    $this->cloudinary->delete($cafeteria->foto_public_id);
+                }
 
                 // Subir nueva foto a Cloudinary (pública)
                 $result = $this->cloudinary->upload($request->file('foto'), 'metra/perfiles');
@@ -97,6 +99,10 @@ class CafeteriaPerfilController extends Controller
                 return ApiResponse::error('Error al subir la foto a Cloudinary', 500);
             }
         }
+
+        // Limpieza final: remover 'foto' antes del update ya que en DB es 'foto_url'
+        unset($data['foto']);
+        
         $cafeteria->update($data);
 
         $cafeteria->refresh(); //Devuelve los datos actualizados
