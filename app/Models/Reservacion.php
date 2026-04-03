@@ -33,7 +33,9 @@ class Reservacion extends Model
         'promocion_id',
         'zona_id',
         'cancelado_por_id',
-        'cancelado_por_rol'
+        'cancelado_por_rol',
+        'fecha_checkin',
+        'fecha_checkout'
     ];
 
     protected static function booted()

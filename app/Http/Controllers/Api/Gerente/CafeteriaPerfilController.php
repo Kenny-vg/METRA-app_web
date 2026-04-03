@@ -27,7 +27,7 @@ class CafeteriaPerfilController extends Controller
         $cafeteria = $request->user()->cafeteria;
 
         if ($cafeteria) {
-            $cafeteria->load(['suscripcionActual.plan']);
+            $cafeteria->load(['suscripcionActual.plan', 'gerente']);
         }
 
         return ApiResponse::success(

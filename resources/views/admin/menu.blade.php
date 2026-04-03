@@ -206,11 +206,55 @@
             }
         }
 
-        document.getElementById('btnCerrarSesion')?.addEventListener('click', function (e) {
-            e.preventDefault();
-            localStorage.clear();
-            sessionStorage.clear();
-            window.location.href = '/logout';
+        async function cargarInfoSidebarGlobal() {
+            const elUser = document.getElementById('sidebar-user-name');
+            const elCafe = document.getElementById('sidebar-cafe-name');
+            if (!elUser || !elCafe) return;
+
+            // 1. Cargar desde cache (Flicker-free)
+            const cachedUser = localStorage.getItem('metra_user_name');
+            const cachedCafe = localStorage.getItem('metra_cafe_name');
+
+            if (cachedUser) {
+                elUser.textContent = `Hola, ${cachedUser}`;
+                elUser.classList.remove('d-none');
+            }
+            if (cachedCafe) {
+                elCafe.textContent = cachedCafe;
+                elCafe.classList.remove('d-none');
+            }
+
+            // 2. Refresh desde API
+            try {
+                const res = await MetraAPI.get('/gerente/mi-cafeteria');
+                const cafe = res.data;
+                const userName = cafe.gerente ? cafe.gerente.name : 'Gerente';
+                const cafeName = cafe.nombre;
+
+                // Actualizar DOM
+                elUser.textContent = `Hola, ${userName}`;
+                elUser.classList.remove('d-none');
+                elCafe.textContent = cafeName;
+                elCafe.classList.remove('d-none');
+
+                // Guardar en cache para próxima navegación
+                localStorage.setItem('metra_user_name', userName);
+                localStorage.setItem('metra_cafe_name', cafeName);
+
+            } catch (e) {
+                console.error("Error actualizando sidebar:", e);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarInfoSidebarGlobal();
+            
+            document.getElementById('btnCerrarSesion')?.addEventListener('click', function (e) {
+                e.preventDefault();
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = '/logout';
+            });
         });
     </script>
 
