@@ -220,7 +220,7 @@ class CafeteriaSeeder extends Seeder
 
                 $cliente = $clientNames[array_rand($clientNames)] . ' ' . $lastNames[array_rand($lastNames)];
                 
-                $rsv = Reservacion::create([
+                $rsvData = [
                     'folio' => 'SEED-' . Str::upper(Str::random(5)),
                     'nombre_cliente' => $cliente,
                     'telefono' => '55' . rand(10000000, 99999999),
@@ -234,7 +234,16 @@ class CafeteriaSeeder extends Seeder
                     'zona_id' => $zonas[array_rand($zonas)],
                     'ocasion_especial_id' => (rand(0, 1) === 0) ? $ocasiones[array_rand($ocasiones)] : null,
                     'promocion_id' => (rand(0, 1) === 0) ? $promos[array_rand($promos)] : null
-                ]);
+                ];
+
+                if ($status === 'finalizada' || $status === 'en_curso') {
+                    $rsvData['fecha_checkin'] = $horaInicio->copy()->addMinutes(rand(-10, 5));
+                    if ($status === 'finalizada') {
+                        $rsvData['fecha_checkout'] = $horaFin->copy()->addMinutes(rand(0, 30));
+                    }
+                }
+
+                $rsv = Reservacion::create($rsvData);
 
                 // Si está finalizada, crear ocupación y reseña
                 if ($status === 'finalizada') {
@@ -248,8 +257,8 @@ class CafeteriaSeeder extends Seeder
                         'cafe_id' => $cafe->id,
                         'user_id' => $staff->id,
                         'mesa_id' => $mesaAsignada ? $mesaAsignada->id : null,
-                        'fecha_checkin' => $horaInicio->copy()->addMinutes(rand(-10, 5)),
-                        'fecha_checkout' => $horaFin->copy()->addMinutes(rand(0, 30))
+                        'hora_entrada' => $rsv->fecha_checkin,
+                        'hora_salida' => $rsv->fecha_checkout
                     ]);
 
                     // 60% chance de reseña
