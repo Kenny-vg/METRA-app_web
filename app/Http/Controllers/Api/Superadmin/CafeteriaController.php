@@ -89,13 +89,38 @@ class CafeteriaController extends Controller
     public function verComprobante(Cafeteria $cafeteria)
     {
         $comprobante = $cafeteria->comprobante_url;
+        $publicId = $cafeteria->comprobante_public_id;
 
         // Fallback: Si el negocio no lo tiene directamente, buscar en su última suscripción
-        if (!$comprobante) {
-            $ultimaSub = $cafeteria->suscripciones()->whereNotNull('comprobante_url')->latest()->first();
-            $comprobante = $ultimaSub ? $ultimaSub->comprobante_url : null;
+        if (!$comprobante && !$publicId) {
+            $ultimaSub = $cafeteria->suscripciones()->whereNotNull('comprobante_public_id')->latest()->first();
+            if ($ultimaSub) {
+                $publicId = $ultimaSub->comprobante_public_id;
+            } else {
+                // Legacy: buscar por URL local
+                $ultimaSub = $cafeteria->suscripciones()->whereNotNull('comprobante_url')->latest()->first();
+                $comprobante = $ultimaSub ? $ultimaSub->comprobante_url : null;
+            }
         }
 
+        // Caso 1: Comprobante en Cloudinary (autenticado)
+        if ($publicId) {
+            try {
+                $cloudinary = app(\App\Services\CloudinaryService::class);
+                // Intentar como imagen primero, luego como raw (PDFs)
+                try {
+                    $signedUrl = $cloudinary->privateDownloadUrl($publicId, 'jpg', 'image');
+                } catch (\Throwable $e) {
+                    $signedUrl = $cloudinary->privateDownloadUrl($publicId, 'pdf', 'raw');
+                }
+                return redirect()->away($signedUrl);
+            } catch (\Throwable $e) {
+                \Log::error("Error generando URL firmada: " . $e->getMessage());
+                return ApiResponse::error('Error al generar acceso al comprobante', 500);
+            }
+        }
+
+        // Caso 2: Comprobante legacy en storage local
         if (!$comprobante) {
             return ApiResponse::error('Este negocio no tiene comprobante registrado', 404);
         }

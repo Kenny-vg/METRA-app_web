@@ -157,6 +157,23 @@ class SuscripcionController extends Controller
      */
     public function verComprobante(Suscripcion $suscripcion)
     {
+        // Caso 1: Comprobante en Cloudinary (autenticado)
+        if ($suscripcion->comprobante_public_id) {
+            try {
+                $cloudinary = app(\App\Services\CloudinaryService::class);
+                try {
+                    $signedUrl = $cloudinary->privateDownloadUrl($suscripcion->comprobante_public_id, 'jpg', 'image');
+                } catch (\Throwable $e) {
+                    $signedUrl = $cloudinary->privateDownloadUrl($suscripcion->comprobante_public_id, 'pdf', 'raw');
+                }
+                return redirect()->away($signedUrl);
+            } catch (\Throwable $e) {
+                \Log::error("Error generando URL firmada suscripción: " . $e->getMessage());
+                return ApiResponse::error('Error al generar acceso al comprobante', 500);
+            }
+        }
+
+        // Caso 2: Legacy en storage local
         if (!$suscripcion->comprobante_url) {
             return ApiResponse::error('Esta suscripción no tiene comprobante.', 404);
         }

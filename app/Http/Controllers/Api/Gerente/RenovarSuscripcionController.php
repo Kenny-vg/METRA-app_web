@@ -7,10 +7,16 @@ use Illuminate\Http\Request;
 use App\Models\Suscripcion;
 use App\Models\Plan;
 use App\Helpers\ApiResponse;
-use Illuminate\Support\Facades\Storage;
+use App\Services\CloudinaryService;
 
 class RenovarSuscripcionController extends Controller
 {
+    protected CloudinaryService $cloudinary;
+
+    public function __construct(CloudinaryService $cloudinary)
+    {
+        $this->cloudinary = $cloudinary;
+    }
     /**
      * El gerente solicita renovación de su suscripción.
      *
@@ -78,8 +84,13 @@ class RenovarSuscripcionController extends Controller
             ->latest('id')
             ->first();
 
-        // Guardar el nuevo comprobante en storage
-        $nuevaRutaComprobante = $request->file('comprobante')->store('comprobantes');
+        // Guardar el nuevo comprobante en Cloudinary (privado/autenticado)
+        try {
+            $result = $this->cloudinary->uploadPrivate($request->file('comprobante'), 'metra/comprobantes');
+        } catch (\Throwable $e) {
+            \Log::error("Error Cloudinary upload renovación: " . $e->getMessage());
+            return ApiResponse::error('Error al subir el comprobante a Cloudinary', 500);
+        }
 
         // Calcular las nuevas fechas esperadas para la renovación (como propuesta inicial)
         $suscripcionActiva = Suscripcion::where('cafe_id', $cafeteria->id)
@@ -97,16 +108,17 @@ class RenovarSuscripcionController extends Controller
 
         // ─── Siempre crear una nueva solicitud en el historial 1:N ───
         $suscripcion = Suscripcion::create([
-            'cafe_id'            => $cafeteria->id,
-            'plan_id'            => $plan->id,
-            'plan_solicitado_id' => null, // Ya no se usa para historial
-            'user_id'            => $user->id,
-            'fecha_inicio'       => $inicio,
-            'fecha_fin'          => $fin,
-            'monto'              => $plan->precio,
-            'comprobante_url'    => $nuevaRutaComprobante,
-            'estado_pago'        => 'pendiente',
-            'en_revision'        => true,
+            'cafe_id'                => $cafeteria->id,
+            'plan_id'                => $plan->id,
+            'plan_solicitado_id'     => null,
+            'user_id'                => $user->id,
+            'fecha_inicio'           => $inicio,
+            'fecha_fin'              => $fin,
+            'monto'                  => $plan->precio,
+            'comprobante_public_id'  => $result['public_id'],
+            'comprobante_url'        => null,
+            'estado_pago'            => 'pendiente',
+            'en_revision'            => true,
         ]);
 
         return ApiResponse::success([

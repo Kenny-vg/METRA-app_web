@@ -10,6 +10,13 @@ use Illuminate\Support\Facades\DB;
 
 class CafeteriaPerfilController extends Controller
 {
+    protected CloudinaryService $cloudinary;
+
+    public function __construct(CloudinaryService $cloudinary)
+    {
+        $this->cloudinary = $cloudinary;
+    }
+
     /**
      * ACCIONES DEL GERENTE
      */
@@ -77,17 +84,17 @@ class CafeteriaPerfilController extends Controller
         ]);
 
         if ($request->hasFile('foto')) {
-            // Borrar anterior si existe
-            if ($cafeteria->foto_url) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($cafeteria->foto_url);
-            }
+            try {
+                // Borrar anterior de Cloudinary si existe
+                $this->cloudinary->delete($cafeteria->foto_public_id);
 
-            $path = $request->file('foto')->store('metra/perfiles', 'public');
-            
-            if ($path) {
-                $data['foto_url'] = $path;
-            } else {
-                return ApiResponse::error('Error al subir la foto al servidor', 500);
+                // Subir nueva foto a Cloudinary (pública)
+                $result = $this->cloudinary->upload($request->file('foto'), 'metra/perfiles');
+                $data['foto_url'] = $result['url'];
+                $data['foto_public_id'] = $result['public_id'];
+            } catch (\Throwable $e) {
+                \Log::error("Error Cloudinary upload perfil: " . $e->getMessage());
+                return ApiResponse::error('Error al subir la foto a Cloudinary', 500);
             }
         }
         $cafeteria->update($data);

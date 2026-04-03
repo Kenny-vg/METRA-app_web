@@ -48,13 +48,15 @@ class Cafeteria extends Model
             }
         });
 
-        // Limpiar local al eliminar registro
+        // Limpiar Cloudinary al eliminar registro
         static::deleting(function ($cafeteria) {
-            if ($cafeteria->foto_url) {
-                Storage::disk('public')->delete($cafeteria->foto_url);
+            $cloudinary = app(\App\Services\CloudinaryService::class);
+
+            if ($cafeteria->foto_public_id) {
+                $cloudinary->delete($cafeteria->foto_public_id);
             }
-            if ($cafeteria->comprobante_url) {
-                Storage::disk('public')->delete($cafeteria->comprobante_url);
+            if ($cafeteria->comprobante_public_id) {
+                $cloudinary->delete($cafeteria->comprobante_public_id, 'image', 'authenticated');
             }
         });
     }

@@ -9,10 +9,10 @@ use App\Models\Suscripcion;
 use App\Models\User;
 use App\Helpers\ApiResponse;
 use App\Mail\ActivacionCuentaMail;
+use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -20,6 +20,12 @@ use Illuminate\Validation\ValidationException;
 
 class RegistroNegocioController extends Controller
 {
+    protected CloudinaryService $cloudinary;
+
+    public function __construct(CloudinaryService $cloudinary)
+    {
+        $this->cloudinary = $cloudinary;
+    }
     /**
      * Devuelve los planes activos (público, sin autenticación).
      */
@@ -253,7 +259,7 @@ class RegistroNegocioController extends Controller
     public function subirComprobante(Request $request, Cafeteria $cafeteria)
     {
         // Evitar subir comprobante si ya existe uno
-        if ($cafeteria->comprobante_url) {
+        if ($cafeteria->comprobante_url || $cafeteria->comprobante_public_id) {
             return ApiResponse::error(
                 'El comprobante ya fue enviado y está en revisión por el administrador.',
                 409
@@ -265,35 +271,31 @@ class RegistroNegocioController extends Controller
         ]);
 
         try {
-
             $file = $request->file('comprobante');
 
-            $path = $file->store('metra/comprobantes', 'public');
-
-            if (!$path) {
-                return ApiResponse::error('Error al subir el comprobante al servidor', 500);
-            }
+            // Upload privado/autenticado a Cloudinary
+            $result = $this->cloudinary->uploadPrivate($file, 'metra/comprobantes');
 
             $cafeteria->update([
-                'comprobante_url' => $path
+                'comprobante_public_id' => $result['public_id'],
+                'comprobante_url'       => null, // No guardamos URL pública
             ]);
 
             $suscripcion = $cafeteria->suscripciones()->latest()->first();
             if ($suscripcion) {
                 $suscripcion->update([
-                    'comprobante_url' => $path
+                    'comprobante_public_id' => $result['public_id'],
+                    'comprobante_url'       => null,
                 ]);
             }
 
             return ApiResponse::success(
-                ['comprobante_url' => $path],
+                ['comprobante_public_id' => $result['public_id']],
                 'Comprobante subido correctamente.'
             );
 
-        }
-        catch (\Throwable $e) {
-
-            \Log::error("Error al subir comprobante: " . $e->getMessage());
+        } catch (\Throwable $e) {
+            \Log::error("Error al subir comprobante a Cloudinary: " . $e->getMessage());
 
             return ApiResponse::error(
                 'Error interno al subir el comprobante.',

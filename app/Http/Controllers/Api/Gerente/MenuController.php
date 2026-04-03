@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Menu;
 use App\Helpers\ApiResponse;
 use App\Traits\Activable;
-use Illuminate\Support\Facades\Storage;
+use App\Services\CloudinaryService;
 use App\Models\MenuCategoria;
 use Illuminate\Validation\Rule;
 
@@ -16,6 +16,12 @@ class MenuController extends Controller
     use Activable;
 
     protected $model = Menu::class;
+    protected CloudinaryService $cloudinary;
+
+    public function __construct(CloudinaryService $cloudinary)
+    {
+        $this->cloudinary = $cloudinary;
+    }
 
     public function index(Request $request)
     {
@@ -63,11 +69,13 @@ class MenuController extends Controller
         ];
 
         if ($request->hasFile('imagen_url')) {
-            $path = $request->file('imagen_url')->store('metra/menus', 'public');
-            if ($path) {
-                $data['imagen_url'] = $path;
-            } else {
-                return ApiResponse::error('Error al subir la imagen al servidor', 500);
+            try {
+                $result = $this->cloudinary->upload($request->file('imagen_url'), 'metra/menus');
+                $data['imagen_url'] = $result['url'];
+                $data['imagen_public_id'] = $result['public_id'];
+            } catch (\Throwable $e) {
+                \Log::error("Error Cloudinary upload menú: " . $e->getMessage());
+                return ApiResponse::error('Error al subir la imagen a Cloudinary', 500);
             }
         }
 
@@ -113,18 +121,17 @@ class MenuController extends Controller
         ];
 
         if ($request->hasFile('imagen_url')) {
+            try {
+                // Borrar la anterior de Cloudinary si existe
+                $this->cloudinary->delete($menu->imagen_public_id);
 
-            // Borrar la anterior si existe
-            if ($menu->imagen_url) {
-                Storage::disk('public')->delete($menu->imagen_url);
-            }
-
-            $path = $request->file('imagen_url')->store('metra/menus', 'public');
-
-            if ($path) {
-                $data['imagen_url'] = $path;
-            } else {
-                return ApiResponse::error('Error al subir la imagen al servidor', 500);
+                // Subir la nueva
+                $result = $this->cloudinary->upload($request->file('imagen_url'), 'metra/menus');
+                $data['imagen_url'] = $result['url'];
+                $data['imagen_public_id'] = $result['public_id'];
+            } catch (\Throwable $e) {
+                \Log::error("Error Cloudinary update menú: " . $e->getMessage());
+                return ApiResponse::error('Error al subir la imagen a Cloudinary', 500);
             }
         }
 

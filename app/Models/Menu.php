@@ -25,10 +25,10 @@ class Menu extends Model
     {
         static::addGlobalScope(new CafeScope);
 
-        // Limpiar local al eliminar registro
+        // Limpiar Cloudinary al eliminar registro
         static::deleting(function ($menu) {
-            if ($menu->imagen_url) {
-                Storage::disk('public')->delete($menu->imagen_url);
+            if ($menu->imagen_public_id) {
+                app(\App\Services\CloudinaryService::class)->delete($menu->imagen_public_id);
             }
         });
     }

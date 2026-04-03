@@ -397,7 +397,8 @@
                 }
 
                 if (cafe.foto_url) {
-                    document.getElementById('previewFoto').src = `/storage/${cafe.foto_url}?v=` + new Date().getTime();
+                    const fotoSrc = cafe.foto_url.startsWith('http') ? cafe.foto_url : `/storage/${cafe.foto_url}?v=` + new Date().getTime();
+                    document.getElementById('previewFoto').src = fotoSrc;
                     document.getElementById('previewFoto').classList.remove('d-none');
                     document.getElementById('placeholder-foto').classList.add('d-none');
                     document.getElementById('overlay-foto').classList.remove('d-none');
@@ -487,7 +488,8 @@
                 // Actualizar preview con la foto guardada (si la API devuelve foto_url)
                 const cafe = res.data || res;
                 if (cafe.foto_url) {
-                    document.getElementById('previewFoto').src = `/storage/${cafe.foto_url}?v=` + new Date().getTime();
+                    const fotoSrc = cafe.foto_url.startsWith('http') ? cafe.foto_url : `/storage/${cafe.foto_url}?v=` + new Date().getTime();
+                    document.getElementById('previewFoto').src = fotoSrc;
                     fotoInput.value = ''; // resetear input
                 }
 
