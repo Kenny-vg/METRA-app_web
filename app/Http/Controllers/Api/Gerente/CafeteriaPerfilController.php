@@ -28,6 +28,11 @@ class CafeteriaPerfilController extends Controller
 
         if ($cafeteria) {
             $cafeteria->load(['suscripcionActual.plan', 'gerente']);
+            
+            // Calculo dinámico de capacidad total (suma capacidad de todas las mesas activas)
+            $cafeteria->capacidad_total = \App\Models\Mesa::where('cafe_id', $cafeteria->id)
+                                            ->where('activo', 1)
+                                            ->sum('capacidad');
         }
 
         return ApiResponse::success(
