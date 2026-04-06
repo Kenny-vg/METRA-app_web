@@ -12,8 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // 1. VISTA: Analítica General (Capacidad y Fidelidad)
-        // Esta vista pre-calcula métricas de alto nivel para el dashboard.
+        // 1. VISTA: Analítica General (Capacidad y Fidelidad Unificada)
         DB::unprepared("
             CREATE OR REPLACE VIEW vw_analitica_gerente_general AS
             SELECT 
@@ -28,21 +27,30 @@ return new class extends Migration
                     HAVING COUNT(*) > 1
                 ) AS sub WHERE sub.cafe_id = c.id) AS clientes_recurrentes,
                 (SELECT COUNT(*) FROM reservaciones WHERE cafe_id = c.id AND estado = 'no_show' AND fecha >= DATE_SUB(NOW(), INTERVAL 30 DAY)) AS no_shows_30_dias,
-                (SELECT COUNT(*) FROM reservaciones WHERE cafe_id = c.id AND fecha >= DATE_SUB(NOW(), INTERVAL 30 DAY)) AS total_reservas_30_dias
+                (SELECT COUNT(*) FROM (
+                    SELECT id FROM reservaciones WHERE cafe_id = c.id AND fecha >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                    UNION ALL
+                    SELECT DISTINCT grupo_id FROM detalle_ocupaciones WHERE cafe_id = c.id AND tipo = 'walkin' AND hora_entrada >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                ) AS total_visitas) AS total_visitas_30_dias
             FROM cafeterias c;
         ");
 
-        // 2. VISTA: Demanda Horaria (Mapa de Calor)
+        // 2. VISTA: Demanda Horaria Unificada (Mapa de Calor)
         DB::unprepared("
             CREATE OR REPLACE VIEW vw_demanda_horaria AS
             SELECT 
                 cafe_id,
-                HOUR(hora_inicio) AS hora,
-                COUNT(*) AS total_reservas
-            FROM reservaciones
-            WHERE estado != 'cancelada'
-            GROUP BY cafe_id, HOUR(hora_inicio);
+                hora,
+                COUNT(*) AS total_servicios
+            FROM (
+                SELECT cafe_id, HOUR(hora_inicio) as hora FROM reservaciones WHERE estado != 'cancelada'
+                UNION ALL
+                SELECT cafe_id, HOUR(hora_entrada) as hora FROM detalle_ocupaciones WHERE tipo = 'walkin' AND estado != 'cancelada'
+                GROUP BY cafe_id, HOUR(hora_entrada), grupo_id
+            ) as unified
+            GROUP BY cafe_id, hora;
         ");
+
     }
 
     /**

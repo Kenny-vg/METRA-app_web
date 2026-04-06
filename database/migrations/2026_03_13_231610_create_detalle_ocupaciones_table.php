@@ -24,6 +24,8 @@ return new class extends Migration
             $table->enum('tipo', ['reservacion', 'walkin'])->default('walkin');
             $table->string('comentarios', 255)->nullable();
             $table->string('token_resena')->nullable();
+            $table->string('grupo_id')->nullable();
+
 
             $table->dateTime('hora_entrada')->nullable();
             $table->dateTime('hora_salida')->nullable();
@@ -56,7 +58,9 @@ return new class extends Migration
             $table->index('cafe_id');
             $table->index('user_id');
             $table->index('mesa_id');
+            $table->index('grupo_id');
             $table->index('estado');
+
 
             $table->timestamps();
         });

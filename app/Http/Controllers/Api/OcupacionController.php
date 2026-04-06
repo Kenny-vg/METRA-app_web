@@ -92,12 +92,15 @@ class OcupacionController extends Controller
             }
 
             $ocupaciones = [];
+            $grupoId = (string) Str::uuid();
             $personasPorMesa = ceil($request->numero_personas / count($request->mesa_ids));
 
             foreach ($request->mesa_ids as $mesaId) {
                 $ocupaciones[] = DetalleOcupacion::create([
                     'mesa_id' => $mesaId,
+                    'grupo_id' => $grupoId,
                     'numero_personas' => $personasPorMesa,
+
                     'reservacion_id' => $request->reservacion_id,
                     'tipo' => $request->reservacion_id ? 'reservacion' : 'walkin',
                     'nombre_cliente' => $request->nombre_cliente ?? ($reservacion ? $reservacion->nombre_cliente : null),
@@ -134,31 +137,54 @@ class OcupacionController extends Controller
             return ApiResponse::error('La mesa ya está cerrada');
         }
 
-        //cerrar ocupacion
-        $ocupacion->update([
-            'estado' => DetalleOcupacion::STATUS_FINALIZADA,
-            'hora_salida' => now()
-        ]);
+        $grupoId = $ocupacion->grupo_id;
+        $reservacionId = $ocupacion->reservacion_id;
 
-        // Actualizar reservación si existe
-        $reservacion = $ocupacion->reservacion;
+        // Buscamos todas las ocupaciones activas asociadas al mismo grupo o reservación
+        $ocupacionesRelacionadasQuery = DetalleOcupacion::where('estado', DetalleOcupacion::STATUS_ACTIVA);
 
-        if ($reservacion && $reservacion->estado === Reservacion::STATUS_ENCURSO) {
-            $reservacion->update([
-                'estado' => Reservacion::STATUS_FINALIZADA,
-                'fecha_checkout' => now()
-            ]);
+        if ($grupoId) {
+            $ocupacionesRelacionadasQuery->where('grupo_id', $grupoId);
+        } elseif ($reservacionId) {
+            $ocupacionesRelacionadasQuery->where('reservacion_id', $reservacionId);
+        } else {
+            $ocupacionesRelacionadasQuery->where('id', $id);
         }
 
-        //Obtener email (ocupación o reservación)
-        $email = $ocupacion->email ?? $reservacion?->email;
+        $ocupacionesAFinalizar = $ocupacionesRelacionadasQuery->get();
 
-        if ($email) {
-            Mail::to($email)->send(new SolicitarResena($ocupacion));
-        }
+        return DB::transaction(function () use ($ocupacionesAFinalizar, $ocupacion) {
+            $ahora = now();
 
-        return ApiResponse::success($ocupacion, 'Mesa cerrada');
+            // Actualizamos todas las ocupaciones del grupo en una sola consulta
+            DetalleOcupacion::whereIn('id', $ocupacionesAFinalizar->pluck('id'))
+                ->update([
+                    'estado' => DetalleOcupacion::STATUS_FINALIZADA,
+                    'hora_salida' => $ahora
+                ]);
+
+            // Actualizar reservación si existe
+            $reservacion = $ocupacion->reservacion;
+
+            if ($reservacion && $reservacion->estado === Reservacion::STATUS_ENCURSO) {
+                $reservacion->update([
+                    'estado' => Reservacion::STATUS_FINALIZADA,
+                    'fecha_checkout' => $ahora
+                ]);
+            }
+
+            // Obtener email (del registro principal o de la reservación)
+            $email = $ocupacion->email ?? $reservacion?->email;
+
+            if ($email) {
+                // Solo se envía una vez para todo el grupo literal gracias a que cerramos el grupo en esta misma petición
+                Mail::to($email)->send(new SolicitarResena($ocupacion));
+            }
+
+            return ApiResponse::success($ocupacion, count($ocupacionesAFinalizar) . ' mesa(s) liberada(s) correctamente.');
+        });
     }
+
 
     public function estadoMesas()
     {

@@ -25,8 +25,10 @@ class DetalleOcupacion extends Model
         'reservacion_id',
         'cafe_id',
         'user_id',
-        'mesa_id'
+        'mesa_id',
+        'grupo_id'
     ];
+
 
     protected $casts = [
         'hora_entrada' => 'datetime',

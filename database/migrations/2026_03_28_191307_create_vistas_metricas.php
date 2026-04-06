@@ -12,18 +12,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // 1. VISTA NATIVA: Reporte Diario de Ocupación por Cafetería (Uso Gerencial)
+        // 1. VISTA NATIVA: Reporte Diario de Ocupación Unificado
         DB::unprepared("
             CREATE OR REPLACE VIEW vw_reporte_diario AS
             SELECT 
                 cafe_id,
                 fecha,
-                COUNT(id) AS total_reservas,
-                SUM(CASE WHEN estado = 'finalizada' THEN 1 ELSE 0 END) AS reservas_completadas,
-                SUM(CASE WHEN estado = 'cancelada' THEN 1 ELSE 0 END) AS reservas_canceladas,
-                SUM(CASE WHEN estado = 'no_show' THEN 1 ELSE 0 END) AS no_shows,
-                SUM(numero_personas) AS total_comensales_esperados
-            FROM reservaciones
+                COUNT(CASE WHEN tipo = 'reserva' THEN 1 END) AS total_reservas,
+                SUM(CASE WHEN tipo = 'reserva' AND estado = 'finalizada' THEN 1 ELSE 0 END) AS reservas_completadas,
+                SUM(CASE WHEN tipo = 'reserva' AND estado = 'cancelada' THEN 1 ELSE 0 END) AS reservas_canceladas,
+                SUM(CASE WHEN tipo = 'reserva' AND estado = 'no_show' THEN 1 ELSE 0 END) AS no_shows,
+                COUNT(CASE WHEN tipo = 'walkin' THEN 1 END) AS total_walkins,
+                SUM(numero_personas) AS total_comensales_reales
+            FROM (
+                SELECT cafe_id, fecha, 'reserva' as tipo, estado, numero_personas FROM reservaciones
+                UNION ALL
+                SELECT cafe_id, DATE(hora_entrada) as fecha, 'walkin' as tipo, estado, SUM(numero_personas) as numero_personas
+                FROM detalle_ocupaciones
+                WHERE tipo = 'walkin'
+                GROUP BY cafe_id, DATE(hora_entrada), grupo_id, estado, tipo
+            ) as unified
             GROUP BY cafe_id, fecha;
         ");
 
@@ -45,8 +53,7 @@ return new class extends Migration
             $table->timestamp('ultima_actualizacion')->useCurrent();
         });
 
-        // 3. STORED PROCEDURE: Motor encargado de hacer el "Materialized Refresh"
-        // Este SP vacía y regenera la métrica calculando todo desde el histórico original agrupando por cafe_id
+        // 3. STORED PROCEDURE: Motor de actualización de métricas mensuales
         DB::unprepared("
             DROP PROCEDURE IF EXISTS sp_refresh_mv_metricas_mensuales;
             CREATE PROCEDURE sp_refresh_mv_metricas_mensuales()
@@ -59,15 +66,23 @@ return new class extends Migration
                     cafe_id,
                     YEAR(fecha) AS anio,
                     MONTH(fecha) AS mes,
-                    COUNT(id) AS total_reservaciones,
-                    SUM(CASE WHEN estado = 'cancelada' THEN 1 ELSE 0 END) AS cancelaciones,
-                    SUM(CASE WHEN estado IN ('finalizada', 'en_curso') THEN numero_personas ELSE 0 END) AS clientes_atendidos,
-                    IFNULL((SUM(CASE WHEN estado = 'finalizada' THEN 1 ELSE 0 END) / COUNT(id)) * 100, 0) AS porcentaje_efectividad,
+                    SUM(CASE WHEN tipo = 'reserva' THEN 1 ELSE 0 END) AS total_reservaciones,
+                    SUM(CASE WHEN tipo = 'reserva' AND estado = 'cancelada' THEN 1 ELSE 0 END) AS cancelaciones,
+                    SUM(CASE WHEN estado IN ('finalizada', 'en_curso', 'activa') THEN numero_personas ELSE 0 END) AS clientes_atendidos,
+                    IFNULL((SUM(CASE WHEN tipo = 'reserva' AND estado = 'finalizada' THEN 1 ELSE 0 END) / NULLIF(SUM(CASE WHEN tipo = 'reserva' THEN 1 ELSE 0 END), 0)) * 100, 0) AS porcentaje_efectividad,
                     NOW()
-                FROM reservaciones
+                FROM (
+                    SELECT cafe_id, fecha, 'reserva' as tipo, estado, numero_personas FROM reservaciones
+                    UNION ALL
+                    SELECT cafe_id, DATE(hora_entrada) as fecha, 'walkin' as tipo, estado, SUM(numero_personas) as numero_personas
+                    FROM detalle_ocupaciones
+                    WHERE tipo = 'walkin'
+                    GROUP BY cafe_id, DATE(hora_entrada), grupo_id, estado, tipo
+                ) as unified
                 GROUP BY cafe_id, YEAR(fecha), MONTH(fecha);
             END;
         ");
+
     }
 
     /**

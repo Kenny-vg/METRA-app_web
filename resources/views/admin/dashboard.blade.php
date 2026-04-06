@@ -16,53 +16,74 @@
     </div>
 
 
-    <div class="row g-4 mb-5 text-center">
-        <div class="col-12 col-sm-6 col-xl-3">
-            <div class="card border-0 p-4 h-100 premium-card">
+    <div class="row g-3 mb-5 text-center row-cols-1 row-cols-md-3 row-cols-xl-5">
+        <!-- 1. Servicios Totales (Unificado) -->
+        <div class="col">
+            <div class="card border-0 p-3 h-100 premium-card">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="small fw-bold text-uppercase" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.7rem;">Reservas de Hoy</span>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: var(--off-white); color: var(--black-primary);">
-                        <i class="bi bi-calendar-check-fill fs-5"></i>
+                    <span class="small fw-bold text-uppercase" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.65rem;">Servicios Totales</span>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: var(--off-white); color: var(--black-primary);">
+                        <i class="bi bi-people-fill fs-6"></i>
                     </div>
                 </div>
-                <h3 class="fw-bold mb-1" id="dash_reservas_hoy" style="color: var(--black-primary); font-size: 2.2rem; letter-spacing: -1px;">...</h3>
+                <h3 class="fw-bold mb-1" id="dash_visitas_totales" style="color: var(--black-primary); font-size: 1.8rem; letter-spacing: -1px;">...</h3>
                 <div class="d-flex align-items-center mt-2 justify-content-center">
-                    <span id="dash_comensales_label" class="small" style="color: var(--text-muted); font-size: 0.75rem;">Cargando...</span>
+                    <span id="dash_desglose_fuentes" class="small fw-bold" style="color: var(--text-muted); font-size: 0.65rem;">Cargando...</span>
                 </div>
             </div>
         </div>
 
-        <div class="col-12 col-sm-6 col-xl-3">
-             <div class="card border-0 p-4 h-100 premium-card">
+        <!-- 2. Ocupación Real (%) -->
+        <div class="col">
+             <div class="card border-0 p-3 h-100 premium-card">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="small fw-bold text-uppercase" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.7rem;">Ocupación Real</span>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(56, 44, 38, 0.05); color: var(--black-primary);">
-                        <i class="bi bi-house-door-fill fs-5"></i>
+                    <span class="small fw-bold text-uppercase" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.65rem;">Ocupación Real</span>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: rgba(56, 44, 38, 0.05); color: var(--black-primary);">
+                        <i class="bi bi-house-door-fill fs-6"></i>
                     </div>
                 </div>
-                <h3 class="fw-bold mb-1" id="dash_ocupacion_real" style="color: var(--black-primary); font-size: 2.2rem; letter-spacing: -1px;">0%</h3>
+                <h3 class="fw-bold mb-1" id="dash_ocupacion_real" style="color: var(--black-primary); font-size: 1.8rem; letter-spacing: -1px;">0%</h3>
                 <div class="mt-2 text-center">
-                    <span id="dash_insight_ocupacion" class="badge rounded-pill" style="background: rgba(46, 125, 50, 0.1); color: #2E7D32; border: 1px solid rgba(46, 125, 50, 0.2); font-weight: 700;">Calculando...</span>
+                    <span id="dash_insight_ocupacion" class="badge rounded-pill" style="background: rgba(46, 125, 50, 0.1); color: #2E7D32; border: 1px solid rgba(46, 125, 50, 0.2); font-size: 0.6rem; font-weight: 700;">Calculando...</span>
                 </div>
             </div>
         </div>
 
-        <div class="col-12 col-sm-6 col-xl-3">
-             <div class="card border-0 p-4 h-100 premium-card">
+        <!-- 3. Tiempo Promedio de Estancia -->
+        <div class="col">
+             <div class="card border-0 p-3 h-100 premium-card">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="small fw-bold text-uppercase" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.7rem;">Tasa No-Show</span>
-                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: var(--off-white); color: #c62828;">
-                        <i class="bi bi-person-x-fill fs-5"></i>
+                    <span class="small fw-bold text-uppercase" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.65rem;">Tiempo de Estancia</span>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: rgba(13, 110, 253, 0.05); color: #0d6efd;">
+                        <i class="bi bi-clock-fill fs-6"></i>
                     </div>
                 </div>
-                <h3 class="fw-bold mb-1" id="dash_noshow_rate" style="color: var(--black-primary); font-size: 2.2rem; letter-spacing: -1px;">0%</h3>
+                <h3 class="fw-bold mb-1" id="dash_tiempo_estancia" style="color: var(--black-primary); font-size: 1.8rem; letter-spacing: -1px;">0m</h3>
                 <div class="mt-2 text-center">
-                    <span id="dash_insight_noshow" class="badge rounded-pill" style="background: rgba(108, 117, 125, 0.1); color: #6c757d; font-weight: 700;">Dato 30 días</span>
+                    <span id="dash_insight_fuente" class="badge rounded-pill" style="background: rgba(13, 110, 253, 0.1); color: #0d6efd; font-size: 0.6rem; font-weight: 700;">Promedio Hoy</span>
                 </div>
             </div>
         </div>
 
-        <div class="col-12 col-sm-6 col-xl-3">
+        <!-- 4. Tasa No-Show -->
+        <div class="col">
+             <div class="card border-0 p-3 h-100 premium-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="small fw-bold text-uppercase" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.65rem;">Tasa No-Show</span>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: var(--off-white); color: #c62828;">
+                        <i class="bi bi-person-x-fill fs-6"></i>
+                    </div>
+                </div>
+                <h3 class="fw-bold mb-1" id="dash_noshow_rate" style="color: var(--black-primary); font-size: 1.8rem; letter-spacing: -1px;">0%</h3>
+                <div class="mt-2 text-center">
+                    <span id="dash_insight_noshow" class="badge rounded-pill" style="background: rgba(108, 117, 125, 0.1); color: #6c757d; font-size: 0.6rem; font-weight: 700;">Solo Reservas</span>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 5. Fidelidad -->
+        <div class="col">
              <div class="card border-0 p-4 h-100 premium-card" style="background: var(--black-primary); border-radius: 16px;">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <span class="small fw-bold text-uppercase" style="color: rgba(255,255,255,0.6); letter-spacing: 1px; font-size: 0.7rem;">Fidelidad</span>
@@ -72,11 +93,12 @@
                 </div>
                 <h3 class="fw-bold mb-1" id="dash_fidelidad_rate" style="color: var(--white-pure); font-size: 2.2rem; letter-spacing: -1px;">0%</h3>
                 <div class="mt-2 text-center">
-                    <span id="dash_insight_fidelidad" class="small fw-bold" style="color: var(--accent-gold); font-size: 0.7rem;">Recurrentes vs Nuevos</span>
+                    <span id="dash_insight_fidelidad" class="small fw-bold" style="color: var(--accent-gold); font-size: 0.7rem;">Clientes Recurrentes</span>
                 </div>
             </div>
         </div>
     </div>
+
 
     <!-- Sección de Gráficos de Inteligencia -->
     <div class="row g-4 mb-5">
@@ -536,17 +558,22 @@
                     const d = resStats.data;
                     
                     // Actualizar Tarjetas
-                    document.getElementById('dash_reservas_hoy').innerText = d.comensales_hoy || 0;
-                    document.getElementById('dash_comensales_label').innerText = `Comensales atendidos / cargando...`;
+                    document.getElementById('dash_visitas_totales').innerText = d.visitas_totales || 0;
+                    document.getElementById('dash_desglose_fuentes').innerText = `${d.desglose.reservaciones} Res. | ${d.desglose.walkins} Walk-ins`;
                     
-                    document.getElementById('dash_ocupacion_real').innerText = `${d.ocupacion_real}%`;
+                    document.getElementById('dash_ocupacion_real').innerText = `${d.ocupacion_real_porcentaje}%`;
                     document.getElementById('dash_insight_ocupacion').innerText = d.insights.ocupacion;
+
+                    document.getElementById('dash_tiempo_estancia').innerText = `${d.tiempo_promedio_estancia_min}m`;
+                    document.getElementById('dash_insight_fuente').innerText = d.insights.fuente_principal;
                     
                     document.getElementById('dash_noshow_rate').innerText = `${d.no_show_rate}%`;
-                    document.getElementById('dash_insight_noshow').innerText = d.insights.no_show;
                     
-                    document.getElementById('dash_fidelidad_rate').innerText = `${d.fidelidad_rate}%`;
-                    document.getElementById('dash_insight_fidelidad').innerText = `${d.clientes_recurrentes} Recurrentes | ${d.clientes_nuevos} Nuevos`;
+                    const fidelidadRate = d.fidelidad.clientes_unicos > 0 
+                        ? Math.round((d.fidelidad.clientes_recurrentes / d.fidelidad.clientes_unicos) * 100) 
+                        : 0;
+                    document.getElementById('dash_fidelidad_rate').innerText = `${fidelidadRate}%`;
+                    document.getElementById('dash_insight_fidelidad').innerText = `${d.fidelidad.clientes_recurrentes} Recurrentes | ${d.fidelidad.clientes_unicos - d.fidelidad.clientes_recurrentes} Nuevos`;
                 }
 
                 // 2. Gráfico: Horas Pico
@@ -563,14 +590,14 @@
         function renderChartHoras(data) {
             const ctx = document.getElementById('chartHorasPico').getContext('2d');
             const labels = data.map(d => `${d.hora}:00`);
-            const values = data.map(d => d.total_reservas);
+            const values = data.map(d => d.total_servicios); // Cambio a total_servicios
 
             new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Reservas',
+                        label: 'Afluencia (Total)',
                         data: values,
                         backgroundColor: 'rgba(212, 175, 55, 0.6)',
                         borderColor: 'rgba(212, 175, 55, 1)',
@@ -600,7 +627,7 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Total Reservas',
+                        label: 'Visitas Totales',
                         data: values,
                         fill: true,
                         backgroundColor: 'rgba(56, 44, 38, 0.05)',

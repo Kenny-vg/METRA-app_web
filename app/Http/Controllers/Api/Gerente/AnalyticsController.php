@@ -19,49 +19,76 @@ class AnalyticsController extends Controller
         $cafeteria = $request->user()->cafeteria;
         if (!$cafeteria) return ApiResponse::error('Sin cafetería', 404);
 
-        // 1. Datos de la Vista Analítica (Capacidad y Fidelidad)
+        $hoy = now()->toDateString();
+
+        // 1. Datos de la Vista Analítica (Capacidad y Fidelidad Unificada)
         $analitica = DB::table('vw_analitica_gerente_general')
             ->where('cafe_id', $cafeteria->id)
             ->first();
 
-        // 2. Cálculo de Ocupación Real Hoy (Capacidad vs Comensales)
-        $comensalesHoy = DB::table('reservaciones')
+        // 2. Reporte del día (desde vista unificada)
+        $reporteHoy = DB::table('vw_reporte_diario')
             ->where('cafe_id', $cafeteria->id)
-            ->where('fecha', now()->toDateString())
-            ->whereIn('estado', [Reservacion::STATUS_FINALIZADA, Reservacion::STATUS_ENCURSO])
-            ->sum('numero_personas');
+            ->where('fecha', $hoy)
+            ->first();
+
+        $reservasHoy = $reporteHoy ? (int)$reporteHoy->total_reservas : 0;
+        $walkinsHoy = $reporteHoy ? (int)$reporteHoy->total_walkins : 0;
+        $comensalesHoy = $reporteHoy ? (int)$reporteHoy->total_comensales_reales : 0;
+        $visitasTotalesHoy = $reservasHoy + $walkinsHoy;
 
         $capacidadTotal = $analitica ? (int)$analitica->capacidad_total : 0;
         
-        // Asumiendo un promedio de 8 horas de operación para el cálculo de "Ocupación Real"
-        // (Esto es una simplificación para la métrica operativa)
-        $ocupacionReal = ($capacidadTotal > 0) ? round(($comensalesHoy / ($capacidadTotal)) * 100, 2) : 0;
+        // Ocupación Real Hoy
+        $ocupacionReal = ($capacidadTotal > 0) ? round(($comensalesHoy / $capacidadTotal) * 100, 2) : 0;
 
-        // 3. Tasa de No-Show (Últimos 30 días)
-        $total30 = $analitica ? (int)$analitica->total_reservas_30_dias : 0;
+        // 3. Tiempo Promedio de Estancia (Hoy, en minutos)
+        $tiempoPromedio = DB::table('detalle_ocupaciones')
+            ->where('cafe_id', $cafeteria->id)
+            ->where('estado', 'finalizada')
+            ->whereNotNull('hora_salida')
+            ->whereDate('hora_entrada', $hoy)
+            ->select(DB::raw('AVG(TIMESTAMPDIFF(MINUTE, hora_entrada, hora_salida)) as avg_stay'))
+            ->first()->avg_stay ?? 0;
+
+        // 4. Tasa de No-Show (Últimos 30 días - Solo Reservaciones)
+        $total30Reservas = DB::table('reservaciones')
+            ->where('cafe_id', $cafeteria->id)
+            ->where('fecha', '>=', now()->subDays(30))
+            ->count();
         $noShows30 = $analitica ? (int)$analitica->no_shows_30_dias : 0;
-        $noShowRate = ($total30 > 0) ? round(($noShows30 / $total30) * 100, 2) : 0;
+        $noShowRate = ($total30Reservas > 0) ? round(($noShows30 / $total30Reservas) * 100, 2) : 0;
 
-        // 4. Fidelidad (Recurrentes vs Nuevos)
-        $unicos = $analitica ? (int)$analitica->clientes_unicos : 0;
-        $recurrentes = $analitica ? (int)$analitica->clientes_recurrentes : 0;
-        $fidelidadRate = ($unicos > 0) ? round(($recurrentes / $unicos) * 100, 2) : 0;
+        // 5. Ratio Walk-in vs Reserva (Hoy)
+        $ratioReserva = ($visitasTotalesHoy > 0) ? round(($reservasHoy / $visitasTotalesHoy) * 100, 2) : 0;
+        $ratioWalkin = ($visitasTotalesHoy > 0) ? round(($walkinsHoy / $visitasTotalesHoy) * 100, 2) : 100;
 
         return ApiResponse::success([
-            'ocupacion_real' => $ocupacionReal,
-            'comensales_hoy' => (int)$comensalesHoy,
-            'capacidad_total' => $capacidadTotal,
+            'visitas_totales' => $visitasTotalesHoy,
+            'desglose' => [
+                'reservaciones' => $reservasHoy,
+                'walkins' => $walkinsHoy
+            ],
+            'comensales_hoy' => $comensalesHoy,
+            'ocupacion_real_porcentaje' => $ocupacionReal,
+            'tiempo_promedio_estancia_min' => round($tiempoPromedio, 0),
             'no_show_rate' => $noShowRate,
-            'fidelidad_rate' => $fidelidadRate,
-            'clientes_recurrentes' => $recurrentes,
-            'clientes_nuevos' => $unicos - $recurrentes,
+            'ratio_fuentes' => [
+                'reservaciones_porcentaje' => $ratioReserva,
+                'walkins_porcentaje' => $ratioWalkin
+            ],
+            'fidelidad' => [
+                'clientes_recurrentes' => $analitica ? (int)$analitica->clientes_recurrentes : 0,
+                'clientes_unicos' => $analitica ? (int)$analitica->clientes_unicos : 0
+            ],
             'insights' => [
-                'ocupacion' => $ocupacionReal > 50 ? '🔥 Alta demanda detectada' : '☕ Operación estable',
-                'no_show' => $noShowRate > 15 ? '⚠️ Nivel de inasistencia elevado' : '✅ Compromiso de clientes óptimo',
-                'fidelidad' => $fidelidadRate > 30 ? '🎖️ Base de clientes leales sólida' : '🚀 Gran potencial de captación'
+                'ocupacion' => $ocupacionReal > 70 ? '🔥 ¡Lleno total hoy!' : ($ocupacionReal > 40 ? '☕ Buena afluencia' : '🍃 Día tranquilo'),
+                'fuente_principal' => $ratioWalkin > 50 ? '🚶 Mayoría de clientes directos' : '📅 Mayoría de clientes con reserva'
             ]
+
         ]);
     }
+
 
     /**
      * Demanda por hora (Gráfico de Barras)
@@ -89,15 +116,15 @@ class AnalyticsController extends Controller
 
         $hace7Dias = now()->subDays(6)->toDateString();
 
-        // Subconsulta en FROM para generar la serie de tiempo (evita huecos en el gráfico)
-        $tendencia = DB::table('reservaciones')
-            ->select('fecha', DB::raw('COUNT(*) as total'))
+        // Usamos la vista de reporte diario que ya tiene los datos unificados por fecha
+        $tendencia = DB::table('vw_reporte_diario')
+            ->select('fecha', DB::raw('(total_reservas + total_walkins) as total'))
             ->where('cafe_id', $cafeteria->id)
             ->where('fecha', '>=', $hace7Dias)
-            ->groupBy('fecha')
             ->orderBy('fecha')
             ->get();
 
         return ApiResponse::success($tendencia);
     }
+
 }
