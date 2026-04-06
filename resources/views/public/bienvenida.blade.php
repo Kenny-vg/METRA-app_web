@@ -325,7 +325,7 @@
                             </div>
                         </div>
                     </div>
-                    <a href="#" class="btn btn-dark rounded-pill d-inline-flex align-items-center gap-3 px-5 py-3 shadow" style="font-size: 1rem; font-weight: 600;">
+                    <a href="{{ asset('apk/METRA.apk') }}" class="btn btn-dark rounded-pill d-inline-flex align-items-center gap-3 px-5 py-3 shadow" style="font-size: 1rem; font-weight: 600;" download>
                         <i class="bi bi-android2" style="font-size: 1.3rem; color: #a4c639;"></i>
                         <div class="text-start">
                             <div style="font-size: 0.7rem; font-weight: 400; opacity: 0.6; line-height: 1;">Uso interno del staff</div>

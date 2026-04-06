@@ -49,9 +49,12 @@
                 </a>
             </form>
 
-            <div class="mt-5">
-                 <a href="{{ route('register') }}" class="text-muted small text-decoration-none">
+            <div class="mt-4 pt-3 border-top">
+                 <a href="{{ route('register') }}" class="text-muted small text-decoration-none d-block mb-2">
                      ¿No tienes cuenta? <span class="fw-bold text-dark">Regístrate</span>
+                 </a>
+                 <a href="{{ asset('apk/METRA.apk') }}" class="text-primary small text-decoration-none fw-bold" download>
+                     <i class="bi bi-phone me-1"></i> ¿Eres Staff? Descarga la App
                  </a>
             </div>
         </div>
