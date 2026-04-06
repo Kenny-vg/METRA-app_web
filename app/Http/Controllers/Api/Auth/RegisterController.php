@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Helpers\ApiResponse;
+use App\Helpers\PasswordHelper;
 
 class RegisterController extends Controller
 {
@@ -16,16 +17,15 @@ class RegisterController extends Controller
         $data = $request->validate([
             'name'=>'required|string|max:100',
             'email'=>'required|email:dns|unique:users,email',
-            'password'=>'required|min:8'
-        ], [
+            'password'=>['required', PasswordHelper::securePasswordPolicy()]
+        ], array_merge([
             'name.required' => 'El nombre es obligatorio.',
             'name.max' => 'El nombre no debe exceder los 100 caracteres.',
             'email.required' => 'El correo electrónico es obligatorio.',
             'email.email' => 'El correo electrónico no tiene un formato válido.',
             'email.unique' => 'El correo electrónico ya se encuentra registrado.',
             'password.required' => 'La contraseña es obligatoria.',
-            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
-        ]);
+        ], PasswordHelper::messages()));
 
         $user = User::create([
             'name'=>$data['name'],
@@ -45,8 +45,8 @@ class RegisterController extends Controller
         $data = $request->validate([
             'email'=>'required|email',
             'token'=>'required',
-            'password'=>'required|min:8'
-        ]);
+            'password'=>['required', PasswordHelper::securePasswordPolicy()]
+        ], PasswordHelper::messages());
 
         $user= User::where('email',$data['email'])
         ->where('activation_token', $data['token'])

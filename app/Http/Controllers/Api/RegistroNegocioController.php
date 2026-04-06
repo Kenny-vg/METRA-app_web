@@ -17,6 +17,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use App\Helpers\PasswordHelper;
 
 class RegistroNegocioController extends Controller
 {
@@ -95,7 +96,7 @@ class RegistroNegocioController extends Controller
             return $query->where('estatus_registro', '!=', 'pendiente');
         }),
             ],
-            'gerente.password' => 'required|string|min:8|confirmed',
+            'gerente.password' => ['required', 'string', 'confirmed', PasswordHelper::securePasswordPolicy()],
 
             'plan_id' => 'required|exists:planes,id,estado,1',
         ]);

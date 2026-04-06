@@ -15,6 +15,19 @@
     <!-- Usamos los estilos globales del sistema METRA -->
     <link rel="stylesheet" href="{{ asset('css/variables.css') }}">
     <link rel="stylesheet" href="{{ asset('css/estilos.css') }}">
+    <style>
+        .password-strength-container { margin-top: 10px; }
+        .strength-meter { height: 6px; display: flex; gap: 4px; margin-bottom: 15px; }
+        .strength-bar { flex: 1; height: 100%; border-radius: 10px; background: #e0e0e0; transition: background 0.3s ease; }
+        .strength-bar.active[data-level="1"] { background: #ff4d4d; } /* Rojo - Débil */
+        .strength-bar.active[data-level="2"] { background: #ffcc00; } /* Amarillo - Medio */
+        .strength-bar.active[data-level="3"] { background: #2ecc71; } /* Verde - Fuerte */
+        .password-hint-list { list-style: none; padding: 0; margin: 0; font-size: 0.75rem; }
+        .password-hint-item { display: flex; align-items: center; gap: 8px; color: var(--text-muted); margin-bottom: 4px; transition: color 0.3s ease; }
+        .password-hint-item i { font-size: 0.9rem; }
+        .password-hint-item.valid { color: #2ecc71; }
+        .password-hint-item.valid i::before { content: "\f272"; } /* bi-check-circle-fill */
+    </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
@@ -251,6 +264,20 @@
                         <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 text-muted toggle-password" style="cursor: pointer; z-index: 10;"></i>
                     </div>
                     <div class="text-danger small mt-1 d-none validation-error" id="error-gerente_password"></div>
+                    
+                    <!-- Medidor de Fortaleza -->
+                    <div class="password-strength-container d-none" id="strength-container">
+                        <div class="strength-meter">
+                            <div class="strength-bar" data-index="0"></div>
+                            <div class="strength-bar" data-index="1"></div>
+                            <div class="strength-bar" data-index="2"></div>
+                        </div>
+                        <ul class="password-hint-list">
+                            <li class="password-hint-item" id="hint-len"><i class="bi bi-circle"></i> Al menos 8 caracteres</li>
+                            <li class="password-hint-item" id="hint-mix"><i class="bi bi-circle"></i> Letras y Números (Mínimo requerido)</li>
+                            <li class="password-hint-item" id="hint-spec"><i class="bi bi-circle"></i> Símbolos o Mayúsculas (Recomendado)</li>
+                        </ul>
+                    </div>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Confirmar contraseña *</label>
@@ -707,7 +734,18 @@
         if (!emailPattern.test(email)) { showAlert('El formato del correo institucional no es válido.'); scrollToStep2(); return; }
         
         if (!password) { showAlert('La contraseña es obligatoria.'); scrollToStep2(); return; }
-        if (password.length < 8) { showAlert('La contraseña debe tener al menos 8 caracteres.'); scrollToStep2(); return; }
+        
+        // Validación de fortaleza Nivel Medio (mínimo 8 chars + letras + números)
+        const hasLen = password.length >= 8;
+        const hasLetters = /[a-zA-Z]/.test(password);
+        const hasNumbers = /[0-9]/.test(password);
+        
+        if (!hasLen || !hasLetters || !hasNumbers) {
+            showAlert('Tu contraseña es demasiado débil. Debe tener al menos 8 caracteres e incluir tanto letras como números.');
+            scrollToStep2();
+            return;
+        }
+        
         if (password !== password_confirmation) { showAlert('Las contraseñas no coinciden. Por favor verifica.'); scrollToStep2(); return; }
         
         if (!selectedPlanId) { showAlert('Debes seleccionar un plan de suscripción para continuar.'); scrollToStep2(); return; }
@@ -938,6 +976,67 @@
     ua.addEventListener('dragover', e => { e.preventDefault(); ua.classList.add('dragover'); });
     ua.addEventListener('dragleave', () => ua.classList.remove('dragover'));
     ua.addEventListener('drop', e => { e.preventDefault(); ua.classList.remove('dragover'); document.getElementById('comprobante-input').files = e.dataTransfer.files; previewFile(document.getElementById('comprobante-input')); });
+
+    // Lógica del Medidor de Fortaleza de Contraseña
+    document.addEventListener('DOMContentLoaded', () => {
+        const passInput = document.getElementById('gerente_password');
+        const container = document.getElementById('strength-container');
+        const bars = document.querySelectorAll('.strength-bar');
+        const hLen = document.getElementById('hint-len');
+        const hMix = document.getElementById('hint-mix');
+        const hSpec = document.getElementById('hint-spec');
+
+        if (!passInput) return;
+
+        passInput.addEventListener('input', () => {
+            const val = passInput.value;
+            if (val.length > 0) {
+                container.classList.remove('d-none');
+            } else {
+                container.classList.add('d-none');
+            }
+
+            const hasLen = val.length >= 8;
+            const hasLetters = /[a-zA-Z]/.test(val);
+            const hasNumbers = /[0-9]/.test(val);
+            const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(val) || /[A-Z]/.test(val) && /[a-z]/.test(val);
+
+            // UI Checklist
+            updateHint(hLen, hasLen);
+            updateHint(hMix, hasLetters && hasNumbers);
+            updateHint(hSpec, hasSpecial);
+
+            // Strength Level
+            let level = 0;
+            if (val.length > 0) {
+                level = 1; // Débil (Rojo)
+                if (hasLen && hasLetters && hasNumbers) {
+                    level = 2; // Medio (Amarillo)
+                    if (hasSpecial) level = 3; // Fuerte (Verde)
+                }
+            }
+
+            // Update Bars
+            bars.forEach((bar, idx) => {
+                bar.classList.remove('active');
+                bar.removeAttribute('data-level');
+                if (idx < level) {
+                    bar.classList.add('active');
+                    bar.setAttribute('data-level', level);
+                }
+            });
+        });
+
+        function updateHint(el, valid) {
+            if (valid) {
+                el.classList.add('valid');
+                el.querySelector('i').className = 'bi bi-check-circle-fill';
+            } else {
+                el.classList.remove('valid');
+                el.querySelector('i').className = 'bi bi-circle';
+            }
+        }
+    });
 
     // Contraseñas Toggle Ojo
     document.addEventListener('click', function(e) {
