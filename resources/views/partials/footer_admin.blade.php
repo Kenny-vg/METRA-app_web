@@ -5,9 +5,6 @@
         </div>
         <div>
             <span class="me-3">© 2026 V-TECH Software</span>
-            <a href="mailto:soporte@vtech.com" class="text-decoration-none text-muted">
-                <i class="bi bi-headset me-1"></i>Soporte
-            </a>
         </div>
     </div>
 </footer>
