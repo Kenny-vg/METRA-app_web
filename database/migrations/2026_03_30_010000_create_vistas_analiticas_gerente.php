@@ -27,11 +27,11 @@ return new class extends Migration
                     HAVING COUNT(*) > 1
                 ) AS sub WHERE sub.cafe_id = c.id) AS clientes_recurrentes,
                 (SELECT COUNT(*) FROM reservaciones WHERE cafe_id = c.id AND estado = 'no_show' AND fecha >= DATE_SUB(NOW(), INTERVAL 30 DAY)) AS no_shows_30_dias,
-                (SELECT COUNT(*) FROM (
-                    SELECT id FROM reservaciones WHERE cafe_id = c.id AND fecha >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-                    UNION ALL
-                    SELECT DISTINCT grupo_id FROM detalle_ocupaciones WHERE cafe_id = c.id AND tipo = 'walkin' AND hora_entrada >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-                ) AS total_visitas) AS total_visitas_30_dias
+                (
+                    (SELECT COUNT(*) FROM reservaciones WHERE cafe_id = c.id AND fecha >= DATE_SUB(NOW(), INTERVAL 30 DAY))
+                    +
+                    (SELECT COUNT(DISTINCT grupo_id) FROM detalle_ocupaciones WHERE cafe_id = c.id AND tipo = 'walkin' AND hora_entrada >= DATE_SUB(NOW(), INTERVAL 30 DAY))
+                ) AS total_visitas_30_dias
             FROM cafeterias c;
         ");
 
