@@ -177,8 +177,8 @@ font-weight:bold;
 
 </div>
 
-<p class="text" style="font-size: 14px;">
-    Si todo está en orden, no es necesario que respondas a este correo. ¡Te esperamos!
+<p class="text" style="font-size: 14px; color: #888888;">
+    <em>Por favor, ten en cuenta que este es un correo generado automáticamente y nuestra bandeja no recibe respuestas. Si necesitas realizar algún cambio, utiliza los botones a continuación. ¡Te esperamos!</em>
 </p>
 
 <div class="btn-container">
