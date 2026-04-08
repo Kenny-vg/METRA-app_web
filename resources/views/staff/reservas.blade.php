@@ -233,7 +233,25 @@
                 return matchQuery && matchTab;
             });
 
-            filtered.sort((a, b) => new Date(`${a.fecha}T${a.hora_inicio}`) - new Date(`${b.fecha}T${b.hora_inicio}`));
+            const statusPriority = {
+                'pendiente': 1,
+                'confirmada': 1,
+                'en_curso': 2,
+                'finalizada': 3,
+                'no_show': 4,
+                'cancelada': 5
+            };
+            
+            filtered.sort((a, b) => {
+                const priorityA = statusPriority[a.estado] || 99;
+                const priorityB = statusPriority[b.estado] || 99;
+                
+                if (priorityA !== priorityB) {
+                    return priorityA - priorityB;
+                }
+                
+                return new Date(`${a.fecha}T${a.hora_inicio}`) - new Date(`${b.fecha}T${b.hora_inicio}`);
+            });
 
             if (filtered.length === 0) {
                 container.innerHTML = '<div class="text-center py-5 text-muted">No hay reservaciones para mostrar</div>';
