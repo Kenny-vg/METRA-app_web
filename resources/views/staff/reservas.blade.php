@@ -267,7 +267,7 @@
                             <div><i class="bi bi-calendar3 me-2 text-gold"></i>${r.fecha}</div>
                             <div><i class="bi bi-clock me-2 text-gold"></i>${r.hora_inicio.substring(0, 5)} - ${r.hora_fin.substring(0, 5)}</div>
                             <div><i class="bi bi-people me-2 text-gold"></i>${r.numero_personas} pers.</div>
-                            <div class="text-truncate"><i class="bi bi-geo-alt me-2 text-gold"></i>${r.zona.nombre}</div>
+                            <div class="text-truncate"><i class="bi bi-geo-alt me-2 text-gold"></i>${r.zona ? r.zona.nombre : 'General'}</div>
                         </div>
 
                     </div>
@@ -290,7 +290,7 @@
             document.getElementById('det-fecha').textContent = r.fecha;
             document.getElementById('det-hora').textContent = `${r.hora_inicio.substring(0, 5)} - ${r.hora_fin.substring(0, 5)}`;
             document.getElementById('det-personas').textContent = r.numero_personas;
-            document.getElementById('det-zona').textContent = r.zona.nombre;
+            document.getElementById('det-zona').textContent = r.zona ? r.zona.nombre : 'General';
 
             document.getElementById('det-ocasion').textContent = (r.ocasion && r.ocasion.nombre) ? r.ocasion.nombre : 'Ninguna';
             document.getElementById('det-notas').textContent = r.comentarios || 'Sin notas';
@@ -303,7 +303,7 @@
             if (r.estado === 'pendiente') {
                 logicBox.classList.remove('d-none');
                 confirmBtn.classList.remove('d-none');
-                renderAvailableTables(r.zona.nombre, r.numero_personas);
+                renderAvailableTables(r.zona ? r.zona.nombre : 'General', r.numero_personas);
             } else {
                 logicBox.classList.add('d-none');
                 confirmBtn.classList.add('d-none');
@@ -314,7 +314,7 @@
 
         function renderAvailableTables(zonaName, requiredPeople) {
             const container = document.getElementById('mesas-available-grid');
-            const availableInZone = allMesas.filter(m => m.zona_nombre === zonaName && m.estado === 'disponible');
+            const availableInZone = zonaName === 'General' ? allMesas.filter(m => m.estado === 'disponible') : allMesas.filter(m => m.zona_nombre === zonaName && m.estado === 'disponible');
 
             document.getElementById('required-cap').textContent = requiredPeople;
 
@@ -383,11 +383,12 @@
                     btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
 
                     const r = allReservas.find(x => x.id === currentReservaId);
+                    const firstMesa = allMesas.find(m => m.id === selectedMesas[0]);
                     const data = {
                         reservacion_id: currentReservaId,
                         mesa_ids: selectedMesas,
                         numero_personas: r.numero_personas,
-                        zona_id: r.zona_id
+                        zona_id: r.zona_id || (firstMesa ? firstMesa.zona_id : null)
                     };
 
                     await MetraAPI.post('/staff/ocupaciones', data);
