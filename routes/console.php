@@ -10,3 +10,6 @@ Schedule::command('app:marcar-reservaciones-no-show')->everyMinute();
 Schedule::call(fn() => DB::unprepared('CALL sp_refresh_mv_metricas_mensuales()'))
     ->dailyAt('00:00')
     ->name('refresh-materialized-metrics');
+
+// Recordatorios de reservaciones (Diario y 2 Horas)
+Schedule::command('app:enviar-recordatorios-reservas')->everyFifteenMinutes();

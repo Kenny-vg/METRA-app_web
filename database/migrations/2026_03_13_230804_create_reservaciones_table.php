@@ -81,6 +81,9 @@ return new class extends Migration
             
             $table->string('cancelado_por_rol', 50)->nullable();
 
+            $table->boolean('recordatorio_dia_enviado')->default(false);
+            $table->boolean('recordatorio_2h_enviado')->default(false);
+
             $table->timestamps();
         });
     }
