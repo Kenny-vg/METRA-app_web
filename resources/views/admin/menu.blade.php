@@ -163,6 +163,11 @@
                 <i class="bi bi-person-circle me-3"></i>Cuenta
             </a>
 
+            <span class="small fw-bold text-uppercase mt-4 mb-2 ms-3" style="color: rgba(255,255,255,0.5);">Operación Móvil</span>
+            <a href="/staff/inicio" class="nav-link-admin">
+                <i class="bi bi-phone me-3"></i>Modo App Staff
+            </a>
+
         </nav>
 
         <div class="mt-auto p-3">

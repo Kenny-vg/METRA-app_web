@@ -1,0 +1,18 @@
+{
+    "name": "METRA Staff",
+    "short_name": "METRA",
+    "description": "Panel operativo para el personal de METRA Luxury Coffee",
+    "start_url": "/staff/inicio",
+    "display": "standalone",
+    "background_color": "#F9F5F0",
+    "theme_color": "#2D1F1A",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "/favicon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

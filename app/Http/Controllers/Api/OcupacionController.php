@@ -188,13 +188,15 @@ class OcupacionController extends Controller
 
     public function estadoMesas()
     {
-        $mesas = Mesa::with('zona')->get()->map(function ($mesa) {
+        $mesas = Mesa::with(['zona', 'ocupacionActiva'])->get()->map(function ($mesa) {
             return [
                 'id' => $mesa->id,
-                'numero' => $mesa->numero_mesa,
+                'nombre' => 'Mesa ' . $mesa->numero_mesa,
                 'capacidad' => $mesa->capacidad,
-                'zona' => $mesa->zona->nombre_zona,
-                'estado' => $mesa->esta_ocupada ? 'ocupada' : 'libre'
+                'zona_id' => $mesa->zona_id,
+                'zona_nombre' => $mesa->zona->nombre_zona,
+                'estado' => $mesa->ocupacionActiva ? 'ocupada' : 'disponible',
+                'ocupacion_id' => $mesa->ocupacionActiva ? $mesa->ocupacionActiva->id : null
             ];
         });
 

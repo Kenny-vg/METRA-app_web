@@ -100,7 +100,14 @@ Route::get('/public/perfil', function () {
 });
 
 Route::get('/staff-app', function () {
-    return view('public.staff-app');
+    return redirect('/staff/inicio');
+});
+
+Route::prefix('staff')->group(function () {
+    Route::get('/inicio', function () { return view('staff.inicio'); });
+    Route::get('/reservas', function () { return view('staff.reservas'); });
+    Route::get('/mesas', function () { return view('staff.mesas'); });
+    Route::get('/registro', function () { return view('staff.registro'); });
 });
 
 

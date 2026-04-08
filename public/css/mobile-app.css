@@ -1,0 +1,294 @@
+:root {
+    --app-bg: #F4EFEA;
+    --app-coffee: #2D1F1A;
+    --app-gold: #D4AF37;
+    --app-border: #E8E2D9;
+    --app-white: #FFFFFF;
+    --app-text-muted: #8C7B76;
+
+    --status-available: #4CAF50;
+    --status-occupied: #F44336;
+    --status-pending: #FFC107;
+
+    --nav-height: 70px;
+    --header-height: 60px;
+}
+
+/* Base Body Styling */
+body.mobile-app-body {
+    background-color: #1a110f;
+    /* Dark background for desktop simulator */
+    font-family: 'Lato', sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    color: var(--app-coffee);
+}
+
+/* Adaptive Container (The Simulator Frame) */
+.adaptive-container {
+    width: 100%;
+    max-width: 480px;
+    /* Fixed width on desktop */
+    height: 94vh;
+    /* Slightly smaller for breathing room on desktop */
+    margin-top: 3vh;
+    border-radius: 20px;
+    background-color: var(--app-bg);
+    position: relative;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Header / Top Bar */
+.mobile-top-bar {
+    height: var(--header-height);
+    background-color: var(--app-coffee);
+    color: var(--app-white);
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.logo-text {
+    font-family: 'Lora', serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: -1px;
+}
+
+.text-gold {
+    color: var(--app-gold);
+}
+
+/* Main Content Wrapper */
+.mobile-content-wrapper {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 24px 20px calc(var(--nav-height) + 30px) 20px;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Bottom Navigation */
+.mobile-bottom-nav {
+    height: var(--nav-height);
+    background-color: var(--app-coffee);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 20;
+}
+
+.nav-item {
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.2s ease;
+    flex: 1;
+}
+
+.nav-item i {
+    font-size: 1.3rem;
+    margin-bottom: 2px;
+}
+
+.nav-item span {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.nav-item.active {
+    color: var(--app-white);
+}
+
+.nav-item.active i {
+    background: rgba(212, 175, 55, 0.2);
+    padding: 4px 16px;
+    border-radius: 20px;
+    color: var(--app-gold);
+}
+
+/* Typography & General Elements */
+h1,
+h2,
+h3,
+.staff-title {
+    font-family: 'Lora', serif;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* Shared Components: Staff Cards */
+.staff-card {
+    background: var(--app-white);
+    border-radius: 16px;
+    border: 1px solid var(--app-border);
+    padding: 20px 18px;
+    margin-bottom: 0;
+    box-shadow: 0 4px 14px rgba(45, 31, 26, 0.08);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    display: block;
+}
+
+.staff-card.status-border {
+    border-left: none;
+}
+
+.staff-card.status-border::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 20%;
+    bottom: 20%;
+    width: 6px;
+    border-radius: 0 6px 6px 0;
+    transition: all 0.3s ease;
+    z-index: 5;
+}
+
+.staff-card.available::before {
+    background-color: var(--status-available);
+}
+
+.staff-card.occupied::before {
+    background-color: var(--status-occupied);
+}
+
+.staff-card.pending::before {
+    background-color: var(--status-pending);
+}
+
+/* Badges */
+.staff-badge {
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-pending {
+    background: rgba(255, 193, 7, 0.15);
+    color: #B38600;
+}
+
+.badge-occupied {
+    background: rgba(244, 67, 54, 0.15);
+    color: #C62828;
+}
+
+.badge-available {
+    background: rgba(76, 175, 80, 0.15);
+    color: #2E7D32;
+}
+
+/* Dashboard Summary Boxes (from screenshots) */
+.summary-box {
+    background: rgba(45, 31, 26, 0.04);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--app-border);
+    margin-bottom: 16px;
+}
+
+.summary-box h6 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--app-coffee);
+}
+
+.summary-box p {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--app-text-muted);
+}
+
+.summary-box.active-click:active {
+    background: rgba(45, 31, 26, 0.08);
+    transform: scale(0.98);
+}
+
+.staff-card.active-click:active {
+    background: #fdfdfd;
+    transform: scale(0.98);
+}
+
+.active-click {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+/* Responsive Overrides for PC */
+@media (min-width: 481px) {
+    .mobile-content-wrapper::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .mobile-content-wrapper::-webkit-scrollbar-thumb {
+        background: var(--app-gold);
+        border-radius: 10px;
+    }
+}
+
+/* Ensure full screen on mobile devices */
+@media (max-width: 480px) {
+    .adaptive-container {
+        max-width: none;
+        height: 100vh;
+        margin-top: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+}
+
+
+.reserva-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    font-size: 0.75rem;
+    color: var(--app-text-muted);
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--app-border);
+}
+
+.reserva-info div {
+    width: 48%;
+}
+
+/* Reservas controls: sticky so tabs stay visible while scrolling */
+.reservas-controls {
+    position: sticky;
+    top: -24px;
+    z-index: 5;
+    background: var(--app-bg);
+    padding-top: 10px;
+    padding-bottom: 4px;
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/* More vertical space between reservation cards */
+#reservas-list {
+    gap: 14px !important;
+    padding-top: 8px !important;
+}

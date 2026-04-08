@@ -28,4 +28,10 @@ class Mesa extends Model
     {
         return $this->belongsTo(Cafeteria::class);
     }
+
+    public function ocupacionActiva()
+    {
+        return $this->hasOne(DetalleOcupacion::class, 'mesa_id')
+            ->where('estado', DetalleOcupacion::STATUS_ACTIVA);
+    }
 }
