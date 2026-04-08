@@ -498,6 +498,7 @@ class ReservacionController extends Controller
             ] : null,
             'ocasion' => $r->relationLoaded('ocasionEspecial') && $r->ocasionEspecial ? ['nombre' => $r->ocasionEspecial->nombre] : null,
             'promocion' => $r->relationLoaded('promocion') && $r->promocion ? ['nombre' => $r->promocion->nombre_promocion, 'precio' => $r->promocion->precio] : null,
+            'zona_id' => $r->zona_id,
             'zona' => $r->relationLoaded('zona') && $r->zona ? ['nombre' => $r->zona->nombre_zona] : null,
             'tipo' => $r->tipo ?? null,
         ];
