@@ -189,9 +189,9 @@
         if (selectedMesas.length > 0) {
             warningBox.classList.remove('d-none');
             if (totalCap >= numPersonas) {
-                warningBox.innerHTML = `<span class="badge bg-success small w-100 py-2">CAPACIDAD CUBIERTA (${totalCap}/${numPersonas}) <i class="bi bi-check-circle-fill"></i></span>`;
+                warningBox.innerHTML = `<span class="badge bg-success small w-100 py-2">CAPACIDAD CUBIERTA (${numPersonas}/${totalCap}) <i class="bi bi-check-circle-fill"></i></span>`;
             } else {
-                warningBox.innerHTML = `<span class="badge bg-warning text-dark small w-100 py-2">CAPACIDAD INSUFICIENTE (${totalCap}/${numPersonas}) <i class="bi bi-exclamation-triangle-fill"></i></span>`;
+                warningBox.innerHTML = `<span class="badge bg-warning text-dark small w-100 py-2">CAPACIDAD INSUFICIENTE (${numPersonas}/${totalCap}) <i class="bi bi-exclamation-triangle-fill"></i></span>`;
             }
         } else {
             warningBox.classList.add('d-none');

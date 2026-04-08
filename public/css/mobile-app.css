@@ -292,3 +292,38 @@ h3,
     gap: 14px !important;
     padding-top: 8px !important;
 }
+
+/* Desktop PWA Floating Box ( >= 992px ) */
+@media (min-width: 992px) {
+    /* Base Body Styling (Backdrop) */
+    body.mobile-app-body {
+        background: linear-gradient(135deg, #F4EFEA 0%, #D8CFC4 100%);
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    body.mobile-app-body::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at center, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    /* PWA Box Styling */
+    .adaptive-container {
+        position: relative;
+        z-index: 10;
+        max-width: 450px; /* Keep mobile format */
+        height: 88vh;     /* Leave breathing room above and below */
+        margin-top: 0;
+        border-radius: 35px; /* App-like rounded corners */
+        box-shadow: 0 30px 80px rgba(45, 31, 26, 0.2), 
+                    0 0 0 10px rgba(255, 255, 255, 0.4); /* Elegant floating shadow and rim */
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        overflow: hidden; /* Prevent content bleeding out of rounded corners */
+        background-color: var(--app-bg);
+    }
+}

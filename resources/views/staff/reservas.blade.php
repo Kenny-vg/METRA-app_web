@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <div id="reservas-list" class="d-flex flex-column gap-3 mt-3 pb-5 px-1">
+    <div id="reservas-list" class="mt-2 pb-5">
         <!-- Loader placeholder -->
         <div class="text-center py-5 text-muted">
             <div class="spinner-border text-gold mb-3" role="status"></div>
@@ -32,7 +32,7 @@
 
     <!-- Modal Detalle/Accion Reserva (Revamp) -->
     <div class="modal fade" id="modalDetalleReserva" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered px-3">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable px-3">
             <div class="modal-content border-0 rounded-4 overflow-hidden">
                 <div class="modal-header border-0 bg-coffee text-white p-4 pb-3 d-flex justify-content-between align-items-center"
                     style="background: var(--app-coffee);">
@@ -127,6 +127,29 @@
     </div>
 
     <style>
+        .reservas-controls {
+            z-index: 20 !important;
+        }
+
+        #reservas-list {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 20px !important;
+            margin-top: 20px !important;
+            height: auto !important;
+            position: static !important;
+            padding: 5px 15px 40px 15px !important;
+        }
+
+        .reserva-card {
+            position: relative !important;
+            margin: 0 !important; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
+            flex-shrink: 0 !important;
+            height: auto !important;
+            display: block !important;
+        }
+
         .btn-tab {
             border-color: transparent;
             color: var(--app-text-muted);
@@ -223,31 +246,31 @@
                 return `
                 <div class="staff-card status-border active-click ${statusClass} reserva-card" onclick="verDetalleReserva(${r.id})">
 
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div class="d-flex align-items-center">
-                            <div class="reserva-icon me-3" style="width: 36px; height: 36px;">
-                                <i class="bi bi-person-fill fs-6"></i>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex align-items-center">
+                                <div class="reserva-icon me-3" style="width: 36px; height: 36px;">
+                                    <i class="bi bi-person-fill fs-6"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold m-0" style="font-size: 0.9rem;">${r.nombre_cliente}</h6>
+                                    <small class="text-muted d-block" style="font-size: 0.7rem;">${r.folio}</small>
+                                </div>
                             </div>
-                            <div>
-                                <h6 class="fw-bold m-0" style="font-size: 0.9rem;">${r.nombre_cliente}</h6>
-                                <small class="text-muted d-block" style="font-size: 0.7rem;">${r.folio}</small>
-                            </div>
+
+                            <span class="staff-badge ${badgeClass}" style="font-size: 0.6rem;">
+                                ${r.estado.replace('_', ' ').toUpperCase()}
+                            </span>
                         </div>
 
-                        <span class="staff-badge ${badgeClass}" style="font-size: 0.6rem;">
-                            ${r.estado.replace('_', ' ').toUpperCase()}
-                        </span>
-                    </div>
+                        <!-- INFO SIN ROW -->
+                        <div class="reserva-info">
+                            <div><i class="bi bi-calendar3 me-2 text-gold"></i>${r.fecha}</div>
+                            <div><i class="bi bi-clock me-2 text-gold"></i>${r.hora_inicio.substring(0, 5)} - ${r.hora_fin.substring(0, 5)}</div>
+                            <div><i class="bi bi-people me-2 text-gold"></i>${r.numero_personas} pers.</div>
+                            <div class="text-truncate"><i class="bi bi-geo-alt me-2 text-gold"></i>${r.zona.nombre}</div>
+                        </div>
 
-                    <!-- INFO SIN ROW -->
-                    <div class="reserva-info">
-                        <div><i class="bi bi-calendar3 me-2 text-gold"></i>${r.fecha}</div>
-                        <div><i class="bi bi-clock me-2 text-gold"></i>${r.hora_inicio.substring(0, 5)} - ${r.hora_fin.substring(0, 5)}</div>
-                        <div><i class="bi bi-people me-2 text-gold"></i>${r.numero_personas} pers.</div>
-                        <div class="text-truncate"><i class="bi bi-geo-alt me-2 text-gold"></i>${r.zona.nombre}</div>
                     </div>
-
-                </div>
                 `;
             }).join('');
         }
@@ -401,9 +424,20 @@
         });
 
         function endAction(msg) {
-            bootstrap.Modal.getInstance(document.getElementById('modalDetalleReserva')).hide();
+            const modalEl = document.getElementById('modalDetalleReserva');
+            const modalInst = bootstrap.Modal.getInstance(modalEl);
+            if (modalInst) modalInst.hide();
+
             Swal.fire({ icon: 'success', title: msg, toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
             fetchData();
+
+            // Override and forcibly clean body state if Bootstrap hooks are delayed
+            setTimeout(() => {
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+                document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+            }, 500);
         }
 
         document.querySelectorAll('.btn-tab').forEach(btn => {
@@ -418,6 +452,20 @@
         document.getElementById('search-reserva').addEventListener('input', renderReservas);
 
         document.addEventListener('DOMContentLoaded', () => {
+            // MOVER EL MODAL AL BODY:
+            // Esto arranca el modal fuera del '.adaptive-container' (el cual tiene overflow-hidden y z-index relativo),
+            // permitiendo que se pinte correctamente *sobre* el backdrop oscuro.
+            const modalEl = document.getElementById('modalDetalleReserva');
+            if (modalEl) document.body.appendChild(modalEl);
+
+            // Escuchar el cierre nativo del Modal para forzar limpieza del gris
+            modalEl.addEventListener('hidden.bs.modal', () => {
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+                document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+            });
+
             fetchData();
             setInterval(fetchData, 60000);
         });
