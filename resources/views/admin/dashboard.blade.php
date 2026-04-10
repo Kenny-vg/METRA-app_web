@@ -350,7 +350,13 @@
                     const json = await MetraAPI.get('/planes-publicos');
                     if (json.data) {
                         selectPlan.innerHTML = '<option value="">Selecciona un plan...</option>' + 
-                            json.data.map(p => `<option value="${p.id}">${p.nombre_plan} ($${p.precio})</option>`).join('');
+                            json.data.map(p => {
+                                let features = [];
+                                if (p.tiene_metricas_avanzadas) features.push('Métricas');
+                                if (p.tiene_recordatorios) features.push('Recordatorios');
+                                let featureStr = features.length > 0 ? ` | Incluye: ${features.join(' y ')}` : '';
+                                return `<option value="${p.id}">${p.nombre_plan} ($${p.precio})${featureStr}</option>`;
+                            }).join('');
                     }
                 } catch (e) {
                     console.error('Error cargando planes modal', e);
@@ -427,9 +433,21 @@
             }
         }
 
-        function renderUpsellOverlay(container, title) {
+        async function renderUpsellOverlay(container, title, featureKey = 'tiene_metricas_avanzadas') {
             if (container.querySelector('.upsell-overlay')) return;
             
+            let nombresPlanes = 'planes selectos';
+            try {
+                if (!window.planesPublicosCache) {
+                    const res = await MetraAPI.get('/planes-publicos');
+                    window.planesPublicosCache = res.data;
+                }
+                const planesValidos = window.planesPublicosCache.filter(p => !!p[featureKey]);
+                if (planesValidos.length > 0) {
+                    nombresPlanes = planesValidos.map(p => p.nombre_plan).join(', ');
+                }
+            } catch (e) { console.error('Error fetching planes for overlay', e); }
+
             const overlay = document.createElement('div');
             overlay.className = 'upsell-overlay d-flex flex-column align-items-center justify-content-center text-center p-4 rounded-4';
             overlay.style.position = 'absolute';
@@ -437,9 +455,9 @@
             overlay.style.left = '0';
             overlay.style.width = '100%';
             overlay.style.height = '100%';
-            overlay.style.background = 'rgba(255,255,255,0.05)';
-            overlay.style.backdropFilter = 'blur(10px)';
-            overlay.style.webkitBackdropFilter = 'blur(10px)';
+            overlay.style.background = 'rgba(0, 0, 0, 0.65)';
+            overlay.style.backdropFilter = 'blur(6px)';
+            overlay.style.webkitBackdropFilter = 'blur(6px)';
             overlay.style.zIndex = '10';
 
             overlay.innerHTML = `
@@ -449,7 +467,7 @@
                 </div>
                 <h6 class="fw-bold mb-1" style="color: white; letter-spacing: -0.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">${title}</h6>
                 <p class="small text-white-50 mb-3 px-3" style="font-size: 0.7rem; line-height: 1.2;">
-                    Exclusivo del Plan Pro. Analítica inteligente para tu negocio.
+                    Exclusivo para: <strong class="text-white">${nombresPlanes}</strong>.<br>Analítica inteligente para tu negocio.
                 </p>
                 <button class="btn btn-sm btn-dark px-3 py-1 fw-bold shadow" style="font-size: 0.7rem; border: 1px solid rgba(255,255,255,0.1);" onclick="abrirModalRenovar()">
                     <i class="bi bi-stars me-1 text-warning"></i>Mejorar Plan

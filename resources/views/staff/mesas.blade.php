@@ -30,6 +30,7 @@
     </div>
 </div>
 
+@push('modals')
 <!-- Modal confirmación liberación (Simple) -->
 <div class="modal fade" id="modalConfirmarLiberar" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered px-4">
@@ -46,6 +47,7 @@
         </div>
     </div>
 </div>
+@endpush
 @endsection
 
 @push('scripts')

@@ -929,9 +929,21 @@ async function verificarPlanMarketing() {
     }
 }
 
-function renderUpsellOverlay(container, title) {
+async function renderUpsellOverlay(container, title, featureKey = 'tiene_recordatorios') {
     if (container.querySelector('.upsell-overlay')) return;
     
+    let nombresPlanes = 'planes selectos';
+    try {
+        if (!window.planesPublicosCache) {
+            const res = await MetraAPI.get('/planes-publicos');
+            window.planesPublicosCache = res.data;
+        }
+        const planesValidos = window.planesPublicosCache.filter(p => !!p[featureKey]);
+        if (planesValidos.length > 0) {
+            nombresPlanes = planesValidos.map(p => p.nombre_plan).join(', ');
+        }
+    } catch (e) { console.error('Error fetching planes for overlay', e); }
+
     const overlay = document.createElement('div');
     overlay.className = 'upsell-overlay d-flex flex-column align-items-center justify-content-center text-center p-4 rounded-4';
     overlay.style.position = 'absolute';
@@ -939,9 +951,9 @@ function renderUpsellOverlay(container, title) {
     overlay.style.left = '0';
     overlay.style.width = '100%';
     overlay.style.height = '100%';
-    overlay.style.background = 'rgba(255,255,255,0.05)';
-    overlay.style.backdropFilter = 'blur(10px)';
-    overlay.style.webkitBackdropFilter = 'blur(10px)';
+    overlay.style.background = 'rgba(0, 0, 0, 0.65)';
+    overlay.style.backdropFilter = 'blur(6px)';
+    overlay.style.webkitBackdropFilter = 'blur(6px)';
     overlay.style.zIndex = '10';
 
     overlay.innerHTML = `
@@ -952,7 +964,7 @@ function renderUpsellOverlay(container, title) {
         <h4 class="fw-bold mb-2" style="color: white; letter-spacing: -1px; text-shadow: 0 4px 8px rgba(0,0,0,0.5);">${title}</h4>
         <p class="text-white mb-4 px-3" style="max-width: 400px; line-height: 1.5; opacity: 0.9;">
             Envía recordatorios automáticos por correo a tus clientes (1 día y 2 horas antes de su cita). <br>
-            <strong>Exclusivo del Plan Pro.</strong>
+            <strong>Exclusivo para: ${nombresPlanes}.</strong>
         </p>
         <div class="d-flex gap-3">
             <button class="btn btn-dark px-4 py-2 fw-bold shadow" onclick="window.location.href='/admin/dashboard?upgrade=1'">
