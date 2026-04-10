@@ -323,6 +323,26 @@
                     </div>`;
             }
 
+            // ─── Alerta de comprobante rechazado ───
+            if (cafe.comprobante_rechazado) {
+                alertContainer.innerHTML = `
+                    <div class="alert border-0 rounded-3 mb-4 shadow-sm" style="background-color: #ffebee; border-left: 4px solid #c62828 !important; border-left-style: solid !important;">
+                        <div class="d-flex align-items-center gap-3 flex-wrap">
+                            <i class="bi bi-x-octagon-fill fs-3" style="color: #c62828;"></i>
+                            <div class="flex-grow-1">
+                                <p class="fw-bold mb-0" style="color: #b71c1c;">Tu comprobante fue rechazado</p>
+                                <p class="small mb-0" style="color: #c62828;">Por favor verifica que tu transferencia sea correcta o contacta a soporte. Puedes volver a subir tu comprobante.</p>
+                            </div>
+                            <button class="btn btn-sm fw-bold px-3 py-2 text-white" style="background: #c62828; border-radius: 8px; white-space: nowrap;" onclick="abrirModalRenovar('${cafe.estado}')">
+                                <i class="bi bi-arrow-repeat me-1"></i>Volver a enviar
+                            </button>
+                        </div>
+                    </div>`;
+                // Mostrar modal automático la primera vez
+                mostrarModalRechazo();
+                // No hacemos return: el widget de suscripción sigue renderizando
+            }
+
             // Alerta de revisión (prioritaria si ya subió comprobante)
             if (cafe.estado === 'pendiente' || cafe.estado === 'en_revision') {
                 alertContainer.innerHTML = `
@@ -506,6 +526,29 @@
                 submitBtn.disabled = false;
             }
         });
+
+        function mostrarModalRechazo() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Comprobante rechazado',
+                html: `
+                    <p style="color: #555;">Tu comprobante de pago no pudo ser validado.</p>
+                    <p class="small text-muted mb-0">Por favor verifica que:</p>
+                    <ul class="text-start small text-muted mt-2 mb-3">
+                        <li>La transferencia se realizó a la cuenta correcta del administrador</li>
+                        <li>El monto corresponde al plan seleccionado</li>
+                        <li>El comprobante es legible y visible</li>
+                    </ul>
+                    <p class="small">Si el problema persiste, <strong>contacta a soporte</strong>.</p>`,
+                showCancelButton: true,
+                confirmButtonText: '<i class="bi bi-arrow-repeat me-1"></i>Volver a enviar comprobante',
+                cancelButtonText: 'Más tarde',
+                confirmButtonColor: '#382C26',
+                cancelButtonColor: '#6c757d',
+            }).then(res => {
+                if (res.isConfirmed) abrirModalRenovar();
+            });
+        }
 
         function verificarRestriccionesPlan(cafe) {
             const plan = cafe.suscripcion_actual?.plan;

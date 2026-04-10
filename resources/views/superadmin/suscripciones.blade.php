@@ -459,6 +459,9 @@ async function verHistorial(cafeteriaId, nombre) {
             let badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7;">● Pagado</span>`;
             if (s.estado_pago === 'pendiente') {
                 badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #FFF8E1; color: #FFA000; border: 1px solid #FFE082;">● Pendiente</span>`;
+            } else if (s.comprobante_url && s.comprobante_url.startsWith('RECHAZADO:')) {
+                // Registro rechazado por superadmin (reutilizamos comprobante_url para el motivo)
+                badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A;">● Rechazada</span>`;
             } else if (isVencida) {
                 badgeEstado = `<span class="badge rounded-pill px-3 py-2" style="background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A;">● Vencida</span>`;
             } else if (s.estado_pago === 'cancelado') {
@@ -466,7 +469,15 @@ async function verHistorial(cafeteriaId, nombre) {
             }
 
             let btnComprobante = '';
-            if (s.comprobante_url) {
+            if (s.comprobante_url && s.comprobante_url.startsWith('RECHAZADO:')) {
+                // Mostrar el motivo del rechazo guardado en comprobante_url
+                const motivoTexto = escapeHTML(s.comprobante_url.replace('RECHAZADO:', '').trim());
+                btnComprobante = `
+                    <span class="d-inline-flex align-items-center gap-1" title="${motivoTexto}">
+                        <i class="bi bi-x-circle-fill text-danger" style="font-size:1rem;"></i>
+                        <span class="small text-danger fw-semibold" style="max-width:130px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:inline-block;">${motivoTexto || 'Sin motivo'}</span>
+                    </span>`;
+            } else if (s.comprobante_url) {
                 if (s.tipo === 'historial') {
                     btnComprobante = `<button type="button" class="btn btn-sm btn-outline-dark rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" title="Ver Recibo Histórico" onclick="verComprobanteHis(${s.id})"><i class="bi bi-file-earmark-text"></i></button>`;
                 } else {
@@ -543,41 +554,28 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function rechazarRenovacion(suscripcionId) {
-    const { value: motivo, isConfirmed } = await Swal.fire({
-        title: 'Rechazar Comprobante',
-        html: `
-            <p class="text-muted mb-3" style="font-size:0.9rem;">
-                Indica el motivo del rechazo para que el gerente pueda corregirlo.
-            </p>
-            <textarea id="swal-motivo" class="form-control" rows="3" maxlength="500"
-                placeholder="Ej: El comprobante no se visualiza correctamente, monto incorrecto, datos ilegibles..."
-                style="resize: none; font-size: 0.9rem;"></textarea>`,
+    const result = await Swal.fire({
+        title: '¿Rechazar este comprobante?',
+        text: 'El gerente será notificado y podrá volver a enviar su comprobante.',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#c62828',
         cancelButtonColor: '#6c757d',
         confirmButtonText: '<i class="bi bi-x-octagon me-1"></i>Sí, rechazar',
-        cancelButtonText: 'Cancelar',
-        preConfirm: () => {
-            return document.getElementById('swal-motivo').value.trim() || null;
-        }
+        cancelButtonText: 'Cancelar'
     });
 
-    if (!isConfirmed) return;
+    if (!result.isConfirmed) return;
 
     document.getElementById('overlay-loading').style.setProperty('display', 'flex', 'important');
     try {
         const res = await MetraAPI.post(
             `/superadmin/suscripciones/${suscripcionId}/rechazar-renovacion`,
-            { motivo: motivo || '' },
+            {},
             { 'X-HTTP-Method-Override': 'PATCH' }
         );
         await cargarSuscripciones();
-        Swal.fire(
-            'Rechazado',
-            res.message || 'El comprobante fue rechazado. El gerente podrá intentar de nuevo.',
-            'info'
-        );
+        Swal.fire('Rechazado', res.message || 'El gerente podrá volver a enviar su comprobante.', 'info');
     } catch (e) {
         Swal.fire('Error', e.data?.message || e.message, 'error');
     } finally {

@@ -42,7 +42,30 @@ class CafeteriaPerfilController extends Controller
             $cafeteria->capacidad_total = \App\Models\Mesa::where('cafe_id', $cafeteria->id)
                 ->where('activo', 1)
                 ->sum('capacidad');
+
+            // Flag: indica si el último comprobante enviado fue rechazado
+            // Se detecta por comprobante_url = 'RECHAZADO' en la suscripción más reciente cancelada
+            $ultimaRechazada = \App\Models\Suscripcion::where('cafe_id', $cafeteria->id)
+                ->where('estado_pago', 'cancelado')
+                ->where('comprobante_url', 'RECHAZADO')
+                ->where('en_revision', false)
+                ->latest('id')
+                ->first();
+
+            // Solo mostrar el aviso si no hay ninguna suscripción pendiente/activa más reciente
+            $hayPendienteOActiva = \App\Models\Suscripcion::where('cafe_id', $cafeteria->id)
+                ->where(function ($q) {
+                    $q->where('en_revision', true)
+                      ->orWhere(function ($q2) {
+                          $q2->where('estado_pago', 'pagado')
+                             ->where('fecha_fin', '>', now());
+                      });
+                })
+                ->exists();
+
+            $cafeteria->comprobante_rechazado = $ultimaRechazada && !$hayPendienteOActiva;
         }
+
 
         return ApiResponse::success(
             $cafeteria,

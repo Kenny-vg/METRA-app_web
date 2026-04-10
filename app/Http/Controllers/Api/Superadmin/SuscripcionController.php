@@ -281,42 +281,25 @@ class SuscripcionController extends Controller
 
     /**
      * Rechazar renovación de suscripción pendiente.
-     * Elimina el registro pendiente y deja la cafetería con su última suscripción válida.
+     * Marca como cancelado y pone comprobante_url='RECHAZADO' como flag
+     * para que el gerente sepa que puede volver a intentarlo.
      */
-    public function rechazarRenovacion(Request $request, Suscripcion $suscripcion)
+    public function rechazarRenovacion(Suscripcion $suscripcion)
     {
         if (!$suscripcion->en_revision) {
             return ApiResponse::error('Esta suscripción no está pendiente de aprobación.', 422);
         }
 
-        $data = $request->validate([
-            'motivo' => 'nullable|string|max:500',
+        $suscripcion->update([
+            'estado_pago'      => 'cancelado',
+            'en_revision'      => false,
+            'fecha_validacion' => now(),
+            'comprobante_url'  => 'RECHAZADO',
         ]);
-
-        $cafeteria  = $suscripcion->cafeteria;
-        $cafe_id    = $suscripcion->cafe_id;
-        $planNombre = $suscripcion->plan->nombre_plan ?? 'Desconocido';
-        $motivo     = $data['motivo'] ?? 'Sin motivo especificado';
-
-        \Log::info("Renovación rechazada. CafífID={$cafe_id}, plan={$planNombre}, motivo={$motivo}");
-
-        // Eliminar el registro pendiente para no dejar basura en el historial
-        $suscripcion->delete();
-
-        // Si la cafetería no tiene ninguna suscripción activa vigente después del rechazo,
-        // dejarla como estaba (el superadmin decide si suspender).
-        $tieneActiva = Suscripcion::where('cafe_id', $cafe_id)
-            ->where('estado_pago', 'pagado')
-            ->where('fecha_fin', '>', now())
-            ->exists();
-
-        // Si la caf no tiene nada activo y estaba activa, mantener su estado para
-        // que el superadmin pueda decidir qué hacer (no la suspendemos automáticamente).
 
         return ApiResponse::success(
             null,
-            'Renovación rechazada. El comprobante ha sido descartado' .
-            ($motivo !== 'Sin motivo especificado' ? ': ' . $motivo : '.')
+            'Comprobante rechazado. El gerente podrá volver a enviar su solicitud.'
         );
     }
 }
