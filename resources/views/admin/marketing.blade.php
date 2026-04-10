@@ -145,14 +145,14 @@
                                 <span class="badge rounded-circle me-3 p-2" style="background: var(--black-primary); color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">2</span>
                                 <div>
                                     <p class="mb-0 fw-bold small">Recordatorio Diario</p>
-                                    <p class="mb-0 x-small text-muted">Aviso general por la mañana (9:00 AM).</p>
+                                    <p class="mb-0 x-small text-muted">Aviso general el mismo día de la cita.</p>
                                 </div>
                             </li>
                             <li class="d-flex align-items-center">
                                 <span class="badge rounded-circle me-3 p-2" style="background: var(--accent-gold); color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">3</span>
                                 <div>
-                                    <p class="mb-0 fw-bold small">Alerta Crítica (2 horas)</p>
-                                    <p class="mb-0 x-small text-muted">Último recordatorio antes de la cita.</p>
+                                    <p class="mb-0 fw-bold small">Alerta de Confirmación</p>
+                                    <p class="mb-0 x-small text-muted">Aviso final 2 horas antes de su reservación.</p>
                                 </div>
                             </li>
                         </ul>
