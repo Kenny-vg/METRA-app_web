@@ -297,6 +297,19 @@ class SuscripcionController extends Controller
             'comprobante_url'  => 'RECHAZADO',
         ]);
 
+        // Enviar email de notificación al gerente
+        try {
+            $gerente = $suscripcion->cafeteria?->gerente;
+            if ($gerente && $gerente->email) {
+                \Illuminate\Support\Facades\Mail::to($gerente->email)
+                    ->send(new \App\Mail\ComprobanteRechazado(
+                        $suscripcion->cafeteria->nombre ?? 'tu cafetería'
+                    ));
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('No se pudo enviar email de rechazo: ' . $e->getMessage());
+        }
+
         return ApiResponse::success(
             null,
             'Comprobante rechazado. El gerente podrá volver a enviar su solicitud.'

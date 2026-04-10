@@ -284,12 +284,13 @@
             const alertContainer = document.getElementById('alerta-vencimiento-container');
             
             if (!cafe || !cafe.suscripcion_actual) {
-                if (cafe && cafe.estado === 'pendiente') {
+                if (cafe && (cafe.estado === 'pendiente' || cafe.estado === 'en_revision')) {
                     container.innerHTML = `
                         <div class="card border-0 p-4 premium-card text-center shadow-sm">
                             <h5 class="fw-bold mb-3 text-warning"><i class="bi bi-hourglass-split me-2"></i>Pago en validación</h5>
-                            <p class="text-muted m-0">Tu suscripción venció, pero estamos validando tu pago. En breve tendrás acceso total.</p>
+                            <p class="text-muted m-0">Tu comprobante está siendo revisado por el administrador. En breve tendrás acceso total.</p>
                         </div>`;
+                    // NO abrimos el modal automáticamente — el widget ya informa al gerente
                 } else {
                     container.innerHTML = `
                         <div class="card border-0 p-4 premium-card text-center shadow-sm">
@@ -297,6 +298,7 @@
                             <p class="text-muted m-0">No tienes una suscripción activa.</p>
                             <button class="btn-admin-primary mt-3 px-4" onclick="abrirModalRenovar('${cafe ? cafe.estado : ''}')"><i class="bi bi-arrow-repeat me-2"></i>Renovar ahora</button>
                         </div>`;
+                    // Aquí sí abrimos el modal — el gerente genuinamente necesita renovar
                     abrirModalRenovar(cafe ? cafe.estado : '');
                 }
                 return;
@@ -344,23 +346,25 @@
             }
 
             // Alerta de revisión (prioritaria si ya subió comprobante)
-            if (cafe.estado === 'pendiente' || cafe.estado === 'en_revision') {
-                alertContainer.innerHTML = `
-                    <div class="alert alert-info border-0 rounded-3 mb-4 d-flex align-items-center fw-bold shadow-sm" style="background-color: #e3f2fd; color: #0d47a1;">
-                        <i class="bi bi-info-circle-fill me-3 fs-3"></i>
-                        <div>Tu suscripción actual vence en ${diasRestantes} días. Tu nueva renovación está en proceso.</div>
-                    </div>`;
-            }
-            // Alerta de vencimiento (solo si NO está en revisión)
-            else if (diasRestantes <= 7 && diasRestantes >= 0) {
-                alertContainer.innerHTML = `
-                    <div class="alert alert-danger border-0 rounded-3 mb-4 d-flex align-items-center fw-bold shadow-sm" style="background-color: #ffebee; color: #c62828;">
-                        <i class="bi bi-clock-history me-3 fs-3"></i>
-                        <div>Tu suscripción vence en ${diasRestantes} días. Por favor, renueva para evitar la suspensión del servicio.</div>
-                        <button class="btn btn-sm btn-danger ms-auto px-3" onclick="abrirModalRenovar('${cafe.estado}')">Renovar ahora</button>
-                    </div>`;
-            } else {
-                alertContainer.innerHTML = '';
+            if (alertContainer) {
+                if (cafe.estado === 'pendiente' || cafe.estado === 'en_revision') {
+                    alertContainer.innerHTML = `
+                        <div class="alert alert-info border-0 rounded-3 mb-4 d-flex align-items-center fw-bold shadow-sm" style="background-color: #e3f2fd; color: #0d47a1;">
+                            <i class="bi bi-info-circle-fill me-3 fs-3"></i>
+                            <div>Tu suscripción actual vence en ${diasRestantes} días. Tu nueva renovación está en proceso.</div>
+                        </div>`;
+                }
+                // Alerta de vencimiento (solo si NO está en revisión)
+                else if (diasRestantes <= 7 && diasRestantes >= 0) {
+                    alertContainer.innerHTML = `
+                        <div class="alert alert-danger border-0 rounded-3 mb-4 d-flex align-items-center fw-bold shadow-sm" style="background-color: #ffebee; color: #c62828;">
+                            <i class="bi bi-clock-history me-3 fs-3"></i>
+                            <div>Tu suscripción vence en ${diasRestantes} días. Por favor, renueva para evitar la suspensión del servicio.</div>
+                            <button class="btn btn-sm btn-danger ms-auto px-3" onclick="abrirModalRenovar('${cafe.estado}')">Renovar ahora</button>
+                        </div>`;
+                } else {
+                    alertContainer.innerHTML = '';
+                }
             }
 
             container.innerHTML = `

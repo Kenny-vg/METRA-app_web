@@ -130,6 +130,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     </p>
                 </div>
 
+                <!-- Banner oculto: aparece cuando el comprobante fue rechazado -->
+                <div id="banner-comprobante-rechazado" style="display:none;" class="mt-3">
+                    <div class="alert border-0 rounded-3 p-3" style="background:#ffebee; border-left: 4px solid #c62828 !important; border-left-style: solid !important;">
+                        <p class="fw-bold mb-1 small" style="color:#b71c1c;"><i class="bi bi-x-octagon-fill me-1"></i>Comprobante rechazado</p>
+                        <p class="small mb-2" style="color:#c62828;">Tu comprobante no pudo ser validado. Verifica tus datos y vuelve a intentarlo.</p>
+                        <button type="button" class="btn btn-sm fw-bold text-white w-100 py-2" style="background:#c62828; border-radius:6px;" onclick="mostrarModalReenvio()">
+                            <i class="bi bi-arrow-repeat me-1"></i>Reenviar comprobante
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -404,6 +415,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             confirmButtonText: 'Entendido'
                         });
                     } else if (msgLower.includes('comprobante fue rechazado')) {
+                        // Guardar email y mostrar banner persistente
+                        window.tempLoginEmail = email;
+                        const bannerEl = document.getElementById('banner-comprobante-rechazado');
+                        if (bannerEl) bannerEl.style.display = 'block';
+
                         Swal.fire({
                             icon: 'error',
                             title: 'Comprobante rechazado',
@@ -417,15 +433,13 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </ul>
                                 <p class="small mb-0">Si el problema persiste, <strong>contacta a soporte</strong>.</p>`,
                             showCancelButton: true,
-                            confirmButtonText: '<i class="bi bi-arrow-repeat me-1"></i>Volver a enviar comprobante',
+                            confirmButtonText: '<i class="bi bi-arrow-repeat me-1"></i>Reenviar comprobante',
                             cancelButtonText: 'Más tarde',
                             confirmButtonColor: '#382C26',
                             cancelButtonColor: '#6c757d'
                         }).then((result) => {
-                            if (result.isConfirmed) {
-                                abrirModalRenovar();
-                                window.tempLoginEmail = email;
-                            }
+                            if (result.isConfirmed) mostrarModalReenvio();
+                            // Si dice "Más tarde" el banner rojo ya es visible
                         });
                     } else if (msgLower.includes('no tiene una suscripción activa')) {
                         Swal.fire({
@@ -470,6 +484,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Función: Abre el modal de reenvío de comprobante (para cuando fue rechazado desde el login)
+window.mostrarModalReenvio = function() {
+    abrirModalRenovar(''); // '' = estado vacío → muestra el formulario completo con selector de plan
+}
 
 window.abrirModalRenovar = async function(estado = '') {
     const modalElement = document.getElementById('modalRenovar');
