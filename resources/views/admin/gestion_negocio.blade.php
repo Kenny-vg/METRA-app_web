@@ -1058,7 +1058,12 @@
                 loadHorarios();
             } catch (error) {
                 const errorData = error.data || error;
-                Swal.fire('Error', errorData.message || 'Error al guardar horario (quizá ya existe)', 'error');
+                let errorMsg = errorData.message || 'Error al guardar horario (quizá ya existe)';
+                if (errorData.errors) {
+                    const firstErrorKey = Object.keys(errorData.errors)[0];
+                    errorMsg = errorData.errors[firstErrorKey][0];
+                }
+                Swal.fire('Error', errorMsg, 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalText;

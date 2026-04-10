@@ -187,7 +187,12 @@ class ReservacionController extends Controller
 
         return DB::transaction(function () use ($request, $cafeteria, $horaInicio, $horaFin) {
 
+            // Prevenir Race Conditions (reservas simultáneas)
+            // Bloqueamos la fila de la cafetería temporalmente para evaluar de forma secuencial las reservas concurrentes.
+            DB::table('cafeterias')->where('id', $cafeteria->id)->lockForUpdate()->get();
+
             if (!$this->validarDisponibilidad(
+
             $cafeteria->id,
             $request->fecha,
             $horaInicio,
