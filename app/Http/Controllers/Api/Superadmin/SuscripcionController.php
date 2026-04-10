@@ -37,6 +37,7 @@ class SuscripcionController extends Controller
                         'fecha_fin' => $s->fecha_fin,
                         'estado_pago' => $s->estado_pago,
                         'comprobante_url' => $s->comprobante_url,
+                        'comprobante_public_id' => $s->comprobante_public_id,
                     ];
                 });
 

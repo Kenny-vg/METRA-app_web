@@ -45,20 +45,7 @@ class RegistroNegocioController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. CHECAR SI ES RECHAZADO ANTES DE VALIDAR 
-        $email = $request->input('gerente.email') ?: $request->input('email');
-        if ($email) {
-            $userRechazado = User::where('email', $email)
-                ->where('estatus_registro', 'rechazado')
-                ->first();
-
-            if ($userRechazado) {
-                return ApiResponse::error(
-                    'Este correo ya fue utilizado en un registro que fue rechazado. Contacta a soporte para más información.',
-                    403
-                );
-            }
-        }
+        // (Rechazados ahora pueden volver a subir comprobante desde el login)
 
         // Limpiar inputs de HTML (Protección XSS)
         $request->merge([
@@ -314,17 +301,7 @@ class RegistroNegocioController extends Controller
 
         $email = strtolower(trim($request->email));
 
-        $gerenteRechazado = User::where('email', $email)
-            ->where('estatus_registro', 'rechazado')
-            ->where('role', 'gerente')
-            ->first();
-
-        if ($gerenteRechazado) {
-            return ApiResponse::error(
-                'Este correo ya fue utilizado en un registro que fue rechazado. Contacta a soporte para más información.',
-                403
-            );
-        }
+        // Rechazados ahora pueden resubir su comprobante desde el login
 
         $user = User::where('email', $email)
             ->where('estatus_registro', 'pendiente')

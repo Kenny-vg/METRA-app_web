@@ -215,7 +215,9 @@ function renderTablaRevision(cafeterias) {
             ${cafeterias.map(c => {
                 const gerente = c.gerente ? `${escapeHTML(c.gerente.name)}<br><small class="text-muted">${escapeHTML(c.gerente.email)}</small>` : '—';
                 const plan    = escapeHTML(c.suscripcion_actual?.plan?.nombre_plan || c.ultima_suscripcion?.plan?.nombre_plan || '—');
-                const comp    = c.comprobante_url
+                const hasComp = c.comprobante_url || c.comprobante_public_id 
+                    || c.ultima_suscripcion?.comprobante_public_id || c.ultima_suscripcion?.comprobante_url;
+                const comp    = hasComp
                     ? `<button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="verComprobante(${c.id})">
                         <i class="bi bi-receipt me-1"></i>Ver Ticket
                        </button>`

@@ -32,8 +32,8 @@ class LoginController extends Controller
 
             if ($user->estatus_registro === 'rechazado') {
                 return ApiResponse::error(
-                    'Tu registro ha sido rechazado. Contacta a soporte.',
-                    403
+                    'Tu comprobante fue rechazado. Por favor verifica tus datos bancarios y vuelve a enviar tu comprobante.',
+                    423
                 );
             }
 

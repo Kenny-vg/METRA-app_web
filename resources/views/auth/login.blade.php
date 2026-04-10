@@ -384,11 +384,23 @@ document.addEventListener('DOMContentLoaded', function() {
                             confirmButtonText: 'Entendido'
                         });
                     } else {
+                        // Cuenta nueva rechazada por el superadmin
                         Swal.fire({
                             icon: 'error',
-                            title: 'Acceso Denegado',
-                            text: errorMsg || 'Tu registro ha sido rechazado. Por favor contacta a soporte.',
-                            confirmButtonColor: '#D32F2F',
+                            title: 'Registro rechazado',
+                            html: `
+                                <p class="text-muted mb-2">Tu solicitud de registro no pudo ser aprobada en esta ocasión.</p>
+                                <p class="small text-muted mb-1">Posibles razones:</p>
+                                <ul class="text-start small text-muted mb-3" style="padding-left: 1.2rem;">
+                                    <li>El comprobante de pago no era válido o legible</li>
+                                    <li>Los datos de la cafetería estaban incompletos</li>
+                                    <li>La transferencia no correspondía al plan seleccionado</li>
+                                </ul>
+                                <p class="small mb-0">
+                                    Te enviamos un correo con más detalles.<br>
+                                    Si crees que es un error, <strong>contacta a soporte</strong>.
+                                </p>`,
+                            confirmButtonColor: '#382C26',
                             confirmButtonText: 'Entendido'
                         });
                     }

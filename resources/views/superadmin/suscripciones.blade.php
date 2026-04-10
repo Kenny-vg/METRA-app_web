@@ -213,7 +213,7 @@ function renderTabla(suscripciones) {
 
         if (s.estado_pago === 'pendiente') {
             badgeEstado = `<span class="badge rounded-pill px-3 py-2 d-inline-flex align-items-center" style="background: #FFF8E1; color: #FFA000; border: 1px solid #FFE082;">● Pendiente</span>`;
-            if (s.comprobante_url) {
+            if (s.comprobante_url || s.comprobante_public_id) {
                 badgeEstado += ` <button type="button" class="btn btn-sm btn-link p-0 ms-2 text-primary align-baseline" onclick="verComprobanteSub(${s.id})" title="Ver Comprobante" data-bs-toggle="tooltip"><i class="bi bi-receipt fs-5"></i></button>`;
             }
         } else if (isVencida) {
@@ -469,6 +469,7 @@ async function verHistorial(cafeteriaId, nombre) {
             }
 
             let btnComprobante = '';
+            const hasComprobante = s.comprobante_url || s.comprobante_public_id;
             if (s.comprobante_url && s.comprobante_url.startsWith('RECHAZADO:')) {
                 // Mostrar el motivo del rechazo guardado en comprobante_url
                 const motivoTexto = escapeHTML(s.comprobante_url.replace('RECHAZADO:', '').trim());
@@ -477,9 +478,9 @@ async function verHistorial(cafeteriaId, nombre) {
                         <i class="bi bi-x-circle-fill text-danger" style="font-size:1rem;"></i>
                         <span class="small text-danger fw-semibold" style="max-width:130px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:inline-block;">${motivoTexto || 'Sin motivo'}</span>
                     </span>`;
-            } else if (s.comprobante_url) {
+            } else if (hasComprobante) {
                 if (s.tipo === 'historial') {
-                    btnComprobante = `<button type="button" class="btn btn-sm btn-outline-dark rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" title="Ver Recibo Histórico" onclick="verComprobanteHis(${s.id})"><i class="bi bi-file-earmark-text"></i></button>`;
+                    btnComprobante = `<button type="button" class="btn btn-sm btn-outline-dark rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" title="Ver Recibo Histórico" onclick="verComprobanteSub(${s.id})"><i class="bi bi-file-earmark-text"></i></button>`;
                 } else {
                     btnComprobante = `<button type="button" class="btn btn-sm btn-outline-dark rounded-circle" style="width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;" title="Ver Recibo Actual" onclick="verComprobanteSub(${s.id})"><i class="bi bi-file-earmark-text"></i></button>`;
                 }
