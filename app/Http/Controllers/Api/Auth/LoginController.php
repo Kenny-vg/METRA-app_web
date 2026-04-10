@@ -30,6 +30,7 @@ class LoginController extends Controller
 
         if (!$user->estado && $user->role === 'gerente') {
 
+            // CASO 1: Rechazado en el registro inicial (o forzado a este estado)
             if ($user->estatus_registro === 'rechazado') {
                 return ApiResponse::error(
                     'Tu comprobante fue rechazado. Por favor verifica tus datos bancarios y vuelve a enviar tu comprobante.',
@@ -37,6 +38,7 @@ class LoginController extends Controller
                 );
             }
 
+            // CASO 2: Pendiente de aprobación (registro inicial o re-subida)
             if ($user->estatus_registro === 'pendiente') {
 
                 $cafeteria = $user->cafeteria;
@@ -72,7 +74,25 @@ class LoginController extends Controller
                         423
                     );
                 }
-            }        }
+            }
+
+            // CASO 3: Renovación o cambio de plan rechazado (para cuentas ya activas pero marcadas como inactivas)
+            $cafeteria = $user->cafeteria;
+            if ($cafeteria) {
+                $ultimaRechazada = $cafeteria->suscripciones()
+                    ->where('estado_pago', 'cancelado')
+                    ->where('comprobante_url', 'RECHAZADO')
+                    ->latest('id')
+                    ->first();
+
+                if ($ultimaRechazada) {
+                    return ApiResponse::error(
+                        'Tu comprobante fue rechazado. Por favor verifica tus datos bancarios y vuelve a enviar tu comprobante.',
+                        423
+                    );
+                }
+            }
+        }
 
         if (!$user->estado) {
             return ApiResponse::error('Usuario inactivo', 403);

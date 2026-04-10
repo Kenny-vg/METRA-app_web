@@ -127,15 +127,19 @@ class RenovarSuscripcionController extends Controller
             'en_revision'            => true,
         ]);
 
-        // ─── Si la cuenta fue rechazada previamente, restaurar estados para re-revisión ───
-        if ($user->estatus_registro === 'rechazado') {
+        // ─── Si la cuenta fue rechazada previamente o está inactiva, restaurar estados para re-revisión ───
+        if ($user->estatus_registro === 'rechazado' || !$user->estado) {
             $user->update([
+                'estado'           => true, 
                 'estatus_registro' => 'pendiente',
             ]);
 
-            $cafeteria->update([
-                'estado' => 'en_revision',
-            ]);
+            // Si la cafetería estaba suspendida (por rechazo inicial), marcarla en revisión
+            if ($cafeteria->estado === 'suspendida') {
+                $cafeteria->update([
+                    'estado' => 'en_revision',
+                ]);
+            }
         }
 
         return ApiResponse::success([
