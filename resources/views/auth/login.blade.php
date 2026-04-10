@@ -403,6 +403,30 @@ document.addEventListener('DOMContentLoaded', function() {
                             confirmButtonColor: '#382C26',
                             confirmButtonText: 'Entendido'
                         });
+                    } else if (msgLower.includes('comprobante fue rechazado')) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Comprobante rechazado',
+                            html: `
+                                <p class="text-muted mb-2">Tu comprobante de pago no pudo ser validado.</p>
+                                <p class="small text-muted mb-1">Por favor verifica que:</p>
+                                <ul class="text-start small text-muted mb-3" style="padding-left: 1.2rem;">
+                                    <li>La transferencia se realizó a la cuenta correcta del administrador</li>
+                                    <li>El monto corresponde al plan seleccionado</li>
+                                    <li>El comprobante es legible y visible</li>
+                                </ul>
+                                <p class="small mb-0">Si el problema persiste, <strong>contacta a soporte</strong>.</p>`,
+                            showCancelButton: true,
+                            confirmButtonText: '<i class="bi bi-arrow-repeat me-1"></i>Volver a enviar comprobante',
+                            cancelButtonText: 'Más tarde',
+                            confirmButtonColor: '#382C26',
+                            cancelButtonColor: '#6c757d'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                abrirModalRenovar();
+                                window.tempLoginEmail = email;
+                            }
+                        });
                     } else if (msgLower.includes('no tiene una suscripción activa')) {
                         Swal.fire({
                             icon: 'warning',

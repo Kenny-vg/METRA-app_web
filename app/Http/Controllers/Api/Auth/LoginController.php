@@ -109,6 +109,20 @@ class LoginController extends Controller
                         );
                     }
 
+                    // Verificar si el último comprobante fue rechazado
+                    $ultimaRechazada = $cafeteria->suscripciones()
+                        ->where('estado_pago', 'cancelado')
+                        ->where('comprobante_url', 'RECHAZADO')
+                        ->latest('id')
+                        ->first();
+
+                    if ($ultimaRechazada) {
+                        return ApiResponse::error(
+                            'Tu comprobante fue rechazado. Por favor verifica tus datos bancarios y vuelve a enviar tu comprobante.',
+                            423
+                        );
+                    }
+
                     return ApiResponse::error(
                         'Tu cafetería no tiene una suscripción activa.',
                         423
