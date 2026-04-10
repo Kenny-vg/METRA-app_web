@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Plan;
 
@@ -13,17 +12,46 @@ class PlanSeeder extends Seeder
      */
     public function run(): void
     {
-        //
-        Plan::updateOrCreate([
-            'nombre_plan' => 'Plan Demo',
-            'precio' => 799,
-            'max_reservas_mes' => 100,
-            'max_usuarios_admin' => 5,
-            'duracion_dias' => 30,
+        Plan::updateOrCreate(
+            ['nombre_plan' => 'Basic'],
+            [
+                'precio' => 499,
+                'max_reservas_mes' => 150,
+                'max_usuarios_admin' => 3,
+                'duracion_dias' => 30,
+                'descripcion' => 'Plan esencial para cafeterías boutique.',
+                'estado' => 1,
+                'tiene_metricas_avanzadas' => false,
+                'tiene_recordatorios' => false,
+            ]
+        );
 
-            'descripcion' => 'Plan de prueba para desarrollo',
-            'estado' => 1,
-        ]);
+        Plan::updateOrCreate(
+            ['nombre_plan' => 'Standard'],
+            [
+                'precio' => 899,
+                'max_reservas_mes' => 500,
+                'max_usuarios_admin' => 6,
+                'duracion_dias' => 30,
+                'descripcion' => 'Crecimiento y gestión de equipo con analítica.',
+                'estado' => 1,
+                'tiene_metricas_avanzadas' => true,
+                'tiene_recordatorios' => false,
+            ]
+        );
         
+        Plan::updateOrCreate(
+            ['nombre_plan' => 'Pro'],
+            [
+                'precio' => 1499,
+                'max_reservas_mes' => 1000,
+                'max_usuarios_admin' => 15,
+                'duracion_dias' => 30,
+                'descripcion' => 'Potencia total con recordatorios y métricas avanzadas.',
+                'estado' => 1,
+                'tiene_metricas_avanzadas' => true,
+                'tiene_recordatorios' => true,
+            ]
+        );
     }
 }

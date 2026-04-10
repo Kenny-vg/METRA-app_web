@@ -43,22 +43,8 @@
             <!-- Sección Superior: System/Status -->
             <div class="col-12 mb-4 mb-md-0">
                 <div class="row g-3 g-md-4">
-                    <!-- Estado del Sistema -->
-                    <div class="col-12 col-md-6">
-                        <div class="card bg-white border-0 shadow-sm rounded-4 p-3 p-md-4">
-                            <h5 class="fw-bold mb-3 text-danger"><i class="bi bi-shield-exclamation me-2"></i>Modo Mantenimiento</h5>
-                            <div class="form-check form-switch p-0 m-0 d-flex justify-content-between align-items-center mb-3">
-                                <label class="form-check-label fw-bold small text-uppercase" for="maintenanceMode" style="letter-spacing: 0.5px;">Acceso Restringido</label>
-                                <input class="form-check-input ms-0" type="checkbox" role="switch" id="maintenanceMode" style="width: 3em; height: 1.5em;">
-                            </div>
-                            <p class="small text-muted mb-0">
-                                Solo Superadmins podrán acceder. Clientes verán página de "Mantenimiento".
-                            </p>
-                        </div>
-                    </div>
-
                     <!-- Información Técnica -->
-                    <div class="col-12 col-md-6">
+                    <div class="col-12">
                         <div class="card bg-white border-0 shadow-sm rounded-4 p-3 p-md-4">
                             <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-server me-2"></i>Build Info</h5>
                             <ul class="list-group list-group-flush small">

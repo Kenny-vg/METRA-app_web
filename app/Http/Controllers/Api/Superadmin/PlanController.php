@@ -28,6 +28,8 @@ class PlanController extends Controller
             'max_usuarios_admin'=>'required|integer|min:1',
             'duracion_dias'=>'required|integer|min:1',
             'descripcion'=>'nullable|string|max:255',
+            'tiene_metricas_avanzadas' => 'sometimes|boolean',
+            'tiene_recordatorios' => 'sometimes|boolean',
         ]);
 
         $data['estado']=true;
@@ -49,6 +51,8 @@ class PlanController extends Controller
             'duracion_dias'=>'sometimes|integer|min:1',
             'descripcion'=>'nullable|string|max:255',
             'estado'=>'sometimes|boolean',
+            'tiene_metricas_avanzadas' => 'sometimes|boolean',
+            'tiene_recordatorios' => 'sometimes|boolean',
         ]);
 
         $plan->update($data);

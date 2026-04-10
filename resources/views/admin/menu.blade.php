@@ -246,6 +246,27 @@
                 localStorage.setItem('metra_user_name', userName);
                 localStorage.setItem('metra_cafe_name', cafeName);
 
+                // 3. Verificar restricciones de plan (Menú)
+                const plan = cafe.suscripcion_actual?.plan;
+                if (plan) {
+                    // Lock en Métricas (si no tiene métricas avanzadas)
+                    if (!plan.tiene_metricas_avanzadas) {
+                        const linkMetrics = document.querySelector('a[href="/admin/dashboard"]');
+                        if (linkMetrics && !linkMetrics.querySelector('.bi-lock-fill')) {
+                            linkMetrics.innerHTML += ' <i class="bi bi-lock-fill ms-auto small text-muted opacity-50"></i>';
+                        }
+                    }
+
+                    // Lock en Eventos y Promos (si no tiene recordatorios)
+                    // Nota: El usuario pidió lock aquí también
+                    if (!plan.tiene_recordatorios) {
+                        const linkMarketing = document.querySelector('a[href="/admin/marketing"]');
+                        if (linkMarketing && !linkMarketing.querySelector('.bi-lock-fill')) {
+                            linkMarketing.innerHTML += ' <i class="bi bi-lock-fill ms-auto small text-muted opacity-50"></i>';
+                        }
+                    }
+                }
+
             } catch (e) {
                 console.error("Error actualizando sidebar:", e);
             }

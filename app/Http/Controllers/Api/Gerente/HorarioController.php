@@ -75,6 +75,10 @@ class HorarioController extends Controller
         $request->validate([
             'hora_apertura'=>'required|date_format:H:i',
             'hora_cierre'=>'required|date_format:H:i|after:hora_apertura',
+        ], [
+            'hora_cierre.after' => 'La hora de cierre debe ser posterior a la de apertura.',
+            'hora_apertura.required' => 'La hora de inicio es necesaria.',
+            'hora_cierre.required' => 'La hora de fin es necesaria.',
         ]);
 
         if ($request->hora_cierre <= $request->hora_apertura) {

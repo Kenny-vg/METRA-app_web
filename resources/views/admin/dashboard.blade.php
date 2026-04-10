@@ -84,7 +84,7 @@
 
         <!-- 5. Fidelidad -->
         <div class="col">
-             <div class="card border-0 p-4 h-100 premium-card" style="background: var(--black-primary); border-radius: 16px;">
+             <div class="card border-0 p-4 h-100 premium-card locked-container" id="card-fidelidad-premium" style="background: var(--black-primary); border-radius: 16px;">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <span class="small fw-bold text-uppercase" style="color: rgba(255,255,255,0.6); letter-spacing: 1px; font-size: 0.7rem;">Fidelidad</span>
                     <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(255,255,255,0.1); color: var(--accent-gold);">
@@ -103,7 +103,7 @@
     <!-- Sección de Gráficos de Inteligencia -->
     <div class="row g-4 mb-5">
         <div class="col-12 col-xl-8">
-            <div class="card border-0 p-4 p-lg-5 h-100 premium-card">
+            <div class="card border-0 p-4 p-lg-5 h-100 premium-card locked-container" id="card-tendencia-premium">
                 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center border-bottom pb-4 mb-4 gap-3">
                     <h5 class="fw-bold m-0"><i class="bi bi-graph-up me-2 text-primary"></i>Tendencia Semanal de Gestión</h5>
                     <span class="small text-muted">Últimos 7 días activos</span>
@@ -115,7 +115,7 @@
         </div>
 
         <div class="col-12 col-xl-4">
-             <div class="card border-0 p-4 p-lg-5 h-100 premium-card">
+             <div class="card border-0 p-4 p-lg-5 h-100 premium-card locked-container" id="card-horaspico-premium">
                 <div class="d-flex flex-column border-bottom pb-4 mb-4">
                     <h5 class="fw-bold m-0"><i class="bi bi-clock-history me-2 text-warning"></i>Horas Pico de Demanda</h5>
                     <span class="small text-muted mt-1">Afluencia por bloque horario</span>
@@ -143,7 +143,7 @@
         </div>
 
         <div class="col-12 col-xl-7">
-             <div class="card border-0 p-4 p-lg-5 premium-card shadow-sm h-100">
+             <div class="card border-0 p-4 p-lg-5 premium-card shadow-sm h-100 locked-container" id="card-historico-premium">
                 <div class="d-flex justify-content-between align-items-center border-bottom pb-4 mb-4" style="border-color: var(--border-light) !important;">
                     <h5 class="fw-bold m-0"><i class="bi bi-list-stars me-2 text-info"></i>Historial Operativo Mensual</h5>
                 </div>
@@ -225,6 +225,7 @@
                 if (emailField && cafe.gerente?.email) emailField.value = cafe.gerente.email;
 
                 renderWidgetSuscripcion(cafe);
+                verificarRestriccionesPlan(cafe);
             } catch (e) {
                 console.error('Error cargando perfil:', e);
                 document.getElementById('suscripcion-widget-container').innerHTML = `
@@ -407,6 +408,57 @@
             }
         });
 
+        function verificarRestriccionesPlan(cafe) {
+            const plan = cafe.suscripcion_actual?.plan;
+            if (!plan) return;
+
+            if (!plan.tiene_metricas_avanzadas) {
+                const targets = [
+                    { id: 'card-fidelidad-premium', title: 'Analítica de Fidelidad' },
+                    { id: 'card-tendencia-premium', title: 'Tendencia de Gestión' },
+                    { id: 'card-horaspico-premium', title: 'Análisis de Horas Pico' },
+                    { id: 'card-historico-premium', title: 'Historial Operativo' }
+                ];
+
+                targets.forEach(t => {
+                    const el = document.getElementById(t.id);
+                    if (el) renderUpsellOverlay(el, t.title);
+                });
+            }
+        }
+
+        function renderUpsellOverlay(container, title) {
+            if (container.querySelector('.upsell-overlay')) return;
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'upsell-overlay d-flex flex-column align-items-center justify-content-center text-center p-4 rounded-4';
+            overlay.style.position = 'absolute';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.background = 'rgba(255,255,255,0.05)';
+            overlay.style.backdropFilter = 'blur(10px)';
+            overlay.style.webkitBackdropFilter = 'blur(10px)';
+            overlay.style.zIndex = '10';
+
+            overlay.innerHTML = `
+                <div class="premium-lock-icon mb-3 shadow-lg d-flex align-items-center justify-content-center" 
+                     style="width: 50px; height: 50px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); border-radius: 50%; border: 2px solid var(--accent-gold);">
+                    <i class="bi bi-patch-check-fill fs-4" style="color: var(--accent-gold);"></i>
+                </div>
+                <h6 class="fw-bold mb-1" style="color: white; letter-spacing: -0.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">${title}</h6>
+                <p class="small text-white-50 mb-3 px-3" style="font-size: 0.7rem; line-height: 1.2;">
+                    Exclusivo del Plan Pro. Analítica inteligente para tu negocio.
+                </p>
+                <button class="btn btn-sm btn-dark px-3 py-1 fw-bold shadow" style="font-size: 0.7rem; border: 1px solid rgba(255,255,255,0.1);" onclick="abrirModalRenovar()">
+                    <i class="bi bi-stars me-1 text-warning"></i>Mejorar Plan
+                </button>
+            `;
+            
+            container.style.position = 'relative';
+            container.appendChild(overlay);
+        }
 
         async function cargarLlegadas() {
             try {

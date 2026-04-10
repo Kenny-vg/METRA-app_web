@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Cafeteria;
 use App\Models\User;
@@ -14,8 +13,6 @@ use App\Models\Menu;
 use App\Models\OcasionEspecial;
 use App\Models\Promocion;
 use App\Models\Reservacion;
-use App\Models\DetalleOcupacion;
-use App\Models\Resena;
 use App\Models\Plan;
 use App\Models\Suscripcion;
 use Carbon\Carbon;
@@ -189,17 +186,12 @@ class CafeteriaSeeder extends Seeder
             $promosIds[] = $promo->id;
         }
 
-        // 6.5 Asegurar Suscripción Activa
-        $plan = Plan::first();
+        // 6.5 Asegurar Suscripción Activa (Tiered)
+        $nombrePlan = ($data['slug'] === 'metra-luxury') ? 'Pro' : 'Basic';
+        $plan = Plan::where('nombre_plan', $nombrePlan)->first();
+        
         if (!$plan) {
-            $plan = Plan::create([
-                'nombre_plan' => 'Plan Pro',
-                'precio' => 499.00,
-                'duracion_dias' => 30,
-                'max_reservas_mes' => 500,
-                'max_usuarios_admin' => 5,
-                'estado' => true
-            ]);
+            $plan = Plan::first();
         }
 
         Suscripcion::updateOrCreate(
@@ -214,49 +206,33 @@ class CafeteriaSeeder extends Seeder
             ]
         );
 
-        // 7. HISTORIAL PARA MINERÍA DE DATOS (Últimos 14 días + Próximos 3)
+        // 7. HISTORIAL PARA MINERÍA DE DATOS
         $this->seedHistoricalData($cafe, $staff, $zonasIds, $ocasionesIds, $promosIds);
     }
 
     private function seedHistoricalData($cafe, $staff, $zonas, $ocasiones, $promos)
     {
-        $startDate = Carbon::now()->subDays(14); // Antes 30
-        $endDate = Carbon::now()->addDays(7);   // Antes 14
+        $startDate = Carbon::now()->startOfMonth(); // Empezar el mes actual
+        $endDate = Carbon::now();
 
-        $clientNames = ['Alejandro', 'Beatriz', 'Carlos', 'Daniela', 'Eduardo', 'Fernanda', 'Gustavo', 'Hilda', 'Ignacio', 'Julia', 'Kevin', 'Laura', 'Mauricio', 'Natalia', 'Oscar', 'Patricia'];
-        $lastNames = ['Hernandez', 'Gomez', 'Perez', 'Ruiz', 'Lopez', 'Garcia', 'Torres', 'Ramirez', 'Diaz', 'Soto', 'Mendoza', 'Vega'];
+        $clientNames = ['Alejandro', 'Beatriz', 'Carlos', 'Daniela', 'Eduardo', 'Fernanda', 'Gustavo', 'Hilda', 'Ignacio', 'Julia'];
+        $lastNames = ['Hernandez', 'Gomez', 'Perez', 'Ruiz', 'Lopez'];
 
         for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
             
-            // Reducción drástica de cantidad para que sea más ligero
-            $resCount = $date->isWeekend() ? rand(4, 7) : rand(1, 3);
-            $walkinCount = $date->isWeekend() ? rand(2, 4) : rand(1, 2);
+            // Generar suficientes reservaciones para probar los límites
+            // Si es Sabroso (Basic limit 150), queremos que esté cerca o lo pase
+            $resCount = ($cafe->slug === 'metra-luxury') ? rand(10, 20) : rand(5, 8); 
 
-            
-            // --- SEMBRAR RESERVACIONES ---
             for ($i = 0; $i < $resCount; $i++) {
-                $status = 'finalizada'; 
-                
-                if ($date->isFuture()) {
-                    $status = 'pendiente';
-                } elseif ($date->isToday()) {
-                    $rollStatus = rand(1, 3);
-                    $status = ($rollStatus === 1) ? 'pendiente' : (($rollStatus === 2) ? 'en_curso' : 'finalizada');
-                } else {
-                    $roll = rand(1, 100);
-                    if ($roll > 92) $status = 'cancelada';
-                    else if ($roll > 85) $status = 'no_show';
-                }
-
-                $hour = rand(8, 21);
-                $minute = (rand(0, 1) === 0) ? '00' : '30';
-                $horaInicio = Carbon::parse($date->toDateString() . ' ' . sprintf('%02d:%s', $hour, $minute));
+                $status = 'finalizada';
+                $hour = rand(8, 20);
+                $horaInicio = Carbon::parse($date->toDateString() . ' ' . sprintf('%02d:00:00', $hour));
                 $horaFin = $horaInicio->copy()->addMinutes($cafe->duracion_reserva_min);
 
                 $cliente = $clientNames[array_rand($clientNames)] . ' ' . $lastNames[array_rand($lastNames)];
-                $grupoId = (string) Str::uuid();
                 
-                $rsv = Reservacion::create([
+                Reservacion::create([
                     'folio' => 'RSV-' . Str::upper(Str::random(6)),
                     'nombre_cliente' => $cliente,
                     'telefono' => '55' . rand(10000000, 99999999),
@@ -264,82 +240,15 @@ class CafeteriaSeeder extends Seeder
                     'fecha' => $date->toDateString(),
                     'hora_inicio' => $horaInicio->format('H:i:s'),
                     'hora_fin' => $horaFin->format('H:i:s'),
-                    'numero_personas' => rand(1, 10),
+                    'numero_personas' => rand(1, 6),
                     'estado' => $status,
                     'cafe_id' => $cafe->id,
                     'zona_id' => $zonas[array_rand($zonas)],
-                    'ocasion_especial_id' => (rand(1, 5) === 1) ? $ocasiones[array_rand($ocasiones)] : null,
-                    'promocion_id' => (rand(1, 5) === 1) ? $promos[array_rand($promos)] : null,
-                    'fecha_checkin' => in_array($status, ['finalizada', 'en_curso']) ? $horaInicio->copy()->addMinutes(rand(-10, 10)) : null,
-                    'fecha_checkout' => ($status === 'finalizada') ? $horaFin->copy()->addMinutes(rand(0, 45)) : null
+                    'ocasion_especial_id' => (rand(1, 4) === 1) ? $ocasiones[array_rand($ocasiones)] : null,
+                    'promocion_id' => (rand(1, 4) === 1) ? $promos[array_rand($promos)] : null,
+                    'fecha_checkin' => $horaInicio->copy()->addMinutes(rand(-5, 5)),
+                    'fecha_checkout' => $horaFin->copy()->addMinutes(rand(0, 30))
                 ]);
-
-                // Si está finalizada o en curso, crear ocupación
-                if (in_array($status, ['finalizada', 'en_curso'])) {
-                    // Decidir si ocupa varias mesas (basado en numero de personas)
-                    $numMesas = ($rsv->numero_personas > 4) ? rand(2, 3) : 1;
-                    $mesasDisponibles = Mesa::where('cafe_id', $cafe->id)->where('zona_id', $rsv->zona_id)->inRandomOrder()->limit($numMesas)->get();
-                    
-                    foreach ($mesasDisponibles as $mIndex => $mesa) {
-                        $ocupacion = DetalleOcupacion::create([
-                            'numero_personas' => ceil($rsv->numero_personas / $mesasDisponibles->count()),
-                            'tipo' => 'reservacion',
-                            'estado' => $status === 'finalizada' ? 'finalizada' : 'activa',
-                            'reservacion_id' => $rsv->id,
-                            'grupo_id' => $grupoId,
-                            'cafe_id' => $cafe->id,
-                            'user_id' => $staff ? $staff->id : $cafe->user_id,
-                            'mesa_id' => $mesa->id,
-                            'nombre_cliente' => $rsv->nombre_cliente,
-                            'email' => $rsv->email,
-                            'hora_entrada' => $rsv->fecha_checkin,
-                            'hora_salida' => $rsv->fecha_checkout
-                        ]);
-
-                        // Reseña solo para la primera mesa del grupo (60% chance)
-                        if ($mIndex === 0 && $status === 'finalizada' && rand(1, 10) <= 6) {
-                            Resena::create([
-                                'detalle_ocupacion_id' => $ocupacion->id,
-                                'cafe_id' => $cafe->id,
-                                'calificacion' => rand(4, 5),
-                                'comentario' => '¡Me encantó la atención en ' . $cafe->nombre . '!',
-                                'estado' => 'publicada'
-                            ]);
-                        }
-                    }
-                }
-            }
-
-            // --- SEMBRAR WALK-INS (Solo hoy o pasado) ---
-            if (!$date->isFuture()) {
-                for ($j = 0; $j < $walkinCount; $j++) {
-                    $status = ($date->isToday() && rand(1, 2) === 1) ? 'activa' : 'finalizada';
-                    $hour = rand(8, 21);
-                    $horaEntrada = Carbon::parse($date->toDateString() . ' ' . sprintf('%02d:%02d:00', $hour, rand(0, 59)));
-                    $horaSalida = ($status === 'finalizada') ? $horaEntrada->copy()->addMinutes(rand(30, 90)) : null;
-                    
-                    $cliente = 'Walk-in ' . Str::random(4);
-                    $grupoId = (string) Str::uuid();
-                    $personas = rand(1, 8);
-                    $numMesas = ($personas > 4) ? 2 : 1;
-                    $zonaId = $zonas[array_rand($zonas)];
-                    $mesasDisponibles = Mesa::where('cafe_id', $cafe->id)->where('zona_id', $zonaId)->inRandomOrder()->limit($numMesas)->get();
-
-                    foreach ($mesasDisponibles as $mesa) {
-                        DetalleOcupacion::create([
-                            'numero_personas' => ceil($personas / $mesasDisponibles->count()),
-                            'tipo' => 'walkin',
-                            'estado' => $status,
-                            'grupo_id' => $grupoId,
-                            'cafe_id' => $cafe->id,
-                            'user_id' => $staff ? $staff->id : $cafe->user_id,
-                            'mesa_id' => $mesa->id,
-                            'nombre_cliente' => $cliente,
-                            'hora_entrada' => $horaEntrada,
-                            'hora_salida' => $horaSalida
-                        ]);
-                    }
-                }
             }
         }
     }

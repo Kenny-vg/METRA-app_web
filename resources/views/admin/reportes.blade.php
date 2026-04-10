@@ -7,7 +7,8 @@
         <p class="m-0" style="color: var(--text-muted); font-size: 0.95rem;">Visualiza métricas avanzadas y comportamiento de tu ecosistema.</p>
     </header>
 
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+    <div id="analytics-content-wrapper" class="locked-container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
         <div class="btn-group bg-white p-1 rounded-pill" style="border: 1px solid var(--border-light); box-shadow: 0 2px 5px rgba(0,0,0,0.02);" role="group">
             <input type="radio" class="btn-check" name="filtroMetricas" id="rangoSemanal" checked>
             <label class="btn btn-admin-secondary border-0 rounded-pill px-4 btn-sm shadow-none m-0" for="rangoSemanal">Semana Actual</label>
@@ -96,26 +97,86 @@
     
     <!-- Script para efecto visual de tabs reportes -->
     <script>
-        document.querySelectorAll('input[name="filtroMetricas"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                document.querySelectorAll('label[for^="rango"]').forEach(label => {
-                    label.classList.remove('bg-dark', 'text-white');
-                    label.style.color = "var(--text-muted)";
+        document.addEventListener('DOMContentLoaded', () => {
+            verificarAccesoReportes();
+
+            document.querySelectorAll('input[name="filtroMetricas"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    document.querySelectorAll('label[for^="rango"]').forEach(label => {
+                        label.classList.remove('bg-dark', 'text-white');
+                        label.style.color = "var(--text-muted)";
+                    });
+                    
+                    if (this.checked) {
+                        const activeLabel = document.querySelector('label[for="' + this.id + '"]');
+                        activeLabel.classList.add('bg-dark', 'text-white');
+                        activeLabel.style.color = "white";
+                    }
                 });
-                
-                if (this.checked) {
-                    const activeLabel = document.querySelector('label[for="' + this.id + '"]');
-                    activeLabel.classList.add('bg-dark', 'text-white');
-                    activeLabel.style.color = "white";
-                }
             });
+            
+            const initialSelected = document.querySelector('input[name="filtroMetricas"]:checked');
+            if (initialSelected) {
+                const initialSelectedIdRep = initialSelected.id;
+                const initialActiveLabelRep = document.querySelector('label[for="' + initialSelectedIdRep + '"]');
+                if (initialActiveLabelRep) {
+                    initialActiveLabelRep.classList.add('bg-dark', 'text-white');
+                    initialActiveLabelRep.style.color = "white";
+                }
+            }
         });
-        
-        const initialSelectedIdRep = document.querySelector('input[name="filtroMetricas"]:checked').id;
-        const initialActiveLabelRep = document.querySelector('label[for="' + initialSelectedIdRep + '"]');
-        if (initialActiveLabelRep) {
-            initialActiveLabelRep.classList.add('bg-dark', 'text-white');
-            initialActiveLabelRep.style.color = "white";
+
+        async function verificarAccesoReportes() {
+            try {
+                const res = await MetraAPI.get('/gerente/mi-cafeteria');
+                const plan = res.data.suscripcion_actual?.plan;
+                
+                if (plan && !plan.tiene_metricas_avanzadas) {
+                    const wrapper = document.getElementById('analytics-content-wrapper');
+                    renderUpsellOverlay(wrapper, 'Centro de Analíticas Pro');
+                }
+            } catch (e) {
+                console.error("Error verificando plan en reportes:", e);
+            }
+        }
+
+        function renderUpsellOverlay(container, title) {
+            if (container.querySelector('.upsell-overlay')) return;
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'upsell-overlay d-flex flex-column align-items-center justify-content-center text-center p-4 rounded-4';
+            overlay.style.position = 'absolute';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.background = 'rgba(255,255,255,0.05)';
+            overlay.style.backdropFilter = 'blur(12px)';
+            overlay.style.webkitBackdropFilter = 'blur(12px)';
+            overlay.style.zIndex = '10';
+
+            overlay.innerHTML = `
+                <div class="premium-lock-icon mb-4 shadow-lg d-flex align-items-center justify-content-center" 
+                     style="width: 80px; height: 80px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); border-radius: 50%; border: 3px solid var(--accent-gold);">
+                    <i class="bi bi-patch-check-fill fs-1" style="color: var(--accent-gold);"></i>
+                </div>
+                <h4 class="fw-bold mb-2" style="color: white; letter-spacing: -1px; text-shadow: 0 4px 8px rgba(0,0,0,0.5);">${title}</h4>
+                <p class="text-white mb-4 px-3" style="max-width: 400px; line-height: 1.5; opacity: 0.9;">
+                    Visualiza el comportamiento de tus clientes, flujos de afluencia y rentabilidad proyectada. <br>
+                    <strong>Disponible en Plan Estándar y Pro.</strong>
+                </p>
+                <div class="d-flex gap-3">
+                    <button class="btn btn-dark px-4 py-2 fw-bold shadow" onclick="window.location.href='/admin/dashboard?upgrade=1'">
+                        <i class="bi bi-stars me-2 text-warning"></i>Mejorar mi Plan
+                    </button>
+                    <button class="btn btn-outline-light px-4 py-2 fw-bold shadow-sm" onclick="window.location.href='/admin/dashboard'">
+                        Volver al inicio
+                    </button>
+                </div>
+            `;
+            
+            container.style.position = 'relative';
+            container.appendChild(overlay);
         }
     </script>
 @endsection

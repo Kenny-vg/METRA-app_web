@@ -567,8 +567,13 @@
                     <hr style="border-color: rgba(56,44,38,0.1); margin: 25px 0;">
                     <div class="d-flex flex-column gap-2 mb-4">
                         <div class="plan-feature"><i class="bi bi-check-circle-fill"></i> ${plan.max_reservas_mes} reservas mensuales</div>
-                        <div class="plan-feature"><i class="bi bi-check-circle-fill"></i> Hasta ${plan.max_usuarios_admin} usuarios del sistema</div>
-                        <div class="plan-feature"><i class="bi bi-check-circle-fill"></i> Vigencia ${plan.duracion_dias} días</div>
+                        <div class="plan-feature"><i class="bi bi-check-circle-fill"></i> Hasta ${plan.max_usuarios_admin} usuarios</div>
+                        <div class="plan-feature ${plan.tiene_metricas_avanzadas ? '' : 'text-muted opacity-50'}">
+                            <i class="bi ${plan.tiene_metricas_avanzadas ? 'bi-check-circle-fill' : 'bi-dash-circle'}"></i> Métricas Avanzadas
+                        </div>
+                        <div class="plan-feature ${plan.tiene_recordatorios ? '' : 'text-muted opacity-50'}">
+                            <i class="bi ${plan.tiene_recordatorios ? 'bi-check-circle-fill' : 'bi-dash-circle'}"></i> Recordatorios Automáticos
+                        </div>
                         <div class="plan-feature"><i class="bi bi-check-circle-fill"></i> Soporte Especializado</div>
                     </div>
                     <button class="${featured ? 'btn-metra-main' : 'btn-plan-outline'} w-100 mt-auto" style="border-radius: 50px;" onclick="window.selectPlanAndScroll(${plan.id})">

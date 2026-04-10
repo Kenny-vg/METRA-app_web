@@ -19,6 +19,9 @@
         </button>
     </header>
 
+    {{-- ── Banner de uso de reservaciones del plan ───────────────────── --}}
+    <div id="banner-uso-reservas" class="mb-4"></div>
+
     <!-- Header Stats (Hoy de un vistazo) -->
     <div class="row mb-5 g-3">
         <div class="col-md-3">
@@ -317,6 +320,33 @@
                         class="btn fw-bold py-2 px-4 rounded-3 shadow-sm flex-grow-1"
                         style="background: var(--accent-gold); color: var(--black-primary);"
                         onclick="guardarConfigReservas()">Guardar Cambios <i class="bi bi-check-circle ms-1"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ── Modal: Límite de reservaciones alcanzado ───────────────────── --}}
+    <div class="modal fade" id="modalLimiteAlcanzado" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow-lg">
+                <div class="modal-body text-center p-5">
+                    <div class="mb-4">
+                        <span class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+                            style="width:72px;height:72px;background:rgba(198,40,40,0.1);">
+                            <i class="bi bi-slash-circle-fill" style="font-size:2.2rem;color:#c62828;"></i>
+                        </span>
+                        <h4 class="fw-bold" style="color:var(--black-primary);">Límite de Reservaciones Alcanzado</h4>
+                        <p class="text-muted mb-4" id="modal-limite-texto">
+                            Has utilizado el 100% de las reservaciones incluidas en tu plan este mes.
+                            Para continuar aceptando nuevas reservas, actualiza tu suscripción.
+                        </p>
+                    </div>
+                    <a href="/admin/dashboard" class="btn fw-bold px-5 py-2 rounded-pill"
+                        style="background:var(--accent-gold);color:var(--black-primary);">
+                        <i class="bi bi-arrow-up-circle-fill me-2"></i>Actualizar Plan
+                    </a>
+                    <button type="button" class="btn btn-link text-muted d-block mx-auto mt-3 small"
+                        data-bs-dismiss="modal">Cerrar y seguir revisando</button>
                 </div>
             </div>
         </div>
@@ -803,6 +833,7 @@
 
             // Carga inicial (modo dia por defecto)
             cargarDia();
+            cargarBannerUsoReservas();
 
             document.querySelectorAll('.btn-day-nav').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -824,5 +855,67 @@
                 else cargarProximas(true);
             }, 60000);
         });
+
+        // ── Banner de uso de reservaciones ──────────────────────────────────
+        async function cargarBannerUsoReservas() {
+            try {
+                const res = await MetraAPI.get('/gerente/analytics/stats');
+                const uso = res?.data?.suscripcion_uso;
+                if (!uso) return;
+
+                const { plan_nombre, reservas_usadas, reservas_limite, porcentaje_uso } = uso;
+                const disponibles = Math.max(0, reservas_limite - reservas_usadas);
+                const banner = document.getElementById('banner-uso-reservas');
+
+                // Colores según porcentaje
+                const isLleno   = porcentaje_uso >= 100;
+                const isWarning = porcentaje_uso >= 80 && !isLleno;
+
+                const bgColor     = isLleno ? 'rgba(198,40,40,0.07)' : isWarning ? 'rgba(212,175,55,0.1)' : 'rgba(56,44,38,0.04)';
+                const borderColor = isLleno ? '#c62828' : isWarning ? 'var(--accent-gold)' : 'var(--border-light)';
+                const barColor    = isLleno ? '#c62828' : isWarning ? '#d4af37' : '#2e7d32';
+                const textColor   = isLleno ? '#c62828' : isWarning ? '#9a6800' : 'var(--text-muted)';
+
+                let mensajeBanner = '';
+                if (isLleno) {
+                    mensajeBanner = `<span class="fw-bold" style="color:#c62828;">Límite alcanzado.</span> No se pueden crear nuevas reservaciones este mes. <a href="/admin/dashboard" class="fw-bold" style="color:#c62828;">Actualiza tu plan →</a>`;
+                } else if (isWarning) {
+                    mensajeBanner = `<span class="fw-bold" style="color:#9a6800;">¡Atención!</span> Te quedan solo <strong>${disponibles}</strong> reservaciones disponibles este mes. <a href="/admin/dashboard" class="fw-bold" style="color:#9a6800;">Actualizar plan</a>`;
+                } else {
+                    mensajeBanner = `Reservaciones disponibles este mes: <strong>${disponibles}</strong> de ${reservas_limite}`;
+                }
+
+                banner.innerHTML = `
+                    <div class="d-flex align-items-center gap-3 p-3 rounded-4" style="background:${bgColor};border:1px solid ${borderColor};">
+                        <div class="flex-shrink-0 d-none d-md-block" style="width:120px;">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small class="fw-bold" style="color:${textColor};font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;">Plan ${escapeHTML(plan_nombre)}</small>
+                                <small class="fw-bold" style="color:${textColor};font-size:0.7rem;">${reservas_usadas}/${reservas_limite}</small>
+                            </div>
+                            <div class="progress" style="height:6px;border-radius:10px;">
+                                <div class="progress-bar" role="progressbar"
+                                    style="width:${Math.min(porcentaje_uso,100)}%;background:${barColor};border-radius:10px;"
+                                    aria-valuenow="${porcentaje_uso}" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                        <p class="m-0 small">${mensajeBanner}</p>
+                        ${isLleno ? '' : ''}
+                    </div>
+                `;
+
+                // Si limite al 100%, mostrar modal bloqueante (una sola vez por carga)
+                if (isLleno && !sessionStorage.getItem('limiteModalMostrado')) {
+                    sessionStorage.setItem('limiteModalMostrado', '1');
+                    document.getElementById('modal-limite-texto').innerHTML =
+                        `Has utilizado las <strong>${reservas_limite}</strong> reservaciones incluidas en tu plan <strong>${escapeHTML(plan_nombre)}</strong> este mes.
+                        Para continuar aceptando nuevas reservas, actualiza tu suscripción.`;
+                    new bootstrap.Modal(document.getElementById('modalLimiteAlcanzado')).show();
+                }
+
+            } catch(e) {
+                console.warn('No se pudo cargar el banner de uso:', e);
+            }
+        }
     </script>
 @endsection

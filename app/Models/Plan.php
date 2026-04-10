@@ -15,7 +15,15 @@ class Plan extends Model
         'max_reservas_mes',
         'max_usuarios_admin',
         'descripcion',
-        'estado'
+        'estado',
+        'tiene_metricas_avanzadas',
+        'tiene_recordatorios',
+    ];
+
+    protected $casts = [
+        'tiene_metricas_avanzadas' => 'boolean',
+        'tiene_recordatorios'     => 'boolean',
+        'estado'                  => 'boolean',
     ];
 
     public function suscripciones()

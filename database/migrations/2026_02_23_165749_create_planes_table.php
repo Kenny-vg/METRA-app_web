@@ -24,6 +24,9 @@ return new class extends Migration
             
             $table->text('descripcion')->nullable();
 
+            $table->boolean('tiene_metricas_avanzadas')->default(false);
+            $table->boolean('tiene_recordatorios')->default(false);
+
             $table->boolean('estado')->default(true);
 
             $table->timestamps();

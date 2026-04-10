@@ -315,6 +315,22 @@
                 document.getElementById('btn-reservar-lateral').href = `${BASE_URL}/reservar/${cafe.slug}`;
                 document.getElementById('btn-reservar-navbar').href = `${BASE_URL}/reservar/${cafe.slug}`;
 
+                // ── Verificar si el negocio tiene reservaciones disponibles (no ha alcanzado su límite mensual) ──
+                try {
+                    const limitCheck = await MetraAPI.get(`/cafeterias-publicas/${cafeSlug}/limite-reservas`);
+                    const limiteAlcanzado = limitCheck?.data?.limite_alcanzado === true;
+
+                    if (limiteAlcanzado) {
+                        bloquearBotonesReserva();
+                    }
+                } catch (errLimit) {
+                    // Si la respuesta es 403 con upgrade_required es porque el negocio agotó su cuota
+                    if (errLimit?.status === 403 || errLimit?.data?.upgrade_required) {
+                        bloquearBotonesReserva();
+                    }
+                    // Cualquier otro error: no bloquear, dejar al usuario intentar
+                }
+
                 // Reveal UI
                 document.getElementById('loader-screen').classList.add('d-none');
                 document.getElementById('cafe-content').classList.remove('d-none');
@@ -584,6 +600,36 @@
                 `;
             }
         });
+
+        /**
+         * Deshabilita los botones de reserva cuando el negocio ha alcanzado su límite mensual.
+         */
+        function bloquearBotonesReserva() {
+            const msgBloqueado = `
+                <span class="d-flex align-items-center gap-2" style="pointer-events:none;">
+                    <i class="bi bi-slash-circle"></i>
+                    Reservas no disponibles — contacta al negocio
+                </span>
+            `;
+            const estilosBloqueado = [
+                'background: #e0e0e0 !important',
+                'color: #757575 !important',
+                'cursor: not-allowed !important',
+                'pointer-events: none',
+                'border: none',
+                'text-decoration: none',
+            ].join(';');
+
+            ['btn-reservar-lateral', 'btn-reservar-navbar'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (!btn) return;
+                btn.innerHTML = msgBloqueado;
+                btn.setAttribute('style', estilosBloqueado);
+                btn.removeAttribute('href');
+                btn.setAttribute('aria-disabled', 'true');
+                btn.setAttribute('tabindex', '-1');
+            });
+        }
     </script>
 </body>
 </html>

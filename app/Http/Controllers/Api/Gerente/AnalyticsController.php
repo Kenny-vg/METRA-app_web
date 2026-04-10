@@ -12,6 +12,15 @@ use App\Models\Reservacion;
 class AnalyticsController extends Controller
 {
     /**
+     * Verifica si la cafetería tiene acceso a métricas avanzadas según su plan.
+     */
+    private function tieneMetricasAvanzadas(Request $request): bool
+    {
+        $plan = $request->user()->cafeteria?->plan_activo;
+        return $plan && $plan->tiene_metricas_avanzadas;
+    }
+
+    /**
      * Resumen operativo avanzado (Tarjetas)
      */
     public function stats(Request $request)
@@ -84,17 +93,43 @@ class AnalyticsController extends Controller
             'insights' => [
                 'ocupacion' => $ocupacionReal > 70 ? '🔥 ¡Lleno total hoy!' : ($ocupacionReal > 40 ? '☕ Buena afluencia' : '🍃 Día tranquilo'),
                 'fuente_principal' => $ratioWalkin > 50 ? '🚶 Mayoría de clientes directos' : '📅 Mayoría de clientes con reserva'
-            ]
-
+            ],
+            // Exposición del uso mensual de reservaciones para el contador del frontend
+            'suscripcion_uso' => (function() use ($cafeteria) {
+                $plan = $cafeteria->plan_activo;
+                if (!$plan) return null;
+                $usadas = \App\Models\Reservacion::where('cafe_id', $cafeteria->id)
+                    ->whereBetween('fecha', [now()->startOfMonth()->toDateString(), now()->endOfMonth()->toDateString()])
+                    ->whereNotIn('estado', ['cancelada'])
+                    ->count();
+                return [
+                    'plan_nombre'      => $plan->nombre_plan,
+                    'reservas_usadas'  => $usadas,
+                    'reservas_limite'  => $plan->max_reservas_mes,
+                    'porcentaje_uso'   => $plan->max_reservas_mes > 0
+                        ? round(($usadas / $plan->max_reservas_mes) * 100, 1)
+                        : 0,
+                    'tiene_metricas_avanzadas' => (bool) $plan->tiene_metricas_avanzadas,
+                    'tiene_recordatorios'      => (bool) $plan->tiene_recordatorios,
+                ];
+            })()
         ]);
     }
 
 
     /**
-     * Demanda por hora (Gráfico de Barras)
+     * Demanda por hora (Gráfico de Barras) - Solo Plan Standard/Pro
      */
     public function hourlyDemand(Request $request)
     {
+        if (!$this->tieneMetricasAvanzadas($request)) {
+            return ApiResponse::error(
+                'Las métricas avanzadas son exclusivas del Plan Standard o Pro.',
+                403,
+                ['upgrade_required' => true]
+            );
+        }
+
         $cafeteria = $request->user()->cafeteria;
         if (!$cafeteria) return ApiResponse::error('Sin cafetería', 404);
 
@@ -107,10 +142,18 @@ class AnalyticsController extends Controller
     }
 
     /**
-     * Tendencia Semanal (Gráfico de Líneas - Últimos 7 días)
+     * Tendencia Semanal (Gráfico de Líneas - Últimos 7 días) - Solo Plan Standard/Pro
      */
     public function weeklyTrends(Request $request)
     {
+        if (!$this->tieneMetricasAvanzadas($request)) {
+            return ApiResponse::error(
+                'Las métricas avanzadas son exclusivas del Plan Standard o Pro.',
+                403,
+                ['upgrade_required' => true]
+            );
+        }
+
         $cafeteria = $request->user()->cafeteria;
         if (!$cafeteria) return ApiResponse::error('Sin cafetería', 404);
 

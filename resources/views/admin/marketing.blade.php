@@ -22,6 +22,11 @@
             <i class="bi bi-megaphone me-2"></i>Promociones Activas
         </button>
     </li>
+    <li class="nav-item">
+        <button class="nav-link rounded-pill px-4" id="recordatorios-tab" data-bs-toggle="pill" data-bs-target="#recordatorios" style="border: 1px solid var(--border-light); font-weight: 600; font-size: 0.9rem;">
+            <i class="bi bi-clock-history me-2"></i>Recordatorios
+        </button>
+    </li>
 </ul>
 
 <div class="tab-content">
@@ -115,7 +120,60 @@
         </table>
     </div>
 </div>
-</div>
+    </div>
+
+    <!-- RECORDATORIOS -->
+    <div class="tab-pane fade" id="recordatorios">
+        <div class="card border-0 p-4 p-md-5 premium-card locked-container" id="recordatorios-lock-wrapper">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 pb-3 border-bottom" style="border-color: var(--border-light) !important;">
+                <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Recordatorios Automáticos</h5>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-12 col-md-6">
+                    <div class="p-4 rounded-4" style="background: var(--off-white); border: 1px solid var(--border-light);">
+                        <h6 class="fw-bold mb-3"><i class="bi bi-envelope-paper me-2 text-primary"></i>Secuencia de Notificaciones</h6>
+                        <ul class="list-unstyled mb-0 d-flex flex-column gap-3">
+                            <li class="d-flex align-items-center">
+                                <span class="badge rounded-circle me-3 p-2" style="background: var(--black-primary); color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">1</span>
+                                <div>
+                                    <p class="mb-0 fw-bold small">Confirmación Inmediata</p>
+                                    <p class="mb-0 x-small text-muted">Se envía al momento de crear la reserva.</p>
+                                </div>
+                            </li>
+                            <li class="d-flex align-items-center">
+                                <span class="badge rounded-circle me-3 p-2" style="background: var(--black-primary); color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">2</span>
+                                <div>
+                                    <p class="mb-0 fw-bold small">Recordatorio Diario</p>
+                                    <p class="mb-0 x-small text-muted">Aviso general por la mañana (9:00 AM).</p>
+                                </div>
+                            </li>
+                            <li class="d-flex align-items-center">
+                                <span class="badge rounded-circle me-3 p-2" style="background: var(--accent-gold); color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">3</span>
+                                <div>
+                                    <p class="mb-0 fw-bold small">Alerta Crítica (2 horas)</p>
+                                    <p class="mb-0 x-small text-muted">Último recordatorio antes de la cita.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="p-4 rounded-4 h-100 d-flex flex-column justify-content-center" style="background: rgba(212, 175, 55, 0.05); border: 1px dashed var(--accent-gold);">
+                        <h6 class="fw-bold mb-3 text-dark">Impacto en tu Negocio</h6>
+                        <p class="small text-muted mb-3">Los recordatorios automatizados reducen el <strong>No-Show</strong> hasta en un <strong>40%</strong>, asegurando que tus mesas no se queden vacías por olvidos.</p>
+                        <hr class="my-3 opacity-10">
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-3 p-2 me-3" style="background: white; border: 1px solid var(--border-light);">
+                                <i class="bi bi-check2-all text-success fs-4"></i>
+                            </div>
+                            <span class="small fw-bold">Estado: <span class="text-success" id="status-reminders-text">Inactivo</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Plantillas para Renderizado Estructural (Seguridad XSS y Rendimiento) -->
@@ -847,6 +905,64 @@ document.addEventListener('DOMContentLoaded', () => {
     loadOcasiones();
     loadOcasionesForSelect();
     loadPromociones();
+    verificarPlanMarketing();
 });
+
+async function verificarPlanMarketing() {
+    try {
+        const res = await MetraAPI.get('/gerente/mi-cafeteria');
+        const plan = res.data.suscripcion_actual?.plan;
+        
+        if (plan) {
+            if (!plan.tiene_recordatorios) {
+                const wrapper = document.getElementById('recordatorios-lock-wrapper');
+                renderUpsellOverlay(wrapper, 'Recordatorios Inteligentes');
+                document.getElementById('status-reminders-text').textContent = 'Bloqueado (Plan Básico/Estándar)';
+                document.getElementById('status-reminders-text').className = 'text-danger';
+            } else {
+                document.getElementById('status-reminders-text').textContent = 'Activo (Plan Pro)';
+                document.getElementById('status-reminders-text').className = 'text-success';
+            }
+        }
+    } catch (e) {
+        console.error("Error verificando plan en marketing:", e);
+    }
+}
+
+function renderUpsellOverlay(container, title) {
+    if (container.querySelector('.upsell-overlay')) return;
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'upsell-overlay d-flex flex-column align-items-center justify-content-center text-center p-4 rounded-4';
+    overlay.style.position = 'absolute';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.background = 'rgba(255,255,255,0.05)';
+    overlay.style.backdropFilter = 'blur(10px)';
+    overlay.style.webkitBackdropFilter = 'blur(10px)';
+    overlay.style.zIndex = '10';
+
+    overlay.innerHTML = `
+        <div class="premium-lock-icon mb-4 shadow-lg d-flex align-items-center justify-content-center" 
+             style="width: 80px; height: 80px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); border-radius: 50%; border: 3px solid var(--accent-gold);">
+            <i class="bi bi-patch-check-fill fs-1" style="color: var(--accent-gold);"></i>
+        </div>
+        <h4 class="fw-bold mb-2" style="color: white; letter-spacing: -1px; text-shadow: 0 4px 8px rgba(0,0,0,0.5);">${title}</h4>
+        <p class="text-white mb-4 px-3" style="max-width: 400px; line-height: 1.5; opacity: 0.9;">
+            Envía recordatorios automáticos por correo a tus clientes (1 día y 2 horas antes de su cita). <br>
+            <strong>Exclusivo del Plan Pro.</strong>
+        </p>
+        <div class="d-flex gap-3">
+            <button class="btn btn-dark px-4 py-2 fw-bold shadow" onclick="window.location.href='/admin/dashboard?upgrade=1'">
+                <i class="bi bi-stars me-2 text-warning"></i>Mejorar a Pro
+            </button>
+        </div>
+    `;
+    
+    container.style.position = 'relative';
+    container.appendChild(overlay);
+}
 </script>
 @endsection

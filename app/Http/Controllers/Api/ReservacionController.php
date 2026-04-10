@@ -156,6 +156,26 @@ class ReservacionController extends Controller
             'zona_id' => 'nullable|exists:zonas,id'
         ]);
 
+        // ── Validación de límite mensual por plan ─────────────────────────────
+        $planActivo = $cafeteria->plan_activo;
+        if ($planActivo) {
+            $inicioMes   = now()->startOfMonth();
+            $finMes      = now()->endOfMonth();
+            $usadasMes   = Reservacion::where('cafe_id', $cafeteria->id)
+                ->whereBetween('fecha', [$inicioMes->toDateString(), $finMes->toDateString()])
+                ->whereNotIn('estado', ['cancelada'])
+                ->count();
+
+            if ($usadasMes >= $planActivo->max_reservas_mes) {
+                return ApiResponse::error(
+                    'Este negocio ha alcanzado el límite de reservaciones de su plan este mes. Por favor contacta con ellos directamente.',
+                    403,
+                    ['upgrade_required' => true, 'limite' => $planActivo->max_reservas_mes, 'usadas' => $usadasMes]
+                );
+            }
+        }
+        // ─────────────────────────────────────────────────────────────────────
+
         $horaInicio = Carbon::parse($request->hora_inicio);
         $horaFin = $horaInicio->copy()->addMinutes($cafeteria->duracion_reserva_min);
 

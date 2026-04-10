@@ -34,12 +34,15 @@ class EnviarRecordatoriosReservas extends Command
         $dentroDe2HorasTime = now()->addHours(2)->toTimeString();
 
         // 1. RECORDATORIOS DIARIOS
-        // Buscamos reservaciones para hoy que no han recibido el primer aviso
+        // Solo cafés con plan que tenga tiene_recordatorios = true
         /** @var \Illuminate\Database\Eloquent\Collection<int, Reservacion> $diarias */
         $diarias = Reservacion::where('fecha', $hoy)
             ->where('estado', Reservacion::STATUS_PENDIENTE)
             ->where('recordatorio_dia_enviado', false)
             ->whereNotNull('email')
+            ->whereHas('cafeteria.suscripcionActual.plan', function ($query) {
+                $query->where('tiene_recordatorios', true);
+            })
             ->get();
 
         $this->info("Procesando " . $diarias->count() . " recordatorios diarios...");
@@ -56,14 +59,16 @@ class EnviarRecordatoriosReservas extends Command
         }
 
         // 2. RECORDATORIOS 2 HORAS ANTES
-        // Buscamos reservaciones de hoy que faltan < 2 horas y no han recibido este aviso
-        // Nota: Solo se envían si la hora de inicio es mayor a la actual (obvio) y menor a ahora + 2h
+        // Solo cafés con plan que tenga tiene_recordatorios = true
         $proximas = Reservacion::where('fecha', $hoy)
             ->where('estado', Reservacion::STATUS_PENDIENTE)
             ->where('recordatorio_2h_enviado', false)
             ->whereNotNull('email')
             ->where('hora_inicio', '>=', $ahoraTime)
             ->where('hora_inicio', '<=', $dentroDe2HorasTime)
+            ->whereHas('cafeteria.suscripcionActual.plan', function ($query) {
+                $query->where('tiene_recordatorios', true);
+            })
             ->get();
 
         /** @var \Illuminate\Database\Eloquent\Collection<int, Reservacion> $proximas */

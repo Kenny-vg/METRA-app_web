@@ -29,10 +29,19 @@ class CafeteriaPerfilController extends Controller
         if ($cafeteria) {
             $cafeteria->load(['suscripcionActual.plan', 'gerente']);
             
+            // Calculo de uso mensual de reservaciones (Suscripción Tiered)
+            $inicioMes = now()->startOfMonth()->toDateString();
+            $finMes    = now()->endOfMonth()->toDateString();
+            
+            $cafeteria->reservas_mes_actual = \App\Models\Reservacion::where('cafe_id', $cafeteria->id)
+                ->whereBetween('fecha', [$inicioMes, $finMes])
+                ->whereNotIn('estado', [\App\Models\Reservacion::STATUS_CANCELADA])
+                ->count();
+
             // Calculo dinámico de capacidad total (suma capacidad de todas las mesas activas)
             $cafeteria->capacidad_total = \App\Models\Mesa::where('cafe_id', $cafeteria->id)
-                                            ->where('activo', 1)
-                                            ->sum('capacidad');
+                ->where('activo', 1)
+                ->sum('capacidad');
         }
 
         return ApiResponse::success(

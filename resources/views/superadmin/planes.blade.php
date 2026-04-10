@@ -92,6 +92,20 @@ function renderPlanes() {
                             <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Duración (Días)</label>
                             <input type="number" min="1" class="form-control bg-light border-0" id="duracion-${plan.id}" value="${plan.duracion_dias}" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                         </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="metrics-${plan.id}" ${plan.tiene_metricas_avanzadas ? 'checked' : ''}>
+                                    <label class="form-check-label small fw-bold text-muted" for="metrics-${plan.id}" style="font-size: 0.7rem;">Métricas</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="reminders-${plan.id}" ${plan.tiene_recordatorios ? 'checked' : ''}>
+                                    <label class="form-check-label small fw-bold text-muted" for="reminders-${plan.id}" style="font-size: 0.7rem;">Recordatorios</label>
+                                </div>
+                            </div>
+                        </div>
                         <div class="mb-4">
                             <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Descripción</label>
                             <textarea class="form-control bg-light border-0" id="desc-${plan.id}" rows="2" maxlength="255">${escapeHTML(plan.descripcion || '')}</textarea>
@@ -144,6 +158,20 @@ function renderPlanes() {
                             <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Duración (Días)</label>
                             <input type="number" min="1" class="form-control" id="duracion-nuevo" value="30" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                         </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="metrics-nuevo">
+                                    <label class="form-check-label small fw-bold text-muted" for="metrics-nuevo" style="font-size: 0.7rem;">Métricas</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="reminders-nuevo">
+                                    <label class="form-check-label small fw-bold text-muted" for="reminders-nuevo" style="font-size: 0.7rem;">Recordatorios</label>
+                                </div>
+                            </div>
+                        </div>
                         <div class="mb-4">
                             <label class="form-label small text-muted fw-bold text-uppercase" style="letter-spacing: 0.5px;">Descripción</label>
                             <textarea class="form-control" id="desc-nuevo" rows="2" maxlength="255" placeholder="Detalles..."></textarea>
@@ -179,6 +207,8 @@ async function guardarPlan(id) {
     const max_usuarios_admin = document.getElementById(`usuarios-${id}`).value;
     const duracion_dias = document.getElementById(`duracion-${id}`).value;
     const descripcion = document.getElementById(`desc-${id}`).value;
+    const tiene_metricas_avanzadas = document.getElementById(`metrics-${id}`).checked;
+    const tiene_recordatorios = document.getElementById(`reminders-${id}`).checked;
 
     const data = {
         nombre_plan,
@@ -186,7 +216,9 @@ async function guardarPlan(id) {
         max_reservas_mes: parseInt(max_reservas_mes),
         max_usuarios_admin: parseInt(max_usuarios_admin),
         duracion_dias: parseInt(duracion_dias),
-        descripcion
+        descripcion,
+        tiene_metricas_avanzadas,
+        tiene_recordatorios
     };
 
     try {
@@ -213,6 +245,8 @@ async function crearPlan() {
     const max_usuarios_admin = document.getElementById(`usuarios-nuevo`).value;
     const duracion_dias = document.getElementById(`duracion-nuevo`).value;
     const descripcion = document.getElementById(`desc-nuevo`).value;
+    const tiene_metricas_avanzadas = document.getElementById(`metrics-nuevo`).checked;
+    const tiene_recordatorios = document.getElementById(`reminders-nuevo`).checked;
 
     const data = {
         nombre_plan,
@@ -220,7 +254,9 @@ async function crearPlan() {
         max_reservas_mes: parseInt(max_reservas_mes || 0),
         max_usuarios_admin: parseInt(max_usuarios_admin || 1),
         duracion_dias: parseInt(duracion_dias || 30),
-        descripcion
+        descripcion,
+        tiene_metricas_avanzadas,
+        tiene_recordatorios
     };
 
     try {
