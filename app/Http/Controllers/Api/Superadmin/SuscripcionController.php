@@ -47,8 +47,27 @@ class SuscripcionController extends Controller
         }
 
         // Modo Normal (Dashboard Principal)
+        // Por cada cafetería, mostrar la suscripción más relevante con esta prioridad:
+        // 1) pendiente (en_revision) → gerente acaba de enviar comprobante
+        // 2) pagado vigente          → suscripción activa normal
+        // 3) pagado vencido          → expirada pero fue pagada
+        // 4) cualquier otra          → la más reciente por id
+        $todas = $query->orderBy('id', 'desc')->get();
+
+        $prioridad = function (Suscripcion $s): int {
+            if ($s->estado_pago === 'pendiente' || $s->en_revision) return 0;
+            if ($s->estado_pago === 'pagado' && $s->fecha_fin && \Carbon\Carbon::parse($s->fecha_fin)->isFuture()) return 1;
+            if ($s->estado_pago === 'pagado') return 2;
+            return 3;
+        };
+
+        $ultimas = $todas
+            ->groupBy('cafe_id')
+            ->map(fn($grupo) => $grupo->sortBy(fn($s) => $prioridad($s))->first())
+            ->values();
+
         return ApiResponse::success(
-            $query->get(),
+            $ultimas,
             'Listado de Suscripciones'
         );
     }
@@ -205,20 +224,37 @@ class SuscripcionController extends Controller
             return ApiResponse::error('La cafetería asociada está suspendida o no existe.', 422);
         }
 
-        $plan_aprobar = $suscripcion->plan_solicitado_id 
-            ? \App\Models\Plan::find($suscripcion->plan_solicitado_id) 
+        $plan_aprobar = $suscripcion->plan_solicitado_id
+            ? \App\Models\Plan::find($suscripcion->plan_solicitado_id)
             : $suscripcion->plan;
 
-        // REGLA: Como esta fila era PENDIENTE, ya traía unas fechas propuestas.
-        // Si su fecha_inicio es futura (renovó a tiempo antes de vencer su plan activo), mantenemos esas fechas.
-        // Si su fecha_inicio ya pasó (renovó estando vencido, y el superadmin tardó días en aprobar),
-        // recalculamos para que no pierda días y empiece HOY.
+        // Si la fecha de inicio es hoy o pasada, recalcular desde hoy para que no pierda días.
+        // Si es futura, mantenerlas (renovación normal encadenada).
         if (\Carbon\Carbon::parse($suscripcion->fecha_inicio)->startOfDay()->isFuture()) {
             $nueva_fecha_inicio = $suscripcion->fecha_inicio;
-            $nueva_fecha_fin = $suscripcion->fecha_fin;
+            $nueva_fecha_fin    = $suscripcion->fecha_fin;
         } else {
             $nueva_fecha_inicio = now()->startOfDay();
-            $nueva_fecha_fin = now()->startOfDay()->addDays(max(0, $plan_aprobar->duracion_dias - 1))->endOfDay();
+            $nueva_fecha_fin    = now()->startOfDay()->addDays(max(0, $plan_aprobar->duracion_dias - 1))->endOfDay();
+        }
+
+        // Si es un UPGRADE (plan diferente), cancelar las suscripciones previas activas
+        // para que no queden planes solapados para la misma cafetería.
+        $esCambioDePlan = Suscripcion::where('cafe_id', $cafeteria->id)
+            ->where('id', '!=', $suscripcion->id)
+            ->where('estado_pago', 'pagado')
+            ->where('fecha_fin', '>', now())
+            ->exists();
+
+        if ($esCambioDePlan) {
+            Suscripcion::where('cafe_id', $cafeteria->id)
+                ->where('id', '!=', $suscripcion->id)
+                ->where('estado_pago', 'pagado')
+                ->where('fecha_fin', '>', now())
+                ->update([
+                    'estado_pago' => 'cancelado',
+                    'fecha_fin'   => now()->subSecond(), // Termina justo antes de hoy
+                ]);
         }
 
         $suscripcion->update([
@@ -229,18 +265,58 @@ class SuscripcionController extends Controller
             'estado_pago'        => 'pagado',
             'monto'              => $plan_aprobar->precio,
             'fecha_validacion'   => now(),
-            'en_revision'        => false, // Limpiar flag de revisión
+            'en_revision'        => false,
         ]);
 
-        // Asegurarnos de que el estado de la cafetería refleje que ya no está vencida/pendiente
-        $cafeteria->update([
-            'estado' => 'activa'
-        ]);
+        // Asegurarnos de que el estado de la cafetería refleje que está activa
+        $cafeteria->update(['estado' => 'activa']);
 
         return ApiResponse::success(
             $suscripcion->fresh()->load(['cafeteria', 'plan']),
-            '¡Renovación aprobada! La suscripción estará activa hasta el ' .
-                \Carbon\Carbon::parse($suscripcion->fecha_fin)->format('d/m/Y') . '.'
+            '¡Aprobado! La suscripción al Plan ' . $plan_aprobar->nombre_plan .
+                ' estará activa hasta el ' .
+                \Carbon\Carbon::parse($nueva_fecha_fin)->format('d/m/Y') . '.'
+        );
+    }
+
+    /**
+     * Rechazar renovación de suscripción pendiente.
+     * Elimina el registro pendiente y deja la cafetería con su última suscripción válida.
+     */
+    public function rechazarRenovacion(Request $request, Suscripcion $suscripcion)
+    {
+        if (!$suscripcion->en_revision) {
+            return ApiResponse::error('Esta suscripción no está pendiente de aprobación.', 422);
+        }
+
+        $data = $request->validate([
+            'motivo' => 'nullable|string|max:500',
+        ]);
+
+        $cafeteria  = $suscripcion->cafeteria;
+        $cafe_id    = $suscripcion->cafe_id;
+        $planNombre = $suscripcion->plan->nombre_plan ?? 'Desconocido';
+        $motivo     = $data['motivo'] ?? 'Sin motivo especificado';
+
+        \Log::info("Renovación rechazada. CafífID={$cafe_id}, plan={$planNombre}, motivo={$motivo}");
+
+        // Eliminar el registro pendiente para no dejar basura en el historial
+        $suscripcion->delete();
+
+        // Si la cafetería no tiene ninguna suscripción activa vigente después del rechazo,
+        // dejarla como estaba (el superadmin decide si suspender).
+        $tieneActiva = Suscripcion::where('cafe_id', $cafe_id)
+            ->where('estado_pago', 'pagado')
+            ->where('fecha_fin', '>', now())
+            ->exists();
+
+        // Si la caf no tiene nada activo y estaba activa, mantener su estado para
+        // que el superadmin pueda decidir qué hacer (no la suspendemos automáticamente).
+
+        return ApiResponse::success(
+            null,
+            'Renovación rechazada. El comprobante ha sido descartado' .
+            ($motivo !== 'Sin motivo especificado' ? ': ' . $motivo : '.')
         );
     }
 }

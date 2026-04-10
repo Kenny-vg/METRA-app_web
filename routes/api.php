@@ -164,6 +164,8 @@ Route::middleware([
         Route::get('/suscripciones-pendientes', [SuscripcionController::class , 'pendientes']);
         // Aprobar renovación de suscripción pendiente (cafeteria activa que renueva)
         Route::patch('/suscripciones/{suscripcion}/aprobar-renovacion', [SuscripcionController::class , 'aprobarRenovacion']);
+        // Rechazar renovación de suscripción pendiente
+        Route::patch('/suscripciones/{suscripcion}/rechazar-renovacion', [SuscripcionController::class , 'rechazarRenovacion']);
         // Ver comprobantes
         Route::get('/suscripciones/{suscripcion}/comprobante', [SuscripcionController::class , 'verComprobante']);
 

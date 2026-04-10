@@ -173,7 +173,7 @@
 
     <!-- Modal Renovar Suscripción -->
     <div class="modal fade" id="modalRenovar" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-md">
             <div class="modal-content border-0 rounded-4 shadow">
                 <div class="modal-header border-0 p-4">
                     <h5 class="fw-bold m-0" id="titulo-modal-renovar"><i class="bi bi-arrow-repeat me-2"></i>Renovar Suscripción</h5>
@@ -188,6 +188,48 @@
 
                     <form id="formRenovar" class="d-none">
                         <input type="hidden" id="r-email" name="email" value="">
+
+                        <!-- Aviso y datos bancarios -->
+                        <div class="alert border-0 rounded-3 mb-4 p-3" style="background: #FFF8E1; border-left: 4px solid #FFC107 !important; border-left-style: solid !important;">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-info-circle-fill me-2" style="color: #F57F17; font-size: 1.1rem;"></i>
+                                <span class="fw-bold" style="color: #F57F17; font-size: 0.9rem;">Instrucciones para renovar o cambiar de plan</span>
+                            </div>
+                            <p class="small mb-3" style="color: #5D4037;">Para renovar tu suscripción o cambiar de plan, realiza tu transferencia a la siguiente cuenta y sube el comprobante.</p>
+
+                            <div id="modal-datos-pago-loading" class="text-center py-2">
+                                <div class="spinner-border spinner-border-sm" style="color: #F57F17;"></div>
+                            </div>
+
+                            <div id="modal-datos-pago-content" style="display: none;">
+                                <div class="row g-2 mb-1">
+                                    <div class="col-5">
+                                        <span class="text-muted small fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Banco</span>
+                                        <div class="fw-bold text-dark" id="modal-pago-banco" style="font-size: 0.95rem;">—</div>
+                                    </div>
+                                    <div class="col-7">
+                                        <span class="text-muted small fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Beneficiario</span>
+                                        <div class="fw-bold text-dark" id="modal-pago-beneficiario" style="font-size: 0.95rem;">—</div>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <span class="text-muted small fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">CLABE Interbancaria</span>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <span class="fw-bold" id="modal-pago-clabe" style="font-size: 1.05rem; color: var(--accent-gold, #D4AF37); letter-spacing: 1.5px;">—</span>
+                                        <button type="button" class="btn btn-sm p-0 text-muted" onclick="copiarClabe()" title="Copiar CLABE">
+                                            <i class="bi bi-copy" id="modal-clabe-copy-icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="modal-pago-instrucciones-wrap" style="display: none;" class="mt-2 pt-2 border-top">
+                                    <p class="small mb-0" style="color: #5D4037;">
+                                        <i class="bi bi-chat-left-text me-1"></i> <span id="modal-pago-instrucciones"></span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div id="modal-datos-pago-error" style="display:none;" class="small text-danger mt-1"><i class="bi bi-wifi-off me-1"></i>No se pudieron cargar los datos de pago.</div>
+                        </div>
+
                         <div class="mb-3" id="caja-r-plan">
                             <label class="form-label small fw-bold">Selecciona tu nuevo plan</label>
                             <select id="r-plan" class="form-select border-0 shadow-sm rounded-3" style="background: var(--off-white);" required>
@@ -333,7 +375,7 @@
             
             document.getElementById('titulo-modal-renovar').innerHTML = isPendiente 
                 ? '<i class="bi bi-receipt me-2"></i>Actualizar Comprobante' 
-                : '<i class="bi bi-arrow-repeat me-2"></i>Renovar Suscripción';
+                : '<i class="bi bi-arrow-repeat me-2"></i>Renovar / Cambiar Plan';
                 
             const divRevisar = document.getElementById('modal-mensaje-revisar');
             const formRenovar = document.getElementById('formRenovar');
@@ -345,6 +387,9 @@
             } else {
                 if(divRevisar) divRevisar.classList.add('d-none');
                 if(formRenovar) formRenovar.classList.remove('d-none');
+
+                // Cargar datos bancarios
+                cargarDatosPagoModal();
 
                 try {
                     const json = await MetraAPI.get('/planes-publicos');
@@ -365,6 +410,54 @@
             }
 
             modal.show();
+        }
+
+        async function cargarDatosPagoModal() {
+            const loading = document.getElementById('modal-datos-pago-loading');
+            const content = document.getElementById('modal-datos-pago-content');
+            const errorEl = document.getElementById('modal-datos-pago-error');
+            if (loading) loading.style.display = 'block';
+            if (content) content.style.display = 'none';
+            if (errorEl) errorEl.style.display = 'none';
+
+            try {
+                const result = await MetraAPI.get('/configuracion-pago');
+                if (result.data) {
+                    const d = result.data;
+                    document.getElementById('modal-pago-banco').textContent = d.banco || 'No especificado';
+                    document.getElementById('modal-pago-clabe').textContent = d.clabe || 'No especificado';
+                    document.getElementById('modal-pago-beneficiario').textContent = d.beneficiario || 'No especificado';
+                    const instrWrap = document.getElementById('modal-pago-instrucciones-wrap');
+                    if (d.instrucciones_pago) {
+                        document.getElementById('modal-pago-instrucciones').textContent = d.instrucciones_pago;
+                        if (instrWrap) instrWrap.style.display = 'block';
+                    } else {
+                        if (instrWrap) instrWrap.style.display = 'none';
+                    }
+                    if (loading) loading.style.display = 'none';
+                    if (content) content.style.display = 'block';
+                } else {
+                    if (loading) loading.innerHTML = '<span class="small text-muted">Sin datos configurados.</span>';
+                }
+            } catch (e) {
+                console.error('Error cargando datos de pago modal:', e);
+                if (loading) loading.style.display = 'none';
+                if (errorEl) errorEl.style.display = 'block';
+            }
+        }
+
+        window.copiarClabe = function() {
+            const clabe = document.getElementById('modal-pago-clabe').textContent;
+            if (!clabe || clabe === '—') return;
+            navigator.clipboard.writeText(clabe).then(() => {
+                const icon = document.getElementById('modal-clabe-copy-icon');
+                icon.classList.replace('bi-copy', 'bi-check-lg');
+                icon.classList.add('text-success');
+                setTimeout(() => {
+                    icon.classList.replace('bi-check-lg', 'bi-copy');
+                    icon.classList.remove('text-success');
+                }, 2000);
+            });
         }
 
         document.getElementById('formRenovar').addEventListener('submit', async (e) => {

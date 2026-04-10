@@ -163,10 +163,13 @@ async function cargarPendientes() {
                                 <span class="fw-bold" style="color: var(--black-primary);">${monto}</span>
                             </div>
                             <div class="d-flex gap-2">
-                                <button class="btn btn-sm btn-outline-secondary w-50" onclick="verComprobanteSub(${p.id})">
-                                    <i class="bi bi-receipt me-1"></i>Ver Ticket
+                                <button class="btn btn-sm btn-outline-secondary" style="width:33%;" onclick="verComprobanteSub(${p.id})">
+                                    <i class="bi bi-receipt me-1"></i>Ticket
                                 </button>
-                                <button class="btn btn-sm btn-success w-50" style="background-color: #2E7D32; border-color: #2E7D32;" onclick="aprobarRenovacion(${p.id})">
+                                <button class="btn btn-sm btn-outline-danger" style="width:33%;" onclick="rechazarRenovacion(${p.id})">
+                                    <i class="bi bi-x-lg me-1"></i>Rechazar
+                                </button>
+                                <button class="btn btn-sm btn-success" style="width:33%; background-color: #2E7D32; border-color: #2E7D32;" onclick="aprobarRenovacion(${p.id})">
                                     <i class="bi bi-check-lg me-1"></i>Aprobar
                                 </button>
                             </div>
@@ -232,14 +235,17 @@ function renderTabla(suscripciones) {
             </td>
             <td class="text-center pe-4">
                 <div class="d-flex justify-content-center justify-content-md-end gap-2 text-nowrap">
-                    ${
+                    ${// Lógica de botones de acción por estado
                           // Registro inicial pendiente de aprobar
                            (s.cafeteria?.estado === 'en_revision')
                             ? `<span class="btn btn-sm btn-outline-warning rounded-pill px-3 disabled" style="width: 110px; opacity: 0.8; pointer-events: none; border-color: #ffc107; color: #ffc107;">En Revisión</span>`
-                          // Cualquier suscripción pendiente (renovación o vencida) → botón Aprobar Pago
+                          // Suscripción pendiente de renovación → Rechazar + Aprobar
                           : (s.estado_pago === 'pendiente')
-                            ? `<button type="button" class="btn btn-sm btn-success rounded-pill px-3" style="min-width: 120px;" onclick="aprobarRenovacion(${s.id})"><i class="bi bi-check-circle me-1"></i>Aprobar Pago</button>`
-                          // Sin suscripción activa -> suspendida o cancelada
+                            ? `<div class="d-flex gap-2">
+                                 <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="rechazarRenovacion(${s.id})"><i class="bi bi-x-lg me-1"></i>Rechazar</button>
+                                 <button type="button" class="btn btn-sm btn-success rounded-pill px-3" style="background-color:#2E7D32; border-color:#2E7D32;" onclick="aprobarRenovacion(${s.id})"><i class="bi bi-check-circle me-1"></i>Aprobar</button>
+                               </div>`
+                          // Sin suscripción activa → Suspender o Reactivar
                           : (s.estado_pago !== 'cancelado' && s.cafeteria?.estado !== 'suspendida'
                             ? `<button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" style="min-width: 100px;" onclick="cambiarEstado(${s.cafe_id}, 'suspendida')">Suspender</button>`
                             : `<button type="button" class="btn btn-sm btn-success rounded-pill px-3" style="min-width: 100px;" onclick="cambiarEstado(${s.cafe_id}, 'activa')">Reactivar</button>`)
@@ -535,6 +541,49 @@ async function verComprobanteHis(historialId) {
 document.addEventListener('DOMContentLoaded', () => {
     cargarSuscripciones();
 });
+
+async function rechazarRenovacion(suscripcionId) {
+    const { value: motivo, isConfirmed } = await Swal.fire({
+        title: 'Rechazar Comprobante',
+        html: `
+            <p class="text-muted mb-3" style="font-size:0.9rem;">
+                Indica el motivo del rechazo para que el gerente pueda corregirlo.
+            </p>
+            <textarea id="swal-motivo" class="form-control" rows="3" maxlength="500"
+                placeholder="Ej: El comprobante no se visualiza correctamente, monto incorrecto, datos ilegibles..."
+                style="resize: none; font-size: 0.9rem;"></textarea>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#c62828',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '<i class="bi bi-x-octagon me-1"></i>Sí, rechazar',
+        cancelButtonText: 'Cancelar',
+        preConfirm: () => {
+            return document.getElementById('swal-motivo').value.trim() || null;
+        }
+    });
+
+    if (!isConfirmed) return;
+
+    document.getElementById('overlay-loading').style.setProperty('display', 'flex', 'important');
+    try {
+        const res = await MetraAPI.post(
+            `/superadmin/suscripciones/${suscripcionId}/rechazar-renovacion`,
+            { motivo: motivo || '' },
+            { 'X-HTTP-Method-Override': 'PATCH' }
+        );
+        await cargarSuscripciones();
+        Swal.fire(
+            'Rechazado',
+            res.message || 'El comprobante fue rechazado. El gerente podrá intentar de nuevo.',
+            'info'
+        );
+    } catch (e) {
+        Swal.fire('Error', e.data?.message || e.message, 'error');
+    } finally {
+        document.getElementById('overlay-loading').style.setProperty('display', 'none', 'important');
+    }
+}
 
 async function aprobarRenovacion(suscripcionId) {
     const result = await Swal.fire({

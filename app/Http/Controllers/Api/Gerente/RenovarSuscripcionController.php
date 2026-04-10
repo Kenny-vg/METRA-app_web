@@ -100,7 +100,13 @@ class RenovarSuscripcionController extends Controller
             ->first();
 
         if ($suscripcionActiva) {
-            $inicio = \Carbon\Carbon::parse($suscripcionActiva->fecha_fin)->startOfDay()->addDay();
+            // Si el plan solicitado es diferente al actual (Ej. Upgrade), empezar hoy mismo.
+            if ($suscripcionActiva->plan_id != $plan->id) {
+                $inicio = now()->startOfDay();
+            } else {
+                // Si es el mismo plan (Renovación normal), agregarlo al final del periodo actual.
+                $inicio = \Carbon\Carbon::parse($suscripcionActiva->fecha_fin)->startOfDay()->addDay();
+            }
         } else {
             $inicio = now()->startOfDay();
         }
