@@ -26,7 +26,14 @@ class AprobacionController extends Controller
         ]);
 
         //marcar pago validado y resetear fechas desde hoy
-        $suscripcion = $cafeteria->suscripcionActual ?? $cafeteria->suscripciones()->orderByDesc('created_at')->first();
+        $suscripcion = $cafeteria->suscripciones()
+            ->where(function($q) {
+                $q->where('estado_pago', 'pendiente')
+                  ->orWhere('en_revision', true);
+            })
+            ->orderByDesc('created_at')
+            ->first();
+
         if ($suscripcion) {
             $plan = $suscripcion->plan;
             $duracion = $plan ? $plan->duracion_dias : 30;
@@ -38,6 +45,7 @@ class AprobacionController extends Controller
                 'fecha_inicio' => $inicio,
                 'fecha_fin' => $fin,
                 'fecha_validacion' => now(),
+                'en_revision' => false,
             ]);
         }
 
@@ -76,10 +84,21 @@ class AprobacionController extends Controller
             'estatus_registro' => 'rechazado'
         ]);
 
-        //cancelar suscripcion
-        optional($cafeteria->suscripcionActual)->update([
-            'estado_pago' => 'cancelado'
-        ]);
+        //cancelar suscripcion pendiente de revision
+        $suscripcion = $cafeteria->suscripciones()
+            ->where(function($q) {
+                $q->where('estado_pago', 'pendiente')
+                  ->orWhere('en_revision', true);
+            })
+            ->orderByDesc('created_at')
+            ->first();
+
+        if ($suscripcion) {
+            $suscripcion->update([
+                'estado_pago' => 'cancelado',
+                'en_revision' => false
+            ]);
+        }
 
         // Notificar al gerente
         if ($cafeteria->gerente) {
