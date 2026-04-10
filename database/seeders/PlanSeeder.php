@@ -15,7 +15,7 @@ class PlanSeeder extends Seeder
         Plan::updateOrCreate(
             ['nombre_plan' => 'Basic'],
             [
-                'precio' => 499,
+                'precio' => 199,
                 'max_reservas_mes' => 150,
                 'max_usuarios_admin' => 3,
                 'duracion_dias' => 30,
@@ -29,7 +29,7 @@ class PlanSeeder extends Seeder
         Plan::updateOrCreate(
             ['nombre_plan' => 'Standard'],
             [
-                'precio' => 899,
+                'precio' => 399,
                 'max_reservas_mes' => 500,
                 'max_usuarios_admin' => 6,
                 'duracion_dias' => 30,
@@ -41,9 +41,9 @@ class PlanSeeder extends Seeder
         );
         
         Plan::updateOrCreate(
-            ['nombre_plan' => 'Pro'],
+            ['nombre_plan' => 'Premium'],
             [
-                'precio' => 1499,
+                'precio' => 499,
                 'max_reservas_mes' => 1000,
                 'max_usuarios_admin' => 15,
                 'duracion_dias' => 30,

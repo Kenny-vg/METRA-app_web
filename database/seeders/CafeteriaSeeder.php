@@ -25,20 +25,17 @@ class CafeteriaSeeder extends Seeder
      */
     public function run(): void
     {
-        // 0. Obtener usuarios para cada cafetería
+        // 0. Obtener usuarios para Luxury
         $gerenteMetra = User::where('email', 'gerente@metra.com')->first();
         $staffMetra = User::where('email', 'staff@metra.com')->first();
         
-        $gerenteSabroso = User::where('email', 'sabroso@metra.com')->first();
-        $staffSabroso = User::where('email', 'staff_sabroso@metra.com')->first();
-
-        if (!$gerenteMetra || !$gerenteSabroso) return;
+        if (!$gerenteMetra) return;
 
         // Sembrar METRA Luxury
         $this->seedCafeteria($gerenteMetra, $staffMetra, [
             'nombre' => 'METRA Luxury Coffee',
             'slug' => 'metra-luxury',
-            'descripcion' => 'Experiencia premium de café de especialidad y alta repostería.',
+            'descripcion' => 'Experiencia premium de café de especialidad y alta repostería en el corazón de Polanco.',
             'calle' => 'Av. Presidente Masaryk',
             'num_exterior' => '123',
             'colonia' => 'Polanco',
@@ -47,71 +44,32 @@ class CafeteriaSeeder extends Seeder
             'cp' => '11560',
             'telefono' => '5551234567',
             'zonas' => [
-                ['nombre' => 'Salón Principal', 'capacidad' => 2, 'mesas' => 6],
-                ['nombre' => 'Terraza Exclusive', 'capacidad' => 4, 'mesas' => 4],
-                ['nombre' => 'Barra de Especialidad', 'capacidad' => 1, 'mesas' => 4]
+                ['nombre' => 'Salón Principal', 'capacidad' => 2, 'mesas' => 8],
+                ['nombre' => 'Terraza Exclusive', 'capacidad' => 4, 'mesas' => 6],
+                ['nombre' => 'Barra de Especialidad', 'capacidad' => 1, 'mesas' => 5]
             ],
             'menu' => [
-                ['cat' => 'Café Caliente', 'items' => [
-                    ['n' => 'Flat White', 'p' => 65, 'd' => 'Espresso doble con leche cremada.'],
-                    ['n' => 'Latte Macchiato', 'p' => 70, 'd' => 'Tres capas de leche y espresso.'],
-                    ['n' => 'V60 Pour Over', 'p' => 85, 'd' => 'Café de especialidad filtrado.']
+                ['cat' => 'Café de Especialidad', 'items' => [
+                    ['n' => 'Flat White', 'p' => 75, 'd' => 'Espresso de origen con leche cremada a temperatura perfecta.'],
+                    ['n' => 'Latte Macchiato ART', 'p' => 85, 'd' => 'Tres capas de leche y espresso con arte latte premium.'],
+                    ['n' => 'V60 Pour Over', 'p' => 110, 'd' => 'Café de especialidad filtrado con notas frutales (Etiopía o Colombia).']
                 ]],
-                ['cat' => 'Bebidas Frías', 'items' => [
-                    ['n' => 'Cold Brew Nitro', 'p' => 75, 'd' => 'Infusión en frío con nitrógeno.'],
-                    ['n' => 'Frappé Metra', 'p' => 95, 'd' => 'Mezcla secreta de la casa con chocolate.']
+                ['cat' => 'Bebidas Signature', 'items' => [
+                    ['n' => 'Cold Brew Nitro Gold', 'p' => 95, 'd' => 'Infusión en frío de 18 horas con nitrógeno y un toque cítrico.'],
+                    ['n' => 'Affogato Metra', 'p' => 105, 'd' => 'Helado de vainilla artesanal bañado en un shot de espresso intenso.']
                 ]],
-                ['cat' => 'Postres', 'items' => [
-                    ['n' => 'Tarta de Queso', 'p' => 110, 'd' => 'Receta vasca con frutos rojos.'],
-                    ['n' => 'Macarons (3 pzs)', 'p' => 85, 'd' => 'Selección de sabores franceses.']
+                ['cat' => 'Alta Repostería', 'items' => [
+                    ['n' => 'Tarta del Cielo', 'p' => 145, 'd' => 'Base crujiente con mousse de queso y jalea de frutos rojos orgánicos.'],
+                    ['n' => 'Croissant de Almendras', 'p' => 85, 'd' => 'Masa hojaldrada mantequillosa con relleno cremoso de almendras tostadas.'],
+                    ['n' => 'Macarons Premium (6 pzs)', 'p' => 220, 'd' => 'Caja de selección de autor: Lavanda, Pistache, Frambuesa.']
                 ]]
             ],
             'ocasiones' => [
-                ['nombre' => 'Cumpleaños'], ['nombre' => 'Aniversario'], ['nombre' => 'Negocios']
+                ['nombre' => 'Cena Romántica'], ['nombre' => 'Cumpleaños VIP'], ['nombre' => 'Reunión de Negocios']
             ],
             'promociones' => [
-                ['nombre' => 'Cortesía Cumpleañera', 'precio' => 0.00, 'desc' => 'Pastel individual de cortesía para el cumpleañero.'],
-                ['nombre' => 'Brunch Ejecutivo', 'precio' => 180.00, 'desc' => 'Café + Alimento + Jugo natural.']
-            ]
-        ]);
-
-        // Sembrar Café Sabroso
-        $this->seedCafeteria($gerenteSabroso, $staffSabroso, [
-            'nombre' => 'Café Sabroso',
-            'slug' => 'cafe-sabroso',
-            'descripcion' => 'El sabor de la tradición en cada taza. Ambiente familiar y acogedor.',
-            'calle' => 'Calle Libertad',
-            'num_exterior' => '456',
-            'colonia' => 'Americana',
-            'estado_republica' => 'Jalisco',
-            'ciudad' => 'Guadalajara',
-            'cp' => '44160',
-            'telefono' => '3339876543',
-            'zonas' => [
-                ['nombre' => 'Patio Tradicional', 'capacidad' => 6, 'mesas' => 5],
-                ['nombre' => 'Barra Clásica', 'capacidad' => 2, 'mesas' => 4],
-                ['nombre' => 'Salón Familiar', 'capacidad' => 4, 'mesas' => 6]
-            ],
-            'menu' => [
-                ['cat' => 'Tradición Mexicana', 'items' => [
-                    ['n' => 'Café de Olla', 'p' => 45, 'd' => 'Endulzado con piloncillo y canela.'],
-                    ['n' => 'Chocolate Abuelita', 'p' => 50, 'd' => 'Clásico chocolate caliente espumoso.']
-                ]],
-                ['cat' => 'Antojitos', 'items' => [
-                    ['n' => 'Concha con Nata', 'p' => 55, 'd' => 'Pan dulce artesanal con nata natural.'],
-                    ['n' => 'Molletes Divorciados', 'p' => 95, 'd' => 'Con salsa verde y roja picante.']
-                ]],
-                ['cat' => 'Desayunos', 'items' => [
-                    ['n' => 'Chilaquiles Verdes', 'p' => 115, 'd' => 'Con pollo, crema y queso cotija.'],
-                    ['n' => 'Huevos a la Mexicana', 'p' => 85, 'd' => 'Acompañados de frijoles refritos.']
-                ]]
-            ],
-            'ocasiones' => [
-                ['nombre' => 'Familiar'], ['nombre' => 'Reunión Amigos'], ['nombre' => 'Primera Cita']
-            ],
-            'promociones' => [
-                ['nombre' => 'Desayuno Sabroso 2x1', 'precio' => 120.00, 'desc' => 'Segunda orden de molletes al 50%.'],
-                ['nombre' => 'Cortesía de Primera Cita', 'precio' => 0.00, 'desc' => 'Dos mini brownies decorados para la pareja.']
+                ['nombre' => 'Experiencia Cumpleañera', 'precio' => 0.00, 'desc' => 'Mini tarta de autor y velita para el cumpleañero.'],
+                ['nombre' => 'Maridaje Matutino', 'precio' => 165.00, 'desc' => 'Café de especialidad + Repostería fina a elección.']
             ]
         ]);
     }
@@ -133,16 +91,20 @@ class CafeteriaSeeder extends Seeder
                 'telefono' => $data['telefono'] ?? null,
                 'estado' => 'activa',
                 'user_id' => $gerente->id,
-                'porcentaje_reservas' => 85,
-                'duracion_reserva_min' => 60,
+                'porcentaje_reservas' => 90,
+                'duracion_reserva_min' => 90,
                 'intervalo_reserva_min' => 30,
                 'tolerancia_reserva_min' => 15
             ]
         );
 
+        // Actualizar el gerente con el cafe_id
+        $gerente->update(['cafe_id' => $cafe->id]);
+        if ($staff) $staff->update(['cafe_id' => $cafe->id]);
+
         // 2. Horarios
         foreach (['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'] as $dia) {
-            Horario::updateOrCreate(['dia_semana' => $dia, 'cafe_id' => $cafe->id], ['hora_apertura' => '07:00', 'hora_cierre' => '23:00', 'activo' => true]);
+            Horario::updateOrCreate(['dia_semana' => $dia, 'cafe_id' => $cafe->id], ['hora_apertura' => '07:00', 'hora_cierre' => '23:30', 'activo' => true]);
         }
 
         // 3. Ocasiones
@@ -186,12 +148,19 @@ class CafeteriaSeeder extends Seeder
             $promosIds[] = $promo->id;
         }
 
-        // 6.5 Asegurar Suscripción Activa (Tiered)
-        $nombrePlan = ($data['slug'] === 'metra-luxury') ? 'Pro' : 'Basic';
-        $plan = Plan::where('nombre_plan', $nombrePlan)->first();
-        
+        // 6.5 Asegurar Suscripción Activa (Premium)
+        $plan = Plan::where('nombre_plan', 'Premium')->first();
         if (!$plan) {
-            $plan = Plan::first();
+            $plan = Plan::create([
+                'nombre_plan' => 'Premium',
+                'precio' => 499,
+                'max_reservas_mes' => 1000,
+                'max_usuarios_admin' => 15,
+                'duracion_dias' => 30,
+                'estado' => 1,
+                'tiene_metricas_avanzadas' => true,
+                'tiene_recordatorios' => true
+            ]);
         }
 
         Suscripcion::updateOrCreate(
@@ -199,57 +168,91 @@ class CafeteriaSeeder extends Seeder
             [
                 'plan_id' => $plan->id,
                 'user_id' => $gerente->id,
-                'fecha_inicio' => Carbon::now()->subDays(30),
-                'fecha_fin' => Carbon::now()->addDays(30),
+                'fecha_inicio' => Carbon::now()->subDays(15),
+                'fecha_fin' => Carbon::now()->addDays(15),
                 'monto' => $plan->precio,
                 'fecha_validacion' => Carbon::now()
             ]
         );
 
-        // 7. HISTORIAL PARA MINERÍA DE DATOS
+        // 7. HISTORIAL PARA DEMO (Reservas, Ocupaciones y Reseñas)
         $this->seedHistoricalData($cafe, $staff, $zonasIds, $ocasionesIds, $promosIds);
     }
 
     private function seedHistoricalData($cafe, $staff, $zonas, $ocasiones, $promos)
     {
-        $startDate = Carbon::now()->startOfMonth(); // Empezar el mes actual
+        $startDate = Carbon::now()->subDays(30); // Últimos 30 días
         $endDate = Carbon::now();
 
-        $clientNames = ['Alejandro', 'Beatriz', 'Carlos', 'Daniela', 'Eduardo', 'Fernanda', 'Gustavo', 'Hilda', 'Ignacio', 'Julia'];
-        $lastNames = ['Hernandez', 'Gomez', 'Perez', 'Ruiz', 'Lopez'];
+        $clientNames = ['Alejandro', 'Beatriz', 'Carlos', 'Daniela', 'Eduardo', 'Fernanda', 'Gustavo', 'Hilda', 'Ignacio', 'Julia', 'Roberto', 'Mariana', 'Esteban', 'Paola'];
+        $lastNames = ['Hernández', 'Gómez', 'Pérez', 'Ruiz', 'López', 'Sánchez', 'Torres', 'Ramírez'];
+        
+        $reviews = [
+            'Excelente servicio y el café es insuperable. El Flat White es el mejor que he probado.',
+            'Lugar muy elegante y tranquilo, perfecto para mis reuniones de negocios.',
+            'La terraza es hermosa y el personal muy atento. Volveré pronto.',
+            'Repostería fina de verdad. Los macarons son deliciosos.',
+            'Ambiente sofisticado y café de altísima calidad. Muy recomendado.',
+            'Me encantó el Affogato, una combinación perfecta.',
+            'Atención impecable en la barra de especialidad.'
+        ];
 
         for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
             
-            // Generar suficientes reservaciones para probar los límites
-            // Si es Sabroso (Basic limit 150), queremos que esté cerca o lo pase
-            $resCount = ($cafe->slug === 'metra-luxury') ? rand(10, 20) : rand(5, 8); 
+            // Generar entre 5 y 12 reservaciones diarias para que el dashboard luzca lleno
+            $resCount = rand(5, 12); 
 
             for ($i = 0; $i < $resCount; $i++) {
-                $status = 'finalizada';
+                $status = ($date->copy()->isPast()) ? 'finalizada' : 'confirmada';
                 $hour = rand(8, 20);
                 $horaInicio = Carbon::parse($date->toDateString() . ' ' . sprintf('%02d:00:00', $hour));
                 $horaFin = $horaInicio->copy()->addMinutes($cafe->duracion_reserva_min);
 
                 $cliente = $clientNames[array_rand($clientNames)] . ' ' . $lastNames[array_rand($lastNames)];
                 
-                Reservacion::create([
+                $r = Reservacion::create([
                     'folio' => 'RSV-' . Str::upper(Str::random(6)),
                     'nombre_cliente' => $cliente,
                     'telefono' => '55' . rand(10000000, 99999999),
-                    'email' => strtolower(Str::slug($cliente)) . '@test.com',
+                    'email' => strtolower(Str::slug($cliente)) . '@example.com',
                     'fecha' => $date->toDateString(),
                     'hora_inicio' => $horaInicio->format('H:i:s'),
                     'hora_fin' => $horaFin->format('H:i:s'),
-                    'numero_personas' => rand(1, 6),
+                    'numero_personas' => rand(1, 4),
                     'estado' => $status,
                     'cafe_id' => $cafe->id,
                     'zona_id' => $zonas[array_rand($zonas)],
-                    'ocasion_especial_id' => (rand(1, 4) === 1) ? $ocasiones[array_rand($ocasiones)] : null,
+                    'ocasion_especial_id' => (rand(1, 3) === 1) ? $ocasiones[array_rand($ocasiones)] : null,
                     'promocion_id' => (rand(1, 4) === 1) ? $promos[array_rand($promos)] : null,
-                    'fecha_checkin' => $horaInicio->copy()->addMinutes(rand(-5, 5)),
-                    'fecha_checkout' => $horaFin->copy()->addMinutes(rand(0, 30))
                 ]);
+
+                // Si está finalizada, crear el detalle de ocupación y opcionalmente una reseña
+                if ($status === 'finalizada') {
+                    $o = \App\Models\DetalleOcupacion::create([
+                        'reservacion_id' => $r->id,
+                        'cafe_id' => $cafe->id,
+                        'user_id' => $staff ? $staff->id : null,
+                        'mesa_id' => Mesa::where('cafe_id', $cafe->id)->where('zona_id', $r->zona_id)->inRandomOrder()->first()?->id,
+                        'numero_personas' => $r->numero_personas,
+                        'tipo' => 'reservacion',
+                        'hora_entrada' => $horaInicio->copy()->addMinutes(rand(-5, 5)),
+                        'hora_salida' => $horaFin->copy()->addMinutes(rand(0, 20)),
+                        'estado' => 'finalizada',
+                    ]);
+
+                    // Crear reseña para el 60% de las ocupaciones
+                    if (rand(1, 10) <= 6) {
+                        \App\Models\Resena::create([
+                            'detalle_ocupacion_id' => $o->id,
+                            'cafe_id' => $cafe->id,
+                            'calificacion' => rand(4, 5), // Siempre buenas calificaciones para la demo ;)
+                            'comentario' => $reviews[array_rand($reviews)],
+                            'estado' => 'aprobada'
+                        ]);
+                    }
+                }
             }
         }
     }
+}
 }

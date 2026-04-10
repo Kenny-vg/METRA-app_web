@@ -14,13 +14,13 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-       /*
-        |--------------------------------------------------------------------------
-        | SUPERADMIN
-        |--------------------------------------------------------------------------
-        */
+        /*
+         |--------------------------------------------------------------------------
+         | SUPERADMIN
+         |--------------------------------------------------------------------------
+         */
         User::updateOrCreate([
-            'email' => 'superadmin@metra.com',
+            'email' => 'aimankendra22@gmail.com',
         ], [
             'name' => 'Super Admin',
             'password' => Hash::make('12345678'),
@@ -31,7 +31,7 @@ class UserSeeder extends Seeder
 
         /*
         |--------------------------------------------------------------------------
-        | GERENTES DE PRUEBA
+        | GERENTE DE PRUEBA (LUXURY)
         |--------------------------------------------------------------------------
         */
         User::updateOrCreate([
@@ -41,54 +41,24 @@ class UserSeeder extends Seeder
             'password' => Hash::make('12345678'),
             'role' => 'gerente',
             'estado' => true,
-            'cafe_id' => 1,
-        ]);
-
-        User::updateOrCreate([
-            'email' => 'sabroso@metra.com',
-        ], [
-            'name' => 'Gerente Sabroso',
-            'password' => Hash::make('12345678'),
-            'role' => 'gerente',
-            'estado' => true,
-            'cafe_id' => 2,
+            'cafe_id' => null, // Se asigna en CafeteriaSeeder si es necesario, o lo dejamos así
         ]);
 
         /*
         |--------------------------------------------------------------------------
-        | PERSONAL DE PRUEBA
+        | PERSONAL DE PRUEBA (LUXURY)
         |--------------------------------------------------------------------------
         */
         User::updateOrCreate([
             'email' => 'staff@metra.com',
         ], [
-            'name' => 'Staff Test',
+            'name' => 'Staff Luxury',
             'password' => Hash::make('12345678'),
             'role' => 'personal',
             'estado' => true,
-            'cafe_id' => 1,
-        ]);
-
-        User::updateOrCreate([
-            'email' => 'staff_sabroso@metra.com',
-        ], [
-            'name' => 'Staff Sabroso',
-            'password' => Hash::make('12345678'),
-            'role' => 'personal',
-            'estado' => true,
-            'cafe_id' => 2,
-        ]);
-
-        User::updateOrCreate([
-            'email' => 'cliente@metra.com',
-        ], [
-            'name' => 'Cliente Test',
-            'password' => Hash::make('12345678'),
-            'role' => 'cliente',
-            'estado' => true,
-            'cafe_id' => null
+            'cafe_id' => null,
         ]);
     }
 
-    
+
 }
