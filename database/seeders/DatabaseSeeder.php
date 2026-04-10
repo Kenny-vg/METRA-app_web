@@ -24,7 +24,6 @@ class DatabaseSeeder extends Seeder
             PlanSeeder::class,
             UserSeeder::class,
             CafeteriaSeeder::class,
-            SubscriptionSeeder::class,
         ]);
 
         /*User::factory()->create([

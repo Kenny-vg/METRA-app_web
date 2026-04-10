@@ -15,6 +15,8 @@ use App\Models\Promocion;
 use App\Models\Reservacion;
 use App\Models\Plan;
 use App\Models\Suscripcion;
+use App\Models\DetalleOcupacion;
+use App\Models\Resena;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 
@@ -149,29 +151,18 @@ class CafeteriaSeeder extends Seeder
         }
 
         // 6.5 Asegurar Suscripción Activa (Premium)
-        $plan = Plan::where('nombre_plan', 'Premium')->first();
-        if (!$plan) {
-            $plan = Plan::create([
-                'nombre_plan' => 'Premium',
-                'precio' => 499,
-                'max_reservas_mes' => 1000,
-                'max_usuarios_admin' => 15,
-                'duracion_dias' => 30,
-                'estado' => 1,
-                'tiene_metricas_avanzadas' => true,
-                'tiene_recordatorios' => true
-            ]);
-        }
+        $plan = Plan::where('nombre_plan', 'Premium')->first() ?? Plan::first();
 
         Suscripcion::updateOrCreate(
-            ['cafe_id' => $cafe->id, 'estado_pago' => 'pagado'],
+            ['cafe_id' => $cafe->id],
             [
                 'plan_id' => $plan->id,
                 'user_id' => $gerente->id,
                 'fecha_inicio' => Carbon::now()->subDays(15),
                 'fecha_fin' => Carbon::now()->addDays(15),
-                'monto' => $plan->precio,
-                'fecha_validacion' => Carbon::now()
+                'monto' => $plan?->precio ?? 0,
+                'fecha_validacion' => Carbon::now(),
+                'estado_pago' => 'pagado'
             ]
         );
 
@@ -228,7 +219,7 @@ class CafeteriaSeeder extends Seeder
 
                 // Si está finalizada, crear el detalle de ocupación y opcionalmente una reseña
                 if ($status === 'finalizada') {
-                    $o = \App\Models\DetalleOcupacion::create([
+                    $o = DetalleOcupacion::create([
                         'reservacion_id' => $r->id,
                         'cafe_id' => $cafe->id,
                         'user_id' => $staff ? $staff->id : null,
@@ -242,17 +233,16 @@ class CafeteriaSeeder extends Seeder
 
                     // Crear reseña para el 60% de las ocupaciones
                     if (rand(1, 10) <= 6) {
-                        \App\Models\Resena::create([
+                        Resena::create([
                             'detalle_ocupacion_id' => $o->id,
                             'cafe_id' => $cafe->id,
                             'calificacion' => rand(4, 5), // Siempre buenas calificaciones para la demo ;)
                             'comentario' => $reviews[array_rand($reviews)],
-                            'estado' => 'aprobada'
+                            'estado' => 'publicada'
                         ]);
                     }
                 }
             }
         }
     }
-}
 }
