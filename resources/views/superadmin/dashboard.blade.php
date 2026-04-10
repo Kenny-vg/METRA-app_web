@@ -266,11 +266,8 @@ function renderTablaTodos(cafeterias) {
             <td class="text-end">
                 <div class="d-flex justify-content-end gap-2">
                     ${c.estado_dinamico === 'en_revision'
-                        ? `<button type="button" class="btn btn-sm btn-success rounded-pill px-3" onclick="accionSolicitud(${c.id},'aprobar')">
-                               <i class="bi bi-check2 me-1"></i>Aprobar
-                           </button>
-                           <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" onclick="accionSolicitud(${c.id},'rechazar')">
-                               <i class="bi bi-x me-1"></i>Rechazar
+                        ? `<button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-3" onclick="document.getElementById('seccion-revision').scrollIntoView({behavior: 'smooth'})">
+                               <i class="bi bi-eye me-1"></i>Ver Revisión
                            </button>`
                         : `<button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3"
                                   onclick="accionSolicitud(${c.id},'${c.estado_dinamico === 'activa' ? 'suspender' : 'aprobar'}')">

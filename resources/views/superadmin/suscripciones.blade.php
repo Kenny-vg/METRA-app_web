@@ -237,15 +237,9 @@ function renderTabla(suscripciones) {
                 <div class="d-flex justify-content-center justify-content-md-end gap-2 text-nowrap">
                     ${// Lógica de botones de acción por estado
                           // Registro inicial pendiente de aprobar
-                           (s.cafeteria?.estado === 'en_revision')
+                           (s.cafeteria?.estado === 'en_revision' || s.en_revision)
                             ? `<span class="btn btn-sm btn-outline-warning rounded-pill px-3 disabled" style="width: 110px; opacity: 0.8; pointer-events: none; border-color: #ffc107; color: #ffc107;">En Revisión</span>`
-                          // Suscripción pendiente de renovación → Rechazar + Aprobar
-                          : (s.estado_pago === 'pendiente')
-                            ? `<div class="d-flex gap-2">
-                                 <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="rechazarRenovacion(${s.id})"><i class="bi bi-x-lg me-1"></i>Rechazar</button>
-                                 <button type="button" class="btn btn-sm btn-success rounded-pill px-3" style="background-color:#2E7D32; border-color:#2E7D32;" onclick="aprobarRenovacion(${s.id})"><i class="bi bi-check-circle me-1"></i>Aprobar</button>
-                               </div>`
-                          // Sin suscripción activa → Suspender o Reactivar
+                          // Sin suscripción activa o vigente → Suspender o Reactivar
                           : (s.estado_pago !== 'cancelado' && s.cafeteria?.estado !== 'suspendida'
                             ? `<button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" style="min-width: 100px;" onclick="cambiarEstado(${s.cafe_id}, 'suspendida')">Suspender</button>`
                             : `<button type="button" class="btn btn-sm btn-success rounded-pill px-3" style="min-width: 100px;" onclick="cambiarEstado(${s.cafe_id}, 'activa')">Reactivar</button>`)

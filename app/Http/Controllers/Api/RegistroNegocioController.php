@@ -274,6 +274,7 @@ class RegistroNegocioController extends Controller
                 $suscripcion->update([
                     'comprobante_public_id' => $result['public_id'],
                     'comprobante_url'       => null,
+                    'en_revision'           => true,
                 ]);
             }
 
