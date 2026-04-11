@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,30 +12,41 @@
     <!-- Flatpickr for Date Selection -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/airbnb.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap"
+        rel="stylesheet">
     <script>
         window.API_URL = "{{ url('/api') }}";
         window.FILE_URL = "{{ url('/') }}";
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%); /* METRA Cream/Gold Gradient */
-            color: #111; /* METRA Black */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+            /* METRA Cream/Gold Gradient */
+            color: #111;
+            /* METRA Black */
             min-height: 100vh;
         }
-        .text-gold { color: #d4af37; }
-        .bg-gold { background-color: #d4af37; }
-        
-        .reserva-card { 
-            background: #ffffff; 
-            border-radius: 16px; 
-            padding: 3.5rem 3rem; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.08); 
-            border: 1px solid rgba(212,175,55,0.1); /* Subtle Gold border */
+
+        .text-gold {
+            color: #d4af37;
         }
-        
+
+        .bg-gold {
+            background-color: #d4af37;
+        }
+
+        .reserva-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 3.5rem 3rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            /* Subtle Gold border */
+        }
+
         .page-title {
             font-family: 'Playfair Display', serif;
             font-weight: 600;
@@ -42,151 +54,163 @@
             font-size: 2.5rem;
         }
 
-        .section-title { 
-            font-weight: 600; 
-            font-size: 1.15rem; 
-            color: #111; 
-            letter-spacing: -0.2px; 
-            border-bottom: 2px solid #f0ecdf; /* Creamy divider */
-            padding-bottom: 0.75rem; 
-            margin-bottom: 2rem; 
+        .section-title {
+            font-weight: 600;
+            font-size: 1.15rem;
+            color: #111;
+            letter-spacing: -0.2px;
+            border-bottom: 2px solid #f0ecdf;
+            /* Creamy divider */
+            padding-bottom: 0.75rem;
+            margin-bottom: 2rem;
         }
 
-        .input-metra { 
-            border-radius: 10px; 
-            border: 1px solid #e0ddd5; 
-            padding: 0.85rem 1.1rem; 
-            color: #111; 
+        .input-metra {
+            border-radius: 10px;
+            border: 1px solid #e0ddd5;
+            padding: 0.85rem 1.1rem;
+            color: #111;
             background-color: #faf9f7;
-            transition: all 0.2s ease-in-out; 
+            transition: all 0.2s ease-in-out;
             font-size: 0.95rem;
         }
-        
+
         .input-group-text.bg-metra-light {
             background-color: #faf9f7;
             border-color: #e0ddd5;
             color: #7b7871;
         }
 
-        .input-metra:focus, .input-group:focus-within .input-metra, .input-group:focus-within .input-group-text { 
-            border-color: #d4af37; 
+        .input-metra:focus,
+        .input-group:focus-within .input-metra,
+        .input-group:focus-within .input-group-text {
+            border-color: #d4af37;
             background-color: #fff;
-            outline: 0; 
-        }
-        
-        .input-metra:focus {
-            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1); 
+            outline: 0;
         }
 
-        .input-metra.is-invalid { 
-            border-color: #ef4444; 
+        .input-metra:focus {
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+        }
+
+        .input-metra.is-invalid {
+            border-color: #ef4444;
             background-color: #fffafb;
         }
+
         .input-metra.is-invalid:focus {
-            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1); 
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
         }
 
-        .btn-metra-main { 
+        .btn-metra-main {
             background: linear-gradient(135deg, #2a2a2a 0%, #111 100%);
-            color: #d4af37 !important; /* Ensure gold text is always visible */
-            border-radius: 10px; 
-            font-weight: 600; 
-            padding: 1.1rem; 
-            border: 1px solid #111; 
-            transition: all 0.3s ease; 
-            letter-spacing: 0.5px; 
+            color: #d4af37 !important;
+            /* Ensure gold text is always visible */
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 1.1rem;
+            border: 1px solid #111;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
             font-size: 0.95rem;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
         }
-        
-        .btn-metra-main:hover:not(:disabled) { 
-            background: #111; 
+
+        .btn-metra-main:hover:not(:disabled) {
+            background: #111;
             color: #ffffff !important;
             transform: translateY(-2px);
-            box-shadow: 0 15px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
             border-color: #000;
         }
-        
-        .btn-metra-main:disabled { 
-            background: #e2e8f0; 
+
+        .btn-metra-main:disabled {
+            background: #e2e8f0;
             color: #94a3b8;
             border-color: #e2e8f0;
             box-shadow: none;
-            cursor: not-allowed; 
+            cursor: not-allowed;
         }
 
-        .invalid-feedback-custom { 
-            display: none; 
-            width: 100%; 
-            margin-top: 0.4rem; 
-            font-size: 0.8rem; 
-            color: #ef4444; 
+        .invalid-feedback-custom {
+            display: none;
+            width: 100%;
+            margin-top: 0.4rem;
+            font-size: 0.8rem;
+            color: #ef4444;
             font-weight: 500;
         }
-        
-        .input-metra.is-invalid ~ .invalid-feedback-custom,
-        .input-group:has(.is-invalid) ~ .invalid-feedback-custom { 
-            display: block; 
+
+        .input-metra.is-invalid~.invalid-feedback-custom,
+        .input-group:has(.is-invalid)~.invalid-feedback-custom {
+            display: block;
         }
 
-        .promo-label { 
-            border: 1px solid #e0ddd5; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            transition: all 0.3s ease; 
-            background: #fff; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.01);
+        .promo-label {
+            border: 1px solid #e0ddd5;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.01);
         }
-        
+
         .promo-label:hover {
             border-color: #d4af37;
             transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(212,175,55,0.05);
+            box-shadow: 0 8px 15px rgba(212, 175, 55, 0.05);
         }
 
-        .btn-check:checked + .promo-label { 
-            border-color: #d4af37; 
-            background-color: #fffbfa; 
-            box-shadow: 0 0 0 1px #d4af37, 0 8px 15px rgba(212,175,55,0.08); 
+        .btn-check:checked+.promo-label {
+            border-color: #d4af37;
+            background-color: #fffbfa;
+            box-shadow: 0 0 0 1px #d4af37, 0 8px 15px rgba(212, 175, 55, 0.08);
         }
-        
-        .flatpickr-calendar { 
-            font-family: 'Inter', sans-serif; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1); 
+
+        .flatpickr-calendar {
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
             border: 1px solid #f1f5f9;
             border-radius: 12px;
             padding: 10px;
         }
+
         .flatpickr-day.selected {
             background: #d4af37 !important;
             border-color: #d4af37 !important;
             color: #fff !important;
             font-weight: 600;
         }
+
         .flatpickr-day.disabled {
             color: #cbd5e1 !important;
         }
-        
+
         .form-label {
             color: #555;
             margin-bottom: 0.4rem;
         }
     </style>
 </head>
+
 <body>
     <main class="container py-5">
         <div class="row justify-content-center">
             <div class="col-12 col-md-11 col-lg-9 col-xl-8">
-                
+
                 <div class="text-center mb-5 mt-3">
-                    <span class="badge text-gold mb-2" style="background: #111; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">
+                    <span class="badge text-gold mb-2"
+                        style="background: #111; padding: 0.5rem 1rem; font-weight: 600; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">
                         Experiencia Exclusiva METRA
                     </span>
                     <h2 class="page-title mb-2">Reservación de Mesa</h2>
-                    <p class="text-muted" style="font-size: 1.1rem; color: #444 !important;">Asegure su lugar completando los siguientes detalles.</p>
+                    <p class="text-muted" style="font-size: 1.1rem; color: #444 !important;">Asegure su lugar
+                        completando los siguientes detalles.</p>
                     <div class="mt-4">
-                        <a href="javascript:history.back()" class="btn btn-outline-dark rounded-pill px-4 py-2 small fw-bold" style="font-size: 0.85rem; border: 1px solid #d1c8b3;">
+                        <a href="javascript:history.back()"
+                            class="btn btn-outline-dark rounded-pill px-4 py-2 small fw-bold"
+                            style="font-size: 0.85rem; border: 1px solid #d1c8b3;">
                             <i class="bi bi-arrow-left me-2"></i>Volver
                         </a>
                     </div>
@@ -196,7 +220,8 @@
                     <form id="reserva-form" novalidate>
                         <input type="hidden" id="cafe_id" value="">
 
-                        <div id="general-error" class="alert alert-danger d-none mb-4" style="border-radius: 10px; font-weight: 500;"></div>
+                        <div id="general-error" class="alert alert-danger d-none mb-4"
+                            style="border-radius: 10px; font-weight: 500;"></div>
 
                         <!-- 1. Detalles Experiencia -->
                         <div class="mb-5">
@@ -212,8 +237,11 @@
                                 <div class="col-12 col-md-4">
                                     <label class="form-label small fw-bold">Fecha *</label>
                                     <div class="input-group">
-                                        <span class="input-group-text bg-metra-light border-end-0"><i class="bi bi-calendar-event"></i></span>
-                                        <input type="text" id="fecha-select" class="form-control input-metra border-start-0 ps-0" placeholder="Seleccione invitados primero" required readonly disabled>
+                                        <span class="input-group-text bg-metra-light border-end-0"><i
+                                                class="bi bi-calendar-event"></i></span>
+                                        <input type="text" id="fecha-select"
+                                            class="form-control input-metra border-start-0 ps-0"
+                                            placeholder="Seleccione invitados primero" required readonly disabled>
                                     </div>
                                     <div class="invalid-feedback-custom">Por favor seleccione una fecha válida.</div>
                                 </div>
@@ -223,7 +251,9 @@
                                         <select id="hora-select" class="form-select input-metra" required disabled>
                                             <option value="">Seleccione fecha e invitados primero</option>
                                         </select>
-                                        <div id="hora-spinner" class="spinner-border text-gold spinner-border-sm position-absolute d-none" style="right: 35px; top: 13px;" role="status"></div>
+                                        <div id="hora-spinner"
+                                            class="spinner-border text-gold spinner-border-sm position-absolute d-none"
+                                            style="right: 35px; top: 13px;" role="status"></div>
                                     </div>
                                     <div class="invalid-feedback-custom">Seleccione la hora de reservación.</div>
                                 </div>
@@ -236,27 +266,33 @@
                             <div class="row g-4">
                                 <div class="col-12 col-md-12">
                                     <label class="form-label small fw-bold">Nombre(s) *</label>
-                                    <input type="text" id="nombre_cliente" class="form-control input-metra" placeholder="Su nombre" required>
+                                    <input type="text" id="nombre_cliente" class="form-control input-metra"
+                                        placeholder="Su nombre" required>
                                     <div class="invalid-feedback-custom">El nombre es obligatorio.</div>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label small fw-bold">Apellido Paterno *</label>
-                                    <input type="text" id="apellido_p" class="form-control input-metra" placeholder="Su apellido paterno" required>
+                                    <input type="text" id="apellido_p" class="form-control input-metra"
+                                        placeholder="Su apellido paterno" required>
                                     <div class="invalid-feedback-custom">El apellido paterno es obligatorio.</div>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label small fw-bold">Apellido Materno</label>
-                                    <input type="text" id="apellido_m" class="form-control input-metra" placeholder="(Opcional)">
+                                    <input type="text" id="apellido_m" class="form-control input-metra"
+                                        placeholder="(Opcional)">
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label small fw-bold">Correo electrónico *</label>
-                                    <input type="email" id="email" class="form-control input-metra" placeholder="ejemplo@correo.com" required>
+                                    <input type="email" id="email" class="form-control input-metra"
+                                        placeholder="ejemplo@correo.com" required>
                                     <div class="invalid-feedback-custom email-err">Ingrese un correo válido.</div>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label small fw-bold">Teléfono móvil *</label>
-                                    <input type="text" id="telefono" class="form-control input-metra" placeholder="10 dígitos numéricos" maxlength="10" required>
-                                    <div class="invalid-feedback-custom">El teléfono debe contener exactamente 10 números.</div>
+                                    <input type="text" id="telefono" class="form-control input-metra"
+                                        placeholder="10 dígitos numéricos" maxlength="10" required>
+                                    <div class="invalid-feedback-custom">El teléfono debe contener exactamente 10
+                                        números.</div>
                                 </div>
                             </div>
                         </div>
@@ -274,12 +310,13 @@
                                 <div class="col-12 col-md-6">
                                     <label class="form-label small fw-bold">Área preferida de la mesa</label>
                                     <select id="zona-select" name="zona_id" class="form-select input-metra">
-                                        <option value="">Indiferente (Donde haya cupo)</option>
+                                        <option value="">Indiferente</option>
                                     </select>
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label small fw-bold">Notas al Chef / Gerencia</label>
-                                    <textarea id="comentarios" class="form-control input-metra" rows="2" placeholder="Describa alergias, requerimientos dietéticos o solicitudes de arreglo de mesa..."></textarea>
+                                    <textarea id="comentarios" class="form-control input-metra" rows="2"
+                                        placeholder="Describa alergias, requerimientos dietéticos o solicitudes de arreglo de mesa..."></textarea>
                                 </div>
                             </div>
                         </div>
@@ -288,16 +325,19 @@
                         <div class="mb-5">
                             <h5 class="section-title">4. Complementos y Cortesías</h5>
                             <div class="col-12" id="promos-container">
-                                <div class="text-center py-5 small" style="background: #faf9f7; border-radius: 12px; border: 1px dashed #e0ddd5; color: #7b7871;">
+                                <div class="text-center py-5 small"
+                                    style="background: #faf9f7; border-radius: 12px; border: 1px dashed #e0ddd5; color: #7b7871;">
                                     <i class="bi bi-stars fs-3 d-block mb-3 text-gold"></i>
-                                    Seleccione previamente una <strong>ocasión especial</strong> para descubrir atenciones exclusivas preparadas en esta sucursal.
+                                    Seleccione previamente una <strong>ocasión especial</strong> para descubrir
+                                    atenciones exclusivas preparadas en esta sucursal.
                                 </div>
                                 <input type="hidden" id="promocion_id" value="">
                             </div>
                         </div>
 
                         <div class="mt-5 pt-2">
-                            <button type="submit" id="btn-submit" class="btn btn-metra-main w-100 py-3 d-flex justify-content-center align-items-center">
+                            <button type="submit" id="btn-submit"
+                                class="btn btn-metra-main w-100 py-3 d-flex justify-content-center align-items-center">
                                 Confirmar y Reservar
                             </button>
                         </div>
@@ -312,7 +352,7 @@
     <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
     <script src="/js/metra-utils.js"></script>
     <script>
-        window.escapeHTML = function(str) {
+        window.escapeHTML = function (str) {
             if (str === null || str === undefined) return '';
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         };
@@ -332,7 +372,7 @@
             const zonaSelect = document.getElementById('zona-select');
             const btnSubmit = document.getElementById('btn-submit');
             const errorContainer = document.getElementById('general-error');
-            
+
             // Inputs Titular
             const iNom = document.getElementById('nombre_cliente');
             const iApP = document.getElementById('apellido_p');
@@ -340,9 +380,9 @@
             const iEmail = document.getElementById('email');
             const iTel = document.getElementById('telefono');
 
-            const diasMap = {0:'Domingo',1:'Lunes',2:'Martes',3:'Miércoles',4:'Jueves',5:'Viernes',6:'Sábado'};
+            const diasMap = { 0: 'Domingo', 1: 'Lunes', 2: 'Martes', 3: 'Miércoles', 4: 'Jueves', 5: 'Viernes', 6: 'Sábado' };
             // Nombres normalizados de los días para hacer match con la API
-            const diasApiMap = {0:'Domingo',1:'Lunes',2:'Martes',3:'Miercoles',4:'Jueves',5:'Viernes',6:'Sabado'};
+            const diasApiMap = { 0: 'Domingo', 1: 'Lunes', 2: 'Martes', 3: 'Miercoles', 4: 'Jueves', 5: 'Viernes', 6: 'Sabado' };
             let flatpickrInstance = null;
             let disabledDaysNumerico = [];
             // Guardamos los horarios de operación por día para usarlos en la generación de slots
@@ -350,7 +390,7 @@
 
             // Helper to clean accents "Miércoles" -> "miercoles"
             const normalizarStr = (str) => {
-                if(!str) return '';
+                if (!str) return '';
                 return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
             };
 
@@ -358,7 +398,7 @@
 
             // --- VALIDACIONES EN TIEMPO REAL ---
             const requiredInputs = [fechaInput, horaSelect, paxSelect, iNom, iApP, iEmail, iTel];
-            
+
             function validateEmail(email) {
                 const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 return re.test(email);
@@ -387,11 +427,11 @@
 
                 // Si pierde el foco y está vacío o es inválido, pintar rojo
                 input.addEventListener('focusout', () => {
-                    if(input.value.trim() === '') {
+                    if (input.value.trim() === '') {
                         input.classList.add('is-invalid');
-                    } else if(input.id === 'email' && !validateEmail(input.value.trim())) {
+                    } else if (input.id === 'email' && !validateEmail(input.value.trim())) {
                         input.classList.add('is-invalid');
-                    } else if(input.id === 'telefono' && !/^\d{10}$/.test(input.value.replace(/\s/g,''))) {
+                    } else if (input.id === 'telefono' && !/^\d{10}$/.test(input.value.replace(/\s/g, ''))) {
                         input.classList.add('is-invalid');
                     }
                     checkFormValidity();
@@ -410,12 +450,12 @@
                 let operacionHorariosInicial = jsonH.data || [];
                 // Guardamos los horarios para usarlos al generar slots adicionales
                 schedulesData = operacionHorariosInicial;
-                
+
                 const activeDaysNames = operacionHorariosInicial.map(h => normalizarStr(h.dia_semana));
                 disabledDaysNumerico = [];
                 Object.keys(diasMap).forEach(num => {
                     const strDay = normalizarStr(diasMap[num]);
-                    if(!activeDaysNames.includes(strDay)) {
+                    if (!activeDaysNames.includes(strDay)) {
                         disabledDaysNumerico.push(parseInt(num));
                     }
                 });
@@ -424,11 +464,11 @@
                     locale: "es",
                     minDate: "today",
                     disable: [
-                        function(date) {
+                        function (date) {
                             return disabledDaysNumerico.includes(date.getDay());
                         }
                     ],
-                    onChange: function(selectedDates, dateStr, instance) {
+                    onChange: function (selectedDates, dateStr, instance) {
                         fechaInput.classList.remove('is-invalid');
                         cargarHorasDisponibles();
                         cargarPromocionesDisponibles();
@@ -440,21 +480,21 @@
                 const jsonM = await MetraAPI.get(`/cafeterias/${cafeSlug}/mesas-capacidad?t=${new Date().getTime()}`);
                 const max = jsonM.data.max_capacidad || 1;
                 paxSelect.innerHTML = '<option value="">Opciones de capacidad...</option>';
-                for(let i=1; i<=max; i++) {
-                    paxSelect.innerHTML += `<option value="${i}">${i} Persona${i>1?'s':''}</option>`;
+                for (let i = 1; i <= max; i++) {
+                    paxSelect.innerHTML += `<option value="${i}">${i} Persona${i > 1 ? 's' : ''}</option>`;
                 }
 
                 // 3. Zonas y Ocasiones (Datos estáticos de catálogo)
                 const jsonO = await MetraAPI.get(`/cafeterias/${cafeSlug}/ocasiones?t=${new Date().getTime()}`);
-                jsonO.data.forEach(o => { ocasionSelect.innerHTML += `<option value="${o.id}">${escapeHTML(o.nombre)}</option>`});
+                jsonO.data.forEach(o => { ocasionSelect.innerHTML += `<option value="${o.id}">${escapeHTML(o.nombre)}</option>` });
 
                 const jsonZ = await MetraAPI.get(`/cafeterias/${cafeSlug}/zonas?t=${new Date().getTime()}`);
-                jsonZ.data.forEach(z => { zonaSelect.innerHTML += `<option value="${z.id}">${escapeHTML(z.nombre_zona)}</option>`});
+                jsonZ.data.forEach(z => { zonaSelect.innerHTML += `<option value="${z.id}">${escapeHTML(z.nombre_zona)}</option>` });
 
                 // 4. Limpieza: Se ha eliminado el pre-llenado asumiendo perfiles de usuario/gerente,
                 // asegurando que los datos de cliente siempre deban ingresarse limpios a petición.
-                
-            } catch(e) { console.error('Error init', e); }
+
+            } catch (e) { console.error('Error init', e); }
 
             // Helper: convierte "HH:MM" a minutos desde medianoche
             function hhmm2min(str) {
@@ -474,7 +514,7 @@
             async function cargarHorasDisponibles() {
                 const fecha = fechaInput.value;
                 const pax = paxSelect.value;
-                
+
                 if (!fecha || !pax) {
                     horaSelect.innerHTML = '<option value="">Seleccione fecha e invitados primero</option>';
                     horaSelect.disabled = true;
@@ -488,7 +528,7 @@
                 try {
                     const url = `/cafeterias/${cafeSlug}/horarios-disponibles?fecha=${fecha}&numero_personas=${pax}`;
                     const jsonH = await MetraAPI.get(url);
-                    
+
                     console.log('Horarios recibidos:', jsonH.data);
                     let horarios = jsonH.data || [];
 
@@ -530,7 +570,7 @@
                             }
                         }
                     }
-                    
+
                     if (horarios.length === 0) {
                         horaSelect.innerHTML = '<option value="">No hay horarios disponibles</option>';
                         horaSelect.disabled = true;
@@ -545,7 +585,7 @@
                     }
                     horaSelect.value = '';
                     checkFormValidity();
-                } catch(e) {
+                } catch (e) {
                     console.error('Error cargando horas', e);
                     horaSelect.innerHTML = '<option value="">Error de conexión</option>';
                 } finally {
@@ -554,10 +594,10 @@
             }
 
             paxSelect.addEventListener('change', () => {
-                if(paxSelect.value) {
+                if (paxSelect.value) {
                     fechaInput.disabled = false;
                     fechaInput.placeholder = "Seleccione día";
-                    if(fechaInput.value) {
+                    if (fechaInput.value) {
                         cargarHorasDisponibles();
                     }
                 } else {
@@ -582,17 +622,17 @@
                 }
 
                 pCont.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-gold spinner-border-sm"></div><div class="mt-2 text-muted x-small">Buscando beneficios...</div></div>';
-                
+
                 try {
                     let url = `/cafeterias/${cafeSlug}/promociones?fecha=${fecha}&hora=${hora}`;
-                    if(ocasionId) url += `&ocasion_id=${ocasionId}`;
-                    
+                    if (ocasionId) url += `&ocasion_id=${ocasionId}`;
+
                     const jsonP = await MetraAPI.get(url + `&t=${new Date().getTime()}`);
                     const promos = jsonP.data || [];
 
-                    if(promos.length === 0){
-                        let msg = ocasionId 
-                            ? 'No hay promociones para esta ocasión en el horario seleccionado.' 
+                    if (promos.length === 0) {
+                        let msg = ocasionId
+                            ? 'No hay promociones para esta ocasión en el horario seleccionado.'
                             : 'No hay promociones generales para este horario.';
                         pCont.innerHTML = `<div class="text-center py-5 small" style="background: #faf9f7; border-radius: 12px; border: 1px dashed #e0ddd5; color: #7b7871;">${msg}</div><input type="hidden" id="promocion_id" value="">`;
                         return;
@@ -618,12 +658,12 @@
                     promos.forEach(p => {
                         const isFree = parseFloat(p.precio) === 0;
                         const dP = isFree ? 'Cortesía / Sujeto a consumo' : `$${p.precio}`;
-                        ht += `<div class="col-12 col-md-6"><input type="radio" name="promo" id="promo-${p.id}" value="${p.id}" class="btn-check" onchange="document.getElementById('promocion_id').value='${p.id}';"><label class="card h-100 p-4 w-100 promo-label" for="promo-${p.id}"><div class="d-flex justify-content-between mb-3"><span class="badge" style="background: rgba(212,175,55,0.1); color: #d4af37; border: 1px solid rgba(212,175,55,0.2); font-size: 0.8rem; letter-spacing: 0.5px;">${dP}</span></div><h6 class="fw-bold mb-2" style="font-size:1.05rem; color:#1e293b;">${escapeHTML(p.nombre_promocion)}</h6><p class="small text-muted mb-0" style="font-size: 0.85rem; line-height: 1.4;">${escapeHTML(p.descripcion||'')}</p></label></div>`;
+                        ht += `<div class="col-12 col-md-6"><input type="radio" name="promo" id="promo-${p.id}" value="${p.id}" class="btn-check" onchange="document.getElementById('promocion_id').value='${p.id}';"><label class="card h-100 p-4 w-100 promo-label" for="promo-${p.id}"><div class="d-flex justify-content-between mb-3"><span class="badge" style="background: rgba(212,175,55,0.1); color: #d4af37; border: 1px solid rgba(212,175,55,0.2); font-size: 0.8rem; letter-spacing: 0.5px;">${dP}</span></div><h6 class="fw-bold mb-2" style="font-size:1.05rem; color:#1e293b;">${escapeHTML(p.nombre_promocion)}</h6><p class="small text-muted mb-0" style="font-size: 0.85rem; line-height: 1.4;">${escapeHTML(p.descripcion || '')}</p></label></div>`;
                     });
-                    
+
                     ht += '</div><input type="hidden" id="promocion_id" value="">';
                     pCont.innerHTML = ht;
-                } catch(e) { 
+                } catch (e) {
                     console.error('Error promos', e);
                     pCont.innerHTML = '<div class="text-center py-4 text-danger small">Error al cargar beneficios.</div>';
                 }
@@ -635,23 +675,23 @@
             // --- SUBMIT FINAL ---
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                
+
                 // Forzar validación sucia
                 let focusTriggered = false;
                 requiredInputs.forEach(input => {
-                    if(!input.value.trim()){
+                    if (!input.value.trim()) {
                         input.classList.add('is-invalid');
-                        if(!focusTriggered) { input.focus(); focusTriggered = true; }
-                    } else if(input.id === 'email' && !validateEmail(input.value.trim())) {
+                        if (!focusTriggered) { input.focus(); focusTriggered = true; }
+                    } else if (input.id === 'email' && !validateEmail(input.value.trim())) {
                         input.classList.add('is-invalid');
-                        if(!focusTriggered) { input.focus(); focusTriggered = true; }
-                    } else if(input.id === 'telefono' && !/^\d{10}$/.test(input.value.replace(/\s/g,''))) {
+                        if (!focusTriggered) { input.focus(); focusTriggered = true; }
+                    } else if (input.id === 'telefono' && !/^\d{10}$/.test(input.value.replace(/\s/g, ''))) {
                         input.classList.add('is-invalid');
-                        if(!focusTriggered) { input.focus(); focusTriggered = true; }
+                        if (!focusTriggered) { input.focus(); focusTriggered = true; }
                     }
                 });
 
-                if(focusTriggered) return; // Detener flujo fallido
+                if (focusTriggered) return; // Detener flujo fallido
 
                 errorContainer.classList.add('d-none');
                 btnSubmit.disabled = true;
@@ -678,14 +718,14 @@
 
                 try {
                     const json = await MetraAPI.post(`/cafeterias/${cafeSlug}/reservaciones`, payload);
-                    
-                    if(json.success) {
+
+                    if (json.success) {
                         // Mostrar pantalla de confirmación tal como se pidió
                         const rsv = json.data;
                         const cafeNombre = escapeHTML(rsv.cafeteria ? rsv.cafeteria.nombre : 'La Cafetería');
                         const zonaP = escapeHTML(rsv.zona ? rsv.zona.nombre : 'Área General');
                         const ocasionP = escapeHTML(rsv.ocasion ? rsv.ocasion.nombre : 'Sin Ocasión Especial');
-                        
+
                         document.querySelector('.reserva-card').innerHTML = `
                             <div class="text-center py-5 px-3">
                                 <div class="mb-4">
@@ -746,22 +786,23 @@
                         btnSubmit.innerHTML = originalText;
                         errorContainer.innerHTML = '<strong>Error en tu solicitud:</strong> ' + 'Ocurrió un error en la validación.';
                         errorContainer.classList.remove('d-none');
-                        errorContainer.scrollIntoView({behavior: 'smooth', block: 'center'});
+                        errorContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
-                } catch(error) {
+                } catch (error) {
                     btnSubmit.disabled = false;
                     btnSubmit.innerHTML = originalText;
                     const errData = error.data || error;
                     errorContainer.innerHTML = '<strong>Error:</strong> ' + (errData.message || 'Ocurrió un error en la validación.');
-                    if(errData.errors) {
+                    if (errData.errors) {
                         errorContainer.innerHTML += '<ul class="mb-0 mt-2">' + Object.values(errData.errors).map(err => `<li>${err[0]}</li>`).join('') + '</ul>';
                     }
                     errorContainer.classList.remove('d-none');
-                    errorContainer.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    errorContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             });
 
         });
     </script>
 </body>
+
 </html>
