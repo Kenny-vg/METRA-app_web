@@ -5,11 +5,15 @@
     <header class="mb-5 border-bottom pb-4" style="border-color: var(--border-light) !important;">
         <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
             <div>
-                <h2 class="fw-bold m-0" style="color: var(--black-primary); font-family: 'Inter', sans-serif; letter-spacing: -1px;">Menú Digital</h2>
-                <p class="m-0 mt-2" style="color: var(--text-muted); font-size: 0.95rem;">Gestiona los productos que ofreces a tus clientes.</p>
+                <h2 class="fw-bold m-0"
+                    style="color: var(--black-primary); font-family: 'Inter', sans-serif; letter-spacing: -1px;">Menú
+                    Digital</h2>
+                <p class="m-0 mt-2" style="color: var(--text-muted); font-size: 0.95rem;">Gestiona los productos que ofreces
+                    a tus clientes.</p>
             </div>
             <div class="d-flex gap-2">
-                <button class="btn btn-outline-dark px-4 py-2" onclick="openModalGestionCategorias()" style="border-radius: 8px;">
+                <button class="btn btn-outline-dark px-4 py-2" onclick="openModalGestionCategorias()"
+                    style="border-radius: 8px;">
                     <i class="bi bi-tags me-2"></i>Categorías
                 </button>
                 <button class="btn-admin-primary px-4 py-2" onclick="openModalProducto()">
@@ -24,17 +28,20 @@
             .sortable-ghost {
                 opacity: 0.3 !important;
                 background-color: var(--off-white) !important;
-                box-shadow: inset 0 0 10px rgba(0,0,0,0.1) !important;
+                box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1) !important;
             }
+
             .sortable-drag {
                 cursor: grabbing !important;
                 background-color: #ffffff !important;
-                box-shadow: 0 10px 20px rgba(0,0,0,0.15), 0 5px 5px rgba(0,0,0,0.1) !important;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15), 0 5px 5px rgba(0, 0, 0, 0.1) !important;
                 transform: scale(1.01);
             }
+
             .drag-handle {
                 cursor: grab;
             }
+
             .drag-handle:active {
                 cursor: grabbing;
             }
@@ -49,7 +56,8 @@
     <template id="categoria-group-template">
         <div class="mb-5 js-categoria-section">
             <div class="d-flex align-items-center gap-3 mb-4">
-                <h4 class="fw-bold mb-0 js-categoria-nombre" style="color: var(--black-primary); font-family: 'Inter', sans-serif;"></h4>
+                <h4 class="fw-bold mb-0 js-categoria-nombre"
+                    style="color: var(--black-primary); font-family: 'Inter', sans-serif;"></h4>
                 <hr class="flex-grow-1" style="opacity: 0.1;">
             </div>
             <div class="row g-4 js-productos-row">
@@ -61,19 +69,26 @@
     <!-- Template HTML para Producto -->
     <template id="producto-template">
         <div class="col-md-6 col-lg-4 col-xl-3">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 js-card" style="background: var(--white-pure);">
-                <div class="js-img" style="height: 180px; width: 100%; background-size: cover; background-position: center; border-bottom: 1px solid var(--border-light);"></div>
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 js-card"
+                style="background: var(--white-pure);">
+                <div class="js-img"
+                    style="height: 180px; width: 100%; background-size: cover; background-position: center; border-bottom: 1px solid var(--border-light);">
+                </div>
                 <div class="card-body p-4 d-flex flex-column">
                     <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h5 class="fw-bold mb-0 text-truncate pe-2 js-nombre" style="color: var(--black-primary); font-size: 1.1rem;"></h5>
+                        <h5 class="fw-bold mb-0 text-truncate pe-2 js-nombre"
+                            style="color: var(--black-primary); font-size: 1.1rem;"></h5>
                         <div class="d-flex flex-column align-items-end">
                             <span class="badge rounded-pill mb-1 js-badge" style="font-size: 0.7rem;"></span>
                             <span class="fw-bold text-admin-primary js-precio" style="font-size: 0.9rem;"></span>
                         </div>
                     </div>
-                    <p class="small text-muted mb-4 flex-grow-1 js-desc" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"></p>
-                    
-                    <div class="d-flex justify-content-end mt-auto align-items-center border-top pt-3 js-actions" style="border-color: var(--border-light) !important;">
+                    <p class="small text-muted mb-4 flex-grow-1 js-desc"
+                        style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                    </p>
+
+                    <div class="d-flex justify-content-end mt-auto align-items-center border-top pt-3 js-actions"
+                        style="border-color: var(--border-light) !important;">
                     </div>
                 </div>
             </div>
@@ -85,38 +100,45 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4 border-0 p-2" style="box-shadow: 0 20px 50px rgba(0,0,0,0.1);">
                 <div class="modal-header border-0 pb-0">
-                    <h5 class="fw-bold m-0" id="modalProductoTitle" style="color: var(--black-primary); letter-spacing: -0.5px;">Añadir Producto</h5>
+                    <h5 class="fw-bold m-0" id="modalProductoTitle"
+                        style="color: var(--black-primary); letter-spacing: -0.5px;">Añadir Producto</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body pt-4">
                     <form id="formProducto" onsubmit="saveProducto(event)">
                         <input type="hidden" id="producto-id">
-                        
+
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted">CATEGORÍA</label>
-                            <select id="producto-categoria" class="form-select border-0 shadow-sm rounded-3" style="background: var(--off-white);" required>
+                            <select id="producto-categoria" class="form-select border-0 shadow-sm rounded-3"
+                                style="background: var(--off-white);" required>
                                 <option value="" disabled selected>Selecciona una categoría</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted">NOMBRE DEL PRODUCTO</label>
-                            <input type="text" id="producto-nombre" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" required>
+                            <input type="text" id="producto-nombre" class="form-control border-0 shadow-sm rounded-3"
+                                style="background: var(--off-white);" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted">DESCRIPCIÓN (Opcional)</label>
-                            <textarea id="producto-descripcion" class="form-control border-0 shadow-sm rounded-3" rows="2" style="background: var(--off-white);"></textarea>
+                            <textarea id="producto-descripcion" class="form-control border-0 shadow-sm rounded-3" rows="2"
+                                style="background: var(--off-white);"></textarea>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-muted">PRECIO ($)</label>
-                            <input type="number" id="producto-precio" step="0.01" min="0" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);" required placeholder="0.00">
+                            <input type="number" id="producto-precio" step="0.01" min="0"
+                                class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);"
+                                required placeholder="0.00 MXN">
                         </div>
-                        
+
                         <div class="mb-4">
                             <label class="form-label small fw-bold text-muted">IMAGEN (Opcional)</label>
-                            <input type="file" id="producto-imagen" accept="image/png, image/jpeg, image/webp" class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);">
+                            <input type="file" id="producto-imagen" accept="image/png, image/jpeg, image/webp"
+                                class="form-control border-0 shadow-sm rounded-3" style="background: var(--off-white);">
                             <div class="form-text mt-2 small text-muted">JPG, PNG, WEBP. Máx: 5MB.</div>
                         </div>
 
@@ -135,27 +157,34 @@
             <div class="modal-content rounded-4 border-0 p-2">
                 <div class="modal-header border-0 pb-0">
                     <div class="d-flex align-items-center gap-3">
-                        <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Gestionar Categorías</h5>
-                        <button id="btnGuardarOrden" class="btn btn-sm btn-success d-none shadow-sm" onclick="guardarNuevoOrden()"><i class="bi bi-check2-circle me-1"></i>Guardar Orden</button>
+                        <h5 class="fw-bold m-0" style="color: var(--black-primary); letter-spacing: -0.5px;">Gestionar
+                            Categorías</h5>
+                        <button id="btnGuardarOrden" class="btn btn-sm btn-success d-none shadow-sm"
+                            onclick="guardarNuevoOrden()"><i class="bi bi-check2-circle me-1"></i>Guardar Orden</button>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body pt-4">
                     <!-- Formulario Nueva Categoría -->
-                    <form id="formCategoria" onsubmit="saveCategoria(event)" class="mb-4 p-3 rounded-3" style="background: var(--off-white);">
+                    <form id="formCategoria" onsubmit="saveCategoria(event)" class="mb-4 p-3 rounded-3"
+                        style="background: var(--off-white);">
                         <input type="hidden" id="categoria-id">
                         <div class="row g-2 align-items-end">
                             <div class="col-md-5">
                                 <label class="form-label small fw-bold text-muted">NOMBRE</label>
-                                <input type="text" id="categoria-nombre" class="form-control border-0 shadow-sm rounded-3" required placeholder="Ej: Bebidas">
+                                <input type="text" id="categoria-nombre" class="form-control border-0 shadow-sm rounded-3"
+                                    required placeholder="Ej: Bebidas">
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label small fw-bold text-muted">ORDEN</label>
-                                <input type="number" id="categoria-orden" class="form-control border-0 shadow-sm rounded-3" placeholder="0">
+                                <input type="number" id="categoria-orden" class="form-control border-0 shadow-sm rounded-3"
+                                    placeholder="0">
                             </div>
                             <div class="col-md-5 d-flex gap-2">
-                                <button type="submit" id="btnSaveCategoria" class="btn-admin-primary flex-grow-1">Guardar</button>
-                                <button type="button" class="btn btn-outline-secondary" onclick="resetFormCategoria()">Limpiar</button>
+                                <button type="submit" id="btnSaveCategoria"
+                                    class="btn-admin-primary flex-grow-1">Guardar</button>
+                                <button type="button" class="btn btn-outline-secondary"
+                                    onclick="resetFormCategoria()">Limpiar</button>
                             </div>
                         </div>
                     </form>
@@ -212,7 +241,7 @@
             try {
                 const response = await MetraAPI.get('/gerente/menu-categorias');
                 categoriasLocales = response.data || [];
-                
+
                 // 1. Poblar select del producto
                 const select = document.getElementById('producto-categoria');
                 select.innerHTML = '<option value="" disabled selected>Selecciona una categoría</option>';
@@ -223,29 +252,29 @@
                 // 2. Poblar lista en modal de gestión
                 const lista = document.getElementById('categorias-lista-body');
                 lista.innerHTML = '';
-                
+
                 // Ordenar localmente por si vienen desordenadas
-                categoriasLocales.sort((a,b) => (a.orden || 0) - (b.orden || 0));
+                categoriasLocales.sort((a, b) => (a.orden || 0) - (b.orden || 0));
 
                 categoriasLocales.forEach(c => {
                     lista.innerHTML += `
-                        <tr data-id="${c.id}" style="background: var(--white-pure);">
-                            <td class="drag-handle text-center text-muted" title="Arrastrar para reordenar" style="width: 40px;"><i class="bi bi-arrows-move fs-5"></i></td>
-                            <td class="fw-bold align-middle">${escapeHTML(c.nombre)}</td>
-                            <td class="align-middle"><input type="number" class="form-control form-control-sm border text-center input-orden shadow-none text-muted" style="width: 70px; font-weight: bold; background: var(--off-white);" value="${c.orden || 0}" readonly></td>
-                            <td class="align-middle"><span class="badge ${c.activo ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'} border">${c.activo ? 'Activa' : 'Inactiva'}</span></td>
-                            <td class="text-end align-middle">
-                                <button class="btn btn-sm btn-outline-dark me-1" onclick="editCategoria(${JSON.stringify(c).replace(/"/g, '&quot;')})"><i class="bi bi-pencil"></i></button>
-                                <button class="btn btn-sm ${c.activo ? 'btn-outline-danger' : 'btn-outline-success'}" onclick="toggleEstadoCategoria(${c.id}, ${c.activo})">
-                                    <i class="bi ${c.activo ? 'bi-eye-slash' : 'bi-eye'}"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
+                                <tr data-id="${c.id}" style="background: var(--white-pure);">
+                                    <td class="drag-handle text-center text-muted" title="Arrastrar para reordenar" style="width: 40px;"><i class="bi bi-arrows-move fs-5"></i></td>
+                                    <td class="fw-bold align-middle">${escapeHTML(c.nombre)}</td>
+                                    <td class="align-middle"><input type="number" class="form-control form-control-sm border text-center input-orden shadow-none text-muted" style="width: 70px; font-weight: bold; background: var(--off-white);" value="${c.orden || 0}" readonly></td>
+                                    <td class="align-middle"><span class="badge ${c.activo ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'} border">${c.activo ? 'Activa' : 'Inactiva'}</span></td>
+                                    <td class="text-end align-middle">
+                                        <button class="btn btn-sm btn-outline-dark me-1" onclick="editCategoria(${JSON.stringify(c).replace(/"/g, '&quot;')})"><i class="bi bi-pencil"></i></button>
+                                        <button class="btn btn-sm ${c.activo ? 'btn-outline-danger' : 'btn-outline-success'}" onclick="toggleEstadoCategoria(${c.id}, ${c.activo})">
+                                            <i class="bi ${c.activo ? 'bi-eye-slash' : 'bi-eye'}"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
                 });
 
                 // Inicializar Sortable JS
-                if(window.categoriasSortable) {
+                if (window.categoriasSortable) {
                     window.categoriasSortable.destroy();
                 }
                 window.categoriasSortable = new Sortable(lista, {
@@ -258,7 +287,7 @@
                         const rows = lista.querySelectorAll('tr');
                         rows.forEach((row, index) => {
                             const input = row.querySelector('.input-orden');
-                            if(input) {
+                            if (input) {
                                 input.value = index + 1; // empezamos orden en 1
                             }
                         });
@@ -274,7 +303,7 @@
             const btn = document.getElementById('btnGuardarOrden');
             const rows = document.querySelectorAll('#categorias-lista-body tr');
             const btnOriginalText = btn.innerHTML;
-            
+
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Guardando...';
             btn.disabled = true;
 
@@ -285,9 +314,9 @@
                 rows.forEach(row => {
                     const id = row.getAttribute('data-id');
                     const nuevoOrden = parseInt(row.querySelector('.input-orden').value);
-                    
+
                     const catLocal = categoriasLocales.find(c => c.id == id);
-                    if(catLocal && parseInt(catLocal.orden) !== nuevoOrden) {
+                    if (catLocal && parseInt(catLocal.orden) !== nuevoOrden) {
                         const payload = {
                             nombre: catLocal.nombre, // Requerido por el backend
                             orden: nuevoOrden
@@ -296,13 +325,13 @@
                     }
                 });
 
-                if(peticiones.length > 0) {
+                if (peticiones.length > 0) {
                     await Promise.all(peticiones);
                     showToast('success', 'Orden de categorías actualizado');
                 } else {
                     showToast('info', 'No hubo cambios de orden');
                 }
-                
+
                 btn.classList.add('d-none');
                 loadTodo();
             } catch (error) {
@@ -318,17 +347,17 @@
             try {
                 const response = await MetraAPI.get('/gerente/menu');
                 const categoriasConProductos = response.data || response || [];
-                
+
                 const container = document.getElementById('carta-container');
                 container.innerHTML = '';
 
                 if (categoriasConProductos.length === 0) {
                     container.innerHTML = `
-                        <div class="col-12 text-center text-muted py-5">
-                            <i class="bi bi-basket text-muted mb-3 d-block" style="font-size: 3rem; opacity: 0.5;"></i>
-                            <p>No tienes categorías ni productos en tu menú todavía.</p>
-                        </div>
-                    `;
+                                <div class="col-12 text-center text-muted py-5">
+                                    <i class="bi bi-basket text-muted mb-3 d-block" style="font-size: 3rem; opacity: 0.5;"></i>
+                                    <p>No tienes categorías ni productos en tu menú todavía.</p>
+                                </div>
+                            `;
                     return;
                 }
 
@@ -338,13 +367,13 @@
                 categoriasConProductos.forEach(cat => {
                     const catClone = catTemplate.content.cloneNode(true);
                     catClone.querySelector('.js-categoria-nombre').textContent = cat.nombre;
-                    
+
                     const productsRow = catClone.querySelector('.js-productos-row');
-                    
+
                     if (cat.menus && cat.menus.length > 0) {
                         cat.menus.forEach(p => {
                             const pClone = prodTemplate.content.cloneNode(true);
-                            
+
                             const card = pClone.querySelector('.js-card');
                             if (!p.activo) card.classList.add('opacity-50');
 
@@ -354,7 +383,7 @@
 
                             pClone.querySelector('.js-nombre').textContent = p.nombre_producto;
                             pClone.querySelector('.js-precio').textContent = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(p.precio || 0);
-                            
+
                             const badge = pClone.querySelector('.js-badge');
                             badge.classList.add(p.activo ? 'bg-success' : 'bg-secondary');
                             badge.textContent = p.activo ? 'Activo' : 'Inactivo';
@@ -364,9 +393,9 @@
                             const actionsDiv = pClone.querySelector('.js-actions');
                             if (p.activo) {
                                 actionsDiv.innerHTML = `
-                                    <button class="btn btn-sm btn-outline-dark me-2" onclick='editProducto(${JSON.stringify(p).replace(/"/g, '&quot;')})'><i class="bi bi-pencil"></i></button>
-                                    <button class="btn btn-sm btn-outline-primary" onclick="deleteProducto(${p.id})"><i class="bi bi-x-circle"></i></button>
-                                `;
+                                            <button class="btn btn-sm btn-outline-dark me-2" onclick='editProducto(${JSON.stringify(p).replace(/"/g, '&quot;')})'><i class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="deleteProducto(${p.id})"><i class="bi bi-x-circle"></i></button>
+                                        `;
                             } else {
                                 actionsDiv.innerHTML = `<button class="btn btn-sm btn-success w-100 mt-2" onclick="reactivateProducto(${p.id})"><i class="bi bi-arrow-counterclockwise me-1"></i>Reactivar</button>`;
                             }
@@ -407,7 +436,7 @@
         async function saveCategoria(e) {
             e.preventDefault();
             const id = document.getElementById('categoria-id').value;
-            
+
             const payload = {
                 nombre: document.getElementById('categoria-nombre').value,
                 orden: document.getElementById('categoria-orden').value || 0
@@ -487,7 +516,7 @@
             formData.append('descripcion', document.getElementById('producto-descripcion').value);
             formData.append('categoria_id', document.getElementById('producto-categoria').value);
             formData.append('precio', document.getElementById('producto-precio').value);
-            
+
             if (id) formData.append('_method', 'PUT'); // required by Laravel
 
             const fileInput = document.getElementById('producto-imagen');
@@ -500,7 +529,7 @@
                 loadProductos();
             } catch (error) {
                 Swal.fire('Error', error.data?.message || 'Error al guardar', 'error');
-            } 
+            }
             finally {
                 btn.disabled = false;
                 btn.innerText = 'Guardar Producto';

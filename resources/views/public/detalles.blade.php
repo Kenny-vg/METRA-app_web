@@ -17,28 +17,22 @@
         window.FILE_URL = "{{ url('/') }}";
     </script>
     <style>
-        .btn-filtro-boutique {
-            background: linear-gradient(135deg, #ffffff 0%, #fcfbfa 100%);
-            color: #5c4f4a;
-            border: 1px solid rgba(181, 146, 126, 0.3);
-            border-radius: 50px;
-            padding: 8px 22px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            font-family: 'Montserrat', 'Poppins', sans-serif;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        body.zona-comensal { background-color: #FAF7F0 !important; }
+        .filtros-scroll::-webkit-scrollbar { display: none; }
+        .filtros-scroll { -ms-overflow-style: none; scrollbar-width: none; white-space: nowrap; }
+        .btn-filtro-custom {
+            background-color: transparent;
+            color: var(--black-primary);
+            border: 1px solid rgba(181, 146, 126, 0.4);
+            transition: all 0.2s;
         }
-        .btn-filtro-boutique:hover {
-            border-color: rgba(212,175,55, 0.6);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(212,175,55, 0.1);
+        .btn-filtro-custom:hover {
+            border-color: var(--accent-gold);
         }
-        .btn-filtro-boutique.active {
-            background: linear-gradient(135deg, #4a3b3b 0%, #2c2323 100%);
-            color: #ffffff;
-            border: 1px solid transparent;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        .btn-filtro-custom.btn-admin-primary {
+            border-color: transparent !important;
+            background-color: var(--black-primary) !important;
+            color: #ffffff !important;
         }
     </style>
 </head>
@@ -115,8 +109,8 @@
                         </div>
 
                         <!-- Filtros Ocasiones -->
-                        <div class="d-flex flex-wrap gap-2 mb-4 d-none" id="ocasiones-filtros-container">
-                            <button class="btn btn-sm px-3 rounded-pill btn-admin-primary btn-filtro-ocasion fw-medium" id="btn-todas-promos" onclick="filtrarPromos('todas')">Todas</button>
+                        <div class="d-flex flex-nowrap overflow-auto gap-2 mb-4 pb-2 filtros-scroll d-none" id="ocasiones-filtros-container">
+                            <button class="btn btn-sm px-3 rounded-pill btn-admin-primary btn-filtro-ocasion btn-filtro-custom fw-medium text-nowrap" id="btn-todas-promos" onclick="filtrarPromos('todas')">Todas</button>
                             <!-- Ocasiones cargadas por JS -->
                         </div>
 
@@ -135,8 +129,8 @@
                         </div>
                         
                         <!-- Filtros de Menú -->
-                        <div id="menu-filtros-container" class="d-flex flex-wrap gap-2 mb-4">
-                            <button class="btn-filtro-boutique active btn-filtro-menu" id="btn-todas-menu" onclick="filtrarMenu('todas')">Todas</button>
+                        <div id="menu-filtros-container" class="d-flex flex-nowrap overflow-auto gap-2 mb-4 pb-2 filtros-scroll">
+                            <button class="btn btn-sm px-3 rounded-pill btn-admin-primary btn-filtro-menu btn-filtro-custom fw-medium text-nowrap" id="btn-todas-menu" onclick="filtrarMenu('todas')">Todas</button>
                             <!-- Categorías cargadas por JS -->
                         </div>
 
@@ -276,23 +270,23 @@
 
     <!-- Modal Detalles de Producto -->
     <div class="modal fade" id="modalProductoDetalle" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 550px;">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden; background-color: #fcfbfa;">
-                <div class="modal-header border-0 pb-0 position-absolute w-100 p-3 p-md-4" style="z-index: 10; display: flex; justify-content: flex-end;">
+                <div class="modal-header border-0 pb-0 position-absolute w-100 p-3" style="z-index: 10; display: flex; justify-content: flex-end;">
                     <button type="button" class="btn-close bg-white rounded-circle shadow p-2" style="opacity: 0.9;" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-0">
-                    <div style="height: 400px; position: relative; background: #efece8;">
+                    <div style="height: 280px; position: relative; background: #efece8;">
                         <img id="modalProductoImg" src="" alt="Producto" class="w-100 h-100" style="object-fit: cover;">
                     </div>
                     
                     <div class="p-4 p-md-5 bg-white position-relative" style="border-top-left-radius: 30px; border-top-right-radius: 30px; margin-top: -30px;">
                         <div class="d-flex justify-content-between align-items-start mb-4">
-                            <h3 id="modalProductoNombre" class="fw-bold mb-0 pe-3" style="color: #3b2f2f; font-family: 'Montserrat', 'Poppins', sans-serif; letter-spacing: -0.5px; line-height: 1.2;"></h3>
-                            <span id="modalProductoPrecio" class="fw-bold fs-3 text-nowrap" style="color: var(--accent-gold); font-family: 'Montserrat', 'Poppins', sans-serif; letter-spacing: -0.5px;"></span>
+                            <h4 id="modalProductoNombre" class="fw-bold mb-0 pe-3" style="color: var(--black-primary); line-height: 1.2;"></h4>
+                            <span id="modalProductoPrecio" class="fw-bold fs-4 text-nowrap" style="color: var(--accent-gold);"></span>
                         </div>
-                        <div style="width: 50px; height: 2px; background-color: rgba(212,175,55,0.4); margin-bottom: 24px;"></div>
-                        <p id="modalProductoDesc" style="color: #6b635e; line-height: 1.8; font-size: 1.05rem; margin-bottom: 0; white-space: pre-line;"></p>
+                        <div style="width: 50px; height: 2px; background-color: rgba(212,175,55,0.4); margin-bottom: 20px;"></div>
+                        <p id="modalProductoDesc" class="text-muted" style="line-height: 1.6; font-size: 0.95rem; margin-bottom: 0; white-space: pre-line;"></p>
                     </div>
                 </div>
             </div>
@@ -406,7 +400,7 @@
                 window.filtrarMenu = function(categoriaId) {
                     // Update active pill styling
                     document.querySelectorAll('.btn-filtro-menu').forEach(btn => {
-                        btn.classList.remove('active');
+                        btn.classList.remove('btn-admin-primary');
                     });
                     
                     const activeBtn = categoriaId === 'todas' 
@@ -414,7 +408,7 @@
                         : document.getElementById(`btn-menu-cat-${categoriaId}`);
                         
                     if (activeBtn) {
-                        activeBtn.classList.add('active');
+                        activeBtn.classList.add('btn-admin-primary');
                     }
                     
                     if (categoriaId === 'todas') {
@@ -436,8 +430,8 @@
 
                     categorias.forEach(categoria => {
                         menuContainer.innerHTML += `
-                            <div class="col-12 mt-5 mb-2">
-                                <h6 class="fw-bold text-uppercase pb-2 border-bottom" style="color: var(--accent-gold); letter-spacing: 2px; font-size: 0.85rem; font-family: 'Montserrat', 'Poppins', sans-serif;">
+                            <div class="col-12 mt-4 mb-2 ps-md-4 ps-2">
+                                <h6 class="fw-bold text-uppercase pb-1 border-bottom" style="color: var(--accent-gold); letter-spacing: 1px; font-size: 0.85rem;">
                                     ${escapeHTML(categoria.nombre)}
                                 </h6>
                             </div>
@@ -447,34 +441,32 @@
                             categoria.menus.forEach(item => {
                                 const timestamp = new Date().getTime();
                                 const imgUrl = item.imagen_url ? (item.imagen_url.startsWith('http') ? item.imagen_url : `{{ url('storage') }}/${item.imagen_url}?v=${timestamp}`) : 'https://placehold.co/300x200/faf6f0/c5a059?text=METRA';
-                                const itemPrice = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(item.precio || 0);
+                                const itemPrice = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(item.precio || 0) + ' MXN';
                                 
                                 menuContainer.innerHTML += `
-                                    <div class="col-12 mb-3">
-                                        <div class="d-flex align-items-center w-100 p-2 p-sm-3" 
-                                             style="cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); border-radius: 15px; background-color: #fdfaf5; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid rgba(212,175,55,0.05);" 
-                                             onmouseover="this.style.boxShadow='0 10px 25px rgba(0,0,0,0.08)'; this.style.transform='translateY(-2px)';" 
-                                             onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.03)'; this.style.transform='none';"
+                                    <div class="col-12 mb-3 ps-md-4 ps-2">
+                                        <div class="d-flex align-items-center w-100 p-2 p-md-3" 
+                                             style="cursor: pointer; transition: all 0.2s; border-radius: 12px; background-color: #FDFAF5 !important; box-shadow: 0 4px 12px rgba(0,0,0,0.02); border: none !important;" 
+                                             onmouseover="this.style.boxShadow='0 6px 16px rgba(0,0,0,0.04)'; this.style.transform='translateY(-1px)';" 
+                                             onmouseout="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.02)'; this.style.transform='none';"
                                              data-nombre="${escapeHTML(item.nombre_producto || '')}"
                                              data-desc="${escapeHTML(item.descripcion || '')}"
                                              data-precio="${itemPrice}"
                                              data-img="${imgUrl}"
                                              onclick="mostrarModalProducto(this)">
                                             
-                                            <div class="flex-shrink-0 me-3 me-sm-4" style="width: 75px; height: 75px; border-radius: 12px; overflow: hidden; background: #efece8; position: relative;">
-                                                <img src="${imgUrl}" alt="${escapeHTML(item.nombre_producto)}" class="w-100 h-100" style="object-fit: cover; display: block; filter: brightness(0.95);">
+                                            <div class="flex-shrink-0 me-2 me-md-3" style="width: 65px; height: 65px; border-radius: 12px; overflow: hidden; background: #efece8; position: relative;">
+                                                <img src="${imgUrl}" alt="${escapeHTML(item.nombre_producto)}" class="w-100 h-100" style="object-fit: cover; display: block; filter: brightness(0.98);">
                                                 <div style="position: absolute; inset: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05); border-radius: 12px; pointer-events: none;"></div>
                                             </div>
 
-                                            <div class="flex-grow-1 pe-2 pe-sm-3" style="min-width: 0;">
-                                                <h5 class="fw-bold mb-1" style="color: #3b2f2f; font-family: 'Montserrat', 'Poppins', sans-serif; letter-spacing: -0.3px; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(item.nombre_producto)}</h5>
-                                                <p class="text-muted mb-0" style="line-height: 1.4; font-size: 0.85rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: #8a817c !important;">${escapeHTML(item.descripcion || '')}</p>
+                                            <div class="flex-grow-1 pe-2" style="min-width: 0;">
+                                                <h6 class="fw-bold mb-1" style="color: var(--black-primary); font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.3px;">${escapeHTML(item.nombre_producto)}</h6>
+                                                <p class="text-muted mb-0" style="color: #92877E !important; line-height: 1.4; font-size: 0.85rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${escapeHTML(item.descripcion || '')}</p>
                                             </div>
 
-                                            <div class="flex-shrink-0 ms-auto text-end ps-2">
-                                                <div class="d-flex align-items-center justify-content-center px-3 py-1 px-sm-3 py-sm-2" style="background: rgba(212,175,55,0.08); border-radius: 50px; border: 1px solid rgba(212,175,55,0.15);">
-                                                    <span class="fw-bold" style="color: #b5927e; font-size: 0.95rem; font-family: 'Montserrat', 'Poppins', sans-serif; letter-spacing: -0.5px;">${itemPrice}</span>
-                                                </div>
+                                            <div class="flex-shrink-0 ms-auto text-end ps-2 align-self-center">
+                                                <span class="fw-bold px-3 py-1 rounded-pill" style="color: #A07D5A !important; font-size: 0.95rem; border: 1px solid #EBDDCA !important; background-color: #F7F1E5 !important; display: inline-block; white-space: nowrap;">${itemPrice}</span>
                                             </div>
 
                                         </div>
@@ -494,7 +486,7 @@
                         // Generar botones de filtro
                         const filtrosContainer = document.getElementById('menu-filtros-container');
                         menuOriginalData.forEach(cat => {
-                            filtrosContainer.innerHTML += `<button id="btn-menu-cat-${cat.id}" class="btn-filtro-boutique btn-filtro-menu" onclick="filtrarMenu(${cat.id})">${escapeHTML(cat.nombre)}</button>`;
+                            filtrosContainer.innerHTML += `<button id="btn-menu-cat-${cat.id}" class="btn btn-sm px-3 rounded-pill btn-filtro-menu btn-filtro-custom fw-medium text-nowrap" onclick="filtrarMenu(${cat.id})">${escapeHTML(cat.nombre)}</button>`;
                         });
 
                         renderizarContenidoMenu(menuOriginalData);
@@ -507,7 +499,6 @@
                     // Update active pill styling
                     document.querySelectorAll('.btn-filtro-ocasion').forEach(btn => {
                         btn.classList.remove('btn-admin-primary');
-                        btn.classList.add('btn-outline-secondary');
                     });
                     
                     const activeBtn = ocasionId === 'todas' 
@@ -515,7 +506,6 @@
                         : document.getElementById(`btn-ocasion-${ocasionId}`);
                         
                     if (activeBtn) {
-                        activeBtn.classList.remove('btn-outline-secondary');
                         activeBtn.classList.add('btn-admin-primary');
                     }
                     
@@ -530,7 +520,7 @@
                                 document.getElementById('ocasiones-filtros-container').classList.remove('d-none');
                                 const container = document.getElementById('ocasiones-filtros-container');
                                 ocasiones.forEach(o => {
-                                    container.innerHTML += `<button id="btn-ocasion-${o.id}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill btn-filtro-ocasion fw-medium" onclick="filtrarPromos(${o.id})">${escapeHTML(o.nombre)}</button>`;
+                                    container.innerHTML += `<button id="btn-ocasion-${o.id}" class="btn btn-sm px-3 rounded-pill btn-filtro-ocasion btn-filtro-custom fw-medium text-nowrap" onclick="filtrarPromos(${o.id})">${escapeHTML(o.nombre)}</button>`;
                                 });
                             }
                     } catch (e) {
