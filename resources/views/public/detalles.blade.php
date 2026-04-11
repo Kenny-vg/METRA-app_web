@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,40 +18,84 @@
         window.FILE_URL = "{{ url('/') }}";
     </script>
     <style>
-        body.zona-comensal { background-color: #FAF7F0 !important; }
-        .filtros-scroll::-webkit-scrollbar { display: none; }
-        .filtros-scroll { -ms-overflow-style: none; scrollbar-width: none; white-space: nowrap; }
+        body.zona-comensal {
+            background-color: #FAF7F0 !important;
+        }
+
+        .filtros-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filtros-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            white-space: nowrap;
+        }
+
         .btn-filtro-custom {
             background-color: transparent;
             color: var(--black-primary);
             border: 1px solid rgba(181, 146, 126, 0.4);
             transition: all 0.2s;
         }
+
         .btn-filtro-custom:hover {
             border-color: var(--accent-gold);
         }
+
         .btn-filtro-custom.btn-admin-primary {
             border-color: transparent !important;
             background-color: var(--black-primary) !important;
             color: #ffffff !important;
         }
+
+        .metra-pagination .page-link {
+            background-color: #FDFAF5 !important;
+            color: #8D6E63 !important;
+            border-color: rgba(213, 201, 199, 0.4) !important;
+            transition: all 0.2s;
+        }
+
+        .metra-pagination .page-link:hover {
+            background-color: #F7F1E5 !important;
+            color: var(--black-primary) !important;
+        }
+
+        .metra-pagination .page-item.active .page-link {
+            background-color: var(--black-primary) !important;
+            color: #ffffff !important;
+            border-color: var(--black-primary) !important;
+        }
+
+        .metra-pagination .page-item.disabled .page-link {
+            background-color: #f8f9fa !important;
+            color: #adb5bd !important;
+            border-color: #e9ecef !important;
+            cursor: not-allowed;
+        }
     </style>
 </head>
+
 <body class="zona-comensal">
 
-    <nav class="navbar navbar-expand-lg py-3 py-lg-4" style="background: rgba(248,249,250,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-light); position: sticky; top: 0; z-index: 1000;">
+    <nav class="navbar navbar-expand-lg py-3 py-lg-4"
+        style="background: rgba(248,249,250,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-light); position: sticky; top: 0; z-index: 1000;">
         <div class="container">
-            <a href="{{ url('/') }}" class="navbar-brand fw-bold fs-3 text-decoration-none" style="color: var(--black-primary); letter-spacing: -0.5px;">
+            <a href="{{ url('/') }}" class="navbar-brand fw-bold fs-3 text-decoration-none"
+                style="color: var(--black-primary); letter-spacing: -0.5px;">
                 <i class="bi bi-hexagon-fill me-2" style="color: var(--accent-gold); font-size: 1.2rem;"></i>METRA
             </a>
             <div class="ms-auto d-flex align-items-center gap-3">
-                <a href="{{ url('/') }}" class="nav-link nav-link-custom d-flex align-items-center gap-1" style="color: var(--text-muted); font-size: 0.9rem;">
+                <a href="{{ url('/') }}" class="nav-link nav-link-custom d-flex align-items-center gap-1"
+                    style="color: var(--text-muted); font-size: 0.9rem;">
                     <i class="bi bi-arrow-left-short fs-5"></i> Volver
                 </a>
-                <a href="{{ url('/login') }}" class="btn btn-outline-dark px-4 py-2" style="font-size: 0.9rem; border-radius: 6px;">
+                <a href="{{ url('/login') }}" class="btn btn-outline-dark px-4 py-2"
+                    style="font-size: 0.9rem; border-radius: 6px;">
                     Iniciar Sesión
                 </a>
-                <a href="#" id="btn-reservar-navbar" class="btn-metra-main px-4 py-2" style="font-size: 0.9rem; border-radius: 6px;">
+                <a href="#" id="btn-reservar-navbar" class="btn-metra-main px-4 py-2"
+                    style="font-size: 0.9rem; border-radius: 6px;">
                     Reservar mesa
                 </a>
             </div>
@@ -70,19 +115,23 @@
         <!-- HERO -->
         <section style="position: relative; height: 480px; overflow: hidden;">
             <img id="cafe-hero-img"
-                 src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&q=80&w=1600"
-                 alt="Cargando..."
-                 style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
-            <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.65) 100%);"></div>
+                src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&q=80&w=1600"
+                alt="Cargando..." style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+            <div
+                style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.65) 100%);">
+            </div>
             <div class="container position-absolute bottom-0 start-50 translate-middle-x w-100 pb-5">
                 <div class="text-white">
-                    <span style="display:inline-block; background: rgba(212,175,55,0.2); color: var(--accent-gold); font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 14px; border-radius: 50px; margin-bottom: 14px; border: 1px solid rgba(212,175,55,0.4);">
+                    <span
+                        style="display:inline-block; background: rgba(212,175,55,0.2); color: var(--accent-gold); font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 14px; border-radius: 50px; margin-bottom: 14px; border: 1px solid rgba(212,175,55,0.4);">
                         <i class="bi bi-cup-hot-fill me-1"></i>Con METRA activo
                     </span>
-                    <h1 class="fw-bold mb-2" id="cafe-nombre" style="font-size: clamp(2rem, 5vw, 3.5rem); letter-spacing: -0.5px; line-height: 1.15;">
+                    <h1 class="fw-bold mb-2" id="cafe-nombre"
+                        style="font-size: clamp(2rem, 5vw, 3.5rem); letter-spacing: -0.5px; line-height: 1.15;">
                         Cargando...
                     </h1>
-                    <p id="cafe-desc" style="color: rgba(255,255,255,0.75); font-size: 1.1rem; max-width: 560px; margin: 0;">
+                    <p id="cafe-desc"
+                        style="color: rgba(255,255,255,0.75); font-size: 1.1rem; max-width: 560px; margin: 0;">
                         Por favor espera.
                     </p>
                 </div>
@@ -96,7 +145,8 @@
                 <!-- Columna izquierda -->
                 <div class="col-12 col-lg-7">
 
-                    <div id="direccion-container" class="d-none align-items-center gap-2 mb-5" style="color: var(--text-muted);">
+                    <div id="direccion-container" class="d-none align-items-center gap-2 mb-5"
+                        style="color: var(--text-muted);">
                         <i class="bi bi-geo-alt-fill" style="color: var(--accent-gold);"></i>
                         <span id="cafe-direccion"></span>
                     </div>
@@ -104,19 +154,24 @@
                     <!-- PROMOCIONES -->
                     <section class="mb-5" id="sectionPromociones">
                         <div class="d-flex align-items-baseline justify-content-between mb-4">
-                            <h4 class="fw-bold mb-0" style="color: var(--black-primary); letter-spacing: -0.3px;">Promociones y Eventos</h4>
+                            <h4 class="fw-bold mb-0" style="color: var(--black-primary); letter-spacing: -0.3px;">
+                                Promociones y Eventos</h4>
                             <span class="small text-muted">Oportunidades especiales</span>
                         </div>
 
                         <!-- Filtros Ocasiones -->
-                        <div class="d-flex flex-nowrap overflow-auto gap-2 mb-4 pb-2 filtros-scroll d-none" id="ocasiones-filtros-container">
-                            <button class="btn btn-sm px-3 rounded-pill btn-admin-primary btn-filtro-ocasion btn-filtro-custom fw-medium text-nowrap" id="btn-todas-promos" onclick="filtrarPromos('todas')">Todas</button>
+                        <div class="d-flex flex-nowrap overflow-auto gap-2 mb-4 pb-2 filtros-scroll d-none"
+                            id="ocasiones-filtros-container">
+                            <button
+                                class="btn btn-sm px-3 rounded-pill btn-admin-primary btn-filtro-ocasion btn-filtro-custom fw-medium text-nowrap"
+                                id="btn-todas-promos" onclick="filtrarPromos('todas')">Todas</button>
                             <!-- Ocasiones cargadas por JS -->
                         </div>
 
                         <div class="row g-3" id="promos-publicas">
                             <div class="col-12 text-center text-muted py-3">
-                                <div class="spinner-border spinner-border-sm me-2" role="status"></div> Cargando promociones...
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div> Cargando
+                                promociones...
                             </div>
                         </div>
                     </section>
@@ -124,13 +179,17 @@
                     <!-- MENÚ DESTACADO -->
                     <section class="mb-5">
                         <div class="d-flex align-items-center justify-content-between mb-4">
-                            <h4 class="fw-bold mb-0" style="color: var(--black-primary); letter-spacing: -0.3px;">Menú</h4>
+                            <h4 class="fw-bold mb-0" style="color: var(--black-primary); letter-spacing: -0.3px;">Menú
+                            </h4>
                             <span class="small text-muted">Explora nuestra oferta</span>
                         </div>
-                        
+
                         <!-- Filtros de Menú -->
-                        <div id="menu-filtros-container" class="d-flex flex-nowrap overflow-auto gap-2 mb-4 pb-2 filtros-scroll">
-                            <button class="btn btn-sm px-3 rounded-pill btn-admin-primary btn-filtro-menu btn-filtro-custom fw-medium text-nowrap" id="btn-todas-menu" onclick="filtrarMenu('todas')">Todas</button>
+                        <div id="menu-filtros-container"
+                            class="d-flex flex-nowrap overflow-auto gap-2 mb-4 pb-2 filtros-scroll">
+                            <button
+                                class="btn btn-sm px-3 rounded-pill btn-admin-primary btn-filtro-menu btn-filtro-custom fw-medium text-nowrap"
+                                id="btn-todas-menu" onclick="filtrarMenu('todas')">Todas</button>
                             <!-- Categorías cargadas por JS -->
                         </div>
 
@@ -144,10 +203,12 @@
                     <!-- IMAGEN PRINCIPAL DEL NEGOCIO -->
                     <section class="mb-5">
                         <div class="d-flex align-items-baseline justify-content-between mb-4">
-                            <h4 class="fw-bold mb-0" style="color: var(--black-primary); letter-spacing: -0.3px;">El espacio</h4>
+                            <h4 class="fw-bold mb-0" style="color: var(--black-primary); letter-spacing: -0.3px;">El
+                                espacio</h4>
                         </div>
                         <div id="foto-secundaria-container">
-                            <div class="rounded-4 d-flex align-items-center justify-content-center" style="height: 280px; background: var(--off-white); border: 1px dashed var(--border-light);">
+                            <div class="rounded-4 d-flex align-items-center justify-content-center"
+                                style="height: 280px; background: var(--off-white); border: 1px dashed var(--border-light);">
                                 <div class="text-center text-muted">
                                     <i class="bi bi-image display-4 d-block mb-2" style="opacity: 0.3;"></i>
                                     <small>El gerente aún no ha subido imagen del negocio.</small>
@@ -155,15 +216,17 @@
                             </div>
                         </div>
                     </section>
-                    
+
                     <!-- RESEÑAS -->
                     <section class="mb-5" id="sectionResenas">
                         <div class="d-flex align-items-baseline justify-content-between mb-4">
-                            <h4 class="fw-bold mb-0" style="color: var(--black-primary); letter-spacing: -0.3px;">Lo que dicen nuestros clientes</h4>
+                            <h4 class="fw-bold mb-0" style="color: var(--black-primary); letter-spacing: -0.3px;">Lo que
+                                dicen nuestros clientes</h4>
                         </div>
                         <div class="row g-3" id="resenas-container">
                             <div class="col-12 text-center text-muted py-3">
-                                <div class="spinner-border spinner-border-sm me-2" role="status"></div> Cargando reseñas...
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div> Cargando
+                                reseñas...
                             </div>
                         </div>
                     </section>
@@ -172,17 +235,22 @@
                 <!-- Sidebar reserva -->
                 <div class="col-12 col-lg-5">
                     <div class="sticky-top" style="top: 100px;">
-                        <div class="bg-white rounded-4 shadow p-4 p-lg-5 border" style="border-color: var(--border-light) !important;">
+                        <div class="bg-white rounded-4 shadow p-4 p-lg-5 border"
+                            style="border-color: var(--border-light) !important;">
 
                             <div class="text-center mb-4">
-                                <span style="display:inline-block; background: rgba(212,175,55,0.1); color: var(--accent-gold); font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 5px 14px; border-radius: 50px; border: 1px solid rgba(212,175,55,0.3);">
+                                <span
+                                    style="display:inline-block; background: rgba(212,175,55,0.1); color: var(--accent-gold); font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 5px 14px; border-radius: 50px; border: 1px solid rgba(212,175,55,0.3);">
                                     Sistema de Reservas METRA
                                 </span>
-                                <h4 class="fw-bold mt-3 mb-1" style="color: var(--black-primary);">Hacer una reservación</h4>
+                                <h4 class="fw-bold mt-3 mb-1" style="color: var(--black-primary);">Hacer una reservación
+                                </h4>
                                 <p class="text-muted small mb-0">Elige tu horario y asegura tu lugar.</p>
                             </div>
 
-                            <a href="{{ url('/reservar') }}" id="btn-reservar-lateral" class="btn-metra-main w-100 d-flex align-items-center justify-content-center py-3 mb-4" style="border-radius: 12px; font-size: 1rem;">
+                            <a href="{{ url('/reservar') }}" id="btn-reservar-lateral"
+                                class="btn-metra-main w-100 d-flex align-items-center justify-content-center py-3 mb-4"
+                                style="border-radius: 12px; font-size: 1rem;">
                                 <i class="bi bi-calendar3 me-2"></i>Continuar con la reserva
                             </a>
 
@@ -190,71 +258,88 @@
 
                             <!-- Info rápida -->
                             <div class="d-flex flex-column gap-3 my-3">
-                                
+
                                 <div id="sidebar-direccion" class="d-none align-items-center gap-3">
-                                    <div style="width: 36px; height: 36px; background: var(--off-white); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <div
+                                        style="width: 36px; height: 36px; background: var(--off-white); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                         <i class="bi bi-geo-alt-fill" style="color: var(--accent-gold);"></i>
                                     </div>
                                     <div>
                                         <p class="mb-0 fw-bold small">Ubicación</p>
-                                        <p class="mb-0 text-muted" id="sidebar-direccion-texto" style="font-size: 0.8rem;"></p>
+                                        <p class="mb-0 text-muted" id="sidebar-direccion-texto"
+                                            style="font-size: 0.8rem;"></p>
                                     </div>
                                 </div>
-                                
+
                                 <div id="sidebar-telefono" class="d-none align-items-center gap-3">
-                                    <div style="width: 36px; height: 36px; background: var(--off-white); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <div
+                                        style="width: 36px; height: 36px; background: var(--off-white); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                         <i class="bi bi-telephone-fill" style="color: var(--accent-gold);"></i>
                                     </div>
                                     <div>
                                         <p class="mb-0 fw-bold small">Teléfono de atención</p>
-                                        <p class="mb-0 text-muted" id="sidebar-telefono-texto" style="font-size: 0.8rem;"></p>
+                                        <p class="mb-0 text-muted" id="sidebar-telefono-texto"
+                                            style="font-size: 0.8rem;"></p>
                                     </div>
                                 </div>
 
                                 <div class="d-flex align-items-center gap-3">
-                                    <div style="width: 36px; height: 36px; background: var(--off-white); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <div
+                                        style="width: 36px; height: 36px; background: var(--off-white); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                         <i class="bi bi-clock-fill" style="color: var(--accent-gold);"></i>
                                     </div>
                                     <div>
                                         <p class="mb-0 fw-bold small">Tolerancia de llegada</p>
-                                        <p class="mb-0 text-muted" id="sidebar-tolerancia-texto" style="font-size: 0.8rem;">15 minutos después del horario reservado.</p>
+                                        <p class="mb-0 text-muted" id="sidebar-tolerancia-texto"
+                                            style="font-size: 0.8rem;">15 minutos después del horario reservado.</p>
                                     </div>
                                 </div>
 
                                 {{-- Horario de hoy: se muestra si la cafetería tiene horario activo para este día --}}
                                 <div id="sidebar-horario-hoy-container" class="d-none align-items-center gap-3">
-                                    <div style="width: 36px; height: 36px; background: var(--off-white); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <div
+                                        style="width: 36px; height: 36px; background: var(--off-white); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                         <i class="bi bi-door-open-fill" style="color: var(--accent-gold);"></i>
                                     </div>
                                     <div>
                                         <p class="mb-0 fw-bold small">Horario de hoy</p>
-                                        <p class="mb-0 text-muted" id="sidebar-horario-hoy-texto" style="font-size: 0.8rem;"></p>
+                                        <p class="mb-0 text-muted" id="sidebar-horario-hoy-texto"
+                                            style="font-size: 0.8rem;"></p>
                                     </div>
                                 </div>
 
                                 <div class="d-flex align-items-center gap-3">
-                                    <div style="width: 36px; height: 36px; background: var(--off-white); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <div
+                                        style="width: 36px; height: 36px; background: var(--off-white); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                         <i class="bi bi-envelope-fill" style="color: var(--accent-gold);"></i>
                                     </div>
                                     <div>
                                         <p class="mb-0 fw-bold small">Confirmación</p>
-                                        <p class="mb-0 text-muted" style="font-size: 0.8rem;">Recibirás la confirmación al correo registrado.</p>
+                                        <p class="mb-0 text-muted" style="font-size: 0.8rem;">Recibirás la confirmación
+                                            al correo registrado.</p>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Disponibilidad de horarios -->
                             <hr style="opacity: 0.08;">
-                            <p class="small fw-bold text-uppercase mb-3" style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.72rem;">Horarios de atención</p>
+                            <p class="small fw-bold text-uppercase mb-3"
+                                style="color: var(--text-muted); letter-spacing: 1px; font-size: 0.72rem;">Horarios de
+                                atención</p>
                             <div id="horarios-slots-container" class="d-flex flex-wrap gap-2 mb-4">
                                 {{-- Slots cargados dinámicamente por JS desde la API --}}
-                                <span class="badge rounded-pill px-3 py-2" style="background: var(--off-white); color: var(--text-muted); border: 1px solid var(--border-light); font-size: 0.8rem;">
-                                    <span class="spinner-border spinner-border-sm me-1" style="width:.75rem;height:.75rem;"></span>Cargando...
+                                <span class="badge rounded-pill px-3 py-2"
+                                    style="background: var(--off-white); color: var(--text-muted); border: 1px solid var(--border-light); font-size: 0.8rem;">
+                                    <span class="spinner-border spinner-border-sm me-1"
+                                        style="width:.75rem;height:.75rem;"></span>Cargando...
                                 </span>
                             </div>
-                            <small class="text-muted" style="font-size: 0.75rem;"><i class="bi bi-info-circle me-1"></i>Disponibilidad sujeta a cambios. Confirma al reservar.</small>
+                            <small class="text-muted" style="font-size: 0.75rem;"><i
+                                    class="bi bi-info-circle me-1"></i>Disponibilidad sujeta a cambios. Confirma al
+                                reservar.</small>
 
-                            <div class="mt-4 p-3 rounded-3" style="background: var(--off-white); border: 1px solid var(--border-light);">
+                            <div class="mt-4 p-3 rounded-3"
+                                style="background: var(--off-white); border: 1px solid var(--border-light);">
                                 <p class="small mb-0" style="color: var(--text-muted);">
                                     <i class="bi bi-shield-check-fill me-2" style="color: var(--accent-gold);"></i>
                                     Las reservaciones son gestionadas por el staff del negocio vía METRA.
@@ -271,22 +356,31 @@
     <!-- Modal Detalles de Producto -->
     <div class="modal fade" id="modalProductoDetalle" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" style="max-width: 550px;">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden; background-color: #fcfbfa;">
-                <div class="modal-header border-0 pb-0 position-absolute w-100 p-3" style="z-index: 10; display: flex; justify-content: flex-end;">
-                    <button type="button" class="btn-close bg-white rounded-circle shadow p-2" style="opacity: 0.9;" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content border-0 shadow-lg"
+                style="border-radius: 20px; overflow: hidden; background-color: #fcfbfa;">
+                <div class="modal-header border-0 pb-0 position-absolute w-100 p-3"
+                    style="z-index: 10; display: flex; justify-content: flex-end;">
+                    <button type="button" class="btn-close bg-white rounded-circle shadow p-2" style="opacity: 0.9;"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-0">
                     <div style="height: 280px; position: relative; background: #efece8;">
                         <img id="modalProductoImg" src="" alt="Producto" class="w-100 h-100" style="object-fit: cover;">
                     </div>
-                    
-                    <div class="p-4 p-md-5 bg-white position-relative" style="border-top-left-radius: 30px; border-top-right-radius: 30px; margin-top: -30px;">
+
+                    <div class="p-4 p-md-5 bg-white position-relative"
+                        style="border-top-left-radius: 30px; border-top-right-radius: 30px; margin-top: -30px;">
                         <div class="d-flex justify-content-between align-items-start mb-4">
-                            <h4 id="modalProductoNombre" class="fw-bold mb-0 pe-3" style="color: var(--black-primary); line-height: 1.2;"></h4>
-                            <span id="modalProductoPrecio" class="fw-bold fs-4 text-nowrap" style="color: var(--accent-gold);"></span>
+                            <h4 id="modalProductoNombre" class="fw-bold mb-0 pe-3"
+                                style="color: var(--black-primary); line-height: 1.2;"></h4>
+                            <span id="modalProductoPrecio" class="fw-bold fs-4 text-nowrap"
+                                style="color: var(--accent-gold);"></span>
                         </div>
-                        <div style="width: 50px; height: 2px; background-color: rgba(212,175,55,0.4); margin-bottom: 20px;"></div>
-                        <p id="modalProductoDesc" class="text-muted" style="line-height: 1.6; font-size: 0.95rem; margin-bottom: 0; white-space: pre-line;"></p>
+                        <div
+                            style="width: 50px; height: 2px; background-color: rgba(212,175,55,0.4); margin-bottom: 20px;">
+                        </div>
+                        <p id="modalProductoDesc" class="text-muted"
+                            style="line-height: 1.6; font-size: 0.95rem; margin-bottom: 0; white-space: pre-line;"></p>
                     </div>
                 </div>
             </div>
@@ -294,16 +388,16 @@
     </div>
 
     @include('partials.footer')
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/metra-utils.js"></script>
     <script>
-        window.escapeHTML = function(str) {
+        window.escapeHTML = function (str) {
             if (str === null || str === undefined) return '';
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         };
 
-        window.mostrarModalProducto = function(element) {
+        window.mostrarModalProducto = function (element) {
             const nombre = element.getAttribute('data-nombre') || '';
             const desc = element.getAttribute('data-desc') || '';
             const precio = element.getAttribute('data-precio') || '';
@@ -313,7 +407,7 @@
             document.getElementById('modalProductoDesc').textContent = desc;
             document.getElementById('modalProductoPrecio').textContent = precio;
             document.getElementById('modalProductoImg').src = imgUrl;
-            
+
             const modalEl = document.getElementById('modalProductoDetalle');
             const m = new bootstrap.Modal(modalEl);
             m.show();
@@ -333,14 +427,14 @@
                 // Bind text elements
                 document.getElementById('cafe-nombre').textContent = cafe.nombre || 'Cafetería';
                 document.getElementById('cafe-desc').textContent = cafe.descripcion || 'Un espacio diseñado para que disfrutes cada momento.';
-                
+
                 // Bind Address
                 if (cafe.calle) {
                     const addrHtml = `${cafe.calle}${cafe.num_exterior ? ' ' + cafe.num_exterior : ''}${cafe.colonia ? ', ' + cafe.colonia : ''}`;
                     document.getElementById('cafe-direccion').textContent = addrHtml;
                     document.getElementById('direccion-container').classList.remove('d-none');
                     document.getElementById('direccion-container').classList.add('d-flex');
-                    
+
                     document.getElementById('sidebar-direccion-texto').textContent = addrHtml;
                     document.getElementById('sidebar-direccion').classList.remove('d-none');
                     document.getElementById('sidebar-direccion').classList.add('d-flex');
@@ -361,7 +455,7 @@
                 // Bind image with cache busting if exists
                 let finalImgUrl = FALLBACK_IMG;
                 let timestamp = new Date().getTime(); // simple cache buster
-                
+
                 if (cafe.foto_url) {
                     finalImgUrl = cafe.foto_url.startsWith('http') ? cafe.foto_url : `/storage/${cafe.foto_url}?v=${timestamp}`;
                     document.getElementById('foto-secundaria-container').innerHTML = `
@@ -395,120 +489,199 @@
                 document.getElementById('loader-screen').classList.add('d-none');
                 document.getElementById('cafe-content').classList.remove('d-none');
 
-                // --- Load Menu ---
+                // --- Load Menu (Paginado Local JS) ---
                 let menuOriginalData = [];
-                window.filtrarMenu = function(categoriaId) {
+                let currentFlatMenu = [];
+                let currentPage = 1;
+                const itemsPerPage = 8;
+
+                function flattenCategorias(categorias) {
+                    let flatted = [];
+                    categorias.forEach(cat => {
+                        if (cat.menus && cat.menus.length > 0) {
+                            cat.menus.forEach(item => {
+                                flatted.push({
+                                    categoria_nombre: cat.nombre,
+                                    ...item
+                                });
+                            });
+                        }
+                    });
+                    return flatted;
+                }
+
+                window.filtrarMenu = function (categoriaId) {
                     // Update active pill styling
                     document.querySelectorAll('.btn-filtro-menu').forEach(btn => {
                         btn.classList.remove('btn-admin-primary');
                     });
-                    
-                    const activeBtn = categoriaId === 'todas' 
-                        ? document.getElementById('btn-todas-menu') 
+
+                    const activeBtn = categoriaId === 'todas'
+                        ? document.getElementById('btn-todas-menu')
                         : document.getElementById(`btn-menu-cat-${categoriaId}`);
-                        
+
                     if (activeBtn) {
                         activeBtn.classList.add('btn-admin-primary');
                     }
-                    
+
+                    currentPage = 1; // Reseteamos paginacion al filtrar
+
                     if (categoriaId === 'todas') {
-                        renderizarContenidoMenu(menuOriginalData);
+                        currentFlatMenu = flattenCategorias(menuOriginalData);
                     } else {
                         const filtrada = menuOriginalData.filter(c => c.id == categoriaId);
-                        renderizarContenidoMenu(filtrada);
+                        currentFlatMenu = flattenCategorias(filtrada);
                     }
+
+                    renderizarPagina();
                 };
 
-                function renderizarContenidoMenu(categorias) {
+                window.cambiarPagina = function (newPage) {
+                    const totalPages = Math.ceil(currentFlatMenu.length / itemsPerPage);
+                    if (newPage < 1 || newPage > totalPages) return;
+                    currentPage = newPage;
+                    renderizarPagina();
+
+                    // Smooth scroll hacia arriba del listado
+                    const anchor = document.getElementById('menu-filtros-container');
+                    if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                };
+
+                function renderizarPagina() {
                     const menuContainer = document.getElementById('menu-publico-container');
                     menuContainer.innerHTML = '';
-                    
-                    if(categorias.length === 0) {
-                        menuContainer.innerHTML = '<div class="col-12 text-center py-4 text-muted small"><i class="bi bi-basket opacity-50 d-block fs-2 mb-2"></i>No hay productos disponibles.</div>';
+
+                    if (currentFlatMenu.length === 0) {
+                        menuContainer.innerHTML = '<div class="col-12 text-center py-4 text-muted small"><i class="bi bi-basket opacity-50 d-block fs-2 mb-2"></i>No hay productos disponibles en esta categoría.</div>';
                         return;
                     }
 
-                    categorias.forEach(categoria => {
+                    // Calculamos el chunk de 8 elementos
+                    const totalPages = Math.ceil(currentFlatMenu.length / itemsPerPage);
+                    const startObj = (currentPage - 1) * itemsPerPage;
+                    const paginatedItems = currentFlatMenu.slice(startObj, startObj + itemsPerPage);
+
+                    let lastCatPrinted = null;
+
+                    paginatedItems.forEach(item => {
+                        // Imprimir el titulo de la categoría solo cuando cambie en la lista aplanada
+                        if (item.categoria_nombre !== lastCatPrinted) {
+                            menuContainer.innerHTML += `
+                                <div class="col-12 mt-4 mb-2 ps-md-4 ps-2">
+                                    <h6 class="fw-bold text-uppercase pb-1 border-bottom" style="color: var(--accent-gold); letter-spacing: 1px; font-size: 0.85rem;">
+                                        ${escapeHTML(item.categoria_nombre)}
+                                    </h6>
+                                </div>
+                            `;
+                            lastCatPrinted = item.categoria_nombre;
+                        }
+
+                        const timestamp = new Date().getTime();
+                        const imgUrl = item.imagen_url ? (item.imagen_url.startsWith('http') ? item.imagen_url : `{{ url('storage') }}/${item.imagen_url}?v=${timestamp}`) : 'https://placehold.co/300x200/faf6f0/c5a059?text=METRA';
+                        const itemPrice = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(item.precio || 0) + ' MXN';
+
                         menuContainer.innerHTML += `
-                            <div class="col-12 mt-4 mb-2 ps-md-4 ps-2">
-                                <h6 class="fw-bold text-uppercase pb-1 border-bottom" style="color: var(--accent-gold); letter-spacing: 1px; font-size: 0.85rem;">
-                                    ${escapeHTML(categoria.nombre)}
-                                </h6>
+                            <div class="col-12 mb-3 ps-md-4 ps-2">
+                                <div class="d-flex align-items-center w-100 p-2 p-md-3" 
+                                     style="cursor: pointer; transition: all 0.2s; border-radius: 12px; background-color: #FDFAF5 !important; box-shadow: 0 4px 12px rgba(0,0,0,0.02); border: none !important;" 
+                                     onmouseover="this.style.boxShadow='0 6px 16px rgba(0,0,0,0.04)'; this.style.transform='translateY(-1px)';" 
+                                     onmouseout="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.02)'; this.style.transform='none';"
+                                     data-nombre="${escapeHTML(item.nombre_producto || '')}"
+                                     data-desc="${escapeHTML(item.descripcion || '')}"
+                                     data-precio="${itemPrice}"
+                                     data-img="${imgUrl}"
+                                     onclick="mostrarModalProducto(this)">
+                                    
+                                    <div class="flex-shrink-0 me-2 me-md-3" style="width: 65px; height: 65px; border-radius: 12px; overflow: hidden; background: #efece8; position: relative;">
+                                        <img src="${imgUrl}" alt="${escapeHTML(item.nombre_producto)}" class="w-100 h-100" style="object-fit: cover; display: block; filter: brightness(0.98);">
+                                        <div style="position: absolute; inset: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05); border-radius: 12px; pointer-events: none;"></div>
+                                    </div>
+
+                                    <div class="flex-grow-1 pe-2" style="min-width: 0;">
+                                        <h6 class="fw-bold mb-1" style="color: var(--black-primary); font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.3px;">${escapeHTML(item.nombre_producto)}</h6>
+                                        <p class="text-muted mb-0" style="color: #92877E !important; line-height: 1.4; font-size: 0.85rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${escapeHTML(item.descripcion || '')}</p>
+                                    </div>
+
+                                    <div class="flex-shrink-0 ms-auto text-end ps-2 align-self-center">
+                                        <span class="fw-bold px-3 py-1 rounded-pill" style="color: #A07D5A !important; font-size: 0.95rem; border: 1px solid #EBDDCA !important; background-color: #F7F1E5 !important; display: inline-block; white-space: nowrap;">${itemPrice}</span>
+                                    </div>
+
+                                </div>
                             </div>
                         `;
-
-                        if (categoria.menus && categoria.menus.length > 0) {
-                            categoria.menus.forEach(item => {
-                                const timestamp = new Date().getTime();
-                                const imgUrl = item.imagen_url ? (item.imagen_url.startsWith('http') ? item.imagen_url : `{{ url('storage') }}/${item.imagen_url}?v=${timestamp}`) : 'https://placehold.co/300x200/faf6f0/c5a059?text=METRA';
-                                const itemPrice = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(item.precio || 0) + ' MXN';
-                                
-                                menuContainer.innerHTML += `
-                                    <div class="col-12 mb-3 ps-md-4 ps-2">
-                                        <div class="d-flex align-items-center w-100 p-2 p-md-3" 
-                                             style="cursor: pointer; transition: all 0.2s; border-radius: 12px; background-color: #FDFAF5 !important; box-shadow: 0 4px 12px rgba(0,0,0,0.02); border: none !important;" 
-                                             onmouseover="this.style.boxShadow='0 6px 16px rgba(0,0,0,0.04)'; this.style.transform='translateY(-1px)';" 
-                                             onmouseout="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.02)'; this.style.transform='none';"
-                                             data-nombre="${escapeHTML(item.nombre_producto || '')}"
-                                             data-desc="${escapeHTML(item.descripcion || '')}"
-                                             data-precio="${itemPrice}"
-                                             data-img="${imgUrl}"
-                                             onclick="mostrarModalProducto(this)">
-                                            
-                                            <div class="flex-shrink-0 me-2 me-md-3" style="width: 65px; height: 65px; border-radius: 12px; overflow: hidden; background: #efece8; position: relative;">
-                                                <img src="${imgUrl}" alt="${escapeHTML(item.nombre_producto)}" class="w-100 h-100" style="object-fit: cover; display: block; filter: brightness(0.98);">
-                                                <div style="position: absolute; inset: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05); border-radius: 12px; pointer-events: none;"></div>
-                                            </div>
-
-                                            <div class="flex-grow-1 pe-2" style="min-width: 0;">
-                                                <h6 class="fw-bold mb-1" style="color: var(--black-primary); font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.3px;">${escapeHTML(item.nombre_producto)}</h6>
-                                                <p class="text-muted mb-0" style="color: #92877E !important; line-height: 1.4; font-size: 0.85rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${escapeHTML(item.descripcion || '')}</p>
-                                            </div>
-
-                                            <div class="flex-shrink-0 ms-auto text-end ps-2 align-self-center">
-                                                <span class="fw-bold px-3 py-1 rounded-pill" style="color: #A07D5A !important; font-size: 0.95rem; border: 1px solid #EBDDCA !important; background-color: #F7F1E5 !important; display: inline-block; white-space: nowrap;">${itemPrice}</span>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                `;
-                            });
-                        } else {
-                            menuContainer.innerHTML += '<div class="col-12"><p class="text-muted small ps-2">No hay productos en esta categoría.</p></div>';
-                        }
                     });
+
+                    // Inyectar Botones de Paginación si hay más de 1 página
+                    if (totalPages > 1) {
+                        let pagHtml = `<div class="col-12 mt-4 d-flex justify-content-center"><ul class="pagination metra-pagination gap-1">`;
+
+                        // Botón Anterior
+                        pagHtml += `
+                            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                                <button class="page-link shadow-sm rounded-circle px-3 py-2 fw-bold" onclick="cambiarPagina(${currentPage - 1})">
+                                    <i class="bi bi-chevron-left"></i>
+                                </button>
+                            </li>
+                        `;
+
+                        // Botones Numericos
+                        let startPage = Math.max(1, currentPage - 2);
+                        let endPage = Math.min(totalPages, currentPage + 2);
+                        if (currentPage <= 3) endPage = Math.min(totalPages, 5);
+                        if (currentPage >= totalPages - 2) startPage = Math.max(1, totalPages - 4);
+
+                        for (let i = startPage; i <= endPage; i++) {
+                            pagHtml += `
+                                <li class="page-item ${i === currentPage ? 'active' : ''}">
+                                    <button class="page-link shadow-sm rounded-circle px-3 py-2 fw-bold" onclick="cambiarPagina(${i})">${i}</button>
+                                </li>
+                            `;
+                        }
+
+                        // Botón Siguiente
+                        pagHtml += `
+                            <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                                <button class="page-link shadow-sm rounded-circle px-3 py-2 fw-bold" onclick="cambiarPagina(${currentPage + 1})">
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
+                            </li>
+                        `;
+
+                        pagHtml += `</ul></div>`;
+                        menuContainer.innerHTML += pagHtml;
+                    }
                 }
 
                 try {
                     const jsonMenu = await MetraAPI.get(`/cafeterias/${cafe.slug}/menu`);
                     menuOriginalData = jsonMenu.data || [];
-                        
-                        // Generar botones de filtro
-                        const filtrosContainer = document.getElementById('menu-filtros-container');
-                        menuOriginalData.forEach(cat => {
-                            filtrosContainer.innerHTML += `<button id="btn-menu-cat-${cat.id}" class="btn btn-sm px-3 rounded-pill btn-filtro-menu btn-filtro-custom fw-medium text-nowrap" onclick="filtrarMenu(${cat.id})">${escapeHTML(cat.nombre)}</button>`;
-                        });
 
-                        renderizarContenidoMenu(menuOriginalData);
+                    // Generar botones de filtro
+                    const filtrosContainer = document.getElementById('menu-filtros-container');
+                    menuOriginalData.forEach(cat => {
+                        filtrosContainer.innerHTML += `<button id="btn-menu-cat-${cat.id}" class="btn btn-sm px-3 rounded-pill btn-filtro-menu btn-filtro-custom fw-medium text-nowrap" onclick="filtrarMenu(${cat.id})">${escapeHTML(cat.nombre)}</button>`;
+                    });
+
+                    filtrarMenu('todas');
                 } catch (e) {
                     console.error("Error loading menu", e);
                 }
 
                 // --- Load Promociones y Ocasiones ---
-                window.filtrarPromos = function(ocasionId) {
+                window.filtrarPromos = function (ocasionId) {
                     // Update active pill styling
                     document.querySelectorAll('.btn-filtro-ocasion').forEach(btn => {
                         btn.classList.remove('btn-admin-primary');
                     });
-                    
-                    const activeBtn = ocasionId === 'todas' 
-                        ? document.getElementById('btn-todas-promos') 
+
+                    const activeBtn = ocasionId === 'todas'
+                        ? document.getElementById('btn-todas-promos')
                         : document.getElementById(`btn-ocasion-${ocasionId}`);
-                        
+
                     if (activeBtn) {
                         activeBtn.classList.add('btn-admin-primary');
                     }
-                    
+
                     cargarPromociones(ocasionId === 'todas' ? null : ocasionId);
                 };
 
@@ -516,15 +689,15 @@
                     try {
                         const data = await MetraAPI.get(`/cafeterias/${cafe.slug}/ocasiones`);
                         const ocasiones = data.data || [];
-                            if (ocasiones.length > 0) {
-                                document.getElementById('ocasiones-filtros-container').classList.remove('d-none');
-                                const container = document.getElementById('ocasiones-filtros-container');
-                                ocasiones.forEach(o => {
-                                    container.innerHTML += `<button id="btn-ocasion-${o.id}" class="btn btn-sm px-3 rounded-pill btn-filtro-ocasion btn-filtro-custom fw-medium text-nowrap" onclick="filtrarPromos(${o.id})">${escapeHTML(o.nombre)}</button>`;
-                                });
-                            }
+                        if (ocasiones.length > 0) {
+                            document.getElementById('ocasiones-filtros-container').classList.remove('d-none');
+                            const container = document.getElementById('ocasiones-filtros-container');
+                            ocasiones.forEach(o => {
+                                container.innerHTML += `<button id="btn-ocasion-${o.id}" class="btn btn-sm px-3 rounded-pill btn-filtro-ocasion btn-filtro-custom fw-medium text-nowrap" onclick="filtrarPromos(${o.id})">${escapeHTML(o.nombre)}</button>`;
+                            });
+                        }
                     } catch (e) {
-                         console.error("Error loading ocasiones", e);
+                        console.error("Error loading ocasiones", e);
                     }
                 }
 
@@ -532,24 +705,24 @@
                     const promosContainer = document.getElementById('promos-publicas');
                     try {
                         promosContainer.innerHTML = '<div class="col-12 text-center text-muted py-3"><div class="spinner-border spinner-border-sm me-2"></div> Cargando...</div>';
-                        
-                        const url = ocasionId 
+
+                        const url = ocasionId
                             ? `/cafeterias/${cafe.slug}/ocasiones/${ocasionId}/promociones`
                             : `/cafeterias/${cafe.slug}/promociones`;
-                            
+
                         const jsonPromos = await MetraAPI.get(url);
                         const promosData = jsonPromos.data || [];
-                            promosContainer.innerHTML = '';
-                            
-                            if(promosData.length === 0 && !ocasionId) {
-                                document.getElementById('sectionPromociones').classList.add('d-none');
-                            } else if (promosData.length === 0) {
-                                promosContainer.innerHTML = '<div class="col-12 text-center text-muted py-4"><i class="bi bi-tag d-block fs-3 mb-2 opacity-50"></i>No hay promociones publicadas para esta ocasión.</div>';
-                            } else {
-                                document.getElementById('sectionPromociones').classList.remove('d-none');
-                                promosData.forEach(p => {
-                                    const formattedPrice = parseFloat(p.precio) === 0 ? 'Incluido sin costo' : new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(p.precio);
-                                    promosContainer.innerHTML += `
+                        promosContainer.innerHTML = '';
+
+                        if (promosData.length === 0 && !ocasionId) {
+                            document.getElementById('sectionPromociones').classList.add('d-none');
+                        } else if (promosData.length === 0) {
+                            promosContainer.innerHTML = '<div class="col-12 text-center text-muted py-4"><i class="bi bi-tag d-block fs-3 mb-2 opacity-50"></i>No hay promociones publicadas para esta ocasión.</div>';
+                        } else {
+                            document.getElementById('sectionPromociones').classList.remove('d-none');
+                            promosData.forEach(p => {
+                                const formattedPrice = parseFloat(p.precio) === 0 ? 'Incluido sin costo' : new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(p.precio);
+                                promosContainer.innerHTML += `
                                         <div class="col-12 col-sm-6">
                                             <div class="p-4 rounded-4 h-100 d-flex flex-column shadow-sm" style="background: var(--off-white); border: 1px solid rgba(212,175,55,0.3); position: relative; overflow: hidden;">
                                                 <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent-gold);"></div>
@@ -566,36 +739,36 @@
                                             </div>
                                         </div>
                                     `;
-                                });
-                            }
+                            });
+                        }
                     } catch (e) {
-                         console.error("Error loading promotions", e);
-                         promosContainer.innerHTML = '<div class="col-12 text-danger text-center"><small>No se pudieron cargar las promociones.</small></div>';
+                        console.error("Error loading promotions", e);
+                        promosContainer.innerHTML = '<div class="col-12 text-danger text-center"><small>No se pudieron cargar las promociones.</small></div>';
                     }
                 }
 
                 cargarOcasionesFiltros();
                 cargarPromociones();
-                
+
                 // --- Load Reseñas ---
                 try {
                     const jsonResenas = await MetraAPI.get(`/cafeterias/${cafe.slug}/resenas`);
                     const resenasList = jsonResenas.data || [];
                     const resenasContainer = document.getElementById('resenas-container');
                     const sectionResenas = document.getElementById('sectionResenas');
-                        
+
                     resenasContainer.innerHTML = '';
-                    if(resenasList.length > 0) {
+                    if (resenasList.length > 0) {
                         resenasList.forEach(r => {
                             let starsHtml = '';
-                            for(let i=1; i<=5; i++){
-                                if(i <= r.calificacion){
+                            for (let i = 1; i <= 5; i++) {
+                                if (i <= r.calificacion) {
                                     starsHtml += `<i class="bi bi-star-fill text-warning me-1"></i>`;
                                 } else {
                                     starsHtml += `<i class="bi bi-star text-muted me-1" style="opacity:0.3;"></i>`;
                                 }
                             }
-                            
+
                             resenasContainer.innerHTML += `
                                 <div class="col-12 col-md-6 mb-3">
                                     <div class="p-4 rounded-4 shadow-sm h-100" style="background: var(--off-white); border: 1px solid var(--border-light);">
@@ -625,47 +798,47 @@
                     const jsonHorarios = await MetraAPI.get(`/cafeterias/${cafe.slug}/horarios`);
                     const horariosList = (jsonHorarios.data || []).filter(h => h.activo !== false && h.activo !== 0);
 
-                        if (horariosList.length > 0) {
-                            const fmt24 = t => t ? t.substring(0, 5) : '--:--';
+                    if (horariosList.length > 0) {
+                        const fmt24 = t => t ? t.substring(0, 5) : '--:--';
 
-                            // 1. Horario de hoy en el sidebar
-                            const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
-                            const hoyNombre = diasSemana[new Date().getDay()];
-                            const horarioHoy = horariosList.find(h => h.dia_semana === hoyNombre);
+                        // 1. Horario de hoy en el sidebar
+                        const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+                        const hoyNombre = diasSemana[new Date().getDay()];
+                        const horarioHoy = horariosList.find(h => h.dia_semana === hoyNombre);
 
-                            if (horarioHoy) {
-                                document.getElementById('sidebar-horario-hoy-texto').textContent =
-                                    `${fmt24(horarioHoy.hora_apertura)} \u2013 ${fmt24(horarioHoy.hora_cierre)}`;
-                                const cont = document.getElementById('sidebar-horario-hoy-container');
-                                cont.classList.remove('d-none');
-                                cont.classList.add('d-flex');
-                            }
+                        if (horarioHoy) {
+                            document.getElementById('sidebar-horario-hoy-texto').textContent =
+                                `${fmt24(horarioHoy.hora_apertura)} \u2013 ${fmt24(horarioHoy.hora_cierre)}`;
+                            const cont = document.getElementById('sidebar-horario-hoy-container');
+                            cont.classList.remove('d-none');
+                            cont.classList.add('d-flex');
+                        }
 
-                            // 2. Todos los horarios como badges (Lun–Dom)
-                            const ordenDias = { Lunes:1, Martes:2, Miercoles:3, Jueves:4, Viernes:5, Sabado:6, Domingo:7 };
-                            horariosList.sort((a, b) => (ordenDias[a.dia_semana] || 99) - (ordenDias[b.dia_semana] || 99));
+                        // 2. Todos los horarios como badges (Lun–Dom)
+                        const ordenDias = { Lunes: 1, Martes: 2, Miercoles: 3, Jueves: 4, Viernes: 5, Sabado: 6, Domingo: 7 };
+                        horariosList.sort((a, b) => (ordenDias[a.dia_semana] || 99) - (ordenDias[b.dia_semana] || 99));
 
-                            const slotsContainer = document.getElementById('horarios-slots-container');
-                            slotsContainer.innerHTML = horariosList.map(h => `
+                        const slotsContainer = document.getElementById('horarios-slots-container');
+                        slotsContainer.innerHTML = horariosList.map(h => `
                                 <span class="badge rounded-pill px-3 py-2"
                                       style="background: var(--off-white); color: var(--black-primary); border: 1px solid var(--border-light); font-weight: 600; font-size: 0.8rem;">
-                                    ${h.dia_semana.substring(0,3)}: ${fmt24(h.hora_apertura)}–${fmt24(h.hora_cierre)}
+                                    ${h.dia_semana.substring(0, 3)}: ${fmt24(h.hora_apertura)}–${fmt24(h.hora_cierre)}
                                 </span>
                             `).join('');
-                        } else {
-                            // Sin horarios configurados: mostrar mensaje amigable en lugar de ocultar todo
-                            document.getElementById('horarios-slots-container').innerHTML = `
+                    } else {
+                        // Sin horarios configurados: mostrar mensaje amigable en lugar de ocultar todo
+                        document.getElementById('horarios-slots-container').innerHTML = `
                                 <span class="badge rounded-pill px-3 py-2" style="background: var(--off-white); color: var(--text-muted); border: 1px solid var(--border-light); font-size: 0.8rem;">
                                     Horarios por confirmar
                                 </span>
                             `;
-                        }
+                    }
                 } catch (e) {
                     console.error('Error loading horarios públicos', e);
                     document.getElementById('horarios-slots-container').innerHTML = '<small class="text-muted">Horarios no disponibles temporalmente.</small>';
                 }
 
-            } catch(e) {
+            } catch (e) {
                 console.error(e);
                 document.getElementById('loader-screen').innerHTML = `
                     <div class="text-center text-danger w-100 p-5 mt-5">
@@ -708,4 +881,5 @@
         }
     </script>
 </body>
+
 </html>
